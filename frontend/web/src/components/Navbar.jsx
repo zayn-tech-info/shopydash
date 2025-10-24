@@ -10,11 +10,9 @@ export function Navbar() {
 
   function toggleNavigation() {
     if (isMenuOpened) {
-      // Closing menu
       enablePageScroll();
       setIsMenuOpened(false);
     } else {
-      // Opening menu
       disablePageScroll();
       setIsMenuOpened(true);
     }

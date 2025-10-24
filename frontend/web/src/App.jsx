@@ -1,12 +1,16 @@
 import { Route, Routes } from "react-router-dom";
-import { Herosection } from "./components/hero-section";
+import { Home } from "./pages/Home";
 import { Navbar } from "./components/Navbar";
+import { Footer } from "./components/Footer";
+
+
 function App() {
   return (
     <>
-      <Navbar />
       <div>
-        <Herosection />
+        <Navbar />
+        <Home />
+        <Footer />
       </div>
     </>
   );
