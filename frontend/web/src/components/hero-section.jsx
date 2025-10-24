@@ -1,6 +1,4 @@
-"use client";
-import Logo from "../assets/vendora_logo.png";
-
+ 
 import {
   Store,
   Users,
@@ -18,32 +16,6 @@ import { Footer } from "./Footer";
 export function Herosection() {
   return (
     <div className="min-h-screen">
-      {/* Header */}
-      <header className="border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <img className="w-28 h-16" src={Logo} alt="" />
-            {/* <span className="text-2xl font-bold text-gray-900">Vendora</span> */}
-          </div>
-          <nav className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-gray-600">
-              Features
-            </a>
-            <a href="#how-it-works" className="text-gray-600">
-              How It Works
-            </a>
-            <a href="#waitlist" className="text-gray-600">
-              Join Waitlist
-            </a>
-          </nav>
-          <div className="flex items-center gap-4">
-            <button className="px-4 py-2 text-gray-900">Sign In</button>
-            <button className="px-6 py-2 bg-orange-500 text-white rounded-lg">
-              Get Started
-            </button>
-          </div>
-        </div>
-      </header>
 
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">

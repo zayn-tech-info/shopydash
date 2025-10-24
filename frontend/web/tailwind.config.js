@@ -32,11 +32,14 @@ export default {
           12: "#2E2A41",
           13: "#6C7275",
         },
-        fontFamily: {
-          sans: ["var(--font-sora)", ...fontFamily.sans],
-          code: "var(--font-code)",
-          grotesk: "var(--font-grotesk)",
-        },
+      },
+      letterSpacing: {
+        tagline: "0.15em",
+      },
+      fontFamily: {
+        sans: ["var(--font-sora)", ...fontFamily.sans],
+        code: "var(--font-code)",
+        grotesk: "var(--font-grotesk)",
       },
     },
   },
@@ -45,7 +48,7 @@ export default {
       addBase({});
       addComponents({
         ".container": {
-          "@apply max-w-[77.5rem] mx-auto px-5 md:px-10 lg:px-15 xl:max-w-[87.5rem]":
+          "@apply max-w-[77.5rem] mx-auto px-5 md:px-10 lg:px-[3.75rem] xl:max-w-[87.5rem]":
             {},
         },
         ".h1": {
@@ -79,8 +82,7 @@ export default {
           "@apply text-sm": {},
         },
         ".tagline": {
-          "@apply font-grotesk font-light text-xs tracking-tagline ":
-            {},
+          "@apply font-grotesk font-light text-xs tracking-tagline ": {},
         },
         ".quote": {
           "@apply font-code text-lg leading-normal": {},
