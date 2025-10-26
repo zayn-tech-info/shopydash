@@ -1,7 +1,5 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
-  "builds": [
-    { "src": "frontend/app/package.json", "use": "@vercel/static-build" },
-    { "src": "frontend/web/package.json", "use": "@vercel/static-build" }
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/" }
   ]
 }
