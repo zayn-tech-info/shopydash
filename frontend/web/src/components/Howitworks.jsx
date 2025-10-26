@@ -38,7 +38,7 @@ export function Howitworks() {
                       List Your Products
                     </h4>
                     <p className="text-gray-600">
-                      Add items you want to sell—textbooks, gadgets, food,
+                      Add items you want to sell textbooks, gadgets, food,
                       fashion, or services.
                     </p>
                   </div>

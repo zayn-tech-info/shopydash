@@ -18,7 +18,7 @@ export function Footer() {
                 The campus marketplace connecting students. Starting at LAUTECH.
               </p>
               <a
-                href="https://whatsapp.com/channel/your-channel-link"
+                href="https://chat.whatsapp.com/B8lvW4HByWuG45gZwdKtxZ?mode=wwt"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 mt-4 text-orange-500"

@@ -96,7 +96,7 @@ export function Features() {
               </h3>
               <p className="text-gray-600">
                 Start selling in minutes with your university email. No
-                complicated setup—just sign up and list your products.
+                complicated setup just sign up and list your products.
               </p>
             </div>
           </div>

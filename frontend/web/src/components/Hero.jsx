@@ -14,8 +14,8 @@ export function Hero() {
             <p className="body-1 text-n-4 text-sm max-w-3xl md:max-w-none mx-auto md:mx-0 text-pretty mb-8">
               Vendora connects student vendors and buyers in one social
               marketplace. Buy and sell textbooks, gadgets, food, fashion, and
-              more—all within your campus community. Already helping students at
-              LAUTECH and expanding to more universities.
+              more, all within your campus community. Already helping students
+              at LAUTECH and expanding to more universities.
             </p>
             <div className="flex flex-col sm:flex-row md:justify-start justify-center items-center gap-4">
               <Button className="px-8 py-4 bg-orange-500 text-white rounded-lg text-base md:text-lg font-medium">
@@ -27,7 +27,7 @@ export function Hero() {
             </div>
             <div className="mt-8">
               <a
-                href="https://whatsapp.com/channel/your-channel-link"
+                href="https://chat.whatsapp.com/B8lvW4HByWuG45gZwdKtxZ?mode=wwt"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-white border-2 border-primary-3 text-primary-3 rounded-lg font-medium"

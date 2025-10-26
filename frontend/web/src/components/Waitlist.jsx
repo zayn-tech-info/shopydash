@@ -24,7 +24,7 @@ export function Waitlist() {
             </h2>
             <p className="text-xl text-orange-50">
               Be among the first students to access the campus marketplace.
-              Already launching at LAUTECH—get early access and exclusive
+              Already launching at LAUTECH. Get early access and exclusive
               benefits at your university.
             </p>
           </div>
