@@ -1,15 +1,5 @@
 {
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
-  "projects": [
-    {
-      "name": "app",
-      "rootDirectory": "frontend/app"
-    },
-    {
-      "name": "web",
-      "rootDirectory": "frontend/web"
-    }
-  ],
   "builds": [
     { "src": "frontend/app/package.json", "use": "@vercel/static-build" },
     { "src": "frontend/web/package.json", "use": "@vercel/static-build" }
