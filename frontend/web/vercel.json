@@ -1,3 +1,13 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+  "projects": [
+    {
+      "name": "app",
+      "rootDirectory": "frontend/app"
+    },
+    {
+      "name": "web",
+      "rootDirectory": "frontend/web"
+    }
+  ]
 }
