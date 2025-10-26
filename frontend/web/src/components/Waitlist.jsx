@@ -1,4 +1,6 @@
+import { ExternalLink } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 export function Waitlist() {
   const [email, setEmail] = useState("");
@@ -55,7 +57,10 @@ export function Waitlist() {
             </div>
           ) : (
             <form
-              onSubmit={handleWaitlistSubmit}
+              onSubmit={(e) => {
+                e.preventDefault();
+                window.open("https://forms.gle/RD8YyGTCMjh6pkbw6", "_blank", "noopener,noreferrer");
+              }}
               className="bg-white rounded-lg p-8"
             >
               <div className="mb-6">
@@ -106,13 +111,15 @@ export function Waitlist() {
                 </div>
               </div>
 
-              <button
-                type="submit"
-                className="w-full px-8 py-4 bg-orange-500 text-white rounded-lg text-lg font-medium"
-              >
-                Join Waitlist
-              </button>
-
+              <div className="flex space-x-2 items-center text-white">
+                <button
+                  type="submit"
+                  className="w-full px-8 py-4 bg-orange-500 text-white rounded-lg text-lg font-medium flex items-center justify-center gap-2"
+                >
+                  Join Waitlist
+                  <ExternalLink size={20} />
+                </button>
+              </div>
               <p className="text-sm text-gray-500 text-center mt-4">
                 We respect your privacy. Unsubscribe at any time.
               </p>
