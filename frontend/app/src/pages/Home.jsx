@@ -1,36 +1,18 @@
 import { AsideBar } from "../components/AsideBar";
 import { BottonNav } from "../components/BottonNav";
-import { Header } from "../components/Header";
-import { useState } from "react";
-import { disablePageScroll, enablePageScroll } from "scroll-lock";
+import { Fragment, useState } from "react";
+import { HomeContent } from "../components/HomeContent";
+import { NearByVendors } from "../components/NearByVendors";
 
 export function Home() {
-  const [isMenuOpened, setIsMenuOpened] = useState(false);
-
-  function toggleNavigation() {
-    if (isMenuOpened) {
-      setIsMenuOpened(false);
-      enablePageScroll();
-    } else {
-      setIsMenuOpened(true);
-      disablePageScroll();
-    }
-  }
-
-  function handleClick() {
-    toggleNavigation();
-  }
-
   return (
-    <>
-      <Header handleClick={handleClick} />
+    <Fragment className="relative max-w-7xl mx-auto px-4 sm:px-6 md:px-10 lg:px-8">
       <BottonNav />
-      {/*<div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <HomeContent />
+      <NearByVendors />
+      {/*<div">
         <AsideBar isMenuOpened={isMenuOpened} handleClick={handleClick} />
       </div> */}
-
-
-
-    </>
+    </Fragment>
   );
 }

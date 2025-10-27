@@ -1,4 +1,4 @@
-import { Home, LayoutDashboardIcon, ShoppingCart, User } from "lucide-react";
+import { Beef, BookOpen, Headset, Home, LayoutDashboardIcon, Shirt, ShoppingCart, User } from "lucide-react";
 
 // Keep icon as a component, not a pre-created element, so we can pass className/size/color when rendering
 export const navigation = [
@@ -27,3 +27,26 @@ export const navigation = [
     icon: User,
   },
 ];
+
+export const  categories = [
+  {
+    id: 1,
+    text: "Gadgets",
+    icon: Headset
+  },
+  {
+    id: 2,
+    text: "Clothing",
+    icon: Shirt 
+  },
+  {
+    id: 3,
+    text: "Books",
+    icon: BookOpen
+  },
+  {
+    id: 4,
+    text: "Food",
+    icon: Beef
+  },
+]
