@@ -1,4 +1,5 @@
 import { AsideBar } from "../components/AsideBar";
+import { BottonNav } from "../components/BottonNav";
 import { Header } from "../components/Header";
 import { useState } from "react";
 import { disablePageScroll, enablePageScroll } from "scroll-lock";
@@ -23,9 +24,13 @@ export function Home() {
   return (
     <>
       <Header handleClick={handleClick} />
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <BottonNav />
+      {/*<div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <AsideBar isMenuOpened={isMenuOpened} handleClick={handleClick} />
-      </div>
+      </div> */}
+
+
+
     </>
   );
 }
