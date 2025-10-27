@@ -10,7 +10,7 @@ export function Header({ handleClick }) {
         <img src={Logo} alt="Vendora Logo" width={130} height={70} />
 
         <div className="flex items-center space-x-5">
-          <button className="px-5 py-2 rounded-xl font-medium hover:bg-primary-2 transition-colors duration-500 text-n-1 bg-primary-3">
+          <button className="px-5 py-2 rounded-xl font-medium hover:bg-primary-2 transition-colors duration-500 text-n-1 bg-primary-3 md:hidden">
             Login
           </button>
           <button

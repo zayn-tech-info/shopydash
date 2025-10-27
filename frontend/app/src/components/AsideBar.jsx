@@ -18,7 +18,9 @@ export function AsideBar({ isMenuOpened, handleClick }) {
         <div className="mt-3">
           {navigation.map((nav) => {
             const Icon = nav.icon;
-            const active = location.pathname === nav.href;
+            const active =
+              location.pathname === nav.href ||
+              (location.pathname === "/" && nav.href === "/home");
             return (
               <Link
                 key={nav.id}
@@ -33,13 +35,13 @@ export function AsideBar({ isMenuOpened, handleClick }) {
                 <div className="flex items-center gap-7">
                   {Icon ? (
                     <Icon
-                      className={`w-5 h-5 ${
+                      className={`w-8 h-8 ${
                         active ? "text-primary-3" : "text-white"
                       }`}
                       aria-hidden="true"
                     />
                   ) : null}
-                  <span className="font-medium">{nav.text}</span>
+                  <span className="font-medium text-3xl">{nav.text}</span>
                 </div>
               </Link>
             );
