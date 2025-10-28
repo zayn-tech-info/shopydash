@@ -3,6 +3,8 @@ import { BottonNav } from "../components/BottonNav";
 import { Fragment, useState } from "react";
 import { HomeContent } from "../components/HomeContent";
 import { NearByVendors } from "../components/NearByVendors";
+import { Trending } from "../components/Trending";
+import { FeaturedVendor } from "../components/FeaturedVendor";
 
 export function Home() {
   return (
@@ -10,6 +12,8 @@ export function Home() {
       <BottonNav />
       <HomeContent />
       <NearByVendors />
+      <Trending />
+      <FeaturedVendor />
       {/*<div">
         <AsideBar isMenuOpened={isMenuOpened} handleClick={handleClick} />
       </div> */}
