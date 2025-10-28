@@ -7,6 +7,10 @@ import {
   Shirt,
   ShoppingCart,
   User,
+  Palette,
+  Sparkles,
+  PenTool,
+  Gem,
 } from "lucide-react";
 
 import {
@@ -66,6 +70,26 @@ export const categories = [
     id: 4,
     text: "Food",
     icon: Beef,
+  },
+  {
+    id: 5,
+    text: "Cosmetics",
+    icon: Sparkles,
+  },
+  {
+    id: 6,
+    text: "Art & Design",
+    icon: Palette,
+  },
+  {
+    id: 7,
+    text: "Stationery",
+    icon: PenTool,
+  },
+  {
+    id: 8,
+    text: "Accessories",
+    icon: Gem,
   },
 ];
 

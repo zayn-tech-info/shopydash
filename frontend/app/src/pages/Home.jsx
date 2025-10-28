@@ -5,6 +5,7 @@ import { HomeContent } from "../components/HomeContent";
 import { NearByVendors } from "../components/NearByVendors";
 import { Trending } from "../components/Trending";
 import { FeaturedVendor } from "../components/FeaturedVendor";
+import { ShopByDepartemnt } from "../components/ShopByDepartemnt";
 
 export function Home() {
   return (
@@ -14,6 +15,7 @@ export function Home() {
       <NearByVendors />
       <Trending />
       <FeaturedVendor />
+      <ShopByDepartemnt />
       {/*<div">
         <AsideBar isMenuOpened={isMenuOpened} handleClick={handleClick} />
       </div> */}
