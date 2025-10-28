@@ -13,6 +13,7 @@ export function Home() {
   return (
     <Fragment>
       <div >
+        <HomeContent />
         <NewArrival />
         <Trending />
         <NearByVendors />
