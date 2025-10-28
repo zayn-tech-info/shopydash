@@ -3,6 +3,7 @@ import { Home } from "./pages/Home";
 import { Header } from "./components/Header";
 import { disablePageScroll, enablePageScroll } from "scroll-lock";
 import { useState } from "react";
+import { Footer } from "./components/Footer";
 
 const App = () => {
   const [isMenuOpened, setIsMenuOpened] = useState(false);
@@ -24,12 +25,13 @@ const App = () => {
   return (
     <div>
       <Header handleClick={handleClick} />
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative max-w-7xl mx-auto px-2 sm:px-6 md:px-10 lg:px-8 pb-20">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/home" element={<Home />} />
         </Routes>
       </div>
+      <Footer />
     </div>
   );
 };

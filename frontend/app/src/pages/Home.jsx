@@ -1,24 +1,26 @@
 import { AsideBar } from "../components/AsideBar";
 import { BottonNav } from "../components/BottonNav";
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 import { HomeContent } from "../components/HomeContent";
-import { NearByVendors } from "../components/NearByVendors";
+import { NewArrival } from "../components/NewArrival";
 import { Trending } from "../components/Trending";
+import { NearByVendors } from "../components/NearByVendors";
 import { FeaturedVendor } from "../components/FeaturedVendor";
 import { ShopByDepartemnt } from "../components/ShopByDepartemnt";
+import { Testimonial } from "../components/Testimonial";
 
 export function Home() {
   return (
-    <Fragment className="relative max-w-7xl mx-auto px-2 sm:px-6 md:px-10 lg:px-8">
+    <Fragment>
+      <div >
+        <NewArrival />
+        <Trending />
+        <NearByVendors />
+        <FeaturedVendor />
+        <ShopByDepartemnt />
+        <Testimonial />
+      </div>
       <BottonNav />
-      <HomeContent />
-      <NearByVendors />
-      <Trending />
-      <FeaturedVendor />
-      <ShopByDepartemnt />
-      {/*<div">
-        <AsideBar isMenuOpened={isMenuOpened} handleClick={handleClick} />
-      </div> */}
     </Fragment>
   );
 }

@@ -12,6 +12,12 @@ import { VendorsPost } from "../constants";
 export function NearByVendors({ posts }) {
   const data = Array.isArray(posts) && posts.length > 0 ? posts : VendorsPost;
 
+  const vendorSlug = (name = "") =>
+    name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+
   function initials(name = "") {
     return name
       .split(" ")
@@ -140,6 +146,12 @@ export function NearByVendors({ posts }) {
                         >
                           <ShoppingBag size={13} /> Buy
                         </button>
+                        <a
+                          href={`/vendor/${vendorSlug(post.vendorName)}`}
+                          className="inline-flex items-center gap-1 h-7 px-2 rounded-md bg-white/95 text-n-9 text-[11px] shadow hover:bg-white"
+                        >
+                          View profile
+                        </a>
                       </div>
                     </div>
                     {/* Mobile actions */}
@@ -158,6 +170,12 @@ export function NearByVendors({ posts }) {
                       >
                         <ShoppingBag size={12} /> Buy
                       </button>
+                      <a
+                        href={`/vendor/${vendorSlug(post.vendorName)}`}
+                        className="flex-1 text-center text-[12px] text-primary-3 hover:underline"
+                      >
+                        Profile
+                      </a>
                     </div>
                   </div>
                 ))}

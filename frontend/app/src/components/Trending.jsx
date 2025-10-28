@@ -6,7 +6,9 @@ import { VendorsPost } from "../constants";
 export function Trending({ items, limit = 8, title = "Trending Now" }) {
   // Build a default trending list from VendorsPost if no items passed
   const fallback = Array.isArray(VendorsPost)
-    ? VendorsPost.flatMap((v) => v.products || [])
+    ? VendorsPost.flatMap((v) =>
+        (v.products || []).map((p) => ({ ...p, vendorName: v.vendorName }))
+      )
         .filter(Boolean)
         .sort((a, b) => (b?.rating || 0) - (a?.rating || 0))
     : [];
@@ -24,6 +26,12 @@ export function Trending({ items, limit = 8, title = "Trending Now" }) {
   function handleBuyNow(product) {
     toast.success(`Buying ${product.name}…`, { id: `buy-${product.id}` });
   }
+
+  const vendorSlug = (name = "") =>
+    name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
 
   return (
     <section className="md:px-6 lg:px-8 mt-8 md:mt-10">
@@ -74,6 +82,18 @@ export function Trending({ items, limit = 8, title = "Trending Now" }) {
                 <p className="text-white text-[11px] truncate">{p.name}</p>
               </div>
 
+              {/* Hover overlay: View vendor profile (desktop) */}
+              {p.vendorName && (
+                <div className="absolute inset-0 hidden md:flex items-center justify-center bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <a
+                    href={`/vendor/${vendorSlug(p.vendorName)}`}
+                    className="inline-flex items-center justify-center rounded-md bg-white/95 px-3 py-2 text-sm font-medium text-gray-900 hover:bg-white"
+                  >
+                    View vendor profile
+                  </a>
+                </div>
+              )}
+
               {/* Desktop actions */}
               <div className="absolute inset-x-1.5 bottom-1.5 hidden group-hover:flex md:flex items-center justify-end gap-1.5">
                 <button
@@ -109,6 +129,14 @@ export function Trending({ items, limit = 8, title = "Trending Now" }) {
               >
                 <ShoppingBag size={12} /> Buy
               </button>
+              {p.vendorName && (
+                <a
+                  href={`/vendor/${vendorSlug(p.vendorName)}`}
+                  className="flex-1 text-center text-[12px] text-primary-3 hover:underline"
+                >
+                  Profile
+                </a>
+              )}
             </div>
           </div>
         ))}
