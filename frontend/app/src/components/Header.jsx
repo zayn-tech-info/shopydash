@@ -1,4 +1,4 @@
-import Logo from "../assets/vendora_logo.png";
+import Logo from "../assets/images/vendora_logo.png";
 import { Menu } from "lucide-react";
 import { navigation } from "../constants";
 import { NavLink } from "react-router-dom";

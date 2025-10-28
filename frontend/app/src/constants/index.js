@@ -1,6 +1,24 @@
-import { Beef, BookOpen, Headset, Home, LayoutDashboardIcon, Shirt, ShoppingCart, User } from "lucide-react";
+import {
+  Beef,
+  BookOpen,
+  Headset,
+  Home,
+  LayoutDashboardIcon,
+  Shirt,
+  ShoppingCart,
+  User,
+} from "lucide-react";
 
-// Keep icon as a component, not a pre-created element, so we can pass className/size/color when rendering
+import {
+  armorCardSlotIphoneCaseImg,
+  aongaHighStreetPrintRetroImg,
+  appleCollectionImg,
+  beanBagsBigWImg,
+  betterHomesGardensBazaarImg,
+  caseCompatibleSamsungGalaxyImg,
+  cottonHeadNeckArabScarfImg,
+} from "../utils";
+
 export const navigation = [
   {
     id: 1,
@@ -28,25 +46,129 @@ export const navigation = [
   },
 ];
 
-export const  categories = [
+export const categories = [
   {
     id: 1,
     text: "Gadgets",
-    icon: Headset
+    icon: Headset,
   },
   {
     id: 2,
     text: "Clothing",
-    icon: Shirt 
+    icon: Shirt,
   },
   {
     id: 3,
     text: "Books",
-    icon: BookOpen
+    icon: BookOpen,
   },
   {
     id: 4,
     text: "Food",
-    icon: Beef
+    icon: Beef,
   },
-]
+];
+
+export const VendorsPost = [
+  {
+    id: "post-1",
+    vendorName: "Amina's Crafts",
+    vendorAvatar: null,
+    location: "Adenike",
+    postedAt: "2h",
+    caption: "New handmade arrivals today—limited pieces!",
+    products: [
+      {
+        id: "p-1",
+        name: "Handmade Tote Bag",
+        image:
+          // "https://images.unsplash.com/photo-1547949003-9792a18a2601?q=80&w=800&auto=format&fit=crop",
+          aongaHighStreetPrintRetroImg,
+        price: 22.5,
+        rating: 4.7,
+      },
+      {
+        id: "p-1b",
+        name: "Beaded Bracelet",
+        image:
+          // "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=800&auto=format&fit=crop",
+          armorCardSlotIphoneCaseImg,
+        price: 7.5,
+        rating: 4.4,
+      },
+      {
+        id: "p-1c",
+        name: "Macrame Keychain",
+        image:
+          // "https://images.unsplash.com/photo-1601597111158-2fceff292cdc?q=80&w=800&auto=format&fit=crop",
+          appleCollectionImg,
+        price: 4.0,
+        rating: 4.2,
+      },
+      {
+        id: "p-1d",
+        name: "Woven Pouch",
+        image:
+          // "https://images.unsplash.com/photo-1610436070184-217dc72f66f6?q=80&w=800&auto=format&fit=crop",
+          beanBagsBigWImg,
+        price: 9.0,
+        rating: 4.5,
+      },
+    ],
+  },
+  {
+    id: "post-2",
+    vendorName: "Green Valley Farm",
+    vendorAvatar: null,
+    location: "Under G",
+    postedAt: "4h",
+    caption: "Fresh picks from this morning's harvest!",
+    products: [
+      {
+        id: "p-2",
+        name: "Strawberries",
+        image:
+          // "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?q=80&w=800&auto=format&fit=crop",
+          betterHomesGardensBazaarImg,
+        price: 5.0,
+        rating: 4.5,
+      },
+      {
+        id: "p-2b",
+        name: "Spinach",
+        image:
+          // "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=800&auto=format&fit=crop",
+          caseCompatibleSamsungGalaxyImg,
+        price: 3.2,
+        rating: 4.3,
+      },
+      {
+        id: "p-2c",
+        name: "Tomatoes",
+        image:
+          // "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?q=80&w=800&auto=format&fit=crop",
+          cottonHeadNeckArabScarfImg,
+        price: 4.1,
+        rating: 4.6,
+      },
+      {
+        id: "p-2b",
+        name: "Spinach",
+        image:
+          // "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=800&auto=format&fit=crop",
+          caseCompatibleSamsungGalaxyImg,
+        price: 3.2,
+        rating: 4.3,
+      },
+      {
+        id: "p-2c",
+        name: "Tomatoes",
+        image:
+          // "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?q=80&w=800&auto=format&fit=crop",
+          cottonHeadNeckArabScarfImg,
+        price: 4.1,
+        rating: 4.6,
+      },
+    ],
+  },
+];

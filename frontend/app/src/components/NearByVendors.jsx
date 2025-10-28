@@ -7,89 +7,10 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
-
-// Compact vendor posts: profile + up to four products
-const DEFAULT_POSTS = [
-  {
-    id: "post-1",
-    vendorName: "Amina's Crafts",
-    vendorAvatar: null,
-    distanceKm: 0.7,
-    postedAt: "2h",
-    caption: "New handmade arrivals today—limited pieces!",
-    products: [
-      {
-        id: "p-1",
-        name: "Handmade Tote Bag",
-        image:
-          "https://images.unsplash.com/photo-1547949003-9792a18a2601?q=80&w=800&auto=format&fit=crop",
-        price: 22.5,
-        rating: 4.7,
-      },
-      {
-        id: "p-1b",
-        name: "Beaded Bracelet",
-        image:
-          "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=800&auto=format&fit=crop",
-        price: 7.5,
-        rating: 4.4,
-      },
-      {
-        id: "p-1c",
-        name: "Macrame Keychain",
-        image:
-          "https://images.unsplash.com/photo-1601597111158-2fceff292cdc?q=80&w=800&auto=format&fit=crop",
-        price: 4.0,
-        rating: 4.2,
-      },
-      {
-        id: "p-1d",
-        name: "Woven Pouch",
-        image:
-          "https://images.unsplash.com/photo-1610436070184-217dc72f66f6?q=80&w=800&auto=format&fit=crop",
-        price: 9.0,
-        rating: 4.5,
-      },
-    ],
-  },
-  {
-    id: "post-2",
-    vendorName: "Green Valley Farm",
-    vendorAvatar: null,
-    distanceKm: 1.2,
-    postedAt: "4h",
-    caption: "Fresh picks from this morning's harvest!",
-    products: [
-      {
-        id: "p-2",
-        name: "Strawberries",
-        image:
-          "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?q=80&w=800&auto=format&fit=crop",
-        price: 5.0,
-        rating: 4.5,
-      },
-      {
-        id: "p-2b",
-        name: "Spinach",
-        image:
-          "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=800&auto=format&fit=crop",
-        price: 3.2,
-        rating: 4.3,
-      },
-      {
-        id: "p-2c",
-        name: "Tomatoes",
-        image:
-          "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?q=80&w=800&auto=format&fit=crop",
-        price: 4.1,
-        rating: 4.6,
-      },
-    ],
-  },
-];
+import { VendorsPost } from "../constants";
 
 export function NearByVendors({ posts }) {
-  const data = Array.isArray(posts) && posts.length > 0 ? posts : DEFAULT_POSTS;
+  const data = Array.isArray(posts) && posts.length > 0 ? posts : VendorsPost;
 
   function initials(name = "") {
     return name
@@ -111,11 +32,9 @@ export function NearByVendors({ posts }) {
   }
 
   return (
-    <section className="px-4 md:px-6 lg:px-8 mt-6 md:mt-8">
+    <section className="md:px-6 lg:px-8 mt-6 md:mt-8">
       <header className="flex items-center justify-between mb-3 md:mb-4">
-        <h2 className="text-lg md:text-xl font-semibold text-n-9">
-          Nearby vendors
-        </h2>
+        <h2 className="text-lg md:text-xl font-medium">Nearby vendors</h2>
         <button
           type="button"
           className="text-sm text-primary-3 hover:underline focus:outline-none"
@@ -125,7 +44,7 @@ export function NearByVendors({ posts }) {
         </button>
       </header>
 
-      <div className="space-y-3 md:space-y-4">
+      <div className="space-y-4 md:space-y-10">
         {data.map((post) => (
           <article
             key={post.id}
@@ -150,8 +69,8 @@ export function NearByVendors({ posts }) {
                     {post.vendorName}
                   </p>
                   <p className="text-[11px] text-n-6 flex items-center gap-2">
-                    <span className="inline-flex items-center gap-1">
-                      <MapPin size={12} /> {post.distanceKm} km
+                    <span className="inline-flex items-center gap-1 text-n-6">
+                      <MapPin size={12} /> {post.location}
                     </span>
                     <span>•</span>
                     <span>{post.postedAt}</span>
@@ -167,19 +86,18 @@ export function NearByVendors({ posts }) {
               </button>
             </div>
 
-            {/* Caption */}
             {post.caption && (
               <div className="px-3 md:px-4 pb-2 text-[13px] text-n-8">
                 {post.caption}
               </div>
             )}
 
-            {/* Product grid */}
+            {/* Product grid  section */}
             <div className="px-3 md:px-4 pb-2.5">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
                 {post.products.slice(0, 4).map((p) => (
-                  <div key={p.id} className="group relative">
-                    <div className="relative aspect-[4/5] rounded-md overflow-hidden bg-n-2">
+                  <div key={p.id} className="group relative border-n-5">
+                    <div className="relative aspect-[4/5] rounded-md overflow-hidden border border-stroke-1 bg-n-2">
                       <img
                         src={p.image}
                         alt={p.name}
@@ -187,11 +105,11 @@ export function NearByVendors({ posts }) {
                         className="w-full h-full object-cover"
                       />
                       {/* Price badge */}
-                      <div className="absolute top-1.5 left-1.5 bg-white/90 text-n-9 text-[11px] px-1.5 py-0.5 rounded shadow">
+                      <div className="absolute top-1.5 left-1.5 bg-white/90 text-n-9 text-[11px] px-3 py-2 md:text-base font-medium rounded shadow">
                         $ {Number(p.price).toFixed(2)}
                       </div>
                       {/* Rating */}
-                      <div className="absolute top-1.5 right-1.5 flex items-center gap-1 bg-black/55 text-white text-[10px] px-1.5 py-0.5 rounded">
+                      <div className="absolute top-1.5 right-1.5 flex items-center gap-1 bg-black/55 text-white text-[10px]  px-3 py-2 md:text-base text-sm rounded">
                         <Star
                           size={11}
                           className="fill-current text-amber-400"
@@ -251,7 +169,7 @@ export function NearByVendors({ posts }) {
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md border border-stroke-1 text-n-8 hover:bg-n-2/60 text-[13px]"
+                  className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md border border-n-1 bg-primary-3 text-n-1 text-[13px]"
                 >
                   <MessageCircle size={14} /> Message vendor
                 </button>

@@ -6,7 +6,7 @@ import { NearByVendors } from "../components/NearByVendors";
 
 export function Home() {
   return (
-    <Fragment className="relative max-w-7xl mx-auto px-4 sm:px-6 md:px-10 lg:px-8">
+    <Fragment className="relative max-w-7xl mx-auto px-2 sm:px-6 md:px-10 lg:px-8">
       <BottonNav />
       <HomeContent />
       <NearByVendors />
