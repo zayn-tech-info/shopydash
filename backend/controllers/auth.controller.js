@@ -1,4 +1,5 @@
 const User = require("../models/auth.model");
+const sendToken = require("../utils/sendToken");
 
 const signup = async (req, res, next) => {
   const {
@@ -62,10 +63,8 @@ const signup = async (req, res, next) => {
     }
 
     const user = await User.create(req.body);
-    return res.status(201).json({
-      success: true,
-      message: "User created successfully",
-    });
+    sendToken(user, "User created successfully", res, 201);
+
   } catch (err) {
     console.error(err);
     return res.status(500).json({
@@ -74,5 +73,6 @@ const signup = async (req, res, next) => {
     });
   }
 };
+
 
 module.exports = { signup };
