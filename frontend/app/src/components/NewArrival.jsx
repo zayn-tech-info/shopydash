@@ -32,7 +32,6 @@ const buildNewArrivals = (withinHours = 24) => {
     }
   }
 
-  // Sort by most recent (smallest hours first)
   return items.sort((a, b) => a.ageHrs - b.ageHrs);
 };
 

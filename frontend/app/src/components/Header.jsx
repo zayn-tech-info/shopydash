@@ -1,7 +1,7 @@
 import Logo from "../assets/images/vendora_logo.png";
 import { Menu } from "lucide-react";
 import { navigation } from "../constants";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 export function Header({ handleClick }) {
   return (
@@ -10,9 +10,11 @@ export function Header({ handleClick }) {
         <img src={Logo} alt="Vendora Logo" width={130} height={70} />
 
         <div className="flex items-center space-x-5">
-          <button className="px-5 py-2 rounded-md font-medium hover:bg-primary-2 transition-colors duration-500 text-n-1 bg-primary-3 md:hidden">
-            Login
-          </button>
+          <Link to="/login">
+            <button className="px-5 py-2 rounded-md font-medium hover:bg-primary-2 transition-colors duration-500 text-n-1 bg-primary-3 md:hidden">
+              Login
+            </button>
+          </Link>
           {/* <button
             type="button"
             className="md:hidden text-n-9 cursor-pointer"
@@ -48,10 +50,11 @@ export function Header({ handleClick }) {
               );
             })}
           </ul>
-
-          <button className="px-5 py-1 rounded-md font-medium hover:bg-primary-2 transition-colors duration-500 text-n-1 bg-primary-3">
-            Login
-          </button>
+          <Link to="/login">
+            <button className="px-5 py-1 rounded-md font-medium hover:bg-primary-2 transition-colors duration-500 text-n-1 bg-primary-3">
+              Login
+            </button>
+          </Link>
         </nav>
       </div>
     </header>

@@ -1,0 +1,45 @@
+# Root gitignore for Vendora monorepo (frontend + backend)
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Node
+node_modules/
+
+# Build output / caches
+dist
+build
+.out
+.cache
+.tmp
+.temp
+.eslintcache
+.parcel-cache
+
+# Coverage
+coverage
+.nyc_output
+*.lcov
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Tooling / platforms
+.vercel
+.turbo
+.pnpm-store/
+
+# Optional local files
+.idea/

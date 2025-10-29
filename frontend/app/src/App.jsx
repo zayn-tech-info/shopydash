@@ -4,6 +4,8 @@ import { Header } from "./components/Header";
 import { disablePageScroll, enablePageScroll } from "scroll-lock";
 import { useState } from "react";
 import { Footer } from "./components/Footer";
+import { Login } from "./pages/Login";
+import { Signup } from "./pages/Signup";
 
 const App = () => {
   const [isMenuOpened, setIsMenuOpened] = useState(false);
@@ -29,6 +31,8 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/home" element={<Home />} />
+          <Route path="login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
         </Routes>
       </div>
       <Footer />
