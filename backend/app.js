@@ -1,13 +1,11 @@
 const express = require("express");
+const connectDB = require("./config/db");
+const authRouter = require("./routes/auth.route");
 
+connectDB();
 const app = express();
 
- 
 app.use(express.json());
-
- 
-app.get("/", (req, res) => {
-  res.json({ ok: true, name: "Vendora API" });
-});
+app.use("/api/v1/auth", authRouter);
 
 module.exports = app;
