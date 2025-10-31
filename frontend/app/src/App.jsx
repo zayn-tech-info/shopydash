@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { Home } from "./pages/Home";
+import VendorDashboard from "./pages/VendorDashboard";
 import { Header } from "./components/Header";
 import { disablePageScroll, enablePageScroll } from "scroll-lock";
 import { useEffect, useState } from "react";
@@ -57,6 +58,7 @@ const App = () => {
             path="/signup"
             element={!authUser ? <Signup /> : <Navigate to="/" />}
           />
+          <Route path="/vendor/dashboard" element={<VendorDashboard />} />
         </Routes>
       </div>
       <Footer />
