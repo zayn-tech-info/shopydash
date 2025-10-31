@@ -1,69 +1,12 @@
-import React from "react";
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { api } from "../lib/axios";
 import { toast } from "react-hot-toast";
 import Logo from "../assets/images/vendora_logo.png";
-import { Copy, CopyCheckIcon, Edit, Link2 } from "lucide-react";
-
-const sampleVendor = {
-  userId: "12345",
-  businessName: "Basit Wears",
-  storeUsername: "basitwears",
-  storeDescription:
-    "We sell handcrafted, sustainable fashion for everyday comfort.",
-  businessCategory: "Fashion",
-  phone: "+92 300 0000000",
-  whatsappNumber: "+92 300 0000000",
-  email: "basit@example.com",
-  address: "Shop 12, Market Street",
-  city: "Lahore",
-  state: "Punjab",
-  country: "Pakistan",
-  mapLocation: { lat: 31.5204, lng: 74.3587 },
-  profileImage: null,
-  coverImage: null,
-  gallery: [],
-  active: true,
-};
+import { Edit, Link2 } from "lucide-react";
+import { useVendorProfileStore } from "../store/vendorProfileStore";
+import { useEffect } from "react";
 
 export default function VendorProfileClean() {
-  const { username } = useParams();
-  const [vendor, setVendor] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let mounted = true;
-    async function fetchVendor() {
-      setLoading(true);
-      try {
-        const res = await api.get(`/vendors/username/${username}`);
-        if (!mounted) return;
-        if (res?.data?.success && res.data.data?.vendorProfile) {
-          setVendor(res.data.data.vendorProfile);
-        } else if (res?.data?.success && res.data.data) {
-          setVendor(res.data.data);
-        } else {
-          setVendor({
-            ...sampleVendor,
-            storeUsername: username || sampleVendor.storeUsername,
-          });
-        }
-      } catch (err) {
-        setVendor({
-          ...sampleVendor,
-          storeUsername: username || sampleVendor.storeUsername,
-        });
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    }
-
-    fetchVendor();
-    return () => {
-      mounted = false;
-    };
-  }, [username]);
+  const { isGettingVendorProfile, vendorProfile, getVendorProfile } =
+    useVendorProfileStore();
 
   function copyProfileLink() {
     const link = window.location.href;
@@ -76,6 +19,11 @@ export default function VendorProfileClean() {
       fallbackCopy(link);
     }
   }
+
+  useEffect(() => {
+    getVendorProfile();
+    console.log(vendorProfile);
+  }, [vendorProfile, getVendorProfile]);
 
   function fallbackCopy(text) {
     try {
@@ -91,13 +39,13 @@ export default function VendorProfileClean() {
     }
   }
 
-  if (loading)
+  if (isGettingVendorProfile)
     return (
       <div className="py-20">
-        <div className="max-w-3xl mx-auto">Loading vendor profile…</div>
+        <div className="max-w-3xl mx-auto">loading Vendor profile</div>
       </div>
     );
-  if (!vendor)
+  if (!vendorProfile)
     return (
       <div className="py-20">
         <div className="max-w-3xl mx-auto">Vendor not found.</div>
@@ -109,16 +57,16 @@ export default function VendorProfileClean() {
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-md shadow-sm overflow-hidden mb-6 relative">
           <div className="w-full h-40 sm:h-48 bg-n-3">
-            {vendor.coverImage ? (
+            {vendorProfile.coverImage ? (
               <img
-                src={vendor.coverImage}
+                src={vendorProfile.coverImage}
                 alt="cover"
                 className="w-full h-full object-cover"
               />
             ) : (
               <div className="w-full h-full bg-gradient-to-r from-primary-3 to-primary-4 flex items-center justify-center">
                 <span className="text-white font-semibold md:text-3xl text-base md:mb-5 mb-2">
-                  {vendor.businessName}
+                  {vendorProfile.businessName}
                 </span>
               </div>
             )}
@@ -127,8 +75,8 @@ export default function VendorProfileClean() {
           <div className="absolute left-1/2 transform -translate-x-1/2 -bottom-12">
             <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-white shadow-xl bg-white">
               <img
-                src={vendor.profileImage || Logo}
-                alt={vendor.businessName}
+                src={vendorProfile.profileImage || Logo}
+                alt={vendorProfile.businessName}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -137,12 +85,12 @@ export default function VendorProfileClean() {
           <div className="absolute right-4 top-4 flex items-center gap-3">
             <span
               className={`px-3 py-1 rounded-full text-sm font-medium ${
-                vendor.active
+                vendorProfile.active
                   ? "bg-green-100 text-green-800"
                   : "bg-red-100 text-red-800"
               }`}
             >
-              {vendor.active ? "Active" : "Inactive"}
+              {vendorProfile.active ? "Active" : "Inactive"}
             </span>
             <button
               onClick={copyProfileLink}
@@ -157,7 +105,7 @@ export default function VendorProfileClean() {
           <h2 className="text-xl sm:text-xl font-extrabol">
             @
             <a className="text-blue-700 font-medium" href="">
-              {vendor.storeUsername || vendor.businessName}
+              {vendorProfile.storeUsername || vendorProfile.businessName}
             </a>
           </h2>
           <p className="text-sm text-n-6 mt-1">Member since Oct 2025</p>
@@ -190,7 +138,7 @@ export default function VendorProfileClean() {
         {/* Body */}
         <div className="px-4 sm:px-6 mt-6">
           <div className="text-n-7 mb-6 text-center sm:text-left">
-            {vendor.storeDescription}
+            {vendorProfile.storeDescription}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -200,15 +148,19 @@ export default function VendorProfileClean() {
                   <h4 className="font-medium md:text-lg border-n-7 border-2 backdrop-blur-sm inline-block px-2 rounded mb-2">
                     Category
                   </h4>
-                  <div className="mb-3">{vendor.businessCategory}</div>
+                  <div className="mb-3">{vendorProfile.businessCategory}</div>
 
                   <div className="border-t border-gray-100 pt-3">
-                    <h4 className="font-medium mb-2">Contact</h4>
+                    <h4 className="mb-2 md:text-lg text-base font-medium">
+                      Contact
+                    </h4>
                     <dl className="space-y-3 text-sm">
                       <div className="flex items-start">
                         <dt className="w-28 sm:w-32 font-medium">Phone</dt>
                         <dd className="flex-1 text-primary-4 font-medium">
-                          <a href={`tel:${vendor.phone}`}>{vendor.phone}</a>
+                          <a href={`tel:${vendorProfile.phoneNumber}`}>
+                            {vendorProfile.phoneNumber}
+                          </a>
                         </dd>
                       </div>
 
@@ -216,7 +168,7 @@ export default function VendorProfileClean() {
                         <dt className="w-28 sm:w-32 font-medium">WhatsApp</dt>
                         <dd className="flex-1 text-primary-4 font-medium">
                           <a
-                            href={`https://wa.me/${vendor.whatsappNumber?.replace(
+                            href={`https://wa.me/${vendorProfile.whatsAppNumber?.replace(
                               /\D/g,
                               ""
                             )}`}
@@ -228,12 +180,12 @@ export default function VendorProfileClean() {
                         </dd>
                       </div>
 
-                      {vendor.email ? (
+                      {vendorProfile.email ? (
                         <div className="flex items-start">
                           <dt className="w-28 sm:w-32 font-medium">Email</dt>
                           <dd className="flex-1 text-primary-4 font-medium">
-                            <a href={`mailto:${vendor.email}`}>
-                              {vendor.email}
+                            <a href={`mailto:${vendorProfile.email}`}>
+                              {vendorProfile.email}
                             </a>
                           </dd>
                         </div>
@@ -250,18 +202,18 @@ export default function VendorProfileClean() {
                   Location
                 </h4>
                 <div className="text-sm text-n-7 mt-1 space-y-1">
-                  <div>{vendor.address}</div>
+                  <div>{vendorProfile.address}</div>
                   <div>
-                    {vendor.city}, {vendor.state}
+                    {vendorProfile.city}, {vendorProfile.state}
                   </div>
-                  <div>{vendor.country}</div>
+                  <div>{vendorProfile.country}</div>
                 </div>
 
-                {vendor.mapLocation ? (
+                {vendorProfile.mapLocation ? (
                   <div className="mt-3">
                     <iframe
-                      title="vendor-map"
-                      src={`https://www.google.com/maps?q=${vendor.mapLocation.lat},${vendor.mapLocation.lng}&z=15&output=embed`}
+                      title="vendorProfile-map"
+                      src={`https://www.google.com/maps?q=${vendorProfile.mapLocation.lat},${vendorProfile.mapLocation.lng}&z=15&output=embed`}
                       className="w-full h-36 rounded-md border"
                     />
                   </div>
@@ -275,9 +227,9 @@ export default function VendorProfileClean() {
               <h3 className="font-medium md:text-lg border-n-7 border-2 backdrop-blur-sm inline-block px-2 rounded mb-2">
                 Gallery
               </h3>
-              {vendor.gallery && vendor.gallery.length > 0 ? (
+              {vendorProfile.gallery && vendorProfile.gallery.length > 0 ? (
                 <div className="grid grid-cols-3 gap-2 mt-3">
-                  {vendor.gallery.map((img, i) => (
+                  {vendorProfile.gallery.map((img, i) => (
                     <div
                       key={i}
                       className="w-full h-24 bg-n-3 rounded overflow-hidden"

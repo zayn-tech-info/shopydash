@@ -45,7 +45,7 @@ export const navigation = [
   {
     id: 4,
     text: "Profile",
-    href: `vendor/profile${}`,
+    href: "/me",
     icon: User,
   },
 ];

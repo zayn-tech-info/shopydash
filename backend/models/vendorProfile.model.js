@@ -16,12 +16,10 @@ const vendorProfileSchema = new mongoose.Schema(
     },
     businessName: {
       type: String,
-      required: [true, "Store username is required"],
       unique: true,
     },
     storeUsername: {
       type: String,
-      required: [true, "Business name is required"],
       unique: true,
     },
     storeDescription: {
@@ -29,23 +27,21 @@ const vendorProfileSchema = new mongoose.Schema(
     },
     businessCategory: {
       type: String,
-      required: [true, "Business type is required"],
     },
     phoneNumber: {
       type: String,
-      required: [true, "WhatsApp number is required"],
+
       unique: true,
       trim: true,
     },
     whatsAppNumber: {
       type: String,
-      required: [true, "Phone number is required"],
       unique: true,
       trim: true,
     },
     email: {
       type: String,
-      required: [true, "Email is required"],
+
       unique: true,
       trim: true,
       validate: {
