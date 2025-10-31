@@ -38,14 +38,14 @@ export const navigation = [
   },
   {
     id: 3,
-    text: "My Products",
-    href: "/dashboard",
+    text: "Dashboard",
+    href: "vendor/dashboard",
     icon: LayoutDashboardIcon,
   },
   {
     id: 4,
     text: "Profile",
-    href: "/profile",
+    href: `vendor/profile${}`,
     icon: User,
   },
 ];

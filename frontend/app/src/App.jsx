@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { Home } from "./pages/Home";
 import VendorDashboard from "./pages/VendorDashboard";
+import VendorProfile from "./pages/VendorProfileClean";
 import { Header } from "./components/Header";
 import { disablePageScroll, enablePageScroll } from "scroll-lock";
 import { useEffect, useState } from "react";
@@ -9,6 +10,7 @@ import { Login } from "./pages/Login";
 import { Signup } from "./pages/Signup";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/authStore";
+import VendorProfileClean from "./pages/VendorProfileClean";
 
 const App = () => {
   const [isMenuOpened, setIsMenuOpened] = useState(false);
@@ -59,6 +61,7 @@ const App = () => {
             element={!authUser ? <Signup /> : <Navigate to="/" />}
           />
           <Route path="/vendor/dashboard" element={<VendorDashboard />} />
+          <Route path="/vendor/profile/:usernameOrId" element={<VendorProfileClean />} />
         </Routes>
       </div>
       <Footer />

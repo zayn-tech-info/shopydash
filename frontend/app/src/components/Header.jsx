@@ -19,14 +19,6 @@ export function Header() {
               Login
             </button>
           </Link>
-          {/* <button
-            type="button"
-            className="md:hidden text-n-9 cursor-pointer"
-            aria-label="Open menu"
-            onClick={handleClick}
-          >
-            <Menu size={28} />
-          </button> */}
         </div>
 
         <nav className="hidden md:flex items-center space-x-5 text-base">
