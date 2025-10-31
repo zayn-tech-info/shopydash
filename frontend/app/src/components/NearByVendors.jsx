@@ -51,9 +51,9 @@ export function NearByVendors({ posts }) {
       </header>
 
       <div className="space-y-4 md:space-y-10">
-        {data.map((post) => (
+        {data.map((post, postIndex) => (
           <article
-            key={post.id}
+            key={`${post.id ?? `post-${postIndex}`}`}
             className="bg-n-1 border border-stroke-1 rounded-lg overflow-hidden"
           >
             {/* Header */}
@@ -101,8 +101,11 @@ export function NearByVendors({ posts }) {
             {/* Product grid  section */}
             <div className="px-3 md:px-4 pb-2.5">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-                {post.products.slice(0, 4).map((p) => (
-                  <div key={p.id} className="group relative border-n-5">
+                {post.products.slice(0, 4).map((p, pIndex) => (
+                  <div
+                    key={`${post.id ?? postIndex}-${p.id ?? `p-${pIndex}`}`}
+                    className="group relative border-n-5"
+                  >
                     <div className="relative aspect-[4/5] rounded-md overflow-hidden border border-stroke-1 bg-n-2">
                       <img
                         src={p.image}

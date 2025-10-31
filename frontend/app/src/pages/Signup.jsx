@@ -149,7 +149,7 @@ export function Signup() {
             <img
               src={logoUrl}
               alt="Vendora"
-              className="mx-auto h-12 w-auto object-contain"
+              className="mx-auto md:h-20 h-16 w-auto object-contain"
             />
             <h1 className="mt-4 text-xl font-semibold text-gray-900">
               Create your account
@@ -173,7 +173,7 @@ export function Signup() {
                 aria-pressed={isClient}
               >
                 <GraduationCap className="w-4 h-4" aria-hidden="true" />
-                Client Buyer
+                Student Buyer
               </button>
               <button
                 type="button"
@@ -241,7 +241,7 @@ export function Signup() {
 
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700">
-                  Client ID
+                  Student ID
                 </label>
                 <input
                   type="text"
@@ -252,39 +252,6 @@ export function Signup() {
                   autoComplete="email"
                   required
                 />
-              </div>
-
-              <div className="md:col-span-2">
-                <div className="flex items-center justify-between">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Password
-                  </label>
-                </div>
-                <div className="mt-1 relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setField("password", e.target.value)}
-                    placeholder="Create a strong password"
-                    className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 pr-10 text-sm outline-none focus:border-orange-300 focus:ring-2 focus:ring-orange-200"
-                    autoComplete="new-password"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={toggleShowPassword}
-                    className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-gray-700"
-                    aria-label={
-                      showPassword ? "Hide password" : "Show password"
-                    }
-                  >
-                    {showPassword ? (
-                      <EyeOff className="w-4 h-4" aria-hidden="true" />
-                    ) : (
-                      <Eye className="w-4 h-4" aria-hidden="true" />
-                    )}
-                  </button>
-                </div>
               </div>
 
               <div>
@@ -340,15 +307,47 @@ export function Signup() {
                   className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-orange-300 focus:ring-2 focus:ring-orange-200"
                 />
               </div>
+              <div className="md:col-span-2">
+                <div className="flex items-center justify-between">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Password
+                  </label>
+                </div>
+                <div className="mt-1 relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setField("password", e.target.value)}
+                    placeholder="Create a strong password"
+                    className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 pr-10 text-sm outline-none focus:border-orange-300 focus:ring-2 focus:ring-orange-200"
+                    autoComplete="new-password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={toggleShowPassword}
+                    className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-gray-700"
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" aria-hidden="true" />
+                    ) : (
+                      <Eye className="w-4 h-4" aria-hidden="true" />
+                    )}
+                  </button>
+                </div>
+              </div>
             </div>
 
             <button
               type="submit"
-              disabled={ isSigningUp}
+              disabled={isSigningUp}
               className={[
                 "mt-6 w-full rounded-lg bg-[#F97316] py-2.5 text-white text-sm font-semibold shadow-sm transition-colors",
                 "hover:bg-[#ea580c] focus:outline-none focus:ring-2 focus:ring-orange-300",
-                  isSigningUp
+                isSigningUp
                   ? "opacity-70 cursor-not-allowed"
                   : "cursor-pointer",
               ].join(" ")}
