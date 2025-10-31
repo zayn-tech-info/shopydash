@@ -1,15 +1,17 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { Home } from "./pages/Home";
 import { Header } from "./components/Header";
 import { disablePageScroll, enablePageScroll } from "scroll-lock";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Footer } from "./components/Footer";
 import { Login } from "./pages/Login";
 import { Signup } from "./pages/Signup";
 import { Toaster } from "react-hot-toast";
+import { useAuthStore } from "./store/authStore";
 
 const App = () => {
   const [isMenuOpened, setIsMenuOpened] = useState(false);
+  const { checkAuth, authUser } = useAuthStore();
 
   function toggleNavigation() {
     if (isMenuOpened) {
@@ -25,20 +27,36 @@ const App = () => {
     toggleNavigation();
   }
 
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
   return (
     <div>
       <Header handleClick={handleClick} />
       <div className="relative max-w-7xl mx-auto px-2 sm:px-6 md:px-10 lg:px-8 pb-20">
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+          <Route
+            path="/"
+            element={authUser ? <Home /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/home"
+            element={authUser ? <Home /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="login"
+            element={!authUser ? <Login /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/signup"
+            element={!authUser ? <Signup /> : <Navigate to="/" />}
+          />
         </Routes>
       </div>
       <Footer />
 
-      <Toaster/>
+      <Toaster />
     </div>
   );
 };

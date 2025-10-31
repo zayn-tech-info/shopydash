@@ -37,7 +37,7 @@ export function Signup() {
 
   const isClient = role === "client";
 
-  const isSubmitDisabled = useMemo(() => {
+/*   const isSubmitDisabled = useMemo(() => {
     if (isClient) {
       return (
         !username ||
@@ -67,7 +67,7 @@ export function Signup() {
     businessName,
     isClient,
   ]);
-
+ */
   const validateForm = () => {
     const trimmed = {
       fullName: fullName?.trim() ?? "",
@@ -118,7 +118,7 @@ export function Signup() {
       bio: bio || undefined,
       logo: logo || undefined,
     };
-
+ 
     const ok = validateForm();
     if (!ok) {
       return;
@@ -192,7 +192,7 @@ export function Signup() {
             </div>
           </div>
 
-          <form onSubmit={onSubmit} className="px-8 pt-6 pb-8">
+          <form onSubmit={onSubmit} noValidate className="px-8 pt-6 pb-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700">
@@ -254,7 +254,6 @@ export function Signup() {
                 />
               </div>
 
-              {/* Password */}
               <div className="md:col-span-2">
                 <div className="flex items-center justify-between">
                   <label className="block text-sm font-medium text-gray-700">
@@ -345,11 +344,11 @@ export function Signup() {
 
             <button
               type="submit"
-              disabled={isSubmitDisabled || isSigningUp}
+              disabled={ isSigningUp}
               className={[
                 "mt-6 w-full rounded-lg bg-[#F97316] py-2.5 text-white text-sm font-semibold shadow-sm transition-colors",
                 "hover:bg-[#ea580c] focus:outline-none focus:ring-2 focus:ring-orange-300",
-                isSubmitDisabled || isSigningUp
+                  isSigningUp
                   ? "opacity-70 cursor-not-allowed"
                   : "cursor-pointer",
               ].join(" ")}

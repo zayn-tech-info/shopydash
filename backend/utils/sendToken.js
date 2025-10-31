@@ -8,7 +8,8 @@ const sendToken = (user, message, res, statusCode) => {
     httpOnly: true,
     secure: isProduction,
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    sameSite: isProduction ? "lax" : "none",
+    // sameSite: isProduction ? "lax" : "none",
+    sameSite: "none"
   });
 
   res.status(statusCode).json({

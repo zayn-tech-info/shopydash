@@ -156,4 +156,15 @@ const logout = (req, res, next) => {
   }
 };
 
-module.exports = { signup, login, logout };
+const checkAuth = (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      message: "Authentication failed",
+    });
+  }
+
+  res.status(200).json(req.user);
+};
+
+module.exports = { signup, login, logout, checkAuth };

@@ -2,12 +2,16 @@ const User = require("../models/auth.model");
 const jwt = require("jsonwebtoken");
 const util = require("util");
 
-const protectRoute = async () => {
+const protectRoute = async (req, res, next) => {
   let token;
   const jwtToken = req.headers.authorization;
 
   if (jwtToken && jwtToken.startsWith("Bearer ")) {
     token = jwtToken.split(" ")[1];
+  }
+
+  if (!token && req.cookies && req.cookies.token) {
+    token = req.cookies.token;
   }
 
   if (!token) {
@@ -24,13 +28,13 @@ const protectRoute = async () => {
       process.env.JWT_SECRET_KEY
     );
   } catch (error) {
-    return res.status(500).json({
+    return res.status(401).json({
       success: false,
       message: error.message || "Invalid or malformed token",
     });
   }
-
-  const user = await User.find(decodeToken.id);
+ 
+  const user = await User.findById(decodeToken.id);
 
   if (!user) {
     return res.status(404).json({

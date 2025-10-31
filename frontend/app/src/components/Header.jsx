@@ -1,15 +1,20 @@
 import Logo from "../assets/images/vendora_logo.png";
 import { navigation } from "../constants";
 import { Link, NavLink } from "react-router-dom";
+import { useAuthStore } from "../store/authStore";
 
 export function Header() {
+  const { authUser } = useAuthStore();
+
   return (
     <header className="sticky top-0 z-50 bg-n-1/90 backdrop-blur shadow-md">
       <div className="container flex items-center justify-between">
-        <img src={Logo} alt="Vendora Logo" width={130} height={70} />
+        <Link to="/">
+          <img src={Logo} alt="Vendora Logo" width={130} height={70} />
+        </Link>
 
         <div className="flex items-center space-x-5">
-          <Link to="/login">
+          <Link className={`${authUser ? "hidden" : "block"}`} to="/login">
             <button className="px-5 py-2 rounded-md font-medium hover:bg-primary-2 transition-colors duration-500 text-n-1 bg-primary-3 md:hidden">
               Login
             </button>
@@ -49,7 +54,8 @@ export function Header() {
               );
             })}
           </ul>
-          <Link to="/login">
+
+          <Link className={`${authUser ? "hidden" : "block"}`} to="/login">
             <button className="px-5 py-1 rounded-md font-medium hover:bg-primary-2 transition-colors duration-500 text-n-1 bg-primary-3">
               Login
             </button>
