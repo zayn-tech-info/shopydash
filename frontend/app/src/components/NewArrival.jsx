@@ -58,9 +58,9 @@ export function NewArrival({ withinHours = 24, limit = 8 }) {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {arrivals.map((item) => (
+          {arrivals.map((item, idx) => (
             <article
-              key={item.id}
+              key={`${item.id}-${idx}`}
               className="group rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow"
             >
               <div className="relative aspect-square w-full bg-gray-50">
@@ -76,7 +76,6 @@ export function NewArrival({ withinHours = 24, limit = 8 }) {
                   />
                 ) : null}
 
-                {/* Hover overlay: View vendor profile (desktop) */}
                 {item.vendorName && (
                   <div className="absolute inset-0 hidden md:flex items-center justify-center bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity">
                     <a

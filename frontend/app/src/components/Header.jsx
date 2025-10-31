@@ -1,9 +1,8 @@
 import Logo from "../assets/images/vendora_logo.png";
-import { Menu } from "lucide-react";
 import { navigation } from "../constants";
 import { Link, NavLink } from "react-router-dom";
 
-export function Header({ handleClick }) {
+export function Header() {
   return (
     <header className="sticky top-0 z-50 bg-n-1/90 backdrop-blur shadow-md">
       <div className="container flex items-center justify-between">

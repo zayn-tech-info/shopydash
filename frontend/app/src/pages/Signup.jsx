@@ -1,62 +1,150 @@
 import logoUrl from "../assets/images/vendora_logo.png";
-import { useMemo } from "react";
-import { useSignupStore } from "../store/signup";
+import { useMemo, useState } from "react";
+import { useSignupStore } from "../store/signupStore";
 import { GraduationCap, Store, Eye, EyeOff } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 export function Signup() {
   const {
     role,
     showPassword,
-    student,
-    vendor,
+    fullName,
+    email,
+    password,
+    phoneNumber,
+    schoolName,
+    schoolEmail,
+    schoolId,
+    username,
+    businessName,
+    whatsAppNumber,
+    profilePic,
+    bio,
+    logo,
     setRole,
     toggleShowPassword,
-    setStudentField,
-    setVendorField,
-    resetStudent,
-    resetVendor,
+    setField,
+    resetField,
+
+    signup,
+    isSigningUp,
+    error,
   } = useSignupStore();
 
-  const isStudent = role === "student";
+  const navigate = useNavigate();
+
+  const isClient = role === "client";
 
   const isSubmitDisabled = useMemo(() => {
-    if (isStudent) {
+    if (isClient) {
       return (
-        !student.fullName ||
-        !student.emailOrId ||
-        !student.password ||
-        !student.phone ||
-        !student.schoolName
+        !username ||
+        !fullName ||
+        !email ||
+        !password ||
+        !phoneNumber ||
+        !schoolName
       );
     }
-    return (
-      !vendor.fullName ||
-      !vendor.email ||
-      !vendor.password ||
-      !vendor.whatsapp ||
-      !vendor.schoolName
-    );
-  }, [isStudent, student, vendor]);
 
-  const onSubmit = (e) => {
+    return (
+      !username ||
+      !fullName ||
+      !email ||
+      !password ||
+      !phoneNumber ||
+      !businessName
+    );
+  }, [
+    username,
+    fullName,
+    email,
+    password,
+    phoneNumber,
+    schoolName,
+    businessName,
+    isClient,
+  ]);
+
+  const validateForm = () => {
+    const trimmed = {
+      fullName: fullName?.trim() ?? "",
+      email: email?.trim() ?? "",
+      password: password?.trim() ?? "",
+      phoneNumber: phoneNumber?.trim() ?? "",
+      schoolName: schoolName?.trim() ?? "",
+      username: username?.trim() ?? "",
+      businessName: businessName?.trim() ?? "",
+      whatsAppNumber: whatsAppNumber?.trim() ?? "",
+      schoolEmail: schoolEmail?.trim() ?? "",
+      schoolId: schoolId?.trim() ?? "",
+    };
+
+    if (!trimmed.fullName) return toast.error("Full name is required"), false;
+    if (!trimmed.email) return toast.error("Email is required"), false;
+    if (!trimmed.password) return toast.error("Password is required"), false;
+    if (!trimmed.username) return toast.error("Username is required"), false;
+    if (!trimmed.whatsAppNumber)
+      return toast.error("WhatsApp number is required"), false;
+
+    if (isClient) {
+      if (!trimmed.schoolName)
+        return toast.error("School name is required"), false;
+    } else {
+      if (!trimmed.businessName)
+        return toast.error("Business name is required"), false;
+    }
+
+    return true;
+  };
+
+  const onSubmit = async (e) => {
     e.preventDefault();
-    // Placeholder: you can hook up your backend here
-    const payload = isStudent ? { role, ...student } : { role, ...vendor };
-    console.log("Signup submit", payload);
+    const payload = {
+      role,
+      username,
+      fullName,
+      email,
+      password,
+      phoneNumber,
+      whatsAppNumber,
+      schoolName,
+      businessName: businessName || undefined,
+      schoolId: schoolId ? Number(schoolId) : undefined,
+      schoolEmail: schoolEmail || undefined,
+      profilePic: profilePic || undefined,
+      bio: bio || undefined,
+      logo: logo || undefined,
+    };
+
+    const ok = validateForm();
+    if (!ok) {
+      return;
+    }
+
+    try {
+      const result = await signup(payload);
+      toast.success("Account created successfully!");
+      resetField();
+      navigate("/");
+    } catch (err) {
+      const msg =
+        typeof err === "string" ? err : err?.message ?? "Signup failed";
+      toast.error(msg);
+    }
   };
 
   const switchTo = (nextRole) => {
     setRole(nextRole);
-    if (nextRole === "student") resetStudent();
-    else resetVendor();
+    resetField();
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-xl">
         <div className="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl border border-orange-100 overflow-hidden">
-          {/* Header / Logo */}
           <div className="px-8 pt-8 text-center">
             <img
               src={logoUrl}
@@ -71,33 +159,32 @@ export function Signup() {
             </p>
           </div>
 
-          {/* Role Toggle */}
           <div className="mt-8 px-2">
             <div className="mx-6 grid grid-cols-2 rounded-full bg-orange-50 p-1">
               <button
                 type="button"
-                onClick={() => switchTo("student")}
+                onClick={() => switchTo("client")}
                 className={[
                   "flex items-center justify-center gap-2 rounded-full py-2.5 text-sm font-medium transition-colors",
-                  isStudent
+                  isClient
                     ? "bg-white text-orange-600 shadow-sm"
                     : "text-gray-600 hover:text-orange-700",
                 ].join(" ")}
-                aria-pressed={isStudent}
+                aria-pressed={isClient}
               >
                 <GraduationCap className="w-4 h-4" aria-hidden="true" />
-                Student Buyer
+                Client Buyer
               </button>
               <button
                 type="button"
                 onClick={() => switchTo("vendor")}
                 className={[
                   "flex items-center justify-center gap-2 rounded-full py-2.5 text-sm font-medium transition-colors",
-                  !isStudent
+                  !isClient
                     ? "bg-white text-orange-600 shadow-sm"
                     : "text-gray-600 hover:text-orange-700",
                 ].join(" ")}
-                aria-pressed={!isStudent}
+                aria-pressed={!isClient}
               >
                 <Store className="w-4 h-4" aria-hidden="true" />
                 Vendor
@@ -105,50 +192,62 @@ export function Signup() {
             </div>
           </div>
 
-          {/* Form */}
           <form onSubmit={onSubmit} className="px-8 pt-6 pb-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Full Name / Business Name */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700">
-                  {isStudent ? "Full Name" : "Full Name / Business Name"}
+                  Full name
                 </label>
                 <input
                   type="text"
-                  value={isStudent ? student.fullName : vendor.fullName}
-                  onChange={(e) =>
-                    isStudent
-                      ? setStudentField("fullName", e.target.value)
-                      : setVendorField("fullName", e.target.value)
-                  }
-                  placeholder={
-                    isStudent
-                      ? "e.g. John Doe"
-                      : "e.g. Jane Doe or Vendora Shop"
-                  }
+                  value={fullName}
+                  onChange={(e) => setField("fullName", e.target.value)}
+                  placeholder={isClient ? "e.g. John Doe" : "e.g. Vendora Shop"}
                   className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-orange-300 focus:ring-2 focus:ring-orange-200"
                   required
                 />
               </div>
 
-              {/* Email / Student ID OR Email */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700">
-                  {isStudent ? "Email / Student ID" : "Email"}
+                  Username
                 </label>
                 <input
-                  type={isStudent ? "text" : "email"}
-                  value={isStudent ? student.emailOrId : vendor.email}
-                  onChange={(e) =>
-                    isStudent
-                      ? setStudentField("emailOrId", e.target.value)
-                      : setVendorField("email", e.target.value)
-                  }
+                  type="text"
+                  value={username}
+                  onChange={(e) => setField("username", e.target.value)}
+                  placeholder="e.g. johndoe123"
+                  className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-orange-300 focus:ring-2 focus:ring-orange-200"
+                  required
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Email
+                </label>
+                <input
+                  type="text"
+                  value={email}
+                  onChange={(e) => setField("email", e.target.value)}
                   placeholder={
-                    isStudent
-                      ? "e.g. john@uni.edu or 20231234"
-                      : "e.g. vendor@shop.com"
+                    isClient ? "e.g. john@uni.edu" : "e.g. vendor@shop.com"
                   }
+                  className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-orange-300 focus:ring-2 focus:ring-orange-200"
+                  autoComplete="email"
+                  required
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Client ID
+                </label>
+                <input
+                  type="text"
+                  value={schoolId}
+                  onChange={(e) => setField("schoolId", e.target.value)}
+                  placeholder={isClient ? "e.g. 20221234" : "e.g.  20221334"}
                   className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-orange-300 focus:ring-2 focus:ring-orange-200"
                   autoComplete="email"
                   required
@@ -165,12 +264,8 @@ export function Signup() {
                 <div className="mt-1 relative">
                   <input
                     type={showPassword ? "text" : "password"}
-                    value={isStudent ? student.password : vendor.password}
-                    onChange={(e) =>
-                      isStudent
-                        ? setStudentField("password", e.target.value)
-                        : setVendorField("password", e.target.value)
-                    }
+                    value={password}
+                    onChange={(e) => setField("password", e.target.value)}
                     placeholder="Create a strong password"
                     className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 pr-10 text-sm outline-none focus:border-orange-300 focus:ring-2 focus:ring-orange-200"
                     autoComplete="new-password"
@@ -193,65 +288,88 @@ export function Signup() {
                 </div>
               </div>
 
-              {/* WhatsApp / Phone */}
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  {isStudent ? "Phone Number (WhatsApp)" : "WhatsApp Number"}
+                  Phone Number
                 </label>
                 <input
                   type="tel"
-                  value={isStudent ? student.phone : vendor.whatsapp}
-                  onChange={(e) =>
-                    isStudent
-                      ? setStudentField("phone", e.target.value)
-                      : setVendorField("whatsapp", e.target.value)
-                  }
+                  value={phoneNumber}
+                  onChange={(e) => setField("phoneNumber", e.target.value)}
                   placeholder="e.g. +234 801 234 5678"
                   className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-orange-300 focus:ring-2 focus:ring-orange-200"
                   required
                 />
               </div>
 
-              {/* School Name */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  WhatsApp Number
+                </label>
+                <input
+                  type="tel"
+                  value={whatsAppNumber}
+                  onChange={(e) => setField("whatsAppNumber", e.target.value)}
+                  placeholder="e.g. +234 801 234 5678"
+                  className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-orange-300 focus:ring-2 focus:ring-orange-200"
+                />
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   School Name
                 </label>
                 <input
                   type="text"
-                  value={isStudent ? student.schoolName : vendor.schoolName}
-                  onChange={(e) =>
-                    isStudent
-                      ? setStudentField("schoolName", e.target.value)
-                      : setVendorField("schoolName", e.target.value)
-                  }
+                  value={schoolName}
+                  onChange={(e) => setField("schoolName", e.target.value)}
                   placeholder="e.g. University of Lagos"
                   className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-orange-300 focus:ring-2 focus:ring-orange-200"
                   required
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Business Name
+                </label>
+                <input
+                  type="text"
+                  value={businessName}
+                  onChange={(e) => setField("businessName", e.target.value)}
+                  placeholder="e.g. Vendora Shop"
+                  className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-orange-300 focus:ring-2 focus:ring-orange-200"
                 />
               </div>
             </div>
 
             <button
               type="submit"
-              disabled={isSubmitDisabled}
+              disabled={isSubmitDisabled || isSigningUp}
               className={[
                 "mt-6 w-full rounded-lg bg-[#F97316] py-2.5 text-white text-sm font-semibold shadow-sm transition-colors",
                 "hover:bg-[#ea580c] focus:outline-none focus:ring-2 focus:ring-orange-300",
-                isSubmitDisabled
+                isSubmitDisabled || isSigningUp
                   ? "opacity-70 cursor-not-allowed"
                   : "cursor-pointer",
               ].join(" ")}
             >
-              Create your Vendora account
+              {isSigningUp
+                ? "Creating your account..."
+                : "Create your Vendora account"}
             </button>
+
+            {error && (
+              <p className="mt-3 text-center text-sm text-red-600">{error}</p>
+            )}
 
             <p className="mt-4 text-center text-sm text-gray-600">
               Already have an account?{" "}
-              <Link to="/login">
-                <a className="font-medium text-orange-600 hover:text-orange-700">
-                  Log in
-                </a>
+              <Link
+                to="/login"
+                className="font-medium text-orange-600 hover:text-orange-700"
+              >
+                Log in
               </Link>
             </p>
           </form>

@@ -40,7 +40,7 @@ export function Testimonial() {
       <div className="max-w-7xl mx-auto">
         <div className="flex items-end justify-between gap-4 mb-4">
           <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
-            Student Testimonials
+            Client Testimonials
           </h2>
           <span className="text-sm text-gray-500">
             Real stories from campus sellers

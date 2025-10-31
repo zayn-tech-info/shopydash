@@ -43,8 +43,7 @@ export function HomeContent({
           </div>
         </div>
       </form>
-
-      {/* Categoires of items students could buy in my app lol */}
+ 
       <div>
         <div className="flex gap-4 md:gap-10 lg:gap-16 overflow-x-auto no-scrollbar px-4 py-3 justify-center">
           {categories.map((item) => {

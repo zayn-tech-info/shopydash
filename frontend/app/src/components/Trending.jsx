@@ -47,7 +47,10 @@ export function Trending({ items, limit = 8, title = "Trending Now" }) {
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         {data.map((p, idx) => (
-          <div key={p.id ?? `${p.name}-${idx}`} className="group relative">
+          <div
+            key={`${p.id ?? p.name}-${p.vendorName ?? ""}-${idx}`}
+            className="group relative"
+          >
             <div className="relative aspect-[4/5] rounded-md overflow-hidden bg-n-2 border border-stroke-1">
               <img
                 src={p.image}

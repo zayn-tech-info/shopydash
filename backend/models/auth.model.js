@@ -14,7 +14,7 @@ const userSchema = mongoose.Schema(
     },
     username: {
       type: String,
-      required: [true, "Username is required"],
+      // required: [true, "Username is required"],
       unique: [true, "Username alread exist"],
       trim: true,
       minlength: [4, "Username must be at least 4 characters long"],
@@ -22,7 +22,7 @@ const userSchema = mongoose.Schema(
     },
     email: {
       type: String,
-      required: [true, "Email is required"],
+      // required: [true, "Email is required"],
       unique: [true, "Email alread exist"],
       trim: true,
       validate: {
@@ -38,16 +38,18 @@ const userSchema = mongoose.Schema(
       unique: [true, "Phone number alread exist"],
       trim: true,
     },
-    school: {
+    schoolName: {
       type: String,
       required: [true, "Please enter your institution name"],
       trim: true,
     },
     schoolId: {
+      unique: [true, "Shool ID alread exist"],
       type: Number,
       trim: true,
     },
     schoolEmail: {
+      unique: [true, "Shool email alread exist"],
       type: String,
       trim: true,
     },
@@ -76,6 +78,12 @@ const userSchema = mongoose.Schema(
         true,
         "This Business name already exist, You no go like change am?",
       ],
+      trim: true,
+    },
+    whatsAppNumber: {
+      type: String,
+      required: [true, "WhatsApp Number is required"],
+      unique: [true, "WhatsApp Number alread exist"],
       trim: true,
     },
     logo: {

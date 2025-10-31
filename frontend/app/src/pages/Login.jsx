@@ -1,30 +1,69 @@
 import { useMemo } from "react";
-import { useAuthStore } from "../store/auth";
+import { useAuthStore } from "../store/authStore";
 import { ShoppingBag, GraduationCap, Eye, EyeOff } from "lucide-react";
 import logoUrl from "../assets/images/vendora_logo.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 export function Login() {
+  const navigate = useNavigate();
   const {
     role,
-    emailOrId,
+    email,
+    schoolId,
+    username,
     password,
     showPassword,
     setRole,
-    setEmailOrId,
+    setEmail,
     setPassword,
     toggleShowPassword,
-    reset,
+    resetloginField,
+    login,
   } = useAuthStore();
 
   const isSubmitDisabled = useMemo(
-    () => !emailOrId || !password,
-    [emailOrId, password]
+    () => !email || !password,
+    [email, password]
   );
 
-  const onSubmit = (e) => {
+  const validateForm = () => {
+    const trimmed = {
+      email: email?.trim() ?? "",
+      password: password?.trim() ?? "",
+      schoolId: schoolId?.trim() ?? "",
+      username: username?.trim() ?? "",
+    };
+ 
+    if (!trimmed.password) return toast.error("Password is required"), false;
+
+    return true;
+  };
+
+  const onSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login submit", { role, emailOrId, password });
+    const payload = {
+      email,
+      password,
+      username,
+      schoolId,
+    };
+
+    const ok = validateForm();
+    if (!ok) {
+      return;
+    }
+
+    try {
+      const result = await login(payload);
+      toast.success("User Logged in successfully!");
+      resetloginField();
+      navigate("/");
+    } catch (err) {
+      const msg =
+        typeof err === "string" ? err : err?.message ?? "Signup failed";
+      toast.error(msg);
+    }
   };
 
   return (
@@ -50,7 +89,7 @@ export function Login() {
                 type="button"
                 onClick={() => {
                   setRole("vendor");
-                  reset();
+                  resetloginField();
                 }}
                 className={[
                   "flex items-center justify-center gap-2 rounded-full py-2.5 text-sm font-medium transition-colors",
@@ -66,19 +105,19 @@ export function Login() {
               <button
                 type="button"
                 onClick={() => {
-                  setRole("student");
-                  reset();
+                  setRole("client");
+                  resetloginField();
                 }}
                 className={[
                   "flex items-center justify-center gap-2 rounded-full py-2.5 text-sm font-medium transition-colors",
-                  role === "student"
+                  role === "client"
                     ? "bg-white text-orange-600 shadow-sm"
                     : "text-gray-600 hover:text-orange-700",
                 ].join(" ")}
-                aria-pressed={role === "student"}
+                aria-pressed={role === "client"}
               >
                 <GraduationCap className="w-4 h-4" aria-hidden="true" />
-                Student Login
+                Client Login
               </button>
             </div>
           </div>
@@ -88,18 +127,18 @@ export function Login() {
             <div className="space-y-4">
               <div>
                 <label
-                  htmlFor="emailOrId"
+                  htmlFor="email"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Email / Student ID
+                  Emailm / Clienta ID
                 </label>
                 <input
-                  id="emailOrId"
+                  id="email"
                   type="text"
-                  value={emailOrId}
-                  onChange={(e) => setEmailOrId(e.target.value)}
+                  value={email || username || schoolId}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder={
-                    role === "student"
+                    role === "client"
                       ? "e.g. john.doe@uni.edu or 20231234"
                       : "e.g. vendor@shop.com"
                   }
@@ -170,15 +209,15 @@ export function Login() {
             {/* Create Account */}
             <p className="mt-4 text-center text-sm text-gray-600">
               New here?{" "}
-              <Link to="/signup">
-                <a className="font-medium text-orange-600 hover:text-orange-700">
-                  Create an account
-                </a>
+              <Link
+                to="/signup"
+                className="font-medium text-orange-600 hover:text-orange-700"
+              >
+                Create an account
               </Link>
             </p>
           </form>
 
-          {/* Footer */}
           <div className="px-8 pb-6">
             <p className="text-center text-xs text-gray-500">
               By logging in, you agree to our{" "}

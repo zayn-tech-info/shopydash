@@ -2,14 +2,15 @@ const User = require("../models/auth.model");
 const sendToken = require("../utils/sendToken");
 const jwt = require("jsonwebtoken");
 const util = require("util");
+const validator = require("validator");
 
 const signup = async (req, res, next) => {
   const {
-    fullname,
+    fullName,
     username,
     email,
     phoneNumber,
-    school,
+    schoolName,
     password,
     businessName,
     role,
@@ -18,11 +19,11 @@ const signup = async (req, res, next) => {
   try {
     if (role === "client") {
       if (
-        !fullname ||
+        !fullName ||
         !username ||
         !email ||
         !phoneNumber ||
-        !school ||
+        !schoolName ||
         !password
       ) {
         return res.status(400).json({
@@ -32,11 +33,11 @@ const signup = async (req, res, next) => {
       }
     } else if (role === "vendor") {
       if (
-        !fullname ||
+        !fullName ||
         !username ||
         !email ||
         !phoneNumber ||
-        !school ||
+        !schoolName ||
         !password ||
         !businessName
       ) {
@@ -77,20 +78,39 @@ const signup = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   try {
-    const { password, email } = req.body;
+    const { password } = req.body;
+    const identifier =
+      req.body.email ||
+      req.body.emailOrId ||
+      req.body.identifier ||
+      req.body.username ||
+      req.body.schoolId;
 
-    if (!email || !password) {
+    if (!identifier || !password) {
       return res.status(400).json({
         success: false,
-        message: "Email and password are required",
+        message:
+          "Identifier (email/username/schoolId) and password are required",
       });
     }
 
-    const user = await User.findOne({ email });
+    const trimmed = String(identifier).trim();
+    const maybeNumber = Number(trimmed);
+    let query = null;
+
+    if (trimmed !== "" && !Number.isNaN(maybeNumber) && /^\d+$/.test(trimmed)) {
+      query = { schoolId: maybeNumber };
+    } else if (validator.isEmail(trimmed)) {
+      query = { email: trimmed };
+    } else {
+      query = { username: trimmed };
+    }
+
+    const user = await User.findOne(query);
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: "Invalid email or password",
+        message: "Invalid email/school id/username or password",
       });
     }
 
@@ -98,7 +118,7 @@ const login = async (req, res, next) => {
     if (!isPasswordMatch) {
       return res.status(401).json({
         success: false,
-        message: "Invalid email or password",
+        message: "Invalid email/school id/username or password",
       });
     }
 
@@ -135,7 +155,5 @@ const logout = (req, res, next) => {
     });
   }
 };
-
-
 
 module.exports = { signup, login, logout };

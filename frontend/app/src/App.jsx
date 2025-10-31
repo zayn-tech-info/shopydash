@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Footer } from "./components/Footer";
 import { Login } from "./pages/Login";
 import { Signup } from "./pages/Signup";
+import { Toaster } from "react-hot-toast";
 
 const App = () => {
   const [isMenuOpened, setIsMenuOpened] = useState(false);
@@ -36,6 +37,8 @@ const App = () => {
         </Routes>
       </div>
       <Footer />
+
+      <Toaster/>
     </div>
   );
 };
