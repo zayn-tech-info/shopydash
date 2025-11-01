@@ -11,6 +11,7 @@ import { Signup } from "./pages/Signup";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/authStore";
 import VendorProfileClean from "./pages/VendorProfileClean";
+import { BottomNav } from "./components/BottomNav";
 
 const App = () => {
   const [isMenuOpened, setIsMenuOpened] = useState(false);
@@ -65,7 +66,7 @@ const App = () => {
         </Routes>
       </div>
       <Footer />
-
+      <BottomNav />
       <Toaster />
     </div>
   );

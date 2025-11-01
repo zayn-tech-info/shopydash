@@ -1,5 +1,5 @@
 import { AsideBar } from "../components/AsideBar";
-import { BottonNav } from "../components/BottonNav";
+import { BottomNav } from "../components/BottomNav";
 import { Fragment } from "react";
 import { HomeContent } from "../components/HomeContent";
 import { NewArrival } from "../components/NewArrival";
@@ -12,7 +12,7 @@ import { Testimonial } from "../components/Testimonial";
 export function Home() {
   return (
     <Fragment>
-      <div >
+      <div>
         <HomeContent />
         <NewArrival />
         <Trending />
@@ -21,7 +21,7 @@ export function Home() {
         <ShopByDepartemnt />
         <Testimonial />
       </div>
-      <BottonNav />
+      <BottomNav />
     </Fragment>
   );
 }

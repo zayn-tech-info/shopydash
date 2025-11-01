@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import { navigation } from "../constants";
 import { NavLink, useLocation } from "react-router-dom";
 
-export function BottonNav() {
+export function BottomNav() {
   const location = useLocation();
   const current = useMemo(() => {
     return location.pathname === "/" ? "/" : location.pathname;

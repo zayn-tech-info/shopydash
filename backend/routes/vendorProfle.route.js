@@ -14,11 +14,13 @@ route.post(
   verifyRole("vendor"),
   createVendorProfile
 );
-
 route.get("/username/:id", getVendorProfile);
-
-route.get("/me", protectRoute, getVendorProfile);
-
-route.put("/", protectRoute, verifyRole("vendor"), updateVendorProfile);
+route.get("/me", protectRoute, verifyRole("vendor"), getVendorProfile);
+route.patch(
+  "/updateVendorProfile",
+  protectRoute,
+  verifyRole("vendor"),
+  updateVendorProfile
+);
 
 module.exports = route;
