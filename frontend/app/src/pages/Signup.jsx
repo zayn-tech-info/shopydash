@@ -1,12 +1,15 @@
 import logoUrl from "../assets/images/vendora_logo.png";
 import { useMemo, useState } from "react";
 import { useSignupStore } from "../store/signupStore";
+import { useVendorProfileStore } from "../store/vendorProfileStore";
+import { useAuthStore } from "../store/authStore";
 import { GraduationCap, Store, Eye, EyeOff } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 
 export function Signup() {
+  const { createVendorProfile } = useVendorProfileStore();
   const {
     role,
     showPassword,
@@ -34,10 +37,11 @@ export function Signup() {
   } = useSignupStore();
 
   const navigate = useNavigate();
+  const { checkAuth } = useAuthStore();
 
   const isClient = role === "client";
 
-/*   const isSubmitDisabled = useMemo(() => {
+  /*   const isSubmitDisabled = useMemo(() => {
     if (isClient) {
       return (
         !username ||
@@ -118,7 +122,7 @@ export function Signup() {
       bio: bio || undefined,
       logo: logo || undefined,
     };
- 
+
     const ok = validateForm();
     if (!ok) {
       return;
@@ -126,6 +130,14 @@ export function Signup() {
 
     try {
       const result = await signup(payload);
+      // ensure client auth state is refreshed from server (cookie/token)
+      try {
+        await checkAuth();
+      } catch (e) {
+        // ignore - we'll still attempt to create profile
+      }
+
+      await createVendorProfile();
       toast.success("Account created successfully!");
       resetField();
       navigate("/");
