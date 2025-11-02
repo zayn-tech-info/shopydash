@@ -13,8 +13,8 @@ const mode = process.env.NODE_ENV || "development";
 
 const frontendOrigin =
   mode === "development"
-    ? "https://vendora-app-rho.vercel.app"
-    : "http://localhost:5173";
+    ? "http://localhost:5173"
+    : "https://vendora-app-rho.vercel.app";
 
 app.use(
   cors({
