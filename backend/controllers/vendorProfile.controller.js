@@ -34,11 +34,13 @@ const createVendorProfile = async (req, res) => {
 
 const getVendorProfile = async (req, res) => {
   try {
-    const { id } = req.params || {};
+    const { storeUsername } = req.params || {};
 
     let vendorProfile;
-    if (id) {
-      vendorProfile = await vendorProfileModel.findOne({ userId: id });
+    if (storeUsername) {
+      vendorProfile = await vendorProfileModel.findOne({
+        storeUsername,
+      });
     } else {
       const userId = req.user && req.user._id;
       if (!userId) {

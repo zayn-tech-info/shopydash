@@ -1,5 +1,4 @@
-import { useMemo } from "react";
-import { useAuthStore } from "../store/authStore";
+ import { useAuthStore } from "../store/authStore";
 import { ShoppingBag, GraduationCap, Eye, EyeOff } from "lucide-react";
 import logoUrl from "../assets/images/vendora_logo.png";
 import { Link, useNavigate } from "react-router-dom";
@@ -22,11 +21,6 @@ export function Login() {
     login,
   } = useAuthStore();
 
-  const isSubmitDisabled = useMemo(
-    () => !email || !password,
-    [email, password]
-  );
-
   const validateForm = () => {
     const trimmed = {
       email: email?.trim() ?? "",
@@ -34,7 +28,7 @@ export function Login() {
       schoolId: schoolId?.trim() ?? "",
       username: username?.trim() ?? "",
     };
- 
+
     if (!trimmed.password) return toast.error("Password is required"), false;
 
     return true;
@@ -130,7 +124,7 @@ export function Login() {
                   htmlFor="email"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Emailm / Clienta ID
+                  Email / Client ID
                 </label>
                 <input
                   id="email"
@@ -193,13 +187,9 @@ export function Login() {
 
               <button
                 type="submit"
-                disabled={isSubmitDisabled}
                 className={[
                   "mt-2 w-full rounded-lg bg-[#F97316] py-2.5 text-white text-sm font-semibold shadow-sm transition-colors",
                   "hover:bg-[#ea580c] focus:outline-none focus:ring-2 focus:ring-orange-300",
-                  isSubmitDisabled
-                    ? "opacity-70 cursor-not-allowed"
-                    : "cursor-pointer",
                 ].join(" ")}
               >
                 Continue to Vendora

@@ -1,9 +1,11 @@
-import { create } from "zustand";
+ import { create } from "zustand";
 import { api } from "../lib/axios";
 
 export const useAuthStore = create((set) => ({
   role: "client",
   email: "",
+  schoolId: "",
+  username: "",
   password: "",
   showPassword: false,
   isLogginIn: false,
@@ -24,7 +26,7 @@ export const useAuthStore = create((set) => ({
 
       console.log("API response: ", res);
       const payload = res?.data?.data ?? res?.data ?? res;
- 
+
       set({ authUser: payload, isLogginIn: false, error: null });
       return payload;
     } catch (err) {

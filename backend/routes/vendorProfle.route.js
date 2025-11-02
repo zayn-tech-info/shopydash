@@ -14,7 +14,9 @@ route.post(
   verifyRole("vendor"),
   createVendorProfile
 );
-route.get("/username/:id", getVendorProfile);
+ 
+ 
+route.get("/store/:storeUsername", getVendorProfile);
 route.get("/me", protectRoute, verifyRole("vendor"), getVendorProfile);
 route.patch(
   "/updateVendorProfile",

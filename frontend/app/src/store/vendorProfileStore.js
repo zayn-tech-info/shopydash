@@ -31,24 +31,32 @@ export const useVendorProfileStore = create((set) => ({
     }
   },
 
-  getVendorProfile: async () => {
+  getVendorProfile: async (storeUsername) => {
     try {
-      const res = await api.get(`/api/v1/vendorProfile/me`);
+      let res;
+
+      if (storeUsername) {
+        res = await api.get(`/api/v1/vendorProfile/store/${storeUsername}`);
+      } else {
+        res = await api.get(`/api/v1/vendorProfile/me`);
+      }
+
       console.log("API response", res);
       const payload = res?.data?.data ?? res?.data ?? res;
       set({
         vendorProfile: payload.vendorProfile,
-        isCreatingProfile: false,
+        isGettingVendorProfile: false,
         error: null,
       });
+      return payload;
     } catch (err) {
       const serverMessage =
         err?.response?.data?.message ??
         err?.response?.data ??
         err?.message ??
         "An unknown error occurred";
-      console.error("create vendor profile error:", err);
-      set({ error: serverMessage, isCreatingProfile: false });
+      console.error("get vendor profile error:", err);
+      set({ error: serverMessage, isGettingVendorProfile: false });
 
       throw serverMessage;
     }

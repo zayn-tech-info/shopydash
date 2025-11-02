@@ -62,7 +62,7 @@ const App = () => {
             element={!authUser ? <Signup /> : <Navigate to="/" />}
           />
           <Route path="/vendor/dashboard" element={<VendorDashboard />} />
-          <Route path="/me" element={<VendorProfileClean />} />
+          <Route path="/:storeUsername" element={<VendorProfileClean />} />
         </Routes>
       </div>
       <Footer />

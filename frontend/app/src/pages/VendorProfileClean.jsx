@@ -1,8 +1,9 @@
 import { toast } from "react-hot-toast";
 import Logo from "../assets/images/vendora_logo.png";
+import { useEffect, useState } from "react";
 import { Edit, Link2 } from "lucide-react";
 import { useVendorProfileStore } from "../store/vendorProfileStore";
-import { useEffect, useState } from "react";
+import { useAuthStore } from "../store/authStore";
 
 export default function VendorProfileClean() {
   const {
@@ -14,6 +15,7 @@ export default function VendorProfileClean() {
   } = useVendorProfileStore();
   const [showEditModal, setShowEditModal] = useState(false);
   const [formData, setFormData] = useState(null);
+  const { authUser, checkAuth } = useAuthStore();
 
   function copyProfileLink() {
     const link = window.location.href;
@@ -27,9 +29,20 @@ export default function VendorProfileClean() {
     }
   }
 
+  function normaliseDate(dateString) {
+    const isoDate = dateString;
+    const date = new Date(isoDate);
+
+    const options = { day: "numeric", month: "long", year: "numeric" };
+    const formattedDate = date.toLocaleDateString("en-GB", options);
+
+    return formattedDate;
+  }
+
   useEffect(() => {
     getVendorProfile();
-  }, [getVendorProfile]);
+    checkAuth();
+  }, [getVendorProfile, checkAuth]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -130,7 +143,9 @@ export default function VendorProfileClean() {
             ) : (
               <div className="w-full h-full bg-gradient-to-r from-primary-3 to-primary-4 flex items-center justify-center">
                 <span className="text-white font-semibold md:text-3xl text-base md:mb-5 mb-2">
-                  {vendorProfile.businessName}
+                  {vendorProfile && vendorProfile?.businessName
+                    ? vendorProfile.businessName
+                    : authUser.businessName}
                 </span>
               </div>
             )}
@@ -169,12 +184,19 @@ export default function VendorProfileClean() {
           <h2 className="text-xl sm:text-xl font-extrabol">
             @
             <a className="text-blue-700 font-medium" href="">
-              {vendorProfile.storeUsername || vendorProfile.businessName}
+              {vendorProfile && vendorProfile?.username
+                ? vendorProfile.storeUsername
+                : authUser.username}
             </a>
           </h2>
-          <p className="text-sm text-n-6 mt-1">Member since Oct 2025</p>
+          <p className="text-sm text-n-6 mt-1">
+            Member since{" "}
+            <span className="font-bold">
+              {normaliseDate(vendorProfile.createdAt)}
+            </span>
+          </p>
 
-          <div className="mt-4 flex items-center justify-center gap-6 text-sm text-n-7">
+          <div className="mt-2 flex items-center justify-center gap-6 text-sm text-n-7">
             <div className="flex items-center gap-2">
               <span className="font-medium">0 followers</span>
             </div>
@@ -184,9 +206,15 @@ export default function VendorProfileClean() {
           </div>
 
           <div className="mt-5 flex items-center justify-center gap-3">
-            <button className="px-5 py-1 rounded-md bg-n-7  border-n-8 text-white text-sm font-medium">
-              Follow
-            </button>
+            {authUser &&
+            vendorProfile &&
+            authUser._id === vendorProfile.userId ? (
+              ""
+            ) : (
+              <button className="px-5 py-1 rounded-md bg-n-7  border-n-8 text-white text-sm font-medium">
+                Follow
+              </button>
+            )}
             <button
               onClick={copyProfileLink}
               className="px-5 py-1 rounded-md border-n-8 text-n-9 border-2 text-sm font-medium"
@@ -204,7 +232,7 @@ export default function VendorProfileClean() {
 
         {/* Body */}
         <div className="px-4 sm:px-6 mt-6">
-          <div className="text-n-7 mb-6 text-center sm:text-left">
+          <div className="text-n-7 mb-6 text-center sm:text-center">
             {vendorProfile.storeDescription}
           </div>
 
@@ -225,8 +253,16 @@ export default function VendorProfileClean() {
                       <div className="flex items-start">
                         <dt className="w-28 sm:w-32 font-medium">Phone</dt>
                         <dd className="flex-1 text-primary-4 font-medium">
-                          <a href={`tel:${vendorProfile.phoneNumber}`}>
-                            {vendorProfile.phoneNumber}
+                          <a
+                            href={`tel:${
+                              vendorProfile && vendorProfile?.phoneNumber
+                                ? vendorProfile.phoneNumber
+                                : authUser.phoneNumber
+                            }`}
+                          >
+                            {vendorProfile && vendorProfile?.phoneNumber
+                              ? vendorProfile.phoneNumber
+                              : authUser.phoneNumber}
                           </a>
                         </dd>
                       </div>
@@ -235,10 +271,11 @@ export default function VendorProfileClean() {
                         <dt className="w-28 sm:w-32 font-medium">WhatsApp</dt>
                         <dd className="flex-1 text-primary-4 font-medium">
                           <a
-                            href={`https://wa.me/${vendorProfile.whatsAppNumber?.replace(
-                              /\D/g,
-                              ""
-                            )}`}
+                            href={`https://wa.me/${(vendorProfile &&
+                            vendorProfile?.phoneNumber
+                              ? vendorProfile.phoneNumber
+                              : authUser.phoneNumber
+                            )?.replace(/\D/g, "")}`}
                             target="_blank"
                             rel="noreferrer"
                           >
@@ -256,7 +293,11 @@ export default function VendorProfileClean() {
                             </a>
                           </dd>
                         </div>
-                      ) : null}
+                      ) : (
+                        <p className="md:text-lg bg-gray-100 border border-gray-300 md:px-3 px-2 mt-5 text-sm">
+                          - -
+                        </p>
+                      )}
                     </dl>
                   </div>
                 </div>
@@ -268,12 +309,19 @@ export default function VendorProfileClean() {
                 <h4 className=" md:text-lg border-n-7 border-2 backdrop-blur-sm inline-block px-2 rounded mb-2">
                   Location
                 </h4>
-                <div className="text-sm text-n-7 mt-1 space-y-1">
+                <div className="text-sm text-n-7 mt-1 space-y-4">
                   <div>{vendorProfile.address}</div>
                   <div>
-                    {vendorProfile.city}, {vendorProfile.state}
+                    {vendorProfile ? (
+                      vendorProfile.city
+                    ) : (
+                      <p className="md:text-lg bg-gray-100 border border-gray-300 md:px-3 px-2 mt-5 text-sm">
+                        - -
+                      </p>
+                    )}
+                    , {vendorProfile.state}
                   </div>
-                  <div>{vendorProfile.country}</div>
+                  <div>{vendorProfile ? vendorProfile.country : "--"}</div>
                 </div>
 
                 {vendorProfile.mapLocation ? (
@@ -284,7 +332,11 @@ export default function VendorProfileClean() {
                       className="w-full h-36 rounded-md border"
                     />
                   </div>
-                ) : null}
+                ) : (
+                  <p className="md:text-lg bg-gray-100 border border-gray-300 md:px-3 px-2 mt-5 text-sm">
+                    - -
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -310,9 +362,9 @@ export default function VendorProfileClean() {
                   ))}
                 </div>
               ) : (
-                <div className="mt-3 text-sm text-n-6">
-                  No gallery images yet.
-                </div>
+                <p className="md:text-lg bg-gray-100 border border-gray-300 md:px-3 p-2 mt-5 text-sm">
+                  No gallery image yet
+                </p>
               )}
             </div>
           </div>
