@@ -1,6 +1,7 @@
 import { toast } from "react-hot-toast";
 import Logo from "../assets/images/vendora_logo.png";
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { Edit, Link2 } from "lucide-react";
 import { useVendorProfileStore } from "../store/vendorProfileStore";
 import { useAuthStore } from "../store/authStore";
@@ -13,6 +14,8 @@ export default function VendorProfileClean() {
     isUpdatingVendorProfile,
     updateVendorProfile,
   } = useVendorProfileStore();
+
+  const params = useParams();
   const [showEditModal, setShowEditModal] = useState(false);
   const [formData, setFormData] = useState(null);
   const { authUser, checkAuth } = useAuthStore();
@@ -40,9 +43,13 @@ export default function VendorProfileClean() {
   }
 
   useEffect(() => {
-    getVendorProfile();
-    checkAuth();
-  }, [getVendorProfile, checkAuth]);
+    const usernameParam = params?.storeUsername;
+    if (usernameParam && usernameParam !== "me") {
+      getVendorProfile(usernameParam);
+    } else {
+      getVendorProfile();
+    }
+  }, [getVendorProfile, params?.storeUsername]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

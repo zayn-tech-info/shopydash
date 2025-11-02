@@ -33,6 +33,8 @@ export const useVendorProfileStore = create((set) => ({
 
   getVendorProfile: async (storeUsername) => {
     try {
+      set({ isGettingVendorProfile: true, error: null });
+
       let res;
 
       if (storeUsername) {

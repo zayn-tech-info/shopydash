@@ -9,14 +9,16 @@ const vendorProfile = require("./routes/vendorProfle.route");
 connectDB();
 const app = express();
 
-const mode = process.env.NODE_ENV;
+const mode = process.env.NODE_ENV || "development";
+
+const frontendOrigin =
+  mode === "development"
+    ? "https://vendora-app-rho.vercel.app"
+    : "http://localhost:5173";
 
 app.use(
   cors({
-    origin:
-      mode === "development"
-        ? "https://vendora-app-rho.vercel.app"
-        : "http://localhost:5173",
+    origin: frontendOrigin,
     credentials: true,
   })
 );

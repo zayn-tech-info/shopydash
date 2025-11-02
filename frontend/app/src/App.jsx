@@ -14,35 +14,54 @@ import VendorProfileClean from "./pages/VendorProfileClean";
 import { BottomNav } from "./components/BottomNav";
 
 const App = () => {
-  const [isMenuOpened, setIsMenuOpened] = useState(false);
-  const { checkAuth, authUser } = useAuthStore();
-
-  function toggleNavigation() {
-    if (isMenuOpened) {
-      setIsMenuOpened(false);
-      enablePageScroll();
-    } else {
-      setIsMenuOpened(true);
-      disablePageScroll();
-    }
-  }
-
-  function handleClick() {
-    toggleNavigation();
-  }
+  const { checkAuth, authUser, isCheckingAuth } = useAuthStore();
+  const location = useLocation();
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
 
-  const location = useLocation();
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0 });
   }, [location.pathname]);
 
+  if (isCheckingAuth) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <button
+          type="button"
+          className="flex items-center gap-3 bg-primary-3 text-white px-4 py-2 rounded"
+          disabled
+        >
+          <svg
+            className="h-5 w-5 animate-spin"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+              fill="none"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+            />
+          </svg>
+          Loading…
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div>
-      <Header handleClick={handleClick} />
+      <Header />
       <div className="relative max-w-7xl mx-auto px-2 sm:px-6 md:px-10 lg:px-8 pb-20">
         <Routes>
           <Route
