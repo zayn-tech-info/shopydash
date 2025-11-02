@@ -41,37 +41,6 @@ export function Signup() {
 
   const isClient = role === "client";
 
-  /*   const isSubmitDisabled = useMemo(() => {
-    if (isClient) {
-      return (
-        !username ||
-        !fullName ||
-        !email ||
-        !password ||
-        !phoneNumber ||
-        !schoolName
-      );
-    }
-
-    return (
-      !username ||
-      !fullName ||
-      !email ||
-      !password ||
-      !phoneNumber ||
-      !businessName
-    );
-  }, [
-    username,
-    fullName,
-    email,
-    password,
-    phoneNumber,
-    schoolName,
-    businessName,
-    isClient,
-  ]);
- */
   const validateForm = () => {
     const trimmed = {
       fullName: fullName?.trim() ?? "",
@@ -130,13 +99,7 @@ export function Signup() {
 
     try {
       const result = await signup(payload);
-      // ensure client auth state is refreshed from server (cookie/token)
-      try {
-        await checkAuth();
-      } catch (e) {
-        // ignore - we'll still attempt to create profile
-      }
-
+      await checkAuth();
       await createVendorProfile();
       toast.success("Account created successfully!");
       resetField();

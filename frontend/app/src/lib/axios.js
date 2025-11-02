@@ -11,14 +11,3 @@ export const api = axios.create({
     "Content-Type": "application/json",
   },
 });
-
-// axiosInstance.interceptors.response.use(
-//   (response) => response,
-//   (error) => {
-//     if (error.response?.status === 401) {
-//       Cookies.remove("token");
-//       console.log("Authentication failed, please login again");
-//     }
-//     return Promise.reject(error);
-//   }
-// );
