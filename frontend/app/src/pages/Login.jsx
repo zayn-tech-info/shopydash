@@ -71,7 +71,7 @@ export function Login() {
               alt="Vendora"
               className="mx-auto h-32 md:h-16 w-auto object-contain"
             />
-            <p className="mt-3 text-sm text-gray-600">
+            <p className="mt-3 text-base text-gray-600">
               Buy. Sell. Connect — right on campus.
             </p>
           </div>
@@ -129,7 +129,7 @@ export function Login() {
           />
 
           <div className="px-8 pb-6">
-            <p className="text-center text-xs text-gray-500">
+            <p className="text-center text-base text-gray-500">
               By logging in, you agree to our{" "}
               <a className="underline hover:text-gray-700" href="#">
                 Terms of Use

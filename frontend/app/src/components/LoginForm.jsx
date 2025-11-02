@@ -21,7 +21,7 @@ export function LoginForm(
           <div>
             <label
               htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-base font-medium text-gray-700"
             >
               Email / Client ID
             </label>
@@ -45,13 +45,13 @@ export function LoginForm(
             <div className="flex items-center justify-between">
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-base font-medium text-gray-700"
               >
                 Password
               </label>
               <a
                 href="#"
-                className="text-sm text-orange-600 hover:text-orange-700"
+                className="text-base text-orange-600 hover:text-orange-700"
               >
                 Forgot password?
               </a>
@@ -85,7 +85,7 @@ export function LoginForm(
           <button
             type="submit"
             className={[
-              "mt-2 w-full rounded-lg bg-[#F97316] py-2.5 text-white text-sm font-semibold shadow-sm transition-colors",
+              "mt-2 w-full rounded-lg bg-[#F97316] py-2.5 text-white font-semibold shadow-sm text-base transition-colors",
               "hover:bg-[#ea580c] focus:outline-none focus:ring-2 focus:ring-orange-300",
             ].join(" ")}
           >
@@ -94,7 +94,7 @@ export function LoginForm(
         </div>
 
         {/* Create Account */}
-        <p className="mt-4 text-center text-sm text-gray-600">
+        <p className="mt-4 text-center text-base text-gray-600">
           New here?{" "}
           <Link
             to="/signup"
