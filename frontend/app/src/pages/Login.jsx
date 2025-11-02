@@ -62,14 +62,14 @@ export function Login() {
   };
 
   return (
-    <div className="min-h-screen  bg-gradient-to-b from-orange-50 to-white flex items-center justify-center px-4 md:py-10">
+    <div className="md:min-h-screen  my-auto mt-24 md:mt-0 bg-gradient-to-b from-orange-50 to-white flex items-center justify-center px-4 md:py-10">
       <div className="w-full max-w-md">
         <div className="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl border border-orange-100 overflow-hidden">
           <div className="px-8 pt-8 text-center">
             <img
               src={logoUrl}
               alt="Vendora"
-              className="mx-auto h-12 w-auto object-contain"
+              className="mx-auto h-32 md:h-16 w-auto object-contain"
             />
             <p className="mt-3 text-sm text-gray-600">
               Buy. Sell. Connect — right on campus.
