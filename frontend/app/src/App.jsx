@@ -84,8 +84,8 @@ const App = () => {
           <Route path="/:storeUsername" element={<VendorProfileClean />} />
         </Routes>
       </div>
-      <Footer />
-      <BottomNav />
+      {authUser ? <Footer /> : ""}
+      {authUser ? <BottomNav /> : ""}
       <Toaster />
     </div>
   );
