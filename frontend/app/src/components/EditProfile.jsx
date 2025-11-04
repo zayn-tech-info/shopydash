@@ -5,7 +5,7 @@ import { useVendorProfileStore } from "../store/vendorProfileStore";
 export function EditProfile() {
   const {
     vendorProfile,
- 
+
     isUpdatingVendorProfile,
     updateVendorProfile,
   } = useVendorProfileStore();
@@ -13,8 +13,6 @@ export function EditProfile() {
   const params = useParams();
   const [showEditModal, setShowEditModal] = useState(false);
   const [formData, setFormData] = useState(null);
-
- 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -52,7 +50,6 @@ export function EditProfile() {
   };
 
   useEffect(() => {
- 
     setFormData({
       businessName: vendorProfile.businessName || "",
       storeUsername: vendorProfile.storeUsername || "",
@@ -73,8 +70,6 @@ export function EditProfile() {
       mapLocationLng: vendorProfile.mapLocation?.lng || "",
     });
   }, [showEditModal, vendorProfile]);
-
- 
 
   return (
     <div>

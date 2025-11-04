@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ShoppingCart } from "lucide-react";
 
 import { useAuthStore } from "../store/authStore";
+import { Link } from "react-router-dom";
 
 export function NoProfile() {
   const { authUser, checkAuth } = useAuthStore();
@@ -23,19 +24,19 @@ export function NoProfile() {
           </p>
 
           <div className="flex items-center justify-center gap-3">
-            <a
-              href="/vendor/create"
+            <Link
+              to="/createprofile"
               title="Create profile"
               className="px-4 py-2 border-n-3 border-2  text-n-8 rounded-md text-sm font-medium shadow-sm hover:bg-primary-700 transition-colors"
             >
               Create profile
-            </a>
-            <a
-              href="/"
+            </Link>
+            <Link
+              to="/"
               className="px-4 bg-primary-3 text-n-1 py-2 transition-colors duration-500 text-sm rounded-md border border-gray-200 hover:bg-primary-2"
             >
               Browse stores
-            </a>
+            </Link>
           </div>
         </div>
       </div>

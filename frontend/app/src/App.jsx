@@ -13,6 +13,7 @@ import { useAuthStore } from "./store/authStore";
 import VendorProfileClean from "./pages/VendorProfileClean";
 import { BottomNav } from "./components/BottomNav";
 import { Loader } from "./components/Loader";
+import CreateVendorProfile from "./pages/CreateVendorProfile";
 
 const App = () => {
   const { checkAuth, authUser, isCheckingAuth } = useAuthStore();
@@ -50,6 +51,12 @@ const App = () => {
           <Route
             path="/signup"
             element={!authUser ? <Signup /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/createprofile"
+            element={
+              authUser ? <CreateVendorProfile /> : <Navigate to="login" />
+            }
           />
           <Route path="/vendor/dashboard" element={<VendorDashboard />} />
           <Route path="/:storeUsername" element={<VendorProfileClean />} />
