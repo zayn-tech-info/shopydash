@@ -19,10 +19,12 @@ const vendorProfileSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
+      sparse: true,
     },
     storeUsername: {
       type: String,
       unique: true,
+      sparse: true,
     },
     storeDescription: {
       type: String,
@@ -40,10 +42,11 @@ const vendorProfileSchema = new mongoose.Schema(
       type: String,
       unique: true,
       trim: true,
+      sparse: true,
     },
     email: {
       type: String,
-
+      sparse: true,
       unique: true,
       trim: true,
       validate: {
@@ -155,7 +158,6 @@ const vendorProfileSchema = new mongoose.Schema(
   }
 );
 
-
 Object.keys(vendorProfileSchema.paths).forEach(function (field) {
   const opts = vendorProfileSchema.paths[field].options || {};
   if (opts.unique) {
@@ -169,5 +171,3 @@ Object.keys(vendorProfileSchema.paths).forEach(function (field) {
 });
 
 module.exports = mongoose.model("VendorProfile", vendorProfileSchema);
-
- 

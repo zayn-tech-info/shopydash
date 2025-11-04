@@ -1,21 +1,64 @@
 import { Eye, EyeOff } from "lucide-react";
-import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/authStore";
 
-export function LoginForm(
-  onSubmit,
-  email,
-  username,
-  schoolId,
-  setEmail,
-  role,
-  showPassword,
-  password,
-  setPassword,
-  toggleShowPassword
-) {
+export function LoginForm() {
+  const navigate = useNavigate();
+  const {
+    role,
+    email,
+    schoolId,
+    username,
+    password,
+    showPassword,
+    setRole,
+    setEmail,
+    setPassword,
+    toggleShowPassword,
+    resetloginField,
+    login,
+  } = useAuthStore();
+
+  const validateForm = () => {
+    const trimmed = {
+      email: email?.trim() ?? "",
+      password: password?.trim() ?? "",
+      schoolId: schoolId?.trim() ?? "",
+      username: username?.trim() ?? "",
+    };
+
+    if (!trimmed.password) return toast.error("Password is required"), false;
+
+    return true;
+  };
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    const payload = {
+      email,
+      password,
+      username,
+      schoolId,
+    };
+
+    const ok = validateForm();
+    if (!ok) {
+      return;
+    }
+
+    try {
+      const result = await login(payload);
+      toast.success("User Logged in successfully!");
+      resetloginField();
+      navigate("/");
+    } catch (err) {
+      const msg =
+        typeof err === "string" ? err : err?.message ?? "Signup failed";
+      toast.error(msg);
+    }
+  };
   return (
     <div>
-      {" "}
       <form onSubmit={onSubmit} className="px-8 pt-6 pb-8">
         <div className="space-y-4">
           <div>

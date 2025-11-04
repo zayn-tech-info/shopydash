@@ -19,7 +19,7 @@ const createVendorProfile = async (req, res) => {
 
     const payload = { ...req.body, userId };
 
-    Object.keys(vendorProfileModel.schema.paths).forEach((field) => {
+/*     Object.keys(vendorProfileModel.schema.paths).forEach((field) => {
       if (field === "email") return;
       const opts = vendorProfileModel.schema.paths[field].options || {};
       if (opts.unique) {
@@ -28,7 +28,7 @@ const createVendorProfile = async (req, res) => {
           payload[field] = `${field}_${uuidv4()}`;
         }
       }
-    });
+    }); */
 
     const vendorProfile = await vendorProfileModel.create(payload);
 

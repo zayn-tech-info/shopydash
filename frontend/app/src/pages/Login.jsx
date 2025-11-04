@@ -7,59 +7,7 @@ import { LoginForm } from "../components/LoginForm";
 
 export function Login() {
   const navigate = useNavigate();
-  const {
-    role,
-    email,
-    schoolId,
-    username,
-    password,
-    showPassword,
-    setRole,
-    setEmail,
-    setPassword,
-    toggleShowPassword,
-    resetloginField,
-    login,
-  } = useAuthStore();
-
-  const validateForm = () => {
-    const trimmed = {
-      email: email?.trim() ?? "",
-      password: password?.trim() ?? "",
-      schoolId: schoolId?.trim() ?? "",
-      username: username?.trim() ?? "",
-    };
-
-    if (!trimmed.password) return toast.error("Password is required"), false;
-
-    return true;
-  };
-
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    const payload = {
-      email,
-      password,
-      username,
-      schoolId,
-    };
-
-    const ok = validateForm();
-    if (!ok) {
-      return;
-    }
-
-    try {
-      const result = await login(payload);
-      toast.success("User Logged in successfully!");
-      resetloginField();
-      navigate("/");
-    } catch (err) {
-      const msg =
-        typeof err === "string" ? err : err?.message ?? "Signup failed";
-      toast.error(msg);
-    }
-  };
+  const { role, setRole, resetloginField } = useAuthStore();
 
   return (
     <div className="md:min-h-screen  my-auto mt-24 md:mt-0 bg-gradient-to-b from-orange-50 to-white flex items-center justify-center px-4 md:py-10">
@@ -115,18 +63,7 @@ export function Login() {
             </div>
           </div>
 
-          <LoginForm
-            onSubmit={onSubmit}
-            email={email}
-            username={username}
-            schoolId={schoolId}
-            setEmail={setEmail}
-            role={role}
-            showPassword={showPassword}
-            password={password}
-            setPassword={setPassword}
-            toggleShowPassword={toggleShowPassword}
-          />
+          <LoginForm />
 
           <div className="px-8 pb-6">
             <p className="text-center text-base text-gray-500">
