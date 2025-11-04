@@ -1,38 +1,20 @@
-import { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { api } from "../lib/axios";
 import { toast } from "react-hot-toast";
 import { Loader } from "../components/Loader";
+import { useVendorProfileStore } from "../store/vendorProfileStore";
 
 export default function CreateVendorProfile() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({
-    businessName: "",
-    storeUsername: "",
-    storeDescription: "",
-    businessCategory: "",
-    phoneNumber: "",
-    whatsAppNumber: "",
-    email: "",
-    profileImage: "",
-    coverImage: "",
-    gallery: "",
-    address: "",
-    city: "",
-    state: "",
-    country: "",
-    mapLocationLat: "",
-    mapLocationLng: "",
-    accountNumber: "",
-    paymentMethods: [],
-    instagram: "",
-    facebook: "",
-    twitter: "",
-    notifications: true,
-    autoReply: false,
-  });
+  const {
+    profileData,
+    setProfileField,
+    resetProfileData,
+    createVendorProfile,
+    isCreatingProfile,
+  } = useVendorProfileStore();
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isSubmitting = !!isCreatingProfile;
 
   const paymentOptions = [
     { id: "bank_transfer", label: "Bank transfer" },
@@ -41,21 +23,21 @@ export default function CreateVendorProfile() {
   ];
 
   function togglePayment(method) {
-    setForm((f) => {
-      const exists = f.paymentMethods.includes(method);
-      return {
-        ...f,
-        paymentMethods: exists
-          ? f.paymentMethods.filter((m) => m !== method)
-          : [...f.paymentMethods, method],
-      };
-    });
+    const current = profileData.paymentMethods || [];
+    const exists = current.includes(method);
+    setProfileField(
+      "paymentMethods",
+      exists ? current.filter((m) => m !== method) : [...current, method]
+    );
   }
 
   function validate() {
-    if (!form.businessName.trim()) return "Business name is required";
-    if (!form.storeUsername.trim()) return "Store username is required";
-    if (!form.phoneNumber.trim()) return "Phone number is required";
+    if (!profileData.businessName || !profileData.businessName.trim())
+      return "Business name is required";
+    if (!profileData.storeUsername || !profileData.storeUsername.trim())
+      return "Store username is required";
+    if (!profileData.phoneNumber || !profileData.phoneNumber.trim())
+      return "Phone number is required";
     return null;
   }
 
@@ -63,62 +45,54 @@ export default function CreateVendorProfile() {
     e.preventDefault();
     const err = validate();
     if (err) return toast.error(err);
-    setIsSubmitting(true);
 
     const payload = {
-      businessName: form.businessName,
-      storeUsername: form.storeUsername,
-      storeDescription: form.storeDescription,
-      businessCategory: form.businessCategory,
-      phoneNumber: form.phoneNumber,
-      whatsAppNumber: form.whatsAppNumber,
-      email: form.email,
-      profileImage: form.profileImage,
-      coverImage: form.coverImage,
-      gallery: form.gallery
-        ? form.gallery
+      businessName: profileData.businessName,
+      storeUsername: profileData.storeUsername,
+      storeDescription: profileData.storeDescription,
+      businessCategory: profileData.businessCategory,
+      phoneNumber: profileData.phoneNumber,
+      whatsAppNumber: profileData.whatsAppNumber,
+      email: profileData.email,
+      profileImage: profileData.profileImage,
+      coverImage: profileData.coverImage,
+      gallery: profileData.gallery
+        ? profileData.gallery
             .split(",")
             .map((s) => s.trim())
             .filter(Boolean)
         : [],
-      address: form.address,
-      city: form.city,
-      state: form.state,
-      country: form.country,
+      address: profileData.address,
+      city: profileData.city,
+      state: profileData.state,
+      country: profileData.country,
       mapLocation:
-        form.mapLocationLat || form.mapLocationLng
-          ? { lat: form.mapLocationLat, lng: form.mapLocationLng }
+        profileData.mapLocationLat || profileData.mapLocationLng
+          ? { lat: profileData.mapLocationLat, lng: profileData.mapLocationLng }
           : null,
-      accountNumber: form.accountNumber,
-      paymentMethods: form.paymentMethods,
+      accountNumber: profileData.accountNumber,
+      paymentMethods: profileData.paymentMethods || [],
       socialLinks: {
-        instagram: form.instagram,
-        facebook: form.facebook,
-        twitter: form.twitter,
+        instagram: profileData.instagram,
+        facebook: profileData.facebook,
+        twitter: profileData.twitter,
       },
       settings: {
-        notifications: !!form.notifications,
-        autoReply: !!form.autoReply,
+        notifications: !!profileData.notifications,
+        autoReply: !!profileData.autoReply,
       },
     };
 
     try {
-      // Backend route is mounted at /api/v1/vendorProfile (see backend/app.js)
-      // create endpoint is POST /createVendorProfile
-      const res = await api.post(
-        "/api/v1/vendorProfile/createVendorProfile",
-        payload
-      );
+      await createVendorProfile(payload);
       toast.success("Profile created");
-      // Navigate to the newly created store page if we have a username
-      if (form.storeUsername) navigate(`/vendor/${form.storeUsername}`);
+      if (profileData.storeUsername)
+        navigate(`/vendor/${profileData.storeUsername}`);
       else navigate(`/vendor/me`);
     } catch (e) {
       const msg =
         e?.response?.data?.message || e.message || "Failed to create profile";
       toast.error(msg);
-    } finally {
-      setIsSubmitting(false);
     }
   }
 
@@ -141,9 +115,9 @@ export default function CreateVendorProfile() {
                   Business name
                 </label>
                 <input
-                  value={form.businessName}
+                  value={profileData.businessName}
                   onChange={(e) =>
-                    setForm({ ...form, businessName: e.target.value })
+                    setProfileField("businessName", e.target.value)
                   }
                   className="w-full mt-1 border rounded px-3 py-2"
                 />
@@ -153,9 +127,9 @@ export default function CreateVendorProfile() {
                   Store username
                 </label>
                 <input
-                  value={form.storeUsername}
+                  value={profileData.storeUsername}
                   onChange={(e) =>
-                    setForm({ ...form, storeUsername: e.target.value })
+                    setProfileField("storeUsername", e.target.value)
                   }
                   className="w-full mt-1 border rounded px-3 py-2"
                 />
@@ -165,9 +139,9 @@ export default function CreateVendorProfile() {
             <div>
               <label className="block text-sm font-medium">Description</label>
               <textarea
-                value={form.storeDescription}
+                value={profileData.storeDescription}
                 onChange={(e) =>
-                  setForm({ ...form, storeDescription: e.target.value })
+                  setProfileField("storeDescription", e.target.value)
                 }
                 className="w-full mt-1 border rounded px-3 py-2"
                 rows={4}
@@ -177,9 +151,9 @@ export default function CreateVendorProfile() {
             <div>
               <label className="block text-sm font-medium">Category</label>
               <input
-                value={form.businessCategory}
+                value={profileData.businessCategory}
                 onChange={(e) =>
-                  setForm({ ...form, businessCategory: e.target.value })
+                  setProfileField("businessCategory", e.target.value)
                 }
                 className="w-full mt-1 border rounded px-3 py-2"
               />
@@ -192,9 +166,9 @@ export default function CreateVendorProfile() {
               <div>
                 <label className="block text-sm font-medium">Phone</label>
                 <input
-                  value={form.phoneNumber}
+                  value={profileData.phoneNumber}
                   onChange={(e) =>
-                    setForm({ ...form, phoneNumber: e.target.value })
+                    setProfileField("phoneNumber", e.target.value)
                   }
                   className="w-full mt-1 border rounded px-3 py-2"
                 />
@@ -202,9 +176,9 @@ export default function CreateVendorProfile() {
               <div>
                 <label className="block text-sm font-medium">WhatsApp</label>
                 <input
-                  value={form.whatsAppNumber}
+                  value={profileData.whatsAppNumber}
                   onChange={(e) =>
-                    setForm({ ...form, whatsAppNumber: e.target.value })
+                    setProfileField("whatsAppNumber", e.target.value)
                   }
                   className="w-full mt-1 border rounded px-3 py-2"
                 />
@@ -214,8 +188,8 @@ export default function CreateVendorProfile() {
             <div>
               <label className="block text-sm font-medium">Email</label>
               <input
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                value={profileData.email}
+                onChange={(e) => setProfileField("email", e.target.value)}
                 className="w-full mt-1 border rounded px-3 py-2"
               />
             </div>
@@ -224,30 +198,30 @@ export default function CreateVendorProfile() {
           <section className="space-y-3">
             <h2 className="text-lg font-medium">Location</h2>
             <div>
-              <label className="block text-sm font-medium">School Name</label>
+              <label className="block text-sm font-medium">Address</label>
               <input
-                value={form.address}
-                onChange={(e) => setForm({ ...form, address: e.target.value })}
+                value={profileData.address}
+                onChange={(e) => setProfileField("address", e.target.value)}
                 className="w-full mt-1 border rounded px-3 py-2"
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <input
-                value={form.city}
-                onChange={(e) => setForm({ ...form, city: e.target.value })}
+                value={profileData.city}
+                onChange={(e) => setProfileField("city", e.target.value)}
                 placeholder="City"
                 className="w-full mt-1 border rounded px-3 py-2"
               />
               <input
-                value={form.state}
-                onChange={(e) => setForm({ ...form, state: e.target.value })}
+                value={profileData.state}
+                onChange={(e) => setProfileField("state", e.target.value)}
                 placeholder="State"
                 className="w-full mt-1 border rounded px-3 py-2"
               />
               <input
-                value={form.country}
-                onChange={(e) => setForm({ ...form, country: e.target.value })}
+                value={profileData.country}
+                onChange={(e) => setProfileField("country", e.target.value)}
                 placeholder="Country"
                 className="w-full mt-1 border rounded px-3 py-2"
               />
@@ -255,21 +229,21 @@ export default function CreateVendorProfile() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium">School Area</label>
+                <label className="block text-sm font-medium">Map lat</label>
                 <input
-                  value={form.mapLocationLat}
+                  value={profileData.mapLocationLat || ""}
                   onChange={(e) =>
-                    setForm({ ...form, mapLocationLat: e.target.value })
+                    setProfileField("mapLocationLat", e.target.value)
                   }
                   className="w-full mt-1 border rounded px-3 py-2"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium">Zip code</label>
+                <label className="block text-sm font-medium">Map lng</label>
                 <input
-                  value={form.mapLocationLng}
+                  value={profileData.mapLocationLng || ""}
                   onChange={(e) =>
-                    setForm({ ...form, mapLocationLng: e.target.value })
+                    setProfileField("mapLocationLng", e.target.value)
                   }
                   className="w-full mt-1 border rounded px-3 py-2"
                 />
@@ -277,7 +251,46 @@ export default function CreateVendorProfile() {
             </div>
           </section>
 
- 
+          <section className="space-y-3">
+            <h2 className="text-lg font-medium">Media</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium">
+                  Profile image (URL)
+                </label>
+                <input
+                  value={profileData.profileImage}
+                  onChange={(e) =>
+                    setProfileField("profileImage", e.target.value)
+                  }
+                  className="w-full mt-1 border rounded px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium">
+                  Cover image (URL)
+                </label>
+                <input
+                  value={profileData.coverImage}
+                  onChange={(e) =>
+                    setProfileField("coverImage", e.target.value)
+                  }
+                  className="w-full mt-1 border rounded px-3 py-2"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium">
+                Gallery (comma-separated URLs)
+              </label>
+              <input
+                value={profileData.gallery}
+                onChange={(e) => setProfileField("gallery", e.target.value)}
+                className="w-full mt-1 border rounded px-3 py-2"
+              />
+            </div>
+          </section>
 
           <section className="space-y-3">
             <h2 className="text-lg font-medium">Payments & bank</h2>
@@ -286,7 +299,7 @@ export default function CreateVendorProfile() {
                 <label className="inline-flex items-center gap-2" key={p.id}>
                   <input
                     type="checkbox"
-                    checked={form.paymentMethods.includes(p.id)}
+                    checked={(profileData.paymentMethods || []).includes(p.id)}
                     onChange={() => togglePayment(p.id)}
                   />
                   <span className="text-sm">{p.label}</span>
@@ -299,9 +312,9 @@ export default function CreateVendorProfile() {
                 Account number
               </label>
               <input
-                value={form.accountNumber}
+                value={profileData.accountNumber}
                 onChange={(e) =>
-                  setForm({ ...form, accountNumber: e.target.value })
+                  setProfileField("accountNumber", e.target.value)
                 }
                 className="w-full mt-1 border rounded px-3 py-2"
               />
@@ -312,33 +325,57 @@ export default function CreateVendorProfile() {
             <h2 className="text-lg font-medium">Social & settings</h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <input
-                value={form.instagram}
-                onChange={(e) =>
-                  setForm({ ...form, instagram: e.target.value })
-                }
+                value={profileData.instagram}
+                onChange={(e) => setProfileField("instagram", e.target.value)}
                 placeholder="Instagram"
                 className="w-full mt-1 border rounded px-3 py-2"
               />
               <input
-                value={form.facebook}
-                onChange={(e) => setForm({ ...form, facebook: e.target.value })}
+                value={profileData.facebook}
+                onChange={(e) => setProfileField("facebook", e.target.value)}
                 placeholder="Facebook"
                 className="w-full mt-1 border rounded px-3 py-2"
               />
               <input
-                value={form.twitter}
-                onChange={(e) => setForm({ ...form, twitter: e.target.value })}
+                value={profileData.twitter}
+                onChange={(e) => setProfileField("twitter", e.target.value)}
                 placeholder="Twitter"
                 className="w-full mt-1 border rounded px-3 py-2"
               />
             </div>
- 
+
+            <div className="flex items-center gap-4">
+              <label className="inline-flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={!!profileData.notifications}
+                  onChange={(e) =>
+                    setProfileField("notifications", e.target.checked)
+                  }
+                />
+                <span className="text-sm">Enable notifications</span>
+              </label>
+
+              <label className="inline-flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={!!profileData.autoReply}
+                  onChange={(e) =>
+                    setProfileField("autoReply", e.target.checked)
+                  }
+                />
+                <span className="text-sm">Auto-reply customers</span>
+              </label>
+            </div>
           </section>
 
           <div className="flex items-center justify-end gap-3">
             <button
               type="button"
-              onClick={() => navigate(-1)}
+              onClick={() => {
+                resetProfileData();
+                navigate(-1);
+              }}
               className="px-4 py-2 border rounded"
             >
               Cancel
@@ -346,7 +383,7 @@ export default function CreateVendorProfile() {
 
             <button
               type="submit"
-              className="px-4 py-2 bg-primary-3 text-white rounded"
+              className="px-4 py-2 bg-primary-600 text-white rounded"
               disabled={isSubmitting}
             >
               {isSubmitting ? <Loader>Creating...</Loader> : "Create profile"}
