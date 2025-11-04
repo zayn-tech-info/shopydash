@@ -2,9 +2,12 @@ import { toast } from "react-hot-toast";
 import Logo from "../assets/images/vendora_logo.png";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Edit, Link2 } from "lucide-react";
+import { Edit, Link2, ShoppingCart } from "lucide-react";
 import { useVendorProfileStore } from "../store/vendorProfileStore";
 import { useAuthStore } from "../store/authStore";
+import { NoProfile } from "../components/NoProfile";
+import { Loader } from "../components/Loader";
+import { EditProfile } from "../components/EditProfile";
 
 export default function VendorProfileClean() {
   const {
@@ -123,18 +126,9 @@ export default function VendorProfileClean() {
     }
   }
 
-  if (isGettingVendorProfile)
-    return (
-      <div className="py-20">
-        <div className="max-w-3xl mx-auto">loading Vendor profile</div>
-      </div>
-    );
-  if (!vendorProfile)
-    return (
-      <div className="py-20">
-        <div className="max-w-3xl mx-auto">Vendor not found.</div>
-      </div>
-    );
+  if (isGettingVendorProfile) return <Loader children="Loading profile" />;
+
+  if (!vendorProfile) return <NoProfile />;
 
   return (
     <main className="py-6 sm:py-10">
@@ -188,18 +182,18 @@ export default function VendorProfileClean() {
         </div>
 
         <div className="text-center mt-8 px-4">
-          <h2 className="text-xl sm:text-xl font-extrabol">
+          <h2 className="text-2xl sm:text-2xl font-extrabol">
             @
-            <a className="text-blue-700 font-medium" href="">
-              {vendorProfile && vendorProfile?.username
-                ? vendorProfile.storeUsername
-                : authUser.username}
-            </a>
+            <span className="text-blue-700 font-medium ml-1">
+              {vendorProfile?.storeUsername || authUser?.username || "store"}
+            </span>
           </h2>
           <p className="text-sm text-n-6 mt-1">
             Member since{" "}
             <span className="font-bold">
-              {normaliseDate(vendorProfile.createdAt)}
+              {vendorProfile?.createdAt
+                ? normaliseDate(vendorProfile.createdAt)
+                : "--"}
             </span>
           </p>
 
@@ -213,27 +207,42 @@ export default function VendorProfileClean() {
           </div>
 
           <div className="mt-5 flex items-center justify-center gap-3">
-            {authUser &&
-            vendorProfile &&
-            authUser._id === vendorProfile.userId ? (
-              ""
-            ) : (
-              <button className="px-5 py-1 rounded-md bg-n-7  border-n-8 text-white text-sm font-medium">
+            {!(
+              authUser &&
+              vendorProfile &&
+              authUser._id === vendorProfile.userId
+            ) ? (
+              <button className="px-4 py-2 rounded-md bg-primary-600 text-white text-sm font-medium shadow-sm hover:bg-primary-700 transition-colors">
                 Follow
               </button>
+            ) : (
+              <button
+                onClick={() => setShowEditModal(true)}
+                className="px-4 py-2 rounded-md border border-gray-200 text-sm font-medium"
+              >
+                Edit profile
+              </button>
             )}
+
             <button
               onClick={copyProfileLink}
-              className="px-5 py-1 rounded-md border-n-8 text-n-9 border-2 text-sm font-medium"
+              className="px-4 py-2 rounded-md border border-gray-200 text-sm font-medium hover:bg-gray-50"
             >
               Share
             </button>
-            <button
-              onClick={() => setShowEditModal(true)}
-              className="w-10 h-10 rounded-full border flex items-center justify-center"
-            >
-              <Edit />
-            </button>
+
+            {/* small icon action for quick edit (owner only) */}
+            {authUser &&
+            vendorProfile &&
+            authUser._id === vendorProfile.userId ? (
+              <button
+                onClick={() => setShowEditModal(true)}
+                aria-label="Open edit modal"
+                className="w-10 h-10 rounded-full border flex items-center justify-center"
+              >
+                <Edit />
+              </button>
+            ) : null}
           </div>
         </div>
 
@@ -378,266 +387,7 @@ export default function VendorProfileClean() {
         </div>
       </div>
 
-      {showEditModal && formData ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black/40"
-            onClick={() => setShowEditModal(false)}
-          />
-          <form
-            onSubmit={handleSubmit}
-            className="relative w-full max-w-2xl bg-white rounded-lg shadow-lg p-6 z-10 overflow-auto max-h-[90vh]"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium">Edit profile</h3>
-              <button
-                type="button"
-                onClick={() => setShowEditModal(false)}
-                className="p-2 rounded-md border"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="space-y-3">
-              <div>
-                <label className="block text-sm font-medium">
-                  Business name
-                </label>
-                <input
-                  value={formData.businessName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, businessName: e.target.value })
-                  }
-                  className="w-full mt-1 border rounded px-3 py-2"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium">
-                  Store username
-                </label>
-                <input
-                  value={formData.storeUsername}
-                  onChange={(e) =>
-                    setFormData({ ...formData, storeUsername: e.target.value })
-                  }
-                  className="w-full mt-1 border rounded px-3 py-2"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium">Description</label>
-                <textarea
-                  value={formData.storeDescription}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      storeDescription: e.target.value,
-                    })
-                  }
-                  className="w-full mt-1 border rounded px-3 py-2"
-                  rows={4}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-sm font-medium">Category</label>
-                  <input
-                    value={formData.businessCategory}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        businessCategory: e.target.value,
-                      })
-                    }
-                    className="w-full mt-1 border rounded px-3 py-2"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium">Email</label>
-                  <input
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                    className="w-full mt-1 border rounded px-3 py-2"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-sm font-medium">Phone</label>
-                  <input
-                    value={formData.phoneNumber}
-                    onChange={(e) =>
-                      setFormData({ ...formData, phoneNumber: e.target.value })
-                    }
-                    className="w-full mt-1 border rounded px-3 py-2"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium">WhatsApp</label>
-                  <input
-                    value={formData.whatsAppNumber}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        whatsAppNumber: e.target.value,
-                      })
-                    }
-                    className="w-full mt-1 border rounded px-3 py-2"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium">Address</label>
-                <input
-                  value={formData.address}
-                  onChange={(e) =>
-                    setFormData({ ...formData, address: e.target.value })
-                  }
-                  className="w-full mt-1 border rounded px-3 py-2"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                  <label className="block text-sm font-medium">City</label>
-                  <input
-                    value={formData.city}
-                    onChange={(e) =>
-                      setFormData({ ...formData, city: e.target.value })
-                    }
-                    className="w-full mt-1 border rounded px-3 py-2"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium">State</label>
-                  <input
-                    value={formData.state}
-                    onChange={(e) =>
-                      setFormData({ ...formData, state: e.target.value })
-                    }
-                    className="w-full mt-1 border rounded px-3 py-2"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium">Country</label>
-                  <input
-                    value={formData.country}
-                    onChange={(e) =>
-                      setFormData({ ...formData, country: e.target.value })
-                    }
-                    className="w-full mt-1 border rounded px-3 py-2"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-sm font-medium">
-                    Profile image (URL)
-                  </label>
-                  <input
-                    value={formData.profileImage}
-                    onChange={(e) =>
-                      setFormData({ ...formData, profileImage: e.target.value })
-                    }
-                    className="w-full mt-1 border rounded px-3 py-2"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium">
-                    Cover image (URL)
-                  </label>
-                  <input
-                    value={formData.coverImage}
-                    onChange={(e) =>
-                      setFormData({ ...formData, coverImage: e.target.value })
-                    }
-                    className="w-full mt-1 border rounded px-3 py-2"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium">
-                  Gallery (comma-separated URLs)
-                </label>
-                <input
-                  value={formData.gallery}
-                  onChange={(e) =>
-                    setFormData({ ...formData, gallery: e.target.value })
-                  }
-                  className="w-full mt-1 border rounded px-3 py-2"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
-                <div>
-                  <label className="inline-flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={!!formData.active}
-                      onChange={(e) =>
-                        setFormData({ ...formData, active: e.target.checked })
-                      }
-                    />
-                    <span className="ml-2">Active</span>
-                  </label>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium">Map lat</label>
-                  <input
-                    value={formData.mapLocationLat}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        mapLocationLat: e.target.value,
-                      })
-                    }
-                    className="w-full mt-1 border rounded px-3 py-2"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium">Map lng</label>
-                <input
-                  value={formData.mapLocationLng}
-                  onChange={(e) =>
-                    setFormData({ ...formData, mapLocationLng: e.target.value })
-                  }
-                  className="w-full mt-1 border rounded px-3 py-2"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowEditModal(false)}
-                  className="px-4 py-2 border rounded"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isUpdatingVendorProfile}
-                  className="px-4 py-2 bg-primary-3 text-white rounded"
-                >
-                  {isUpdatingVendorProfile
-                    ? "Updating Profile..."
-                    : "Save changes"}
-                </button>
-              </div>
-            </div>
-          </form>
-        </div>
-      ) : null}
+      {showEditModal && formData ? <EditProfile /> : null}
     </main>
   );
 }

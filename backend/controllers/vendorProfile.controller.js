@@ -1,5 +1,4 @@
 const vendorProfileModel = require("../models/vendorProfile.model");
-const { v4: uuidv4 } = require("uuid");
 
 const createVendorProfile = async (req, res) => {
   try {
@@ -18,17 +17,6 @@ const createVendorProfile = async (req, res) => {
     }
 
     const payload = { ...req.body, userId };
-
-/*     Object.keys(vendorProfileModel.schema.paths).forEach((field) => {
-      if (field === "email") return;
-      const opts = vendorProfileModel.schema.paths[field].options || {};
-      if (opts.unique) {
-        const v = payload[field];
-        if (v === undefined || v === null || v === "") {
-          payload[field] = `${field}_${uuidv4()}`;
-        }
-      }
-    }); */
 
     const vendorProfile = await vendorProfileModel.create(payload);
 

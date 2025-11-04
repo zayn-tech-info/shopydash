@@ -158,16 +158,5 @@ const vendorProfileSchema = new mongoose.Schema(
   }
 );
 
-Object.keys(vendorProfileSchema.paths).forEach(function (field) {
-  const opts = vendorProfileSchema.paths[field].options || {};
-  if (opts.unique) {
-    const spec = {};
-    spec[field] = 1;
-    vendorProfileSchema.index(spec, {
-      unique: true,
-      partialFilterExpression: { [field]: { $exists: true, $nin: [null, ""] } },
-    });
-  }
-});
 
 module.exports = mongoose.model("VendorProfile", vendorProfileSchema);
