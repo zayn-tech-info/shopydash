@@ -35,6 +35,8 @@ const testimonials = [
 export function Testimonial() {
   if (!Array.isArray(testimonials) || testimonials.length === 0) return null;
 
+
+  
   return (
     <section className="w-full px-4 sm:px-6 md:px-10 lg:px-8 mt-10">
       <div className="max-w-7xl mx-auto">
