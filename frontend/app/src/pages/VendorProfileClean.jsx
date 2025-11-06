@@ -2,7 +2,7 @@ import { toast } from "react-hot-toast";
 import Logo from "../assets/images/vendora_logo.png";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Edit, Link2, ShoppingCart } from "lucide-react";
+import { Edit, Link2 } from "lucide-react";
 import { useVendorProfileStore } from "../store/vendorProfileStore";
 import { useAuthStore } from "../store/authStore";
 import { NoProfile } from "../components/NoProfile";
@@ -10,18 +10,23 @@ import { Loader } from "../components/Loader";
 import { EditProfile } from "../components/EditProfile";
 
 export default function VendorProfileClean() {
-  const {
-    isGettingVendorProfile,
-    vendorProfile,
-    getVendorProfile,
-    isUpdatingVendorProfile,
-    updateVendorProfile,
-  } = useVendorProfileStore();
+  // subscribe to store with stable selectors to avoid re-creating
+  // an object on every render (which can cause infinite update loops)
+  const isGettingVendorProfile = useVendorProfileStore(
+    (state) => state.isGettingVendorProfile
+  );
+  const vendorProfile = useVendorProfileStore((state) => state.vendorProfile);
+  const getVendorProfile = useVendorProfileStore(
+    (state) => state.getVendorProfile
+  );
+  const updateVendorProfile = useVendorProfileStore(
+    (state) => state.updateVendorProfile
+  );
 
   const params = useParams();
   const [showEditModal, setShowEditModal] = useState(false);
   const [formData, setFormData] = useState(null);
-  const { authUser, checkAuth } = useAuthStore();
+  const { authUser } = useAuthStore();
 
   function copyProfileLink() {
     const link = window.location.href;

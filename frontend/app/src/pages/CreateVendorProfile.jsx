@@ -19,7 +19,7 @@ export default function CreateVendorProfile() {
 
   const paymentOptions = [
     { id: "bank_transfer", label: "Bank transfer" },
-    { id: "paypal", label: "PayPal" },
+    { id: "paystack", label: "paystack" },
     { id: "credit_card", label: "Credit / Debit" },
   ];
 
@@ -47,45 +47,8 @@ export default function CreateVendorProfile() {
     const err = validate();
     if (err) return toast.error(err);
 
-    const payload = {
-      businessName: profileData.businessName,
-      storeUsername: profileData.storeUsername,
-      storeDescription: profileData.storeDescription,
-      businessCategory: profileData.businessCategory,
-      phoneNumber: profileData.phoneNumber,
-      whatsAppNumber: profileData.whatsAppNumber,
-      email: profileData.email,
-      profileImage: profileData.profileImage,
-      coverImage: profileData.coverImage,
-      gallery: profileData.gallery
-        ? profileData.gallery
-            .split(",")
-            .map((s) => s.trim())
-            .filter(Boolean)
-        : [],
-      address: profileData.address,
-      city: profileData.city,
-      state: profileData.state,
-      country: profileData.country,
-      mapLocation:
-        profileData.mapLocationLat || profileData.mapLocationLng
-          ? { lat: profileData.mapLocationLat, lng: profileData.mapLocationLng }
-          : null,
-      accountNumber: profileData.accountNumber,
-      paymentMethods: profileData.paymentMethods || [],
-      socialLinks: {
-        instagram: profileData.instagram,
-        facebook: profileData.facebook,
-        twitter: profileData.twitter,
-      },
-      settings: {
-        notifications: !!profileData.notifications,
-        autoReply: !!profileData.autoReply,
-      },
-    };
-
     try {
-      await createVendorProfile(payload);
+      await createVendorProfile(profileData);
       toast.success("Profile created");
       if (profileData.storeUsername)
         navigate(`/vendor/${profileData.storeUsername}`);
@@ -112,7 +75,7 @@ export default function CreateVendorProfile() {
             <h2 className="text-lg font-medium">Basic information</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <InputField
-                onChange
+                onChange={(e) => setProfileField("businessName", e.target.value)}
                 label="Business name"
                 value={profileData.businessName}
               />

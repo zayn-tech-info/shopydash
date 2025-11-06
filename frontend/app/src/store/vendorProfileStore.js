@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { api } from "../lib/axios";
-import { initialProfileData } from "../constants";
 
 const profileData = {
   businessName: "",
@@ -26,27 +25,20 @@ const profileData = {
   twitter: "",
 };
 
-export const useVendorProfileStore = create((set, get) => ({
+export const useVendorProfileStore = create((set) => ({
   ...profileData,
-  isCreatingProfile: false,
-  error: null,
   vendorProfile: null,
+  isCreatingProfile: false,
   updatedVendorProfile: null,
-  isGettingVendorProfile: false,
   isUpdatingVendorProfile: false,
-  vendorProfileData: null,
+  isGettingVendorProfile: false,
+  error: null,
 
   setProfileField: (field, value) => {
     set((state) => ({ profileData: { ...state.profileData, [field]: value } }));
   },
 
-  resetProfileData: () => set({ profileData: { ...initialProfileData } }),
-
-  reset: () =>
-    set({
-      profileData: { ...initialProfileData },
-      error: null,
-    }),
+  resetProfileData: () => set({ profileData: { ...profileData } }),
 
   createVendorProfile: async (data) => {
     try {
@@ -70,14 +62,28 @@ export const useVendorProfileStore = create((set, get) => ({
     }
   },
 
-  getVendorProfile: async () => {
+  // Fetch vendor profile. If `username` is provided, fetch public store profile
+  // at /store/:storeUsername. Otherwise fetch the authenticated vendor's profile
+  // at /me.
+  getVendorProfile: async (username) => {
     try {
       set({ isGettingVendorProfile: true, error: null });
 
-      const res = await api.get(`/api/v1/vendorProfile/me`);
+      const url = username
+        ? `/api/v1/vendorProfile/store/${encodeURIComponent(username)}`
+        : `/api/v1/vendorProfile/me`;
+
+      const res = await api.get(url);
       console.log("API response", res);
 
       const payload = res?.data?.data ?? res?.data ?? res;
+
+      // populate store with the fetched profile
+      set({
+        vendorProfile: payload,
+        isGettingVendorProfile: false,
+        error: null,
+      });
 
       return payload;
     } catch (err) {
