@@ -101,7 +101,7 @@ export const useVendorProfileStore = create((set, get) => ({
       );
       console.log("API response", res);
       const payload = res?.data?.data ?? res?.data ?? res;
-   
+
       return payload;
     } catch (err) {
       const serverMessage =
