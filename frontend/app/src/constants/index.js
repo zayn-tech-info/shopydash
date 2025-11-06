@@ -23,33 +23,6 @@ import {
   cottonHeadNeckArabScarfImg,
 } from "../utils";
 
-
-
-
-export const initialProfileData = {
-  businessName: "",
-  storeUsername: "",
-  storeDescription: "",
-  businessCategory: "",
-  phoneNumber: "",
-  whatsAppNumber: "",
-  email: "",
-  profileImage: "",
-  coverImage: "",
-  gallery: "",
-  address: "",
-  city: "",
-  state: "",
-  country: "",
-  schoolName: "",
-  zipCode: "",
-  accountNumber: "",
-  paymentMethods: [],
-  instagram: "",
-  facebook: "",
-  twitter: "",
-};
-
 export const navigation = [
   {
     id: 1,

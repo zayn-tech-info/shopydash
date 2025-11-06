@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { Loader } from "../components/Loader";
 import { useVendorProfileStore } from "../store/vendorProfileStore";
+import { InputField } from "../components/InputField";
 
 export default function CreateVendorProfile() {
   const navigate = useNavigate();
@@ -110,30 +111,12 @@ export default function CreateVendorProfile() {
           <section className="space-y-3">
             <h2 className="text-lg font-medium">Basic information</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-sm font-medium">
-                  Business name
-                </label>
-                <input
-                  value={profileData.businessName}
-                  onChange={(e) =>
-                    setProfileField("businessName", e.target.value)
-                  }
-                  className="w-full mt-1 border rounded px-3 py-2"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium">
-                  Store username
-                </label>
-                <input
-                  value={profileData.storeUsername}
-                  onChange={(e) =>
-                    setProfileField("storeUsername", e.target.value)
-                  }
-                  className="w-full mt-1 border rounded px-3 py-2"
-                />
-              </div>
+              <InputField
+                onChange
+                label="Business name"
+                value={profileData.businessName}
+              />
+              <InputField label="Store name" />
             </div>
 
             <div>
@@ -148,147 +131,27 @@ export default function CreateVendorProfile() {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium">Category</label>
-              <input
-                value={profileData.businessCategory}
-                onChange={(e) =>
-                  setProfileField("businessCategory", e.target.value)
-                }
-                className="w-full mt-1 border rounded px-3 py-2"
-              />
-            </div>
+            <InputField label="Category" />
           </section>
 
           <section className="space-y-3">
             <h2 className="text-lg font-medium">Contact</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-sm font-medium">Phone</label>
-                <input
-                  value={profileData.phoneNumber}
-                  onChange={(e) =>
-                    setProfileField("phoneNumber", e.target.value)
-                  }
-                  className="w-full mt-1 border rounded px-3 py-2"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium">WhatsApp</label>
-                <input
-                  value={profileData.whatsAppNumber}
-                  onChange={(e) =>
-                    setProfileField("whatsAppNumber", e.target.value)
-                  }
-                  className="w-full mt-1 border rounded px-3 py-2"
-                />
-              </div>
+              <InputField label="Phone number" />
+              <InputField label="WhatsApp number" />
             </div>
-
-            <div>
-              <label className="block text-sm font-medium">Email</label>
-              <input
-                value={profileData.email}
-                onChange={(e) => setProfileField("email", e.target.value)}
-                className="w-full mt-1 border rounded px-3 py-2"
-              />
-            </div>
+            <InputField label="Email" />
           </section>
 
           <section className="space-y-3">
             <h2 className="text-lg font-medium">Location</h2>
-            <div>
-              <label className="block text-sm font-medium">Address</label>
-              <input
-                value={profileData.address}
-                onChange={(e) => setProfileField("address", e.target.value)}
-                className="w-full mt-1 border rounded px-3 py-2"
-              />
-            </div>
+            <InputField label="Address" />
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <input
-                value={profileData.city}
-                onChange={(e) => setProfileField("city", e.target.value)}
-                placeholder="City"
-                className="w-full mt-1 border rounded px-3 py-2"
-              />
-              <input
-                value={profileData.state}
-                onChange={(e) => setProfileField("state", e.target.value)}
-                placeholder="State"
-                className="w-full mt-1 border rounded px-3 py-2"
-              />
-              <input
-                value={profileData.country}
-                onChange={(e) => setProfileField("country", e.target.value)}
-                placeholder="Country"
-                className="w-full mt-1 border rounded px-3 py-2"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-sm font-medium">Map lat</label>
-                <input
-                  value={profileData.mapLocationLat || ""}
-                  onChange={(e) =>
-                    setProfileField("mapLocationLat", e.target.value)
-                  }
-                  className="w-full mt-1 border rounded px-3 py-2"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium">Map lng</label>
-                <input
-                  value={profileData.mapLocationLng || ""}
-                  onChange={(e) =>
-                    setProfileField("mapLocationLng", e.target.value)
-                  }
-                  className="w-full mt-1 border rounded px-3 py-2"
-                />
-              </div>
-            </div>
-          </section>
-
-          <section className="space-y-3">
-            <h2 className="text-lg font-medium">Media</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-sm font-medium">
-                  Profile image (URL)
-                </label>
-                <input
-                  value={profileData.profileImage}
-                  onChange={(e) =>
-                    setProfileField("profileImage", e.target.value)
-                  }
-                  className="w-full mt-1 border rounded px-3 py-2"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium">
-                  Cover image (URL)
-                </label>
-                <input
-                  value={profileData.coverImage}
-                  onChange={(e) =>
-                    setProfileField("coverImage", e.target.value)
-                  }
-                  className="w-full mt-1 border rounded px-3 py-2"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium">
-                Gallery (comma-separated URLs)
-              </label>
-              <input
-                value={profileData.gallery}
-                onChange={(e) => setProfileField("gallery", e.target.value)}
-                className="w-full mt-1 border rounded px-3 py-2"
-              />
+              {/* No label here */}
+              <InputField placeholder="City" />
+              <InputField placeholder="State" />
+              <InputField placeholder="Country" />
             </div>
           </section>
 
@@ -307,65 +170,15 @@ export default function CreateVendorProfile() {
               ))}
             </div>
 
-            <div>
-              <label className="block text-sm font-medium">
-                Account number
-              </label>
-              <input
-                value={profileData.accountNumber}
-                onChange={(e) =>
-                  setProfileField("accountNumber", e.target.value)
-                }
-                className="w-full mt-1 border rounded px-3 py-2"
-              />
-            </div>
+            <InputField label="Account number" />
           </section>
 
           <section className="space-y-3">
             <h2 className="text-lg font-medium">Social & settings</h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <input
-                value={profileData.instagram}
-                onChange={(e) => setProfileField("instagram", e.target.value)}
-                placeholder="Instagram"
-                className="w-full mt-1 border rounded px-3 py-2"
-              />
-              <input
-                value={profileData.facebook}
-                onChange={(e) => setProfileField("facebook", e.target.value)}
-                placeholder="Facebook"
-                className="w-full mt-1 border rounded px-3 py-2"
-              />
-              <input
-                value={profileData.twitter}
-                onChange={(e) => setProfileField("twitter", e.target.value)}
-                placeholder="Twitter"
-                className="w-full mt-1 border rounded px-3 py-2"
-              />
-            </div>
-
-            <div className="flex items-center gap-4">
-              <label className="inline-flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={!!profileData.notifications}
-                  onChange={(e) =>
-                    setProfileField("notifications", e.target.checked)
-                  }
-                />
-                <span className="text-sm">Enable notifications</span>
-              </label>
-
-              <label className="inline-flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={!!profileData.autoReply}
-                  onChange={(e) =>
-                    setProfileField("autoReply", e.target.checked)
-                  }
-                />
-                <span className="text-sm">Auto-reply customers</span>
-              </label>
+              <InputField placeholder="Instagram" />
+              <InputField placeholder="Twitter" />
+              <InputField placeholder="Facebook" />
             </div>
           </section>
 
