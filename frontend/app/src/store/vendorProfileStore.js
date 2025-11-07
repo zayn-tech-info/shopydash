@@ -10,9 +10,7 @@ const initialProfileData = {
   phoneNumber: "",
   whatsAppNummber: "",
   email: "",
-  profileImage: "",
   coverImage: "",
-  gallery: "",
   address: "",
   city: "",
   state: "",
@@ -61,8 +59,6 @@ export const useVendorProfileStore = create((set) => ({
         "An unknown error occurred";
       console.error("create vendor profile error:", err);
       set({ error: serverMessage, isCreatingProfile: false });
-
-      throw serverMessage;
     }
   },
 

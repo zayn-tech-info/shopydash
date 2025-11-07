@@ -10,8 +10,6 @@ import { Loader } from "../components/Loader";
 import { EditProfile } from "../components/EditProfile";
 
 export default function VendorProfileClean() {
-  // subscribe to store with stable selectors to avoid re-creating
-  // an object on every render (which can cause infinite update loops)
   const isGettingVendorProfile = useVendorProfileStore(
     (state) => state.isGettingVendorProfile
   );

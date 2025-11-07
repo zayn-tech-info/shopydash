@@ -64,9 +64,8 @@ export default function CreateVendorProfile() {
     try {
       await createVendorProfile(profileData);
       toast.success("Profile created");
-      if (profileData.storeUsername)
-        navigate(`/vendor/${profileData.storeUsername}`);
-      else navigate(`/vendor/me`);
+
+      navigate(`/vendor/${profileData.storeUsername}`);
     } catch (e) {
       const msg =
         e?.response?.data?.message || e.message || "Failed to create profile";

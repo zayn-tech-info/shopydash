@@ -59,7 +59,7 @@ const App = () => {
             }
           />
           <Route path="/vendor/dashboard" element={<VendorDashboard />} />
-          <Route path="/:storeUsername" element={<VendorProfileClean />} />
+          <Route path="vendor/:storeUsername" element={<VendorProfileClean />} />
         </Routes>
       </div>
       {authUser ? <Footer /> : ""}

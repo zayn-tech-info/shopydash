@@ -3,7 +3,7 @@ const validator = require("validator");
 
 const VendorProfileAllowedPaymentMethods = [
   "bank_transfer",
-  "paypal",
+  "paystack",
   "credit_card",
 ];
 
@@ -34,7 +34,6 @@ const vendorProfileSchema = new mongoose.Schema(
     },
     phoneNumber: {
       type: String,
-
       unique: true,
       trim: true,
     },
@@ -66,7 +65,7 @@ const vendorProfileSchema = new mongoose.Schema(
     state: String,
     city: String,
     country: String,
-    mapLocation: {
+    /*     mapLocation: {
       type: {
         type: String,
         enum: ["Point"],
@@ -77,14 +76,22 @@ const vendorProfileSchema = new mongoose.Schema(
         default: [0, 0],
       },
     },
-    logo: {
-      type: String,
-      lowercase: true,
-    },
-    bannerImage: {
+ */
+    address: {
       type: String,
     },
-
+    city: {
+      type: String,
+    },
+    state: {
+      type: String,
+    },
+    country: {
+      type: String,
+    },
+    schoolName: {
+      type: String,
+    },
     website: {
       type: String,
       lowercase: true,
@@ -104,6 +111,10 @@ const vendorProfileSchema = new mongoose.Schema(
     totalSales: {
       type: Number,
       default: 0,
+    },
+    reviews: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Review",
     },
     products: [
       {
@@ -139,10 +150,6 @@ const vendorProfileSchema = new mongoose.Schema(
       },
       default: [],
     },
-    walletBalance: {
-      type: Number,
-      default: 0,
-    },
     socialLinks: {
       instagram: String,
       facebook: String,
@@ -157,6 +164,5 @@ const vendorProfileSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
 
 module.exports = mongoose.model("VendorProfile", vendorProfileSchema);
