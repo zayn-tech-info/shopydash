@@ -35,22 +35,9 @@ const createVendorProfile = async (req, res) => {
 
 const getVendorProfile = async (req, res) => {
   try {
-    const { storeUsername } = req.params || {};
+    const userId = req.user._id;
 
-    let vendorProfile;
-    if (storeUsername) {
-      vendorProfile = await vendorProfileModel.findOne({
-        storeUsername,
-      });
-    } else {
-      const userId = req.user && req.user._id;
-      if (!userId) {
-        return res
-          .status(401)
-          .json({ success: false, message: "Unauthorized" });
-      }
-      vendorProfile = await vendorProfileModel.findOne({ userId });
-    }
+    const vendorProfile = await vendorProfileModel.findOne({ userId });
 
     if (!vendorProfile) {
       return res

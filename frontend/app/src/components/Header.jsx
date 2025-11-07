@@ -2,9 +2,20 @@ import Logo from "../assets/images/vendora_logo.png";
 import { navigation } from "../constants";
 import { Link, NavLink } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
+import { useVendorProfileStore } from "../store/vendorProfileStore";
+import { useEffect } from "react";
 
 export function Header() {
   const { authUser } = useAuthStore();
+  const vendorProfile = useVendorProfileStore((state) => state.vendorProfile);
+  const getVendorProfile = useVendorProfileStore(
+    (state) => state.getVendorProfile
+  );
+
+  useEffect(() => {
+    getVendorProfile();
+    console.log(vendorProfile);
+  }, [getVendorProfile, vendorProfile]);
 
   return (
     <header className="sticky top-0 z-50 bg-n-1/90 backdrop-blur shadow-md">
@@ -24,7 +35,12 @@ export function Header() {
         <nav className="hidden md:flex items-center space-x-5 text-base">
           <ul className="flex items-center gap-10 mr-10">
             {navigation.map((nav) => {
-              const to = nav.href === "/home" ? "/" : nav.href;
+              let to = nav.href === "/home" ? "/" : nav.href;
+              if (nav.href === "/me") {
+                to = vendorProfile.vendorProfile?.storeUsername
+                ? `/store/${vendorProfile.vendorProfile.storeUsername}`
+                  : "/createvendorprofile";
+              }
               const Icon = nav.icon;
               return (
                 <li key={nav.id}>

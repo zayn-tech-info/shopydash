@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { api } from "../lib/axios";
 
- 
 const initialProfileData = {
   businessName: "",
   storeUsername: "",
@@ -48,7 +47,7 @@ export const useVendorProfileStore = create((set) => ({
       );
       console.log("API response", res);
       const payload = res?.data?.data ?? res?.data ?? res;
- 
+
       set({ vendorProfile: payload, isCreatingProfile: false, error: null });
       return payload;
     } catch (err) {
@@ -62,23 +61,15 @@ export const useVendorProfileStore = create((set) => ({
     }
   },
 
-  // Fetch vendor profile. If `username` is provided, fetch public store profile
-  // at /store/:storeUsername. Otherwise fetch the authenticated vendor's profile
-  // at /me.
-  getVendorProfile: async (username) => {
+  getVendorProfile: async () => {
     try {
       set({ isGettingVendorProfile: true, error: null });
 
-      const url = username
-        ? `/api/v1/vendorProfile/store/${encodeURIComponent(username)}`
-        : `/api/v1/vendorProfile/me`;
-
-      const res = await api.get(url);
+      const res = await api.get("/api/v1/vendorProfile/store");
       console.log("API response", res);
 
       const payload = res?.data?.data ?? res?.data ?? res;
-
-      // populate store with the fetched profile
+ 
       set({
         vendorProfile: payload,
         isGettingVendorProfile: false,
