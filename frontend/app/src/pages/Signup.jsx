@@ -9,7 +9,9 @@ import { toast } from "react-hot-toast";
 import { SignupForm } from "../components/SignupForm";
 
 export function Signup() {
-  const { createVendorProfile } = useVendorProfileStore();
+  const createVendorProfile = useVendorProfileStore(
+    (state) => state.createVendorProfile
+  );
   const {
     role,
     showPassword,

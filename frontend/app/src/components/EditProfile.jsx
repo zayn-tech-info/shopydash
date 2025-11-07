@@ -3,14 +3,10 @@ import { useParams } from "react-router-dom";
 import { useVendorProfileStore } from "../store/vendorProfileStore";
 
 export function EditProfile() {
-  const {
-    vendorProfile,
+  const vendorProfile = useVendorProfileStore((state) => state.vendorProfile);
+  const isUpdatingVendorProfile = useVendorProfileStore((state) => state.isUpdatingVendorProfile);
+  const updateVendorProfile = useVendorProfileStore((state) => state.updateVendorProfile);
 
-    isUpdatingVendorProfile,
-    updateVendorProfile,
-  } = useVendorProfileStore();
-
-  const params = useParams();
   const [showEditModal, setShowEditModal] = useState(false);
   const [formData, setFormData] = useState(null);
 

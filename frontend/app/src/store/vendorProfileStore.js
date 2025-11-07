@@ -1,13 +1,14 @@
 import { create } from "zustand";
 import { api } from "../lib/axios";
 
-const profileData = {
+ 
+const initialProfileData = {
   businessName: "",
   storeUsername: "",
   storeDescription: "",
   businessCategory: "",
   phoneNumber: "",
-  whatsAppNumber: "",
+  whatsAppNummber: "",
   email: "",
   profileImage: "",
   coverImage: "",
@@ -26,7 +27,7 @@ const profileData = {
 };
 
 export const useVendorProfileStore = create((set) => ({
-  ...profileData,
+  profileData: { ...initialProfileData },
   vendorProfile: null,
   isCreatingProfile: false,
   updatedVendorProfile: null,
@@ -38,9 +39,10 @@ export const useVendorProfileStore = create((set) => ({
     set((state) => ({ profileData: { ...state.profileData, [field]: value } }));
   },
 
-  resetProfileData: () => set({ profileData: { ...profileData } }),
+  resetProfileData: () => set({ profileData: { ...initialProfileData } }),
 
   createVendorProfile: async (data) => {
+    set({ isCreatingProfile: true, error: null });
     try {
       const res = await api.post(
         "/api/v1/vendorProfile/createVendorProfile",
@@ -48,7 +50,9 @@ export const useVendorProfileStore = create((set) => ({
       );
       console.log("API response", res);
       const payload = res?.data?.data ?? res?.data ?? res;
-      set({ userData: payload, isCreatingProfile: false, error: null });
+ 
+      set({ vendorProfile: payload, isCreatingProfile: false, error: null });
+      return payload;
     } catch (err) {
       const serverMessage =
         err?.response?.data?.message ??
@@ -56,7 +60,7 @@ export const useVendorProfileStore = create((set) => ({
         err?.message ??
         "An unknown error occurred";
       console.error("create vendor profile error:", err);
-      set({ error: serverMessage, isSigningUp: false });
+      set({ error: serverMessage, isCreatingProfile: false });
 
       throw serverMessage;
     }
