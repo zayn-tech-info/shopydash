@@ -1,16 +1,14 @@
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { Home } from "./pages/Home";
 import VendorDashboard from "./pages/VendorDashboard";
-import VendorProfile from "./pages/VendorProfileClean";
+import VendorProfile from "./pages/VendorProfile";
 import { Header } from "./components/Header";
-import { disablePageScroll, enablePageScroll } from "scroll-lock";
 import { useEffect, useState } from "react";
 import { Footer } from "./components/Footer";
 import { Login } from "./pages/Login";
 import { Signup } from "./pages/Signup";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/authStore";
-import VendorProfileClean from "./pages/VendorProfileClean";
 import { BottomNav } from "./components/BottomNav";
 import { Loader } from "./components/Loader";
 import CreateVendorProfile from "./pages/CreateVendorProfile";
@@ -59,12 +57,8 @@ const App = () => {
             }
           />
           <Route path="/vendor/dashboard" element={<VendorDashboard />} />
-          <Route
-            path="store/:storeUsername"
-            element={
-              authUser ? <VendorProfileClean /> : <Navigate to="/login" />
-            }
-          />
+          <Route path="store/:storeUsername" element={<VendorProfile />} />
+          <Route path="me" element={<VendorProfile />} />
         </Routes>
       </div>
       {authUser ? <Footer /> : ""}

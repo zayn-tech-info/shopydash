@@ -9,7 +9,6 @@ export function Waitlist() {
 
   const handleWaitlistSubmit = (e) => {
     e.preventDefault();
-    console.log("Waitlist submission:", { email, role });
     setSubmitted(true);
     setTimeout(() => {
       setSubmitted(false);

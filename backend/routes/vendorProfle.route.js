@@ -2,6 +2,7 @@ const express = require("express");
 const {
   createVendorProfile,
   getVendorProfile,
+  getPublicVendorProfile,
   updateVendorProfile,
 } = require("../controllers/vendorProfile.controller");
 const { protectRoute, verifyRole } = require("../middleware/auth.middleware");
@@ -15,13 +16,10 @@ route.post(
   createVendorProfile
 );
 
-route.get(
-  "/store",
-  protectRoute,
-  verifyRole("vendor"),
-  getVendorProfile
-);
+route.get("/store/:storeUsername", getPublicVendorProfile);
+
 route.get("/me", protectRoute, verifyRole("vendor"), getVendorProfile);
+
 route.patch(
   "/updateVendorProfile",
   protectRoute,

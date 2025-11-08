@@ -36,7 +36,6 @@ const createVendorProfile = async (req, res) => {
 const getVendorProfile = async (req, res) => {
   try {
     const userId = req.user._id;
-
     const vendorProfile = await vendorProfileModel.findOne({ userId });
 
     if (!vendorProfile) {
@@ -45,11 +44,47 @@ const getVendorProfile = async (req, res) => {
         .json({ success: false, message: "Vendor profile not found" });
     }
 
+    res.status(200).json({
+      success: true,
+      data: {
+        vendorProfile,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || "Server error",
+    });
+  }
+};
+
+const getPublicVendorProfile = async (req, res) => {
+  try {
+    const storeUsername = req.params.storeUsername;
+
+    if (!storeUsername) {
+      return res.status(400).json({
+        success: false,
+        message: "storeUsername is required",
+      });
+    }
+
+    const vendorProfile = await vendorProfileModel.findOne({
+      storeUsername: storeUsername,
+    });
+
+    if (!vendorProfile) {
+      return res.status(404).json({
+        success: false,
+        message: "Vendor profile not found",
+      });
+    }
     res.status(200).json({ success: true, data: { vendorProfile } });
   } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, message: error.message || "Server error" });
+    res.status(500).json({
+      success: false,
+      message: error.message || "Server error",
+    });
   }
 };
 
@@ -82,4 +117,9 @@ const updateVendorProfile = async (req, res) => {
   }
 };
 
-module.exports = { createVendorProfile, getVendorProfile, updateVendorProfile };
+module.exports = {
+  createVendorProfile,
+  getVendorProfile,
+  getPublicVendorProfile,
+  updateVendorProfile,
+};

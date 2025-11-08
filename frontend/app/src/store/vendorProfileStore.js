@@ -48,7 +48,11 @@ export const useVendorProfileStore = create((set) => ({
       console.log("API response", res);
       const payload = res?.data?.data ?? res?.data ?? res;
 
-      set({ vendorProfile: payload, isCreatingProfile: false, error: null });
+      set({
+        vendorProfile: payload.vendorProfile,
+        isCreatingProfile: false,
+        error: null,
+      });
       return payload;
     } catch (err) {
       const serverMessage =
@@ -65,18 +69,19 @@ export const useVendorProfileStore = create((set) => ({
     try {
       set({ isGettingVendorProfile: true, error: null });
 
-      const res = await api.get("/api/v1/vendorProfile/store");
+      const res = await api.get("/api/v1/vendorProfile/me");
       console.log("API response", res);
 
       const payload = res?.data?.data ?? res?.data ?? res;
- 
+
+      const profile = payload?.vendorProfile ?? payload;
       set({
-        vendorProfile: payload,
+        vendorProfile: profile,
         isGettingVendorProfile: false,
         error: null,
       });
 
-      return payload;
+      return profile;
     } catch (err) {
       const serverMessage =
         err?.response?.data?.message ??
@@ -85,8 +90,6 @@ export const useVendorProfileStore = create((set) => ({
         "An unknown error occurred";
       console.error("get vendor profile error:", err);
       set({ error: serverMessage, isGettingVendorProfile: false });
-
-      throw serverMessage;
     }
   },
   updateVendorProfile: async (data) => {

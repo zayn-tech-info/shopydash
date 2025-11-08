@@ -9,7 +9,7 @@ import { NoProfile } from "../components/NoProfile";
 import { Loader } from "../components/Loader";
 import { EditProfile } from "../components/EditProfile";
 
-export default function VendorProfileClean() {
+export default function VendorProfile() {
   const isGettingVendorProfile = useVendorProfileStore(
     (state) => state.isGettingVendorProfile
   );
