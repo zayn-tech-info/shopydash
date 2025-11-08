@@ -23,7 +23,6 @@ export const useAuthStore = create((set) => ({
     console.log("Recieved Data: ", data);
     try {
       const res = await api.post("/api/v1/auth/login", data);
-
       console.log("API response: ", res);
       const payload = res?.data?.data ?? res?.data ?? res;
 
