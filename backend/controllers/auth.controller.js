@@ -1,7 +1,5 @@
 const User = require("../models/auth.model");
 const sendToken = require("../utils/sendToken");
-const jwt = require("jsonwebtoken");
-const util = require("util");
 const validator = require("validator");
 
 const signup = async (req, res, next) => {

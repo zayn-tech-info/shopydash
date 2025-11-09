@@ -94,10 +94,18 @@ const updateVendorProfile = async (req, res) => {
     if (!userId)
       return res.status(401).json({ success: false, message: "Unauthorized" });
 
+    const vendorProfile = await vendorProfileModel.findOne({ userId });
+
+    if (!vendorProfile) {
+      return res.status(200).json({
+        success: false,
+        message: "Profile not found",
+      });
+    }
     const updated = await vendorProfileModel.findOneAndUpdate(
       { userId },
       { $set: req.body },
-      { new: true }
+      { new: true, runValidators: true, upsert: false }
     );
 
     if (!updated)

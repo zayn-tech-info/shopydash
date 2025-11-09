@@ -19,6 +19,7 @@ const clientProfileSchema = new mongoose.Schema({
     lowercase: true,
     type: String,
     unique: true,
+    required: true
   },
   phoneNumber: {
     type: String,

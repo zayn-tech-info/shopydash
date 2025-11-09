@@ -52,4 +52,78 @@ const createClientProfile = async (req, res) => {
   }
 };
 
-module.exports = { createClientProfile };
+// 1. Verify client authentication (check JWT or session).
+// 2. Extract userId from authenticated user.`
+// 3. Query database for profile matching userId.
+// 4. If profile not found, return “Profile not found” response.
+// 5. If found, return profile data in success response.
+
+const getClientProfile = async (req, res) => {
+  try {
+    const userId = req.user && req.user._id;
+
+    const clientProfile = await clientProfileSchema.findOne({ userId });
+
+    if (!clientProfile) {
+      return res.status(404).json({
+        success: true,
+        message: "Profile not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        clientProfile,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || "Internal server error",
+    });
+  }
+};
+
+// Verify client authentication (check JWT or session).
+// Extract userId from authenticated user.
+// Check if client profile exists for userId.
+// If not found, return “Profile not found” response.
+// Validate incoming update data.
+// Update profile fields with new data.
+// Save updated profile to database.
+// Return success response with updated profile data.
+
+const updateClientProfile = async () => {
+  try {
+    const userId = req.user && req.user._id;
+
+    const clientProfile = await clientProfileSchema.findOne({ userId });
+    if (!clientProfile) {
+      return res.status(404).json({
+        success: false,
+        message: "Profile not found ",
+      });
+    }
+
+    const updatedClientProfile = await clientProfileSchema.findOneAndUpdate(
+      { userId },
+      { $set: req.body },
+      { new: true, runValidators: true, upsert: false }
+    );
+
+    res.status(200).json({
+      success: true,
+      data: {
+        updatedClientProfile,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || "Internal server error",
+    });
+  }
+};
+
+module.exports = { createClientProfile, getClientProfile, updateClientProfile };
