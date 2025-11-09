@@ -17,11 +17,11 @@ const vendorProfileSchema = new mongoose.Schema(
     businessName: {
       type: String,
       unique: true,
-      lowercase: true,
       trim: true,
       sparse: true,
     },
     storeUsername: {
+      lowercase: true,
       type: String,
       unique: true,
       sparse: true,
