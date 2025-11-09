@@ -94,7 +94,7 @@ const getClientProfile = async (req, res) => {
 // Save updated profile to database.
 // Return success response with updated profile data.
 
-const updateClientProfile = async () => {
+const updateClientProfile = async (req, res) => {
   try {
     const userId = req.user && req.user._id;
 
