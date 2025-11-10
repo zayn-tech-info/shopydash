@@ -7,12 +7,12 @@ export default function AboutWishlist({ profile }) {
   const wishlist = profile?.wishlist || [];
 
   return (
-    <div className="flex-1 bg-white p-6 rounded-md border shadow-sm">
-      <div className="flex items-center gap-6 mb-6">
+    <div className="flex-1 bg-white  rounded-md border border-t-0 border-x-0 shadow-sm">
+      <div className="flex items-center p-6 pb-0 pt-0 gap-3 border-b-2 mb-6">
         <button
           onClick={() => setTab("wishlist")}
           className={`px-3 py-2 rounded-t-md ${
-            tab === "wishlist" ? "text-n-1 bg-primary-3" : "text-n-6"
+            tab === "wishlist" ? "text-n-1 bg-primary-3" : "text-n-6 border-2"
           }`}
         >
           Wishlist
@@ -20,7 +20,7 @@ export default function AboutWishlist({ profile }) {
         <button
           onClick={() => setTab("about")}
           className={`px-3 py-2 rounded-t-md ${
-            tab === "about" ? "text-n-1 bg-primary-3" : "text-n-6"
+            tab === "about" ? "text-n-1 bg-primary-3" : "text-n-6 border-2"
           }`}
         >
           About

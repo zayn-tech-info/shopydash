@@ -4,34 +4,31 @@ import ProfileHeader from "../components/Profile/ProfileHeader";
 import AboutWishlist from "../components/Profile/AboutWishlist";
 import { useAuthStore } from "../store/authStore";
 import { useNavigate } from "react-router-dom";
+import { useClientProfileStore } from "../store/clientProfileStore";
+import { Edit } from "lucide-react";
 
 export function ClientProfile() {
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const authUser = useAuthStore((state) => state.authUser);
+  const loading = useClientProfileStore((state) => state.loading);
+  const error = useClientProfileStore((state) => state.error);
+  const clientProfile = useClientProfileStore((state) => state.clientProfile);
+  const getClientProfile = useClientProfileStore(
+    (state) => state.getClientProfile
+  );
+
   const logout = useAuthStore((s) => s.logout);
   const navigate = useNavigate();
 
   useEffect(() => {
-    let mounted = true;
-    const fetchProfile = async () => {
-      try {
-        const res = await api.get("/api/v1/clientProfile/getClientProfile");
-        const payload = res?.data?.data?.clientProfile || null;
-        if (mounted) setProfile(payload);
-      } catch (err) {
-        setError(
-          err?.response?.data?.message || err.message || "Failed to load"
-        );
-      } finally {
-        if (mounted) setLoading(false);
-      }
+    const fetchClientProfile = async () => {
+      await getClientProfile();
     };
-    fetchProfile();
-    return () => {
-      mounted = false;
-    };
-  }, []);
+    fetchClientProfile();
+  }, [getClientProfile]);
+
+  useEffect(() => {
+    console.log(clientProfile);
+  }, [clientProfile]);
 
   if (loading) return <div className="p-8">Loading profile…</div>;
   if (error) return <div className="p-8 text-red-600">{error}</div>;
@@ -40,7 +37,10 @@ export function ClientProfile() {
     <div className="container mx-auto p-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="md:col-span-1">
-          <ProfileHeader profile={profile} />
+          <ProfileHeader
+            getClientProfile={getClientProfile}
+            clientProfile={clientProfile}
+          />
         </div>
 
         <div className="md:col-span-3">
@@ -48,17 +48,31 @@ export function ClientProfile() {
             <div className="flex items-start justify-between">
               <div>
                 <h1 className="text-xl font-bold text-n-9">
-                  {profile?.fullName}
+                  {clientProfile?.fullName}
                 </h1>
                 <p className="text-sm text-n-6">
-                  @{profile?.username || "-"} •{" "}
-                  {[profile?.city, profile?.state, profile?.country]
+                  @{clientProfile?.username || "-"} •{" "}
+                  {[
+                    clientProfile?.city,
+                    clientProfile?.state,
+                    clientProfile?.country,
+                  ]
                     .filter(Boolean)
                     .join(", ")}
                 </p>
               </div>
 
               <div className="flex items-center gap-3">
+                {authUser &&
+                clientProfile &&
+                authUser._id === clientProfile.userId ? (
+                  <button
+                    className="h-10 px-4 bg-n-1 text-n-9 border-n-3 border rounded-md text-sm inline-flex items-center justify-center"
+                    title="Logout"
+                  >
+                    <Edit />
+                  </button>
+                ) : null}
                 <button
                   onClick={() => {
                     logout();
@@ -73,7 +87,7 @@ export function ClientProfile() {
           </div>
 
           <div className="mt-4">
-            <AboutWishlist profile={profile} />
+            <AboutWishlist clientProfile={clientProfile} />
           </div>
         </div>
       </div>

@@ -22,6 +22,7 @@ export default function VendorProfile() {
   const isGettingVendorProfile = useVendorProfileStore(
     (state) => state.isGettingVendorProfile
   );
+
   const vendorProfile = useVendorProfileStore((state) => state.vendorProfile);
   const getVendorProfile = useVendorProfileStore(
     (state) => state.getVendorProfile
@@ -62,6 +63,16 @@ export default function VendorProfile() {
   const openEdit = () => {
     setFormData(vendorProfile || null);
     setShowEditModal(true);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (e) {
+      console.error("Logout failed", e);
+    } finally {
+      navigate("/login");
+    }
   };
 
   if (isGettingVendorProfile) return <Loader />;
@@ -107,9 +118,8 @@ export default function VendorProfile() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="md:col-span-1">
             <VendorSidebar
-              vendor={vendorProfile}
+              vendorProfile={vendorProfile}
               authUser={authUser}
-              onEdit={openEdit}
               onCopy={copyProfileLink}
               onLogout={() => {
                 logout();
@@ -130,8 +140,28 @@ export default function VendorProfile() {
                   </p>
                 </div>
 
-                <div className="flex items-start">
-                  {/* Removed duplicate buttons */}
+                <div className="flex items-start gap-3">
+                  {authUser &&
+                  vendorProfile &&
+                  authUser._id === vendorProfile.userId ? (
+                    <>
+                      <button
+                        onClick={openEdit}
+                        aria-label="Edit profile"
+                        className="p-2 px-5 rounded-md border bg-white text-sm"
+                        title="Edit profile"
+                      >
+                      <Edit />
+                      </button>
+                      <button
+                        onClick={handleLogout}
+                        className="p-2 rounded-md bg-primary-3 px-3 text-white text-sm"
+                        title="Logout"
+                      >
+                        Logout
+                      </button>
+                    </>
+                  ) : null}
                 </div>
               </div>
             </div>
