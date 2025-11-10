@@ -2,6 +2,7 @@ import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { Home } from "./pages/Home";
 import VendorDashboard from "./pages/VendorDashboard";
 import VendorProfile from "./pages/VendorProfile";
+import NotFound from "./pages/NotFound";
 import { Header } from "./components/Header";
 import { useEffect, useState } from "react";
 import { Footer } from "./components/Footer";
@@ -12,6 +13,7 @@ import { useAuthStore } from "./store/authStore";
 import { BottomNav } from "./components/BottomNav";
 import { Loader } from "./components/Loader";
 import CreateVendorProfile from "./pages/CreateVendorProfile";
+import ClientProfile from "./pages/ClientProfile";
 
 const App = () => {
   const { checkAuth, authUser, isCheckingAuth } = useAuthStore();
@@ -58,7 +60,9 @@ const App = () => {
           />
           <Route path="/vendor/dashboard" element={<VendorDashboard />} />
           <Route path="store/:storeUsername" element={<VendorProfile />} />
-          <Route path="me" element={<VendorProfile />} />
+          <Route path="/vendor/profile" element={<VendorProfile />} />
+          <Route path="/profile" element={<ClientProfile />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
       {authUser ? <Footer /> : ""}

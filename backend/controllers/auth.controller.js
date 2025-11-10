@@ -130,15 +130,18 @@ const login = async (req, res, next) => {
   }
 };
 
-const logout = (req, res, next) => {
+ 
+const logout = (req, res) => {
   try {
     const isProduction = process.env.NODE_ENV === "production";
 
+   
     res.cookie("token", "", {
       httpOnly: true,
       secure: isProduction,
-      maxAge: new Date(0),
-      sameSite: isProduction ? "lax" : "none",
+      maxAge: 0,
+    
+      sameSite: isProduction ? "none" : "lax",
     });
 
     return res.status(200).json({
@@ -153,6 +156,7 @@ const logout = (req, res, next) => {
     });
   }
 };
+ 
 
 const checkAuth = (req, res, next) => {
   if (!req.user) {

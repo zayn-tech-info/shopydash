@@ -25,6 +25,12 @@ export function Header() {
           <ul className="flex items-center gap-10 mr-10">
             {navigation.map((nav) => {
               let to = nav.href === "/home" ? "/" : nav.href;
+              to =
+                authUser &&
+                authUser.role === "vendor" &&
+                nav.href === "/profile"
+                  ? "/vendor/profile"
+                  : nav.href;
               const Icon = nav.icon;
               return (
                 <li key={nav.id}>

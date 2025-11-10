@@ -68,18 +68,14 @@ export const useVendorProfileStore = create((set, get) => ({
   getVendorProfile: async (username) => {
     try {
       set({ isGettingVendorProfile: true, error: null });
-
       const url = username
         ? `/api/v1/vendorProfile/store/${encodeURIComponent(username)}`
-        : `/api/v1/vendorProfile/me`;
+        : `/api/v1/vendorProfile/profile`;
 
       const res = await api.get(url);
       console.log("API response", res);
-
       const payload = res?.data?.data ?? res?.data ?? res;
-
       const profile = payload?.vendorProfile ?? payload;
-
       set({
         vendorProfile: profile,
         isGettingVendorProfile: false,
@@ -95,10 +91,11 @@ export const useVendorProfileStore = create((set, get) => ({
         "An unknown error occurred";
       console.error("get vendor profile error:", err);
       set({ error: serverMessage, isGettingVendorProfile: false });
-
       throw serverMessage;
     }
   },
+
+  
   updateVendorProfile: async (data) => {
     set({ isUpdatingVendorProfile: true, error: null });
     try {

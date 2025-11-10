@@ -4,8 +4,11 @@ import Paper from "@mui/material/Paper";
 import { useMemo } from "react";
 import { navigation } from "../constants";
 import { NavLink, useLocation } from "react-router-dom";
+import { useAuthStore } from "../store/authStore";
 
 export function BottomNav() {
+  const authUser = useAuthStore((state) => state.authUser);
+
   const location = useLocation();
   const current = useMemo(() => {
     return location.pathname === "/" ? "/" : location.pathname;
@@ -25,7 +28,14 @@ export function BottomNav() {
           }}
         >
           {navigation.map((nav) => {
-            const to = nav.href === "/home" ? "/" : nav.href;
+            let to = nav.href === "/home" ? "/" : nav.href;
+             to =
+                authUser &&
+                authUser.role === "vendor" &&
+                nav.href === "/profile"
+                  ? "/vendor/profile"
+                  : nav.href;
+
             const Icon = nav.icon;
             return (
               <BottomNavigationAction

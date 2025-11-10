@@ -1,4 +1,4 @@
- import { create } from "zustand";
+import { create } from "zustand";
 import { api } from "../lib/axios";
 
 export const useAuthStore = create((set) => ({
@@ -57,6 +57,23 @@ export const useAuthStore = create((set) => ({
       console.error("Check auth error:", err);
       set({ error: serverMessage, isCheckingAuth: false });
       throw serverMessage;
+    }
+  },
+  logout: async () => {
+    try {
+      await api.post("/api/v1/auth/logout");
+    } catch (err) {
+ 
+      const serverMessage =
+        err?.response?.data?.message ??
+        err?.response?.data ??
+        err?.message ??
+        "An unknown error occurred";
+      console.error("Logout error:", err, serverMessage);
+      set({ error: serverMessage });
+    } finally {
+ 
+      set({ authUser: null, role: "client", email: "", password: "" });
     }
   },
 }));
