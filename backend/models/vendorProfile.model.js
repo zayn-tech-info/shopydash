@@ -155,10 +155,6 @@ const vendorProfileSchema = new mongoose.Schema(
       facebook: String,
       twitter: String,
     },
-    settings: {
-      notifications: { type: Boolean, default: true },
-      autoReply: { type: Boolean, default: false },
-    },
   },
   {
     timestamps: true,

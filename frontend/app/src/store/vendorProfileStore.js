@@ -95,7 +95,6 @@ export const useVendorProfileStore = create((set, get) => ({
     }
   },
 
-  
   updateVendorProfile: async (data) => {
     set({ isUpdatingVendorProfile: true, error: null });
     try {

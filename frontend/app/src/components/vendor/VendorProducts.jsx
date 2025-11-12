@@ -7,20 +7,24 @@ export default function VendorProducts({ vendor }) {
   const products = vendor?.products || [];
 
   return (
-    <div className="bg-white rounded-md shadow-sm p-6 border border-gray-100">
-      <div className="flex items-center gap-6 mb-6">
+    <section className="bg-white rounded-lg p-6 border border-gray-100">
+      <div className="flex items-center gap-4 mb-6">
         <button
           onClick={() => setTab("about")}
-          className={`px-3 py-2 rounded-t-md ${
-            tab === "about" ? "text-n-1 bg-primary-3" : "text-n-6"
+          className={`px-4 py-2 rounded-md text-sm font-medium ${
+            tab === "about"
+              ? "bg-primary-3 text-white"
+              : "text-n-6 bg-white border border-transparent"
           }`}
         >
           About
         </button>
         <button
           onClick={() => setTab("products")}
-          className={`px-3 py-2 rounded-t-md ${
-            tab === "products" ? "text-n-1 bg-primary-3" : "text-n-6"
+          className={`px-4 py-2 rounded-md text-sm font-medium ${
+            tab === "products"
+              ? "bg-primary-3 text-white"
+              : "text-n-6 bg-white border border-transparent"
           }`}
         >
           Products
@@ -29,21 +33,23 @@ export default function VendorProducts({ vendor }) {
 
       <div>
         {tab === "about" && (
-          <div>
-            <h3 className="text-lg font-medium">About</h3>
-            <p className="text-n-7 mt-3">
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">About</h3>
+            <p className="text-n-7">
               {vendor?.storeDescription || "No description yet."}
             </p>
 
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h4 className="font-medium">Category</h4>
-                <div className="mt-1">{vendor?.businessCategory || "-"}</div>
+                <h4 className="font-medium text-sm">Category</h4>
+                <div className="mt-1 text-base">
+                  {vendor?.businessCategory || "-"}
+                </div>
               </div>
 
               <div>
-                <h4 className="font-medium">Member since</h4>
-                <div className="mt-1">
+                <h4 className="font-medium text-sm">Member since</h4>
+                <div className="mt-1 text-base">
                   {vendor?.createdAt
                     ? new Date(vendor.createdAt).toLocaleDateString()
                     : "--"}
@@ -64,6 +70,6 @@ export default function VendorProducts({ vendor }) {
           </div>
         )}
       </div>
-    </div>
+    </section>
   );
 }

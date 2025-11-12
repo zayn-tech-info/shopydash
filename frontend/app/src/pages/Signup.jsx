@@ -103,9 +103,11 @@ export function Signup() {
       const result = await signup(payload);
       await checkAuth();
       await createVendorProfile();
-      toast.success("Account created successfully!");
-      resetField();
-      navigate("/");
+  toast.success("Account created successfully!");
+  resetField();
+ 
+  const { reloadApp } = await import("../utils/navigation");
+  reloadApp("/", true);
     } catch (err) {
       const msg =
         typeof err === "string" ? err : err?.message ?? "Signup failed";

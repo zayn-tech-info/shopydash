@@ -1,6 +1,7 @@
 import { Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
+import { reloadApp } from "../utils/navigation";
 import { useAuthStore } from "../store/authStore";
 
 export function LoginForm() {
@@ -50,7 +51,8 @@ export function LoginForm() {
       const result = await login(payload);
       toast.success("User Logged in successfully!");
       resetloginField();
-      navigate("/");
+
+      reloadApp("/", true);
     } catch (err) {
       const msg =
         typeof err === "string" ? err : err?.message ?? "Signup failed";

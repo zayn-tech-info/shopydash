@@ -19,7 +19,6 @@ export default function VendorDashboard() {
 
   const fetchMe = useCallback(async () => {
     try {
-      // use the protected check endpoint used elsewhere in the app
       const res = await api.get("/api/v1/auth/check");
       const payload = res?.data?.data ?? res?.data ?? res;
       setUser(payload);

@@ -8,7 +8,7 @@ import { useAuthStore } from "../store/authStore";
 
 export function BottomNav() {
   const authUser = useAuthStore((state) => state.authUser);
-
+ 
   const location = useLocation();
   const current = useMemo(() => {
     return location.pathname === "/" ? "/" : location.pathname;
@@ -28,13 +28,13 @@ export function BottomNav() {
           }}
         >
           {navigation.map((nav) => {
+    
             let to = nav.href === "/home" ? "/" : nav.href;
-             to =
-                authUser &&
-                authUser.role === "vendor" &&
-                nav.href === "/profile"
-                  ? "/vendor/profile"
-                  : nav.href;
+
+        
+            if (authUser && authUser.role === "vendor" && nav.href === "/profile") {
+              to = "/vendor/profile";
+            }
 
             const Icon = nav.icon;
             return (

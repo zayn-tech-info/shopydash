@@ -42,12 +42,6 @@ export const navigation = [
     href: "vendor/dashboard",
     icon: LayoutDashboardIcon,
   },
-  {
-    id: 4,
-    text: "Profile",
-    href: "/profile",
-    icon: User,
-  },
 ];
 
 export const categories = [

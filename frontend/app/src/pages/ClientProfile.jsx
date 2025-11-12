@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { api } from "../lib/axios";
-import ProfileHeader from "../components/Profile/ProfileHeader";
-import AboutWishlist from "../components/Profile/AboutWishlist";
+import ProfileHeader from "../components/client/ProfileHeader";
+import AboutWishlist from "../components/client/AboutWishlist";
 import { useAuthStore } from "../store/authStore";
 import { useNavigate } from "react-router-dom";
 import { useClientProfileStore } from "../store/clientProfileStore";
@@ -19,6 +19,7 @@ export function ClientProfile() {
   const logout = useAuthStore((s) => s.logout);
   const navigate = useNavigate();
 
+  
   useEffect(() => {
     const fetchClientProfile = async () => {
       await getClientProfile();

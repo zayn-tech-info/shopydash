@@ -1,4 +1,4 @@
-import { AsideBar } from "../components/AsideBar";
+ 
 import { BottomNav } from "../components/BottomNav";
 import { Fragment } from "react";
 import { HomeContent } from "../components/HomeContent";
@@ -8,6 +8,7 @@ import { NearByVendors } from "../components/NearByVendors";
 import { FeaturedVendor } from "../components/FeaturedVendor";
 import { ShopByDepartemnt } from "../components/ShopByDepartemnt";
 import { Testimonial } from "../components/Testimonial";
+ 
 
 export function Home() {
   return (

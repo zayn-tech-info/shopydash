@@ -1,4 +1,3 @@
-import React from "react";
 
 export default function WishlistItem({ item }) {
   // item may be either populated product object or just an id

@@ -60,8 +60,21 @@ const App = () => {
           />
           <Route path="/vendor/dashboard" element={<VendorDashboard />} />
           <Route path="store/:storeUsername" element={<VendorProfile />} />
-          <Route path="/vendor/profile" element={<VendorProfile />} />
-          <Route path="/profile" element={<ClientProfile />} />
+          <Route
+            path={
+              authUser && authUser.role === "vendor"
+                ? "/vendor/profile"
+                : "/profile"
+            }
+            element={
+              authUser && authUser.role === "vendor" ? (
+                <VendorProfile />
+              ) : (
+                <ClientProfile />
+              )
+            }
+          />
+
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>

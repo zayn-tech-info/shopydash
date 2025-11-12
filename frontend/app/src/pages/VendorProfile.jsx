@@ -7,8 +7,9 @@ import { useVendorProfileStore } from "../store/vendorProfileStore";
 import { useAuthStore } from "../store/authStore";
 import { Loader } from "../components/Loader";
 import { EditProfile } from "../components/EditProfile";
-import VendorSidebar from "../components/Profile/VendorSidebar";
-import VendorProducts from "../components/Profile/VendorProducts";
+import VendorSidebar from "../components/vendor/VendorSidebar";
+import VendorProducts from "../components/vendor/VendorProducts";
+import { VendorAddress } from "../components/vendor/VendorAddress";
 
 const normaliseDate = (date) => {
   try {
@@ -75,14 +76,14 @@ export default function VendorProfile() {
     }
   };
 
-  if (isGettingVendorProfile) return <Loader />;
+  if (isGettingVendorProfile) return <Loader>Loading profile</Loader>;
 
   return (
-    <main className="py-8">
+    <main className="py-10 bg-gray-50 min-h-[70vh]">
       <div className="max-w-6xl mx-auto">
         {/* Top banner */}
-        <div className="relative bg-white rounded-md shadow-sm overflow-hidden mb-6">
-          <div className="w-full h-44 bg-n-3">
+        <div className="relative bg-white rounded-lg overflow-hidden mb-8 border border-gray-100">
+          <div className="w-full h-48 bg-n-3">
             {vendorProfile?.coverImage ? (
               <img
                 src={vendorProfile.coverImage}
@@ -98,7 +99,7 @@ export default function VendorProfile() {
           <div className="absolute right-6 top-6 flex items-center gap-3">
             <button
               onClick={copyProfileLink}
-              className="px-3 py-2 rounded-md border bg-white text-sm"
+              className="inline-flex items-center justify-center px-3 py-2 rounded-md border border-gray-200 bg-white text-sm text-n-7"
               title="Copy profile link"
             >
               <Link2 />
@@ -106,8 +107,8 @@ export default function VendorProfile() {
             <span
               className={`px-3 py-1 rounded-full text-sm font-medium ${
                 vendorProfile?.active
-                  ? "bg-green-100 text-green-800"
-                  : "bg-red-100 text-red-800"
+                  ? "bg-green-50 text-green-800"
+                  : "bg-red-50 text-red-800"
               }`}
             >
               {vendorProfile?.active ? "Active" : "Inactive"}
@@ -115,12 +116,13 @@ export default function VendorProfile() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="md:col-span-1">
             <VendorSidebar
               vendorProfile={vendorProfile}
               authUser={authUser}
               onCopy={copyProfileLink}
+              openEdit={openEdit}
               onLogout={() => {
                 logout();
                 navigate("/login");
@@ -128,34 +130,34 @@ export default function VendorProfile() {
             />
           </div>
 
-          <div className="md:col-span-3">
-            <div className="bg-white p-6 rounded-md border shadow-sm">
-              <div className="flex items-start justify-between">
+          <div className="md:col-span-3 space-y-6">
+            <div>
+              <VendorProducts vendor={vendorProfile} />
+            </div>
+            <VendorAddress
+              vendorProfile={vendorProfile}
+              authUser={authUser}
+              className="md:hidden block"
+            />
+            <div className="bg-white p-6 rounded-lg border border-gray-100">
+              <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-xl font-bold text-n-9">
+                  <h1 className="text-2xl font-semibold text-n-9">
                     {vendorProfile?.businessName}
                   </h1>
-                  <p className="text-sm text-n-6">
+                  <p className="text-sm text-n-6 mt-1">
                     {vendorProfile?.businessCategory}
                   </p>
                 </div>
 
-                <div className="flex items-start gap-3">
+                <div className="flex items-center gap-3">
                   {authUser &&
                   vendorProfile &&
                   authUser._id === vendorProfile.userId ? (
                     <>
                       <button
-                        onClick={openEdit}
-                        aria-label="Edit profile"
-                        className="p-2 px-5 rounded-md border bg-white text-sm"
-                        title="Edit profile"
-                      >
-                      <Edit />
-                      </button>
-                      <button
                         onClick={handleLogout}
-                        className="p-2 rounded-md bg-primary-3 px-3 text-white text-sm"
+                        className="px-4 py-2 rounded-md bg-primary-3 text-white text-sm"
                         title="Logout"
                       >
                         Logout
@@ -164,10 +166,6 @@ export default function VendorProfile() {
                   ) : null}
                 </div>
               </div>
-            </div>
-
-            <div className="mt-4">
-              <VendorProducts vendor={vendorProfile} />
             </div>
           </div>
         </div>
