@@ -35,6 +35,14 @@ export function Header() {
             {navigation.map((nav) => {
               let to = nav.href === "/home" ? "/" : nav.href;
 
+              if (
+                authUser &&
+                authUser.role === "vendor" &&
+                nav.href === "/profile"
+              ) {
+                to = "/vendor/profile";
+              }
+
               const Icon = nav.icon;
               return (
                 <li key={nav.id}>
@@ -55,7 +63,7 @@ export function Header() {
                 </li>
               );
             })}
-            <li>
+            {/*             <li>
               <NavLink
                 to={
                   authUser && authUser.role === "vendor"
@@ -74,7 +82,7 @@ export function Header() {
                 {<User size={16} />}
                 Profile
               </NavLink>
-            </li>
+            </li> */}
           </ul>
 
           <Link className={`${authUser ? "hidden" : "block"}`} to="/login">

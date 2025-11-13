@@ -8,7 +8,7 @@ import { useAuthStore } from "../store/authStore";
 
 export function BottomNav() {
   const authUser = useAuthStore((state) => state.authUser);
- 
+
   const location = useLocation();
   const current = useMemo(() => {
     return location.pathname === "/" ? "/" : location.pathname;
@@ -16,7 +16,7 @@ export function BottomNav() {
   return (
     <div className="md:hidden">
       <Paper
-        sx={{ position: "fixed", bottom: 0, left: 0, right: 0 , zIndex: 99}}
+        sx={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 99 }}
         elevation={8}
       >
         <BottomNavigation
@@ -28,11 +28,13 @@ export function BottomNav() {
           }}
         >
           {navigation.map((nav) => {
-    
             let to = nav.href === "/home" ? "/" : nav.href;
 
-        
-            if (authUser && authUser.role === "vendor" && nav.href === "/profile") {
+            if (
+              authUser &&
+              authUser.role === "vendor" &&
+              nav.href === "/profile"
+            ) {
               to = "/vendor/profile";
             }
 

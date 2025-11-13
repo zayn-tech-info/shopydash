@@ -6,7 +6,7 @@ import { Edit, Link2 } from "lucide-react";
 import { useVendorProfileStore } from "../store/vendorProfileStore";
 import { useAuthStore } from "../store/authStore";
 import { Loader } from "../components/Loader";
-import { EditProfile } from "../components/EditProfile";
+import { EditVendorProfile } from "../components/vendor/EditVendorProfile";
 import VendorSidebar from "../components/vendor/VendorSidebar";
 import VendorProducts from "../components/vendor/VendorProducts";
 import { VendorAddress } from "../components/vendor/VendorAddress";
@@ -170,7 +170,7 @@ export default function VendorProfile() {
         </div>
 
         {showEditModal && formData ? (
-          <EditProfile
+          <EditVendorProfile
             initialData={formData}
             onClose={() => setShowEditModal(false)}
           />

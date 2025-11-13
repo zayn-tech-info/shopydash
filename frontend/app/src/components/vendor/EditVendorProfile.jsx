@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Edit } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { useVendorProfileStore } from "../store/vendorProfileStore";
+import { useVendorProfileStore } from "../../store/vendorProfileStore";
 
-export function EditProfile({ initialData, onClose }) {
+export function EditVendorProfile({ initialData, onClose }) {
   const [formData, setFormData] = useState(initialData || null);
 
   const isUpdatingVendorProfile = useVendorProfileStore(
