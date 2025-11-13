@@ -12,7 +12,7 @@ export default function VendorSidebar({ authUser, vendorProfile, openEdit }) {
   return (
     <aside className="bg-white rounded-lg p-6 border border-gray-100 w-full md:w-72 lg:w-80">
       <div className="flex flex-col items-center">
-        <div className="w-28 h-28 rounded-full overflow-hidden border border-gray-100 mb-4">
+        <div className="w-40 h-40 rounded-full overflow-hidden border border-gray-100 mb-4">
           <img
             src={profileImage}
             alt={businessName}
@@ -20,7 +20,7 @@ export default function VendorSidebar({ authUser, vendorProfile, openEdit }) {
           />
         </div>
 
-        <h2 className="text-lg font-semibold text-n-9 text-center">
+        <h2 className="text-2xl font-semibold text-n-8 text-center">
           {businessName}
         </h2>
         <p className="text-sm text-n-6 mt-1 text-center">@{username}</p>
@@ -29,7 +29,7 @@ export default function VendorSidebar({ authUser, vendorProfile, openEdit }) {
           <button
             onClick={openEdit}
             aria-label="Edit profile"
-            className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-md border border-gray-200 text-sm font-medium bg-white"
+            className="mt-4 inline-flex items-center gap-2 px-6 py-3 rounded-md border border-gray-200 text-lg font-medium bg-white"
             title="Edit profile"
           >
             <Edit size={16} />
@@ -43,7 +43,7 @@ export default function VendorSidebar({ authUser, vendorProfile, openEdit }) {
           </div>
         )}
 
-        <div className="mt-4 text-sm text-n-7 flex gap-3">
+        <div className="mt-4 text-lg text-n-7 flex gap-3">
           <div className="text-center">
             {vendorProfile?.rating
               ? `Rating: ${vendorProfile.rating.toFixed(1)}`

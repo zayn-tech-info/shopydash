@@ -79,11 +79,10 @@ export default function VendorProfile() {
   if (isGettingVendorProfile) return <Loader>Loading profile</Loader>;
 
   return (
-    <main className="py-10 bg-gray-50 min-h-[70vh]">
+    <main className="py-5 bg-gray-50 min-h-[70vh]">
       <div className="max-w-6xl mx-auto">
-        {/* Top banner */}
         <div className="relative bg-white rounded-lg overflow-hidden mb-8 border border-gray-100">
-          <div className="w-full h-48 bg-n-3">
+          <div className="w-full h-20 md:h-48 bg-n-3">
             {vendorProfile?.coverImage ? (
               <img
                 src={vendorProfile.coverImage}
