@@ -16,6 +16,7 @@ const initialProfileData = {
 };
 export const useClientProfileStore = create((set) => ({
   clientProfileData: { ...initialProfileData },
+  updating: false,
   clientProfile: null,
   error: null,
   loading: false,
@@ -25,7 +26,9 @@ export const useClientProfileStore = create((set) => ({
       clientProfileData: { ...state.clientProfileData, [field]: value },
     }));
   },
-  
+
+  resetInputField: () => set({ clientProfileData: { ...initialProfileData } }),
+
   getClientProfile: async () => {
     set({ loading: true });
     try {
@@ -54,4 +57,28 @@ export const useClientProfileStore = create((set) => ({
       set({ error: serverMessage, loading: false });
     }
   },
+
+updateClientProfile: async (payload) => {
+  try {
+    set({ updating: true });
+    const res = await api.patch("/api/v1/clientProfile/updateClientProfile", payload);
+    const payloadRes = res?.data?.data ?? res?.data ?? res;
+    let profile =
+      payloadRes?.clientProfile ??
+      payloadRes?.profile ??
+      payloadRes?.client ??
+      payloadRes;
+    set({ clientProfile: profile, updating: false, error: null });
+    return profile;
+  } catch (error) {
+    const serverMessage =
+      error?.response?.data?.message ??
+      error?.response?.data ??
+      error?.message ??
+      "An unknown error occurred";
+    console.error("update client profile error:", error);
+    set({ error: serverMessage, updating: false });
+    throw error;
+  }
+}
 }));

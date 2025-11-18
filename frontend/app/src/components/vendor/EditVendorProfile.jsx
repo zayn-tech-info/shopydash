@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { Edit } from "lucide-react";
+import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { useVendorProfileStore } from "../../store/vendorProfileStore";
 

@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { api } from "../lib/axios";
+import { useEffect, useState } from "react";
 import ProfileHeader from "../components/client/ProfileHeader";
 import AboutWishlist from "../components/client/AboutWishlist";
 import { useAuthStore } from "../store/authStore";
 import { useNavigate } from "react-router-dom";
 import { useClientProfileStore } from "../store/clientProfileStore";
 import { Edit } from "lucide-react";
+import { EditClientProfile } from "../components/client/EditClientProfile";
 
 export function ClientProfile() {
   const authUser = useAuthStore((state) => state.authUser);
@@ -15,10 +15,18 @@ export function ClientProfile() {
   const getClientProfile = useClientProfileStore(
     (state) => state.getClientProfile
   );
+  const clientProfileData = useClientProfileStore(
+    (state) => state.clientProfileData
+  );
 
+  const [showEditModal, setShowEditModal] = useState(false);
   const logout = useAuthStore((s) => s.logout);
   const navigate = useNavigate();
 
+  const openEdit = () => {
+    setShowEditModal(true);
+  };
+  
   useEffect(() => {
     const fetchClientProfile = async () => {
       await getClientProfile();
@@ -76,6 +84,7 @@ export function ClientProfile() {
                     <button
                       className="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-gray-200 text-sm bg-white"
                       title="Edit profile"
+                      onClick={openEdit}
                     >
                       <Edit />
                       <span>Edit</span>
@@ -97,6 +106,13 @@ export function ClientProfile() {
           </div>
         </div>
       </div>
+
+      {showEditModal && clientProfileData ? (
+        <EditClientProfile
+          clientProfileData={clientProfileData}
+          onClose={() => setShowEditModal(false)}
+        />
+      ) : null}
     </main>
   );
 }
