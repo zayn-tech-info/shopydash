@@ -137,6 +137,21 @@ export default function VendorProfile() {
                 authUser={authUser}
                 className="lg:hidden block"
               />
+
+              {/* Mobile-only Logout */}
+              {authUser &&
+                vendorProfile &&
+                authUser._id === vendorProfile.userId && (
+                  <div className="lg:hidden">
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-n-2/20 hover:bg-n-2/40 text-n-6 rounded-xl transition-colors font-code text-sm font-bold uppercase tracking-wider"
+                    >
+                      <LogOut size={18} />
+                      Logout
+                    </button>
+                  </div>
+                )}
             </div>
           </div>
 

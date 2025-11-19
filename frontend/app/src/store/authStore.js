@@ -17,6 +17,8 @@ export const useAuthStore = create((set) => ({
   setPassword: (password) => set({ password }),
   toggleShowPassword: () => set((s) => ({ showPassword: !s.showPassword })),
   resetloginField: () => set({ email: "", password: "" }),
+  updateUser: (updates) =>
+    set((state) => ({ authUser: { ...state.authUser, ...updates } })),
 
   login: async (data) => {
     set({ isLogginIn: true, error: null });
@@ -63,7 +65,6 @@ export const useAuthStore = create((set) => ({
     try {
       await api.post("/api/v1/auth/logout");
     } catch (err) {
- 
       const serverMessage =
         err?.response?.data?.message ??
         err?.response?.data ??
@@ -72,7 +73,6 @@ export const useAuthStore = create((set) => ({
       console.error("Logout error:", err, serverMessage);
       set({ error: serverMessage });
     } finally {
- 
       set({ authUser: null, role: "client", email: "", password: "" });
     }
   },

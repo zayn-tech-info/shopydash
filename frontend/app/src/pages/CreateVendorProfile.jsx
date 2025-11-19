@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { Loader } from "../components/Loader";
 import { useVendorProfileStore } from "../store/vendorProfileStore";
+import { useAuthStore } from "../store/authStore";
 import { InputField } from "../components/InputField";
 
 export default function CreateVendorProfile() {
@@ -20,6 +21,7 @@ export default function CreateVendorProfile() {
   const isCreatingProfile = useVendorProfileStore(
     (state) => state.isCreatingProfile
   );
+  const { updateUser } = useAuthStore();
 
   useEffect(() => {
     console.log(profileData);
@@ -63,9 +65,10 @@ export default function CreateVendorProfile() {
 
     try {
       await createVendorProfile(profileData);
+      updateUser({ hasProfile: true });
       toast.success("Profile created");
 
-      navigate(`/vendor/${profileData.storeUsername}`);
+      navigate("/vendor/profile");
     } catch (e) {
       const msg =
         e?.response?.data?.message || e.message || "Failed to create profile";

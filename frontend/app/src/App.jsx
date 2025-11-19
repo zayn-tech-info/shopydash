@@ -14,6 +14,8 @@ import { BottomNav } from "./components/BottomNav";
 import { Loader } from "./components/Loader";
 import CreateVendorProfile from "./pages/CreateVendorProfile";
 import ClientProfile from "./pages/ClientProfile";
+import CreateClientProfile from "./pages/CreateClientProfile";
+import CompleteProfileLanding from "./pages/CompleteProfileLanding";
 
 const App = () => {
   const { checkAuth, authUser, isCheckingAuth } = useAuthStore();
@@ -58,6 +60,18 @@ const App = () => {
               authUser ? <CreateVendorProfile /> : <Navigate to="/login" />
             }
           />
+          <Route
+            path="/create-client-profile"
+            element={
+              authUser ? <CreateClientProfile /> : <Navigate to="/login" />
+            }
+          />
+          <Route
+            path="/complete-profile"
+            element={
+              authUser ? <CompleteProfileLanding /> : <Navigate to="/login" />
+            }
+          />
           <Route path="/vendor/dashboard" element={<VendorDashboard />} />
           <Route path="store/:storeUsername" element={<VendorProfile />} />
           <Route
@@ -68,9 +82,15 @@ const App = () => {
             }
             element={
               authUser && authUser.role === "vendor" ? (
-                <VendorProfile />
-              ) : (
+                authUser.hasProfile ? (
+                  <VendorProfile />
+                ) : (
+                  <Navigate to="/complete-profile" />
+                )
+              ) : authUser && authUser.hasProfile ? (
                 <ClientProfile />
+              ) : (
+                <Navigate to="/complete-profile" />
               )
             }
           />

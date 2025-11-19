@@ -138,4 +138,37 @@ export const useClientProfileStore = create((set, get) => ({
       throw error;
     }
   },
+  createClientProfile: async (profileData) => {
+    set({ loading: true, error: null });
+    try {
+      const res = await api.post(
+        "/api/v1/clientProfile/createClientProfile",
+        profileData
+      );
+      const payload = res?.data?.data ?? res?.data ?? res;
+      const profile =
+        payload?.clientProfile ??
+        payload?.profile ??
+        payload?.client ??
+        payload;
+
+      const normalized = normalizeProfile(profile, get().clientProfile);
+      set({
+        clientProfile: normalized,
+        clientProfileData: { ...initialProfileData, ...normalized },
+        loading: false,
+        error: null,
+      });
+      return profile;
+    } catch (err) {
+      const serverMessage =
+        err?.response?.data?.message ??
+        err?.response?.data ??
+        err?.message ??
+        "An unknown error occurred";
+      console.error("create client profile error:", err);
+      set({ error: serverMessage, loading: false });
+      throw err;
+    }
+  },
 }));
