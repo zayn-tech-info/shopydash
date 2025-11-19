@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import ProfileHeader from "../components/client/ProfileHeader";
-import AboutWishlist from "../components/client/AboutWishlist";
+import AboutAndWishlist from "../components/client/AboutAndWishlist";
 import { useAuthStore } from "../store/authStore";
 import { useNavigate } from "react-router-dom";
 import { useClientProfileStore } from "../store/clientProfileStore";
-import { Edit } from "lucide-react";
 import { EditClientProfile } from "../components/client/EditClientProfile";
+import { LogOut } from "lucide-react";
 
 export function ClientProfile() {
   const authUser = useAuthStore((state) => state.authUser);
@@ -18,18 +18,28 @@ export function ClientProfile() {
   const clientProfileData = useClientProfileStore(
     (state) => state.clientProfileData
   );
+  const setClientProfileData = useClientProfileStore(
+    (s) => s.setClientProfileData
+  );
 
   const [showEditModal, setShowEditModal] = useState(false);
   const logout = useAuthStore((s) => s.logout);
   const navigate = useNavigate();
 
   const openEdit = () => {
+    if (clientProfile) {
+      setClientProfileData(clientProfile);
+    }
     setShowEditModal(true);
   };
-  
+
   useEffect(() => {
     const fetchClientProfile = async () => {
-      await getClientProfile();
+      try {
+        await getClientProfile();
+      } catch (err) {
+        console.error("Failed to load client profile:", err);
+      }
     };
     fetchClientProfile();
   }, [getClientProfile]);
@@ -38,70 +48,98 @@ export function ClientProfile() {
     console.log(clientProfile);
   }, [clientProfile]);
 
-  if (loading) return <div className="p-8">Loading profile…</div>;
-  if (error) return <div className="p-8 text-red-600">{error}</div>;
+  if (loading)
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="text-n-4 body-1">Loading profile...</div>
+      </div>
+    );
+  if (error)
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="text-primary-3 body-1">{error}</div>
+      </div>
+    );
 
   return (
-    <main className="py-10 bg-gray-50 min-h-[70vh]">
-      <div className="max-w-6xl mx-auto p-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="md:col-span-1">
-            <ProfileHeader
-              getClientProfile={getClientProfile}
-              clientProfile={clientProfile}
-            />
+    <main className="py-12 bg-n-1 min-h-[80vh]">
+      <div className="container">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Left Sidebar - Profile Info */}
+          <div className="lg:col-span-4 xl:col-span-3">
+            <div className="sticky top-24 space-y-6">
+              <ProfileHeader
+                clientProfile={clientProfile}
+                authUser={authUser}
+                openEdit={openEdit}
+              />
+
+              {/* Mobile-only Logout (if needed, or keep it in header/sidebar) */}
+              {authUser &&
+                clientProfile &&
+                authUser._id === clientProfile.userId && (
+                  <div className="lg:hidden">
+                    <button
+                      onClick={() => {
+                        logout();
+                        navigate("/login");
+                      }}
+                      className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-n-2/20 hover:bg-n-2/40 text-n-6 rounded-xl transition-colors font-code text-sm font-bold uppercase tracking-wider"
+                    >
+                      <LogOut size={18} />
+                      Logout
+                    </button>
+                  </div>
+                )}
+            </div>
           </div>
 
-          <div className="md:col-span-3 space-y-6">
-            <div>
-              <section className="bg-white rounded-lg p-6 border border-gray-100">
-                <AboutWishlist clientProfile={clientProfile} />
-              </section>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg border border-gray-100">
-              <div className="flex items-center justify-between">
+          {/* Main Content */}
+          <div className="lg:col-span-8 xl:col-span-9 space-y-8">
+            {/* Header Section for Desktop */}
+            <div className="bg-white rounded-2xl p-8 border border-n-3/20 shadow-sm">
+              <div className="flex items-start justify-between">
                 <div>
-                  <h1 className="text-2xl font-semibold text-n-9">
+                  <h1 className="h3 text-n-8 mb-2">
                     {clientProfile?.fullName}
                   </h1>
-                  <p className="text-sm text-n-6 mt-1">
-                    @{clientProfile?.username || "-"} •{" "}
-                    {[
-                      clientProfile?.city,
-                      clientProfile?.state,
-                      clientProfile?.country,
-                    ]
-                      .filter(Boolean)
-                      .join(", ")}
-                  </p>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-n-4 body-2">
+                    <span className="font-code text-primary-3">
+                      @{clientProfile?.username || "-"}
+                    </span>
+                    <span className="w-1 h-1 rounded-full bg-n-3"></span>
+                    <span>
+                      {[
+                        clientProfile?.city,
+                        clientProfile?.state,
+                        clientProfile?.country,
+                      ]
+                        .filter(Boolean)
+                        .join(", ")}
+                    </span>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  {authUser &&
+                {authUser &&
                   clientProfile &&
-                  authUser._id === clientProfile.userId ? (
+                  authUser._id === clientProfile.userId && (
                     <button
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-gray-200 text-sm bg-white"
-                      title="Edit profile"
-                      onClick={openEdit}
+                      onClick={() => {
+                        logout();
+                        navigate("/login");
+                      }}
+                      className="hidden lg:flex items-center gap-2 px-6 py-3 bg-n-1 border border-n-3/20 hover:border-primary-3 text-n-6 hover:text-primary-3 rounded-xl transition-all font-code text-xs font-bold uppercase tracking-wider"
                     >
-                      <Edit />
-                      <span>Edit</span>
+                      <LogOut size={16} />
+                      Logout
                     </button>
-                  ) : null}
-
-                  <button
-                    onClick={() => {
-                      logout();
-                      navigate("/login");
-                    }}
-                    className="px-4 py-2 bg-primary-3 text-white rounded-md text-sm"
-                  >
-                    Logout
-                  </button>
-                </div>
+                  )}
               </div>
+            </div>
+
+            {/* Content Section */}
+            <div className="bg-white rounded-2xl p-8 border border-n-3/20 shadow-sm min-h-[400px]">
+              <AboutAndWishlist clientProfile={clientProfile} />
             </div>
           </div>
         </div>

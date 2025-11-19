@@ -103,11 +103,11 @@ export function Signup() {
       const result = await signup(payload);
       await checkAuth();
       await createVendorProfile();
-  toast.success("Account created successfully!");
-  resetField();
- 
-  const { reloadApp } = await import("../utils/navigation");
-  reloadApp("/", true);
+      toast.success("Account created successfully!");
+      resetField();
+
+      const { reloadApp } = await import("../utils/navigation");
+      reloadApp("/", true);
     } catch (err) {
       const msg =
         typeof err === "string" ? err : err?.message ?? "Signup failed";
@@ -121,79 +121,87 @@ export function Signup() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white flex items-center justify-center px-4 py-10">
-      <div className="w-full max-w-xl">
-        <div className="bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl border border-orange-100 overflow-hidden">
-          <div className="px-8 pt-8 text-center">
+    <div className="min-h-screen bg-n-1 flex items-center justify-center px-4 py-12 relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute -top-[20%] -right-[10%] w-[70%] h-[70%] rounded-full bg-primary-3/5 blur-[120px]" />
+        <div className="absolute top-[40%] -left-[10%] w-[60%] h-[60%] rounded-full bg-primary-2/5 blur-[100px]" />
+      </div>
+
+      <div className="w-full max-w-xl relative z-10">
+        <div className="bg-white/80 backdrop-blur-xl shadow-2xl shadow-n-3/10 rounded-3xl border border-white/50 overflow-hidden">
+          <div className="px-8 pt-10 text-center">
             <img
               src={logoUrl}
               alt="Vendora"
-              className="mx-auto md:h-20 h-16 w-auto object-contain"
+              className="mx-auto h-12 w-auto object-contain mb-4"
             />
-            <h1 className="mt-4 text-xl font-semibold text-gray-900">
-              Create your account
-            </h1>
-            <p className="mt-1 text-sm text-gray-600">
+            <h1 className="h4 text-n-8 mb-2">Create your account</h1>
+            <p className="body-2 text-n-4">
               Join the campus marketplace to buy and sell with ease.
             </p>
           </div>
 
-          <div className="mt-8 px-2">
-            <div className="mx-6 grid grid-cols-2 rounded-full bg-orange-50 p-1">
+          <div className="mt-8 px-6">
+            <div className="grid grid-cols-2 p-1 bg-n-2/10 rounded-xl">
               <button
                 type="button"
                 onClick={() => switchTo("client")}
                 className={[
-                  "flex items-center justify-center gap-2 rounded-full py-2.5 text-sm font-medium transition-colors",
+                  "flex items-center justify-center gap-2 rounded-lg py-3 text-sm font-bold uppercase tracking-wider transition-all duration-300",
                   isClient
-                    ? "bg-white text-orange-600 shadow-sm"
-                    : "text-gray-600 hover:text-orange-700",
+                    ? "bg-white text-primary-3 shadow-sm"
+                    : "text-n-4 hover:text-n-6 hover:bg-white/50",
                 ].join(" ")}
-                aria-pressed={isClient}
               >
-                <GraduationCap className="w-4 h-4" aria-hidden="true" />
-                Student Buyer
+                <GraduationCap className="w-4 h-4" />
+                Student
               </button>
               <button
                 type="button"
                 onClick={() => switchTo("vendor")}
                 className={[
-                  "flex items-center justify-center gap-2 rounded-full py-2.5 text-sm font-medium transition-colors",
+                  "flex items-center justify-center gap-2 rounded-lg py-3 text-sm font-bold uppercase tracking-wider transition-all duration-300",
                   !isClient
-                    ? "bg-white text-orange-600 shadow-sm"
-                    : "text-gray-600 hover:text-orange-700",
+                    ? "bg-white text-primary-3 shadow-sm"
+                    : "text-n-4 hover:text-n-6 hover:bg-white/50",
                 ].join(" ")}
-                aria-pressed={!isClient}
               >
-                <Store className="w-4 h-4" aria-hidden="true" />
+                <Store className="w-4 h-4" />
                 Vendor
               </button>
             </div>
           </div>
 
-          <SignupForm
-            onSubmit={onSubmit}
-            fullName={fullName}
-            setField={setField}
-            isClient={isClient}
-            username={username}
-            email={email}
-            schoolId={schoolId}
-            phoneNumber={phoneNumber}
-            whatsAppNumber={whatsAppNumber}
-            schoolName={schoolName}
-            businessName={businessName}
-            showPassword={showPassword}
-            password={password}
-            toggleShowPassword={toggleShowPassword}
-            isSigningUp={isSigningUp}
-            error={error}
-          />
+          <div className="mt-2">
+            <SignupForm
+              onSubmit={onSubmit}
+              fullName={fullName}
+              setField={setField}
+              isClient={isClient}
+              username={username}
+              email={email}
+              schoolId={schoolId}
+              phoneNumber={phoneNumber}
+              whatsAppNumber={whatsAppNumber}
+              schoolName={schoolName}
+              businessName={businessName}
+              showPassword={showPassword}
+              password={password}
+              toggleShowPassword={toggleShowPassword}
+              isSigningUp={isSigningUp}
+              error={error}
+            />
+          </div>
+
           {/* Footer */}
-          <div className="px-8 pb-6">
-            <p className="text-center text-xs text-gray-500">
+          <div className="px-8 pb-8">
+            <p className="text-center text-xs text-n-4">
               By signing up, you agree to our{" "}
-              <a className="underline hover:text-gray-700" href="#">
+              <a
+                className="font-bold text-n-6 hover:text-primary-3 transition-colors"
+                href="#"
+              >
                 Terms of Use
               </a>
               .

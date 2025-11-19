@@ -34,120 +34,102 @@ export function Trending({ items, limit = 8, title = "Trending Now" }) {
       .replace(/(^-|-$)/g, "");
 
   return (
-    <section className="md:px-6 lg:px-8 mt-8 md:mt-10">
-      <header className="mb-3 md:mb-4">
-        <h2 className="text-lg md:text-xl font-semibold text-n-9 flex items-center gap-2">
-          {title}
-          <span aria-hidden>🔥</span>
-        </h2>
-        <p className="text-[13px] text-n-6">
-          Popular items this week on campus.
-        </p>
+    <section className="container mx-auto max-w-7xl px-4 md:px-8">
+      <header className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="h4 text-n-8 flex items-center gap-2">
+            {title}
+            <span className="text-2xl">🔥</span>
+          </h2>
+          <p className="body-2 text-n-4 mt-1">
+            Popular items this week on campus.
+          </p>
+        </div>
       </header>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
         {data.map((p, idx) => (
           <div
             key={`${p.id ?? p.name}-${p.vendorName ?? ""}-${idx}`}
-            className="group relative"
+            className="group relative bg-white rounded-2xl border border-n-3/10 overflow-hidden hover:shadow-xl hover:shadow-n-3/10 transition-all duration-300 hover:-translate-y-1"
           >
-            <div className="relative aspect-[4/5] rounded-md overflow-hidden bg-n-2 border border-stroke-1">
+            <div className="relative aspect-[4/5] bg-n-2/10 overflow-hidden">
               <img
                 src={p.image}
                 alt={p.name}
                 loading="lazy"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
 
               {/* Price */}
-              <div className="absolute top-1.5 left-1.5 bg-white/90 text-n-9 text-[11px] px-1.5 py-0.5 rounded shadow">
-                $ {Number(p.price).toFixed(2)}
+              <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-n-8 font-bold text-xs px-2.5 py-1 rounded-lg shadow-sm">
+                ₦{Number(p.price).toLocaleString()}
               </div>
 
               {/* Rating */}
-              <div className="absolute top-1.5 right-1.5 flex items-center gap-1 bg-black/55 text-white text-[10px] px-1.5 py-0.5 rounded">
-                <Star size={11} className="fill-current text-amber-400" />
+              <div className="absolute top-3 right-3 flex items-center gap-1 bg-n-8/80 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-1 rounded-lg">
+                <Star size={10} className="fill-primary-3 text-primary-3" />
                 <span>
                   {p.rating?.toFixed ? p.rating.toFixed(1) : p.rating}
                 </span>
               </div>
 
               {/* Trending/Popular badge */}
-              <div className="absolute -left-2 top-2 rotate-[-12deg]">
-                <span className="inline-flex items-center gap-1 bg-primary-3 text-white text-[10px] px-2 py-0.5 rounded shadow">
-                  {idx < 3 ? <Flame size={12} /> : <Zap size={12} />}
-                  {idx < 3 ? "Trending" : "Popular"}
-                </span>
-              </div>
-
-              {/* Name overlay */}
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-1.5">
-                <p className="text-white text-[11px] truncate">{p.name}</p>
-              </div>
-
-              {/* Hover overlay: View vendor profile (desktop) */}
-              {p.vendorName && (
-                <div className="absolute inset-0 hidden md:flex items-center justify-center bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <a
-                    href={`/vendor/${vendorSlug(p.vendorName)}`}
-                    className="inline-flex items-center justify-center rounded-md bg-white/95 px-3 py-2 text-sm font-medium text-gray-900 hover:bg-white"
-                  >
-                    View vendor profile
-                  </a>
+              {idx < 3 && (
+                <div className="absolute bottom-3 left-3">
+                  <span className="inline-flex items-center gap-1 bg-primary-3/90 backdrop-blur-sm text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-lg shadow-sm">
+                    <Flame size={12} />
+                    Trending
+                  </span>
                 </div>
               )}
 
-              {/* Desktop actions */}
-              <div className="absolute inset-x-1.5 bottom-1.5 hidden group-hover:flex md:flex items-center justify-end gap-1.5">
+              {/* Hover overlay: View vendor profile (desktop) */}
+              {p.vendorName && (
+                <div className="absolute inset-0 hidden md:flex items-center justify-center bg-n-8/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <a
+                    href={`/vendor/${vendorSlug(p.vendorName)}`}
+                    className="inline-flex items-center justify-center rounded-xl bg-white text-n-8 font-code text-xs font-bold uppercase tracking-wider px-4 py-3 hover:bg-primary-3 hover:text-white transition-colors shadow-lg"
+                  >
+                    View Shop
+                  </a>
+                </div>
+              )}
+            </div>
+
+            <div className="p-4">
+              <h3 className="font-bold text-n-8 text-sm truncate mb-1">
+                {p.name}
+              </h3>
+              <p className="text-xs text-n-4 mb-3 truncate">
+                by {p.vendorName}
+              </p>
+
+              {/* Actions */}
+              <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => handleAddToCart(p)}
-                  className="inline-flex items-center gap-1 h-7 px-2 rounded-md bg-white/95 text-n-9 text-[11px] shadow hover:bg-white"
+                  className="flex-1 h-9 flex items-center justify-center gap-1.5 rounded-lg border border-n-3/20 text-n-6 text-xs font-bold hover:border-primary-3 hover:text-primary-3 transition-colors"
                 >
-                  <ShoppingCart size={13} /> Add
+                  <ShoppingCart size={14} /> Add
                 </button>
                 <button
                   type="button"
                   onClick={() => handleBuyNow(p)}
-                  className="inline-flex items-center gap-1 h-7 px-2 rounded-md bg-primary-3 text-white text-[11px] shadow hover:opacity-90"
+                  className="flex-1 h-9 flex items-center justify-center gap-1.5 rounded-lg bg-primary-3 text-white text-xs font-bold hover:bg-primary-4 transition-colors shadow-md shadow-primary-3/20"
                 >
-                  <ShoppingBag size={13} /> Buy
+                  <ShoppingBag size={14} /> Buy
                 </button>
               </div>
-            </div>
-
-            {/* Mobile actions */}
-            <div className="mt-1 flex md:hidden items-center justify-between gap-2">
-              <button
-                type="button"
-                onClick={() => handleAddToCart(p)}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 h-8 text-[12px] border border-stroke-1 rounded-md text-n-8"
-              >
-                <ShoppingCart size={12} /> Add
-              </button>
-              <button
-                type="button"
-                onClick={() => handleBuyNow(p)}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 h-8 text-[12px] rounded-md bg-primary-3 text-white"
-              >
-                <ShoppingBag size={12} /> Buy
-              </button>
-              {p.vendorName && (
-                <a
-                  href={`/vendor/${vendorSlug(p.vendorName)}`}
-                  className="flex-1 text-center text-[12px] text-primary-3 hover:underline"
-                >
-                  Profile
-                </a>
-              )}
             </div>
           </div>
         ))}
       </div>
 
       {data.length === 0 && (
-        <div className="mt-6 text-center text-sm text-n-6">
-          No trending items yet.
+        <div className="mt-12 text-center">
+          <p className="body-2 text-n-4">No trending items yet.</p>
         </div>
       )}
     </section>

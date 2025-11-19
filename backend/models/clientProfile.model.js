@@ -10,7 +10,7 @@ const clientProfileSchema = new mongoose.Schema({
 
   fullName: {
     type: String,
-    required: true,
+
     trim: true,
     minlength: 2,
     maxlength: 100,
@@ -19,11 +19,9 @@ const clientProfileSchema = new mongoose.Schema({
     lowercase: true,
     type: String,
     unique: true,
-    required: true
   },
   phoneNumber: {
     type: String,
-    required: true,
     trim: true,
     maxlength: 24,
     validate: {
@@ -34,11 +32,11 @@ const clientProfileSchema = new mongoose.Schema({
       message: (props) => `${props.value} is not a valid phone number!`,
     },
   },
-  gender: {
-    type: String,
-    enum: ["male", "female", "other"],
-    lowercase: true,
-  },
+  /*   gender: {
+      type: String,
+      enum: ["male", "female", "other"],
+      lowercase: true,
+    }, */
 
   address: {
     type: String,
@@ -61,7 +59,9 @@ const clientProfileSchema = new mongoose.Schema({
     maxlength: 100,
     default: "Nigeria",
   },
-
+  schoolName: {
+    type: String,
+  },
   profileImage: {
     type: String,
     trim: true,

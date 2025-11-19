@@ -35,46 +35,49 @@ const testimonials = [
 export function Testimonial() {
   if (!Array.isArray(testimonials) || testimonials.length === 0) return null;
 
-
-  
   return (
-    <section className="w-full px-4 sm:px-6 md:px-10 lg:px-8 mt-10">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-end justify-between gap-4 mb-4">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
-            Client Testimonials
-          </h2>
-          <span className="text-sm text-gray-500">
+    <section className="container mx-auto max-w-7xl px-4 md:px-8 mt-12 mb-12">
+      <div className="flex items-end justify-between gap-4 mb-6">
+        <div>
+          <h2 className="h4 text-n-8">Client Testimonials</h2>
+          <p className="body-2 text-n-4 mt-1">
             Real stories from campus sellers
-          </span>
+          </p>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {testimonials.map((t) => (
-            <article
-              key={t.id}
-              className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow"
-            >
-              <div className="flex items-center gap-3">
-                <img
-                  src={t.avatar}
-                  alt={`${t.name} avatar`}
-                  className="h-12 w-12 rounded-full object-cover border border-gray-200"
-                  loading="lazy"
-                />
-                <div className="min-w-0">
-                  <p className="truncate font-medium text-gray-900">{t.name}</p>
-                  <p className="text-sm text-gray-500">{t.school}</p>
-                </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {testimonials.map((t) => (
+          <article
+            key={t.id}
+            className="rounded-2xl border border-n-3/10 bg-white p-6 hover:shadow-xl hover:shadow-n-3/10 transition-all duration-300 hover:-translate-y-1"
+          >
+            <div className="flex items-center gap-4 mb-4">
+              <img
+                src={t.avatar}
+                alt={`${t.name} avatar`}
+                className="h-12 w-12 rounded-full object-cover border-2 border-n-1 shadow-sm"
+                loading="lazy"
+              />
+              <div className="min-w-0">
+                <p className="truncate font-bold text-n-8">{t.name}</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-primary-3">
+                  {t.school}
+                </p>
               </div>
+            </div>
 
-              <div className="mt-4 text-gray-700 leading-relaxed">
-                <Quote size={18} className="inline mr-1 text-gray-400" />
-                <span className="align-middle">{t.quote}</span>
-              </div>
-            </article>
-          ))}
-        </div>
+            <div className="relative">
+              <Quote
+                size={24}
+                className="absolute -top-2 -left-2 text-n-2/50"
+              />
+              <p className="text-n-6 leading-relaxed relative z-10 pl-4 italic">
+                "{t.quote}"
+              </p>
+            </div>
+          </article>
+        ))}
       </div>
     </section>
   );

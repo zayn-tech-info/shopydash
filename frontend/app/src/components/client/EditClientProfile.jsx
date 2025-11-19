@@ -2,18 +2,12 @@ import { useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { useClientProfileStore } from "../../store/clientProfileStore";
 
-export function EditClientProfile({
-  clientProfileData,
-  onClose,
-}) {
-  const setInputField = useClientProfileStore(
-    (state) => state.clientProfileData
-  );
+export function EditClientProfile({ clientProfileData, onClose }) {
+  const setInputField = useClientProfileStore((state) => state.setInputField);
   const updating = useClientProfileStore((s) => s.updating);
   const updateClientProfile = useClientProfileStore(
     (s) => s.updateClientProfile
   );
-
 
   if (!clientProfileData) return null;
 
@@ -56,26 +50,24 @@ export function EditClientProfile({
 
           <div className="space-y-3">
             <div>
-              <label className="block text-sm font-medium">Business name</label>
+              <label className="block text-sm font-medium">Full name</label>
               <input
-                value={clientProfileData.businessName}
-                onChange={handleChange("businessName")}
+                value={clientProfileData.fullName}
+                onChange={handleChange("fullName")}
                 className="w-full mt-1 border rounded px-3 py-2"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium">
-                Store username
-              </label>
+              <label className="block text-sm font-medium">username</label>
               <input
-                value={clientProfileData.storeUsername}
-                onChange={handleChange("storeUsername")}
+                value={clientProfileData.username}
+                onChange={handleChange("username")}
                 className="w-full mt-1 border rounded px-3 py-2"
               />
             </div>
 
-            <div>
+            {/*             <div>
               <label className="block text-sm font-medium">Description</label>
               <textarea
                 value={clientProfileData.storeDescription}
@@ -83,9 +75,9 @@ export function EditClientProfile({
                 className="w-full mt-1 border rounded px-3 py-2"
                 rows={4}
               />
-            </div>
+            </div> */}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/*             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-sm font-medium">Category</label>
                 <input
@@ -102,7 +94,7 @@ export function EditClientProfile({
                   className="w-full mt-1 border rounded px-3 py-2"
                 />
               </div>
-            </div>
+            </div> */}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
@@ -128,6 +120,15 @@ export function EditClientProfile({
               <input
                 value={clientProfileData.address}
                 onChange={handleChange("address")}
+                className="w-full mt-1 border rounded px-3 py-2"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium">School</label>
+              <input
+                value={clientProfileData.schoolName}
+                onChange={handleChange("schoolName")}
                 className="w-full mt-1 border rounded px-3 py-2"
               />
             </div>
@@ -165,9 +166,7 @@ export function EditClientProfile({
                   <input
                     type="checkbox"
                     checked={!!clientProfileData.active}
-                    onChange={(e) =>
-                      setInputField((f) => ({ ...f, active: e.target.checked }))
-                    }
+                    onChange={(e) => setInputField("active", e.target.checked)}
                   />
                   <span className="ml-2">Active</span>
                 </label>
@@ -177,10 +176,7 @@ export function EditClientProfile({
                 <input
                   value={clientProfileData.mapLocationLat || ""}
                   onChange={(e) =>
-                    setInputField((f) => ({
-                      ...f,
-                      mapLocationLat: e.target.value,
-                    }))
+                    setInputField("mapLocationLat", e.target.value)
                   }
                   className="w-full mt-1 border rounded px-3 py-2"
                 />
@@ -192,10 +188,7 @@ export function EditClientProfile({
               <input
                 value={clientProfileData.mapLocationLng || ""}
                 onChange={(e) =>
-                  setInputField((f) => ({
-                    ...f,
-                    mapLocationLng: e.target.value,
-                  }))
+                  setInputField("mapLocationLng", e.target.value)
                 }
                 className="w-full mt-1 border rounded px-3 py-2"
               />

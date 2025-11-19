@@ -38,54 +38,54 @@ export function NearByVendors({ posts }) {
   }
 
   return (
-    <section className="md:px-6 lg:px-8 mt-6 md:mt-8">
-      <header className="flex items-center justify-between mb-3 md:mb-4">
-        <h2 className="text-lg md:text-xl font-medium">Nearby vendors</h2>
+    <section className="container mx-auto max-w-7xl px-4 md:px-8 mt-12">
+      <header className="flex items-center justify-between mb-6">
+        <h2 className="h4 text-n-8">Nearby vendors</h2>
         <button
           type="button"
-          className="text-sm text-primary-3 hover:underline focus:outline-none"
+          className="font-code text-xs font-bold uppercase tracking-wider text-primary-3 hover:text-primary-4 transition-colors"
           aria-label="See all nearby vendors"
         >
           See all
         </button>
       </header>
 
-      <div className="space-y-4 md:space-y-10">
+      <div className="space-y-8">
         {data.map((post, postIndex) => (
           <article
             key={`${post.id ?? `post-${postIndex}`}`}
-            className="bg-n-1 border border-stroke-1 rounded-lg overflow-hidden"
+            className="bg-white border border-n-3/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-3 md:px-4 py-2.5">
-              <div className="flex items-center gap-2.5 min-w-0">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-n-3/10">
+              <div className="flex items-center gap-4 min-w-0">
                 {post.vendorAvatar ? (
                   <img
                     src={post.vendorAvatar}
                     alt={post.vendorName}
-                    className="w-8 h-8 rounded-full object-cover"
+                    className="w-10 h-10 rounded-full object-cover border border-n-3/10"
                   />
                 ) : (
-                  <div className="w-8 h-8 rounded-full bg-primary-2/20 text-primary-3 flex items-center justify-center text-[11px] font-semibold">
+                  <div className="w-10 h-10 rounded-full bg-primary-3/10 text-primary-3 flex items-center justify-center font-code text-xs font-bold">
                     {initials(post.vendorName)}
                   </div>
                 )}
                 <div className="min-w-0">
-                  <p className="text-[13px] font-medium text-n-9 truncate">
+                  <p className="font-bold text-n-8 truncate">
                     {post.vendorName}
                   </p>
-                  <p className="text-[11px] text-n-6 flex items-center gap-2">
-                    <span className="inline-flex items-center gap-1 text-n-6">
+                  <p className="text-xs text-n-4 flex items-center gap-2 mt-0.5">
+                    <span className="inline-flex items-center gap-1">
                       <MapPin size={12} /> {post.location}
                     </span>
-                    <span>•</span>
+                    <span className="w-1 h-1 rounded-full bg-n-3"></span>
                     <span>{post.postedAt}</span>
                   </p>
                 </div>
               </div>
               <button
                 type="button"
-                className="text-n-6 hover:text-n-8 p-1 rounded-md hover:bg-n-2"
+                className="text-n-4 hover:text-n-8 p-2 rounded-full hover:bg-n-2/20 transition-colors"
                 aria-label="More"
               >
                 <MoreHorizontal size={20} />
@@ -93,92 +93,80 @@ export function NearByVendors({ posts }) {
             </div>
 
             {post.caption && (
-              <div className="px-3 md:px-4 pb-2 text-[13px] text-n-8">
+              <div className="px-6 py-4 text-sm text-n-6 leading-relaxed border-b border-n-3/10">
                 {post.caption}
               </div>
             )}
 
             {/* Product grid  section */}
-            <div className="px-3 md:px-4 pb-2.5">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+            <div className="p-6 bg-n-1">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {post.products.slice(0, 4).map((p, pIndex) => (
                   <div
                     key={`${post.id ?? postIndex}-${p.id ?? `p-${pIndex}`}`}
-                    className="group relative border-n-5"
+                    className="group relative bg-white rounded-xl border border-n-3/10 overflow-hidden hover:shadow-lg transition-all duration-300"
                   >
-                    <div className="relative aspect-[4/5] rounded-md overflow-hidden border border-stroke-1 bg-n-2">
+                    <div className="relative aspect-[4/5] bg-n-2/10 overflow-hidden">
                       <img
                         src={p.image}
                         alt={p.name}
                         loading="lazy"
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                       />
                       {/* Price badge */}
-                      <div className="absolute top-1.5 left-1.5 bg-white/90 text-n-9 text-[11px] px-3 py-2 md:text-base font-medium rounded shadow">
-                        $ {Number(p.price).toFixed(2)}
+                      <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-n-8 font-bold text-xs px-2 py-1 rounded-lg shadow-sm">
+                        ₦{Number(p.price).toLocaleString()}
                       </div>
                       {/* Rating */}
-                      <div className="absolute top-1.5 right-1.5 flex items-center gap-1 bg-black/55 text-white text-[10px]  px-3 py-2 md:text-base text-sm rounded">
+                      <div className="absolute top-2 right-2 flex items-center gap-1 bg-n-8/80 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-1 rounded-lg">
                         <Star
-                          size={11}
-                          className="fill-current text-amber-400"
+                          size={10}
+                          className="fill-primary-3 text-primary-3"
                         />
                         <span>
                           {p.rating?.toFixed ? p.rating.toFixed(1) : p.rating}
                         </span>
                       </div>
-                      {/* Name overlay */}
-                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-1.5">
-                        <p className="text-white text-[11px] truncate">
-                          {p.name}
-                        </p>
-                      </div>
+
                       {/* Actions overlay (desktop) */}
-                      <div className="absolute inset-x-1.5 bottom-1.5 hidden group-hover:flex md:flex items-center justify-end gap-1.5">
+                      <div className="absolute inset-0 hidden md:flex flex-col items-center justify-center gap-2 bg-n-8/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4">
                         <button
                           type="button"
                           onClick={() => handleAddToCart(p)}
-                          className="inline-flex items-center gap-1 h-7 px-2 rounded-md bg-white/95 text-n-9 text-[11px] shadow hover:bg-white"
+                          className="w-full h-10 flex items-center justify-center gap-2 rounded-xl bg-white text-n-8 font-code text-xs font-bold uppercase tracking-wider hover:bg-n-2 transition-colors"
                         >
-                          <ShoppingCart size={13} /> Add
+                          <ShoppingCart size={14} /> Add
                         </button>
                         <button
                           type="button"
                           onClick={() => handleBuyNow(p)}
-                          className="inline-flex items-center gap-1 h-7 px-2 rounded-md bg-primary-3 text-white text-[11px] shadow hover:opacity-90"
+                          className="w-full h-10 flex items-center justify-center gap-2 rounded-xl bg-primary-3 text-white font-code text-xs font-bold uppercase tracking-wider hover:bg-primary-4 transition-colors"
                         >
-                          <ShoppingBag size={13} /> Buy
+                          <ShoppingBag size={14} /> Buy
                         </button>
-                        <a
-                          href={`/vendor/${vendorSlug(post.vendorName)}`}
-                          className="inline-flex items-center gap-1 h-7 px-2 rounded-md bg-white/95 text-n-9 text-[11px] shadow hover:bg-white"
-                        >
-                          View profile
-                        </a>
                       </div>
                     </div>
-                    {/* Mobile actions */}
-                    <div className="mt-1 flex md:hidden items-center justify-between gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handleAddToCart(p)}
-                        className="flex-1 inline-flex items-center justify-center gap-1.5 h-8 text-[12px] border border-stroke-1 rounded-md text-n-8"
-                      >
-                        <ShoppingCart size={12} /> Add
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleBuyNow(p)}
-                        className="flex-1 inline-flex items-center justify-center gap-1.5 h-8 text-[12px] rounded-md bg-primary-3 text-white"
-                      >
-                        <ShoppingBag size={12} /> Buy
-                      </button>
-                      <a
-                        href={`/vendor/${vendorSlug(post.vendorName)}`}
-                        className="flex-1 text-center text-[12px] text-primary-3 hover:underline"
-                      >
-                        Profile
-                      </a>
+
+                    <div className="p-3 md:hidden">
+                      <h4 className="font-bold text-xs text-n-8 truncate mb-2">
+                        {p.name}
+                      </h4>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleAddToCart(p)}
+                          className="flex-1 h-8 flex items-center justify-center rounded-lg border border-n-3/20 text-n-8"
+                        >
+                          <ShoppingCart size={14} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleBuyNow(p)}
+                          className="flex-1 h-8 flex items-center justify-center rounded-lg bg-primary-3 text-white"
+                        >
+                          <ShoppingBag size={14} />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -186,29 +174,27 @@ export function NearByVendors({ posts }) {
             </div>
 
             {/* Footer */}
-            <div className="px-3 md:px-4 pb-2.5">
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md border border-n-1 bg-primary-3 text-n-1 text-[13px]"
-                >
-                  <MessageCircle size={14} /> Message vendor
-                </button>
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md text-primary-3 hover:bg-primary-3/10 text-[13px]"
-                >
-                  View profile
-                </button>
-              </div>
+            <div className="px-6 py-4 bg-white border-t border-n-3/10 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                className="h-10 px-4 rounded-xl border border-n-3/20 text-n-6 font-code text-xs font-bold uppercase tracking-wider hover:border-primary-3 hover:text-primary-3 transition-colors"
+              >
+                View profile
+              </button>
+              <button
+                type="button"
+                className="h-10 px-4 rounded-xl bg-primary-3 text-white font-code text-xs font-bold uppercase tracking-wider hover:bg-primary-4 transition-colors shadow-md shadow-primary-3/20 flex items-center gap-2"
+              >
+                <MessageCircle size={16} /> Message
+              </button>
             </div>
           </article>
         ))}
       </div>
 
       {data.length === 0 && (
-        <div className="mt-6 text-center text-sm text-n-6">
-          No nearby vendors found yet.
+        <div className="mt-12 text-center">
+          <p className="body-2 text-n-4">No nearby vendors found yet.</p>
         </div>
       )}
     </section>

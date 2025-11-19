@@ -1,4 +1,3 @@
- 
 import { BottomNav } from "../components/BottomNav";
 import { Fragment } from "react";
 import { HomeContent } from "../components/HomeContent";
@@ -8,19 +7,20 @@ import { NearByVendors } from "../components/NearByVendors";
 import { FeaturedVendor } from "../components/FeaturedVendor";
 import { ShopByDepartemnt } from "../components/ShopByDepartemnt";
 import { Testimonial } from "../components/Testimonial";
- 
 
 export function Home() {
   return (
     <Fragment>
-      <div>
+      <div className="bg-n-1 min-h-screen pb-20 md:pb-0">
         <HomeContent />
-        <NewArrival />
-        <Trending />
-        <NearByVendors />
-        <FeaturedVendor />
-        <ShopByDepartemnt />
-        <Testimonial />
+        <div className="space-y-12 md:space-y-16 pb-12">
+          <NewArrival />
+          <Trending />
+          <NearByVendors />
+          <FeaturedVendor />
+          <ShopByDepartemnt />
+          <Testimonial />
+        </div>
       </div>
       <BottomNav />
     </Fragment>

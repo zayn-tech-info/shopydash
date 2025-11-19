@@ -62,11 +62,11 @@ export function LoginForm() {
   return (
     <div>
       <form onSubmit={onSubmit} className="px-8 pt-6 pb-8">
-        <div className="space-y-4">
+        <div className="space-y-5">
           <div>
             <label
               htmlFor="email"
-              className="block text-base font-medium text-gray-700"
+              className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2"
             >
               Email / Client ID
             </label>
@@ -80,48 +80,48 @@ export function LoginForm() {
                   ? "e.g. john.doe@uni.edu or 20231234"
                   : "e.g. vendor@shop.com"
               }
-              className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-orange-300 focus:ring-2 focus:ring-orange-200"
+              className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
               autoComplete="username"
               required
             />
           </div>
 
           <div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-2">
               <label
                 htmlFor="password"
-                className="block text-base font-medium text-gray-700"
+                className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider"
               >
                 Password
               </label>
               <a
                 href="#"
-                className="text-base text-orange-600 hover:text-orange-700"
+                className="text-xs font-bold text-primary-3 hover:text-primary-4 transition-colors"
               >
                 Forgot password?
               </a>
             </div>
-            <div className="mt-1 relative">
+            <div className="relative">
               <input
                 id="password"
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
-                className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 pr-10 text-sm outline-none focus:border-orange-300 focus:ring-2 focus:ring-orange-200"
+                className="w-full h-12 pl-4 pr-12 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
                 autoComplete="current-password"
                 required
               />
               <button
                 type="button"
                 onClick={toggleShowPassword}
-                className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-gray-700"
+                className="absolute inset-y-0 right-0 flex items-center px-4 text-n-4 hover:text-n-6 transition-colors"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
-                  <EyeOff className="w-4 h-4" aria-hidden="true" />
+                  <EyeOff className="w-5 h-5" />
                 ) : (
-                  <Eye className="w-4 h-4" aria-hidden="true" />
+                  <Eye className="w-5 h-5" />
                 )}
               </button>
             </div>
@@ -129,21 +129,18 @@ export function LoginForm() {
 
           <button
             type="submit"
-            className={[
-              "mt-2 w-full rounded-lg bg-[#F97316] py-2.5 text-white font-semibold shadow-sm text-base transition-colors",
-              "hover:bg-[#ea580c] focus:outline-none focus:ring-2 focus:ring-orange-300",
-            ].join(" ")}
+            className="w-full h-12 bg-primary-3 hover:bg-primary-4 text-white rounded-xl font-code text-sm font-bold uppercase tracking-wider transition-all shadow-lg shadow-primary-3/20 hover:shadow-primary-3/40 hover:-translate-y-0.5"
           >
             Continue to Vendora
           </button>
         </div>
 
         {/* Create Account */}
-        <p className="mt-4 text-center text-base text-gray-600">
+        <p className="mt-8 text-center text-sm text-n-4">
           New here?{" "}
           <Link
             to="/signup"
-            className="font-medium text-orange-600 hover:text-orange-700"
+            className="font-bold text-n-8 hover:text-primary-3 transition-colors"
           >
             Create an account
           </Link>

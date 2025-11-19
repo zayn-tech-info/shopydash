@@ -46,81 +46,82 @@ export function NewArrival({ withinHours = 24, limit = 8 }) {
       .replace(/(^-|-$)/g, "");
 
   return (
-    <section className="w-full px-4 sm:px-6 md:px-10 lg:px-8 mt-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-1 sm:gap-4 mb-3 sm:mb-4">
-          <h2 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 leading-tight">
-            New Arrivals
-          </h2>
-          <p className="text-xs sm:text-sm text-gray-500 leading-snug">
+    <section className="container mx-auto max-w-7xl px-4 md:px-8 mt-12">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+        <div>
+          <h2 className="h4 text-n-8">New Arrivals</h2>
+          <p className="body-2 text-n-4 mt-1">
             Fresh on Campus — newly listed items from vendors near you.
           </p>
         </div>
+        <button className="hidden md:flex items-center gap-2 font-code text-xs font-bold uppercase tracking-wider text-primary-3 hover:text-primary-4 transition-colors">
+          View all items
+        </button>
+      </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {arrivals.map((item, idx) => (
-            <article
-              key={`${item.id}-${idx}`}
-              className="group rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-            >
-              <div className="relative aspect-square w-full bg-gray-50">
-                <span className="absolute left-2 top-2 z-10 inline-flex items-center rounded-full bg-emerald-600 px-2 py-1 text-[10px] font-semibold text-white">
-                  New
-                </span>
-                {item.image ? (
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="absolute inset-0 h-full w-full object-cover"
-                    loading="lazy"
-                  />
-                ) : null}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+        {arrivals.map((item, idx) => (
+          <article
+            key={`${item.id}-${idx}`}
+            className="group bg-white rounded-2xl border border-n-3/10 overflow-hidden hover:shadow-xl hover:shadow-n-3/10 transition-all duration-300 hover:-translate-y-1"
+          >
+            <div className="relative aspect-square bg-n-2/10 overflow-hidden">
+              <span className="absolute left-3 top-3 z-10 inline-flex items-center rounded-lg bg-primary-3/90 backdrop-blur-sm px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-sm">
+                New
+              </span>
+              {item.image ? (
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  loading="lazy"
+                />
+              ) : null}
 
-                {item.vendorName && (
-                  <div className="absolute inset-0 hidden md:flex items-center justify-center bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <a
-                      href={`/vendor/${vendorSlug(item.vendorName)}`}
-                      className="inline-flex items-center justify-center rounded-md bg-white/95 px-3 py-2 text-sm font-medium text-gray-900 hover:bg-white"
-                    >
-                      View vendor profile
-                    </a>
-                  </div>
-                )}
-              </div>
-
-              <div className="p-3">
-                <h3 className="line-clamp-1 text-sm font-medium text-gray-900">
-                  {item.name}
-                </h3>
-                <p className="mt-1 text-xs text-gray-500">
-                  by {item.vendorName}
-                </p>
-                <div className="mt-2 flex items-center justify-between">
-                  <span className="text-sm font-semibold text-gray-900">
-                    ₦{Number(item.price).toLocaleString()}
-                  </span>
-                  {item.rating ? (
-                    <span className="text-xs text-amber-600 font-medium">
-                      ★ {item.rating.toFixed(1)}
-                    </span>
-                  ) : null}
+              {item.vendorName && (
+                <div className="absolute inset-0 hidden md:flex items-center justify-center bg-n-8/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <a
+                    href={`/vendor/${vendorSlug(item.vendorName)}`}
+                    className="inline-flex items-center justify-center rounded-xl bg-white text-n-8 font-code text-xs font-bold uppercase tracking-wider px-4 py-3 hover:bg-primary-3 hover:text-white transition-colors shadow-lg"
+                  >
+                    View Shop
+                  </a>
                 </div>
+              )}
+            </div>
 
-                {/* Mobile quick link to vendor profile */}
-                {item.vendorName && (
-                  <div className="mt-2 md:hidden">
-                    <a
-                      href={`/vendor/${vendorSlug(item.vendorName)}`}
-                      className="text-[12px] text-primary-3 hover:underline"
-                    >
-                      View vendor profile
-                    </a>
-                  </div>
-                )}
+            <div className="p-4">
+              <h3 className="font-bold text-n-8 text-sm truncate mb-1">
+                {item.name}
+              </h3>
+              <p className="text-xs text-n-4 mb-3 truncate">
+                by {item.vendorName}
+              </p>
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-n-8">
+                  ₦{Number(item.price).toLocaleString()}
+                </span>
+                {item.rating ? (
+                  <span className="flex items-center gap-1 text-xs font-bold text-n-8 bg-n-2/20 px-1.5 py-0.5 rounded">
+                    ★ {item.rating.toFixed(1)}
+                  </span>
+                ) : null}
               </div>
-            </article>
-          ))}
-        </div>
+
+              {/* Mobile quick link to vendor profile */}
+              {item.vendorName && (
+                <div className="mt-3 md:hidden pt-3 border-t border-n-3/10">
+                  <a
+                    href={`/vendor/${vendorSlug(item.vendorName)}`}
+                    className="block text-center font-code text-[10px] font-bold uppercase tracking-wider text-primary-3"
+                  >
+                    View Shop
+                  </a>
+                </div>
+              )}
+            </div>
+          </article>
+        ))}
       </div>
     </section>
   );
