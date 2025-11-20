@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useClientProfileStore } from "../store/clientProfileStore";
 import { EditClientProfile } from "../components/client/EditClientProfile";
 import { LogOut } from "lucide-react";
+import { ClientAddress } from "../components/client/ClientAddress";
 
 export function ClientProfile() {
   const authUser = useAuthStore((state) => state.authUser);
@@ -73,24 +74,6 @@ export function ClientProfile() {
                 authUser={authUser}
                 openEdit={openEdit}
               />
-
-              {/* Mobile-only Logout (if needed, or keep it in header/sidebar) */}
-              {authUser &&
-                clientProfile &&
-                authUser._id === clientProfile.userId && (
-                  <div className="lg:hidden">
-                    <button
-                      onClick={() => {
-                        logout();
-                        navigate("/login");
-                      }}
-                      className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-n-2/20 hover:bg-n-2/40 text-n-6 rounded-xl transition-colors font-code text-sm font-bold uppercase tracking-wider"
-                    >
-                      <LogOut size={18} />
-                      Logout
-                    </button>
-                  </div>
-                )}
             </div>
           </div>
 
@@ -119,21 +102,6 @@ export function ClientProfile() {
                     </span>
                   </div>
                 </div>
-
-                {authUser &&
-                  clientProfile &&
-                  authUser._id === clientProfile.userId && (
-                    <button
-                      onClick={() => {
-                        logout();
-                        navigate("/login");
-                      }}
-                      className="hidden lg:flex items-center gap-2 px-6 py-3 bg-n-1 border border-n-3/20 hover:border-primary-3 text-n-6 hover:text-primary-3 rounded-xl transition-all font-code text-xs font-bold uppercase tracking-wider"
-                    >
-                      <LogOut size={16} />
-                      Logout
-                    </button>
-                  )}
               </div>
             </div>
 
@@ -141,6 +109,30 @@ export function ClientProfile() {
             <div className="bg-white rounded-2xl p-8 border border-n-3/20 shadow-sm min-h-[400px]">
               <AboutAndWishlist clientProfile={clientProfile} />
             </div>
+
+            {/* Contact Info Section */}
+            <div className="bg-white rounded-2xl p-8 border border-n-3/20 shadow-sm">
+              <ClientAddress
+                authUser={authUser}
+                clientProfile={clientProfile}
+              />
+            </div>
+
+            {/* Logout Button */}
+            {authUser &&
+              clientProfile &&
+              authUser._id === clientProfile.userId && (
+                <button
+                  onClick={() => {
+                    logout();
+                    navigate("/login");
+                  }}
+                  className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-n-1 border border-n-3/20 hover:border-primary-3 text-n-6 hover:text-primary-3 rounded-2xl transition-all font-code text-sm font-bold uppercase tracking-wider shadow-sm"
+                >
+                  <LogOut size={18} />
+                  Logout
+                </button>
+              )}
           </div>
         </div>
       </div>

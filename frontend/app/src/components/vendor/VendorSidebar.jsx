@@ -1,8 +1,12 @@
-import { Edit } from "lucide-react";
+import { Edit, Share2 } from "lucide-react";
 import Logo from "../../assets/images/clientPfp.png";
-import { VendorAddress } from "./VendorAddress";
 
-export default function VendorSidebar({ authUser, vendorProfile, openEdit }) {
+export default function VendorSidebar({
+  authUser,
+  vendorProfile,
+  openEdit,
+  onCopy,
+}) {
   const businessName =
     vendorProfile?.businessName || authUser?.businessName || "Store";
   const username =
@@ -10,7 +14,7 @@ export default function VendorSidebar({ authUser, vendorProfile, openEdit }) {
   const profileImage = vendorProfile?.profileImage || Logo;
 
   return (
-    <aside className="bg-white rounded-2xl p-6 border border-n-3/20 shadow-sm w-full">
+    <aside className="bg-white rounded-2xl p-6 border border-n-3/20 shadow-sm w-full relative">
       <div className="flex flex-col items-center">
         <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-n-1 shadow-sm mb-4 relative group">
           <img
@@ -18,7 +22,23 @@ export default function VendorSidebar({ authUser, vendorProfile, openEdit }) {
             alt={businessName}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
+
+          {vendorProfile?.active && (
+            <div
+              className="absolute bottom-4 right-4 w-5 h-5 bg-green-500 border-4 border-white rounded-full z-20"
+              title="Active"
+            ></div>
+          )}
         </div>
+
+ 
+        <button
+          onClick={onCopy}
+          className="absolute top-2 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center text-n-7 hover:text-primary-3 shadow-sm border border-n-3/10 transition-colors"
+          title="Share profile"
+        >
+          <Share2 size={16} />
+        </button>
 
         <h2 className="h4 text-n-8 text-center mb-1">{businessName}</h2>
         <p className="body-2 text-n-4 text-center font-code">@{username}</p>
@@ -59,14 +79,6 @@ export default function VendorSidebar({ authUser, vendorProfile, openEdit }) {
             </div>
           </div>
         </div>
-      </div>
-
-      <div className="mt-8 pt-6 border-t border-n-3/10">
-        <VendorAddress
-          authUser={authUser}
-          vendorProfile={vendorProfile}
-          className="md:block hidden"
-        />
       </div>
 
       <div className="mt-6 pt-4 border-t border-n-3/10 text-sm">

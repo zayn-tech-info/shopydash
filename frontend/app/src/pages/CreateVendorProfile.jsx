@@ -72,9 +72,7 @@ export default function CreateVendorProfile() {
 
       navigate("/vendor/profile");
     } catch (e) {
-      const msg =
-        e?.response?.data?.message || e.message || "Failed to create profile";
-      toast.error(msg);
+      toast.error(e);
     }
   }
 

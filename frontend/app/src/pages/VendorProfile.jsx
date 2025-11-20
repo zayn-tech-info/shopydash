@@ -83,7 +83,7 @@ export default function VendorProfile() {
       <div className="container">
         {/* Cover Image Section */}
         <div className="relative bg-n-2/10 rounded-3xl overflow-hidden mb-8 border border-n-3/20 shadow-sm group">
-          <div className="w-full h-48 md:h-64 lg:h-80 bg-n-3 relative">
+          <div className="w-full h-32 md:h-48 lg:h-56 bg-n-3 relative">
             {vendorProfile?.coverImage ? (
               <img
                 src={vendorProfile.coverImage}
@@ -94,27 +94,18 @@ export default function VendorProfile() {
               <div className="w-full h-full bg-gradient-to-r from-primary-3 to-primary-4" />
             )}
             {/* Overlay gradient for better text visibility if needed */}
-            <div className="absolute inset-0 bg-gradient-to-t from-n-8/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-n-8/80 via-n-8/20 to-transparent" />
 
-          {/* top-right actions */}
-          <div className="absolute right-6 top-6 flex items-center gap-3 z-10">
-            <button
-              onClick={copyProfileLink}
-              className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm text-n-7 hover:bg-white hover:text-primary-3 transition-all shadow-sm"
-              title="Copy profile link"
-            >
-              <Link2 size={18} />
-            </button>
-            <span
-              className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm backdrop-blur-sm ${
-                vendorProfile?.active
-                  ? "bg-green-100/90 text-green-800"
-                  : "bg-red-100/90 text-red-800"
-              }`}
-            >
-              {vendorProfile?.active ? "Active" : "Inactive"}
-            </span>
+            <div className="absolute bottom-0 left-0 p-6 md:p-8 z-10 w-full">
+              <h1 className="h2 text-white mb-2 drop-shadow-md">
+                {vendorProfile?.businessName}
+              </h1>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-white/90 body-2">
+                <span className="font-code uppercase tracking-wider text-sm font-bold bg-white/20 backdrop-blur-md px-3 py-1 rounded-lg border border-white/10">
+                  {vendorProfile?.businessCategory}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -132,67 +123,35 @@ export default function VendorProfile() {
                   navigate("/login");
                 }}
               />
-              <VendorAddress
-                vendorProfile={vendorProfile}
-                authUser={authUser}
-                className="lg:hidden block"
-              />
-
-              {/* Mobile-only Logout */}
-              {authUser &&
-                vendorProfile &&
-                authUser._id === vendorProfile.userId && (
-                  <div className="lg:hidden">
-                    <button
-                      onClick={handleLogout}
-                      className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-n-2/20 hover:bg-n-2/40 text-n-6 rounded-xl transition-colors font-code text-sm font-bold uppercase tracking-wider"
-                    >
-                      <LogOut size={18} />
-                      Logout
-                    </button>
-                  </div>
-                )}
             </div>
           </div>
 
           {/* Main Content */}
           <div className="lg:col-span-8 xl:col-span-9 space-y-8">
-            {/* Header Info for Desktop (similar to ClientProfile) */}
-            <div className="bg-white rounded-2xl p-8 border border-n-3/20 shadow-sm">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h1 className="h3 text-n-8 mb-2">
-                    {vendorProfile?.businessName}
-                  </h1>
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-n-4 body-2">
-                    <span className="font-code text-primary-3 uppercase tracking-wider text-sm font-bold">
-                      {vendorProfile?.businessCategory}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  {authUser &&
-                  vendorProfile &&
-                  authUser._id === vendorProfile.userId ? (
-                    <>
-                      <button
-                        onClick={handleLogout}
-                        className="hidden lg:flex items-center gap-2 px-6 py-3 bg-n-1 border border-n-3/20 hover:border-primary-3 text-n-6 hover:text-primary-3 rounded-xl transition-all font-code text-xs font-bold uppercase tracking-wider"
-                        title="Logout"
-                      >
-                        <LogOut size={16} />
-                        Logout
-                      </button>
-                    </>
-                  ) : null}
-                </div>
-              </div>
-            </div>
-
             <div className="bg-white rounded-2xl p-8 border border-n-3/20 shadow-sm min-h-[400px]">
               <AboutAndProducts vendor={vendorProfile} />
             </div>
+
+            {/* Contact Info Section */}
+            <div className="bg-white rounded-2xl p-8 border border-n-3/20 shadow-sm">
+              <VendorAddress
+                vendorProfile={vendorProfile}
+                authUser={authUser}
+              />
+            </div>
+
+            {/* Logout Button */}
+            {authUser &&
+              vendorProfile &&
+              authUser._id === vendorProfile.userId && (
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-n-1 border border-n-3/20 hover:border-primary-3 text-n-6 hover:text-primary-3 rounded-2xl transition-all font-code text-sm font-bold uppercase tracking-wider shadow-sm"
+                >
+                  <LogOut size={18} />
+                  Logout
+                </button>
+              )}
           </div>
         </div>
 

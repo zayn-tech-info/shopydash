@@ -72,6 +72,7 @@ const userSchema = mongoose.Schema(
         true,
         "This Business name already exist, You no go like change am?",
       ],
+      sparse: true,
       trim: true,
     },
     whatsAppNumber: {

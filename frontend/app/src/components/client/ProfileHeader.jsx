@@ -5,7 +5,6 @@ import { useAuthStore } from "../../store/authStore";
 import { useNavigate } from "react-router-dom";
 import Logo from "../../assets/images/clientPfp.png";
 import { useClientProfileStore } from "../../store/clientProfileStore";
-import { ClientAddress } from "./ClientAddress";
 
 export default function ProfileHeader({ clientProfile, authUser, openEdit }) {
   const clientName = clientProfile?.fullName || authUser?.fullName || "Store";
@@ -44,14 +43,6 @@ export default function ProfileHeader({ clientProfile, authUser, openEdit }) {
             </button>
           </div>
         )}
-      </div>
-
-      <div className="mt-8 pt-6 border-t border-n-3/10">
-        <ClientAddress
-          authUser={authUser}
-          clientProfile={clientProfile}
-          className="md:block hidden"
-        />
       </div>
 
       <div className="mt-6 pt-4 border-t border-n-3/10 text-sm">
