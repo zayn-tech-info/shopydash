@@ -62,6 +62,7 @@ export const useVendorProfileStore = create((set, get) => ({
         "An unknown error occurred";
       console.error("create vendor profile error:", err);
       set({ error: serverMessage, isCreatingProfile: false });
+      throw serverMessage;
     }
   },
 

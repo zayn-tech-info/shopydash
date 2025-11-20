@@ -42,6 +42,59 @@ export const useAuthStore = create((set) => ({
     }
   },
 
+  googleAuthenticate: async (token) => {
+    set({ isLogginIn: true, error: null });
+    try {
+      const res = await api.post("/api/v1/auth/google", { token });
+      const payload = res?.data?.data ?? res?.data ?? res;
+
+      const userData = payload.user || payload;
+      const hasProfile =
+        payload.hasProfile !== undefined ? payload.hasProfile : false;
+
+      set({
+        authUser: { ...userData, hasProfile },
+        isLogginIn: false,
+        error: null,
+      });
+      return {
+        success: true,
+        profileComplete: userData.profileComplete,
+        hasProfile,
+      };
+    } catch (err) {
+      set({ isLogginIn: false });
+      const serverMessage =
+        err?.response?.data?.message ??
+        err?.response?.data ??
+        err?.message ??
+        "An unknown error occurred";
+      set({ error: serverMessage });
+      throw serverMessage;
+    }
+  },
+
+  completeRegistration: async (data) => {
+    try {
+      const res = await api.post("/api/v1/auth/complete-registration", data);
+      const payload = res?.data?.data ?? res?.data ?? res;
+
+      const userData = payload.user || payload;
+      const hasProfile =
+        payload.hasProfile !== undefined ? payload.hasProfile : false;
+
+      set({ authUser: { ...userData, hasProfile } });
+      return payload;
+    } catch (err) {
+      const serverMessage =
+        err?.response?.data?.message ??
+        err?.response?.data ??
+        err?.message ??
+        "Failed to complete registration";
+      throw new Error(serverMessage);
+    }
+  },
+
   checkAuth: async () => {
     set({ isCheckingAuth: true, error: null });
     try {

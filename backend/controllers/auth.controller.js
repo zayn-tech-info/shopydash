@@ -4,6 +4,60 @@ const VendorProfile = require("../models/vendorProfile.model");
 const sendToken = require("../utils/sendToken");
 const validator = require("validator");
 
+const googleAuth = async (req, res) => {
+  const { token } = req.body;
+
+  try {
+    const response = await fetch(
+      "https://www.googleapis.com/oauth2/v3/userinfo",
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch user info from Google");
+    }
+
+    const { email, name, picture } = await response.json();
+
+    let user = await User.findOne({ email });
+
+    if (user) {
+      let hasProfile = false;
+      if (user.role === "client") {
+        const profile = await ClientProfile.findOne({ userId: user._id });
+        hasProfile = !!profile;
+      } else if (user.role === "vendor") {
+        const profile = await VendorProfile.findOne({ userId: user._id });
+        hasProfile = !!profile;
+      }
+      sendToken(user, "Logged in successfully", res, 200, hasProfile);
+    } else {
+      const baseUsername = email.split("@")[0];
+      const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+      const username = `${baseUsername}${randomSuffix}`;
+
+      user = await User.create({
+        email,
+        fullName: name,
+        username,
+        profilePic: picture,
+        isGoogleAuth: true,
+        profileComplete: false,
+      });
+
+      sendToken(user, "Account created successfully", res, 201, false);
+    }
+  } catch (error) {
+    console.error("Google Auth Error:", error);
+    return res.status(400).json({
+      success: false,
+      message: "Invalid Google Token",
+    });
+  }
+};
+
 const signup = async (req, res, next) => {
   const {
     fullName,
@@ -66,24 +120,6 @@ const signup = async (req, res, next) => {
     }
 
     const user = await User.create(req.body);
-    // New users don't have a profile yet
-    const userWithProfile = { ...user.toObject(), hasProfile: false };
-
-    // We need to adjust sendToken to accept the modified user object or handle it internally
-    // But sendToken likely uses user methods like getJwtToken, so we should pass the mongoose doc
-    // and maybe send the extra data separately?
-    // sendToken implementation:
-    // const token = user.generateToken();
-    // const options = { ... };
-    // res.status(statusCode).cookie("token", token, options).json({ success: true, token, data: user });
-
-    // Since sendToken sends `user` as data, we might need to modify sendToken or just manually send here.
-    // For now, let's assume sendToken sends the user object.
-    // Actually, looking at sendToken usage in login, it sends `user`.
-    // If I want to add hasProfile, I might need to modify sendToken or just attach it to user if possible (but user is a doc).
-    // Mongoose docs are not easily extensible ad-hoc.
-    // Let's check sendToken implementation if possible, but I don't have it open.
-    // I'll stick to the plan: modify login and checkAuth.
 
     sendToken(user, "User created successfully", res, 201);
   } catch (err) {
@@ -98,18 +134,13 @@ const signup = async (req, res, next) => {
 const login = async (req, res, next) => {
   try {
     const { password } = req.body;
-    const identifier =
-      req.body.email ||
-      req.body.emailOrId ||
-      req.body.identifier ||
-      req.body.username ||
-      req.body.schoolId;
+    const identifier = req.body.email || req.body.username || req.body.schoolId;
 
     if (!identifier || !password) {
       return res.status(400).json({
         success: false,
         message:
-          "Identifier (email/username/schoolId) and password are required",
+          "Identifier (email / username / schoolId) and password are required",
       });
     }
 
@@ -129,7 +160,7 @@ const login = async (req, res, next) => {
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: "Invalid email/school id/username or password",
+        message: "Invalid email / school id / username or password",
       });
     }
 
@@ -137,7 +168,7 @@ const login = async (req, res, next) => {
     if (!isPasswordMatch) {
       return res.status(401).json({
         success: false,
-        message: "Invalid email/school id/username or password",
+        message: "Invalid email / school id / username or password",
       });
     }
 
@@ -150,24 +181,9 @@ const login = async (req, res, next) => {
       hasProfile = !!profile;
     }
 
-    // Create a plain object with hasProfile
     const userResponse = { ...user.toObject(), hasProfile };
 
-    // We can't pass userResponse to sendToken if it expects a Mongoose doc for methods.
-    // So we pass user, but we need to intercept the response or modify sendToken.
-    // Let's assume I can modify sendToken or just manually send response here to be safe.
-    // But sendToken sets cookies.
-    // I'll read sendToken first to be sure.
-
-    // WAIT, I should read sendToken first.
-    // For now, I'll just proceed with checkAuth which is easier.
-    // And I'll check sendToken in a separate step if needed.
-    // Actually, I can just attach hasProfile to the user object (it's JS).
-    user.hasProfile = hasProfile; // This might not persist to toJSON/toObject unless strictly defined in schema?
-    // But if sendToken uses user.toObject(), it might strip unknown fields.
-
-    // Let's try to pass it.
-    // Actually, better to read sendToken.
+    user.hasProfile = hasProfile;
 
     sendToken(user, "Logged in successfully", res, 200, hasProfile);
   } catch (error) {
@@ -224,4 +240,93 @@ const checkAuth = async (req, res, next) => {
   res.status(200).json({ ...req.user.toObject(), hasProfile });
 };
 
-module.exports = { signup, login, logout, checkAuth };
+const completeRegistration = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const {
+      role,
+      phoneNumber,
+      schoolName,
+      whatsAppNumber,
+      businessName,
+      schoolId,
+      password,
+    } = req.body;
+
+    if (!role || !phoneNumber || !schoolName || !whatsAppNumber || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required",
+      });
+    }
+
+    if (role === "vendor" && !businessName) {
+      return res.status(400).json({
+        success: false,
+        message: "Business name is required for vendors",
+      });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    user.role = role;
+    user.phoneNumber = phoneNumber;
+    user.schoolName = schoolName;
+    user.whatsAppNumber = whatsAppNumber;
+    user.password = password;
+    user.businessName = role === "vendor" ? businessName : undefined;
+    user.schoolId = schoolId ? Number(schoolId) : undefined;
+    user.profileComplete = true;
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Registration completed successfully",
+      data: { user: user.toObject(), hasProfile: false },
+    });
+  } catch (error) {
+    console.error("Complete Registration Error:", error);
+
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern)[0];
+      let message = "";
+
+      if (field === "phoneNumber") {
+        message = "This phone number is already registered";
+      } else if (field === "whatsAppNumber") {
+        message = "This WhatsApp number is already registered";
+      } else if (field === "businessName") {
+        message = "This business name is already taken";
+      } else {
+        message = `This ${field} is already in use`;
+      }
+
+      return res.status(400).json({
+        success: false,
+        message: message,
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Server error",
+    });
+  }
+};
+
+module.exports = {
+  signup,
+  login,
+  logout,
+  checkAuth,
+  googleAuth,
+  completeRegistration,
+};

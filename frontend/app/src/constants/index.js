@@ -196,3 +196,39 @@ export const VendorsPost = [
     ],
   },
 ];
+
+export const schools = [
+  "Ladoke Akintola University of Technology (LAUTECH), Ogbomoso",
+  "University of Lagos",
+  "University of Ibadan",
+  "Ahmadu Bello University, Zaria",
+  "Obafemi Awolowo University, Ile-Ife",
+  "University of Nigeria, Nsukka",
+  "Bayero University, Kano",
+  "University of Benin",
+  "University of Ilorin",
+  "Federal University of Technology, Akure (FUTA)",
+  "Federal University of Technology, Minna (FUTMINNA)",
+  "Covenant University, Ota",
+  "Lagos State University, Ojo (LASU)",
+  "Rivers State University, Port Harcourt",
+  "Adekunle Ajasin University, Akungba-Akoko",
+];
+
+export const preferredCategories = [
+  "Food & Snacks",
+  "Clothing & Fashion",
+  "Shoes & Bags",
+  "Electronics & Gadgets",
+  "Phone Accessories",
+  "Beauty & Personal Care",
+  "Health & Wellness",
+  "Groceries",
+  "Home & Kitchen",
+  "Stationery & School Supplies",
+  "Services (Haircut, Laundry, Repairs)",
+  "Sports & Fitness",
+  "Art & Crafts",
+  "Books & Study Materials",
+  "Others",
+];

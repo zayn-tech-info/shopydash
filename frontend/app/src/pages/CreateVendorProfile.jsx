@@ -1,10 +1,12 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { Loader } from "../components/Loader";
+// import { Loader } from "../components/Loader";
 import { useVendorProfileStore } from "../store/vendorProfileStore";
 import { useAuthStore } from "../store/authStore";
 import { InputField } from "../components/InputField";
+import { preferredCategories } from "../constants";
+import { ChevronDown, Check } from "lucide-react";
 
 export default function CreateVendorProfile() {
   const navigate = useNavigate();
@@ -112,11 +114,15 @@ export default function CreateVendorProfile() {
               />
             </div>
 
-            <InputField
-              label="Category"
-              value={profileData.category}
-              onChange={handleInputChange("category")}
-            />
+            <div>
+              <label className="block text-sm font-medium mb-1">Category</label>
+              <CustomDropdown
+                options={preferredCategories}
+                value={profileData.businessCategory}
+                onChange={(value) => setProfileField("businessCategory", value)}
+                placeholder="Select category"
+              />
+            </div>
           </section>
 
           <section className="space-y-3">
@@ -221,14 +227,95 @@ export default function CreateVendorProfile() {
 
             <button
               type="submit"
-              className="px-4 py-2 bg-primary-600 text-white bg-primary-3 rounded"
+              className="px-4 py-2 bg-primary-600 text-white bg-primary-3 rounded min-w-[140px] flex items-center justify-center"
               disabled={isSubmitting}
             >
-              {isSubmitting ? <Loader>Creating...</Loader> : "Create profile"}
+              {isSubmitting ? (
+                <>
+                  <svg
+                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Creating...
+                </>
+              ) : (
+                "Create profile"
+              )}
             </button>
           </div>
         </form>
       </div>
     </main>
+  );
+}
+
+function CustomDropdown({ options, value, onChange, placeholder }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className={`w-full h-10 px-3 rounded-md border border-gray-300 bg-white text-left flex items-center justify-between hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-3 focus:border-transparent ${
+          value ? "text-gray-900" : "text-gray-400"
+        }`}
+      >
+        <span className="truncate block mr-4">{value || placeholder}</span>
+        <ChevronDown
+          className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+
+      {isOpen && (
+        <div className="absolute z-50 w-full mt-1 bg-white rounded-md shadow-lg border border-gray-200 max-h-60 overflow-y-auto">
+          {options.map((option, index) => (
+            <button
+              key={index}
+              type="button"
+              onClick={() => {
+                onChange(option);
+                setIsOpen(false);
+              }}
+              className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center justify-between"
+            >
+              <span className="truncate pr-4">{option}</span>
+              {value === option && (
+                <Check className="w-4 h-4 text-primary-3 flex-shrink-0" />
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

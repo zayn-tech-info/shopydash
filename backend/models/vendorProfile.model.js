@@ -125,12 +125,6 @@ const vendorProfileSchema = new mongoose.Schema(
     accountNumber: {
       type: String,
       trim: true,
-      validate: {
-        validator: function (v) {
-          return /^\d{8,20}$/.test(v);
-        },
-        message: (props) => `${props.value} is not a valid account number!`,
-      },
     },
     paymentMethods: {
       type: [String],

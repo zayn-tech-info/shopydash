@@ -1,6 +1,8 @@
-import { useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
 import { useClientProfileStore } from "../../store/clientProfileStore";
+import { schools } from "../../constants";
+import { ChevronDown, Check } from "lucide-react";
 
 export function EditClientProfile({ clientProfileData, onClose }) {
   const setInputField = useClientProfileStore((state) => state.setInputField);
@@ -67,35 +69,6 @@ export function EditClientProfile({ clientProfileData, onClose }) {
               />
             </div>
 
-            {/*             <div>
-              <label className="block text-sm font-medium">Description</label>
-              <textarea
-                value={clientProfileData.storeDescription}
-                onChange={handleChange("storeDescription")}
-                className="w-full mt-1 border rounded px-3 py-2"
-                rows={4}
-              />
-            </div> */}
-
-            {/*             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-sm font-medium">Category</label>
-                <input
-                  value={clientProfileData.businessCategory}
-                  onChange={handleChange("businessCategory")}
-                  className="w-full mt-1 border rounded px-3 py-2"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium">Email</label>
-                <input
-                  value={clientProfileData.email}
-                  onChange={handleChange("email")}
-                  className="w-full mt-1 border rounded px-3 py-2"
-                />
-              </div>
-            </div> */}
-
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-sm font-medium">Phone</label>
@@ -126,10 +99,11 @@ export function EditClientProfile({ clientProfileData, onClose }) {
 
             <div>
               <label className="block text-sm font-medium">School</label>
-              <input
+              <CustomDropdown
+                options={schools}
                 value={clientProfileData.schoolName}
-                onChange={handleChange("schoolName")}
-                className="w-full mt-1 border rounded px-3 py-2"
+                onChange={(value) => setInputField("schoolName", value)}
+                placeholder="Select your school"
               />
             </div>
 
@@ -205,7 +179,7 @@ export function EditClientProfile({ clientProfileData, onClose }) {
               <button
                 type="submit"
                 disabled={updating}
-                className="px-4 py-2 bg-primary-3 text-white rounded"
+                className="px-4 py-2 bg-primary-3 text-white rounded min-w-[140px] flex items-center justify-center"
               >
                 {updating ? "Updating Profile..." : "Save changes"}
               </button>
@@ -213,6 +187,61 @@ export function EditClientProfile({ clientProfileData, onClose }) {
           </div>
         </form>
       </div>
+    </div>
+  );
+}
+
+function CustomDropdown({ options, value, onChange, placeholder }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className={`w-full h-10 px-3 rounded-md border border-gray-300 bg-white text-left flex items-center justify-between hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-3 focus:border-transparent ${
+          value ? "text-gray-900" : "text-gray-400"
+        }`}
+      >
+        <span className="truncate block mr-4">{value || placeholder}</span>
+        <ChevronDown
+          className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+
+      {isOpen && (
+        <div className="absolute z-50 w-full mt-1 bg-white rounded-md shadow-lg border border-gray-200 max-h-60 overflow-y-auto">
+          {options.map((option, index) => (
+            <button
+              key={index}
+              type="button"
+              onClick={() => {
+                onChange(option);
+                setIsOpen(false);
+              }}
+              className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center justify-between"
+            >
+              <span className="truncate pr-4">{option}</span>
+              {value === option && (
+                <Check className="w-4 h-4 text-primary-3 flex-shrink-0" />
+              )}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

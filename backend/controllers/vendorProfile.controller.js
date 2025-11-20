@@ -26,6 +26,13 @@ const createVendorProfile = async (req, res) => {
       data: { vendorProfile },
     });
   } catch (error) {
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern)[0];
+      return res.status(400).json({
+        success: false,
+        message: `${field} already exists. Please choose another one.`,
+      });
+    }
     res.status(500).json({
       success: false,
       message: error.message || "Internal server error",

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import { UserCircle, LogOut } from "lucide-react";
 
-export default function CompleteProfileLanding() {
+export  function CompleteProfileLanding() {
   const navigate = useNavigate();
   const authUser = useAuthStore((state) => state.authUser);
   const logout = useAuthStore((state) => state.logout);
@@ -20,7 +20,7 @@ export default function CompleteProfileLanding() {
 
   const handleCompleteProfile = () => {
     if (authUser?.role === "vendor") {
-      navigate("/createvendorprofile");
+      navigate("/create-vendor-profile");
     } else {
       navigate("/create-client-profile");
     }

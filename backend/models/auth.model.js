@@ -34,22 +34,17 @@ const userSchema = mongoose.Schema(
     },
     phoneNumber: {
       type: String,
-      required: [true, "Phone number is required"],
-      unique: [true, "Phone number alread exist"],
       trim: true,
     },
     schoolName: {
       type: String,
-      required: [true, "Please enter your institution name"],
       trim: true,
     },
     schoolId: {
-      unique: [true, "Shool ID alread exist"],
       type: Number,
       trim: true,
     },
     schoolEmail: {
-      unique: [true, "Shool email alread exist"],
       type: String,
       trim: true,
     },
@@ -63,7 +58,6 @@ const userSchema = mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, "Please enter your password"],
       trim: true,
     },
     role: {
@@ -82,13 +76,19 @@ const userSchema = mongoose.Schema(
     },
     whatsAppNumber: {
       type: String,
-      required: [true, "WhatsApp Number is required"],
-      unique: [true, "WhatsApp Number alread exist"],
       trim: true,
     },
     logo: {
       type: String,
       trim: true,
+    },
+    isGoogleAuth: {
+      type: Boolean,
+      default: false,
+    },
+    profileComplete: {
+      type: Boolean,
+      default: false,
     },
     passwordChangedAt: {
       type: Date,

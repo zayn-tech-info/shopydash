@@ -94,6 +94,4 @@ const clientProfileSchema = new mongoose.Schema({
   },
 });
 
-clientProfileSchema.index({ userId: 1 });
-
 module.exports = mongoose.model("ClientProfile", clientProfileSchema);

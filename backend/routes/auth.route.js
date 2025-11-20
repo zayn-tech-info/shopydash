@@ -4,6 +4,8 @@ const {
   login,
   checkAuth,
   logout,
+  googleAuth,
+  completeRegistration,
 } = require("../controllers/auth.controller");
 const { protectRoute } = require("../middleware/auth.middleware");
 
@@ -13,5 +15,7 @@ route.post("/signup", signup);
 route.post("/login", login);
 route.post("/logout", logout);
 route.get("/check", protectRoute, checkAuth);
+route.post("/google", googleAuth);
+route.post("/complete-registration", protectRoute, completeRegistration);
 
 module.exports = route;

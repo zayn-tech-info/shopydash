@@ -38,6 +38,27 @@ const createClientProfile = async (req, res) => {
       },
     });
   } catch (error) {
+ 
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern)[0];
+      let message = "";
+
+      if (field === "username") {
+        message = "This username is already taken";
+      } else if (field === "phoneNumber") {
+        message = "This phone number is already registered";
+      } else if (field === "email") {
+        message = "This email is already registered";
+      } else {
+        message = `This ${field} is already in use`;
+      }
+
+      return res.status(400).json({
+        success: false,
+        message: message,
+      });
+    }
+
     if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,

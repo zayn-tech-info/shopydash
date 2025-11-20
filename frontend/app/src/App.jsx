@@ -15,7 +15,9 @@ import { Loader } from "./components/Loader";
 import CreateVendorProfile from "./pages/CreateVendorProfile";
 import ClientProfile from "./pages/ClientProfile";
 import CreateClientProfile from "./pages/CreateClientProfile";
-import CompleteProfileLanding from "./pages/CompleteProfileLanding";
+import { CompleteProfileLanding } from "./pages/CompleteProfileLanding";
+import CompleteProfile from "./pages/CompleteProfile";
+import CompleteRegistration from "./pages/CompleteRegistration";
 
 const App = () => {
   const { checkAuth, authUser, isCheckingAuth } = useAuthStore();
@@ -40,11 +42,31 @@ const App = () => {
         <Routes>
           <Route
             path="/"
-            element={authUser ? <Home /> : <Navigate to="/login" />}
+            element={
+              authUser ? (
+                authUser.profileComplete ? (
+                  <Home />
+                ) : (
+                  <Navigate to="/complete-user-registration" />
+                )
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
           />
           <Route
             path="/home"
-            element={authUser ? <Home /> : <Navigate to="/login" />}
+            element={
+              authUser ? (
+                authUser.profileComplete ? (
+                  <Home />
+                ) : (
+                  <Navigate to="/complete-user-registration" />
+                ) 
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
           />
           <Route
             path="login"
@@ -55,7 +77,7 @@ const App = () => {
             element={!authUser ? <Signup /> : <Navigate to="/" />}
           />
           <Route
-            path="/createvendorprofile"
+            path="/create-vendor-profile"
             element={
               authUser ? <CreateVendorProfile /> : <Navigate to="/login" />
             }
@@ -68,8 +90,18 @@ const App = () => {
           />
           <Route
             path="/complete-profile"
+            element={authUser ? <CompleteProfile /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/complete-profile-landing"
             element={
               authUser ? <CompleteProfileLanding /> : <Navigate to="/login" />
+            }
+          />
+          <Route
+            path="/complete-user-registration"
+            element={
+              authUser ? <CompleteRegistration /> : <Navigate to="/login" />
             }
           />
           <Route path="/vendor/dashboard" element={<VendorDashboard />} />
@@ -85,12 +117,12 @@ const App = () => {
                 authUser.hasProfile ? (
                   <VendorProfile />
                 ) : (
-                  <Navigate to="/complete-profile" />
+                  <Navigate to="/complete-profile-landing" />
                 )
               ) : authUser && authUser.hasProfile ? (
                 <ClientProfile />
               ) : (
-                <Navigate to="/complete-profile" />
+                <Navigate to="/complete-profile-landing" />
               )
             }
           />

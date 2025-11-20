@@ -4,7 +4,7 @@ const testimonials = [
   {
     id: "t-1",
     name: "Bisi",
-    school: "UNILAG",
+    school: "LAUTECH",
     quote: "Vendora helped me sell my sneakers in less than 24 hours!",
     avatar: "https://i.pravatar.cc/80?img=5",
   },
