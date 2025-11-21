@@ -56,37 +56,53 @@ export default function CreateClientProfile() {
         navigate("/profile");
       }
     } catch (e) {
-      toast.error(e);
+      const errorMessage =
+        e?.response?.data?.message || e?.message || "An error occurred";
+      toast.error(errorMessage);
     }
   }
 
   return (
-    <main className="py-8">
-      <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-sm p-6">
-        <h1 className="text-2xl font-semibold mb-4">Complete your profile</h1>
-        <p className="text-sm text-n-7 mb-6">
-          Fill in the details below to complete your profile.
-        </p>
+    <main className="min-h-screen py-12 bg-n-1 relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute -top-[20%] -right-[10%] w-[70%] h-[70%] rounded-full bg-primary-3/5 blur-[120px]" />
+        <div className="absolute top-[40%] -left-[10%] w-[60%] h-[60%] rounded-full bg-primary-2/5 blur-[100px]" />
+      </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <section className="space-y-3">
-            <h2 className="text-lg font-medium">Basic information</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="max-w-4xl mx-auto bg-white/80 backdrop-blur-xl rounded-3xl border border-n-3 p-8 md:p-12 relative z-10">
+        <div className="mb-10">
+          <h1 className="text-3xl md:text-4xl font-bold text-n-8 mb-3">
+            Complete your profile
+          </h1>
+          <p className="text-n-5 text-lg">
+            Fill in the details below to complete your profile.
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-10">
+          <section className="space-y-6">
+            <h2 className="text-xl font-bold text-n-8 border-b border-n-3 pb-2">
+              Basic information
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <InputField
                 onChange={handleInputChange("fullName")}
                 label="Full Name"
                 value={clientProfileData.fullName}
+                placeholder="e.g. John Doe"
               />
               <InputField
                 label="Username"
                 value={clientProfileData.username}
                 onChange={handleInputChange("username")}
+                placeholder="e.g. johndoe"
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
                   School Name
                 </label>
                 <CustomDropdown
@@ -97,7 +113,7 @@ export default function CreateClientProfile() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
                   Preferred Category
                 </label>
                 <CustomDropdown
@@ -112,26 +128,32 @@ export default function CreateClientProfile() {
             </div>
           </section>
 
-          <section className="space-y-3">
-            <h2 className="text-lg font-medium">Contact</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <section className="space-y-6">
+            <h2 className="text-xl font-bold text-n-8 border-b border-n-3 pb-2">
+              Contact
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <InputField
                 label="Phone number"
                 value={clientProfileData.phoneNumber}
                 onChange={handleInputChange("phoneNumber")}
+                placeholder="+234..."
               />
             </div>
           </section>
 
-          <section className="space-y-3">
-            <h2 className="text-lg font-medium">Location</h2>
+          <section className="space-y-6">
+            <h2 className="text-xl font-bold text-n-8 border-b border-n-3 pb-2">
+              Location
+            </h2>
             <InputField
               label="Address"
               value={clientProfileData.address}
               onChange={handleInputChange("address")}
+              placeholder="Street address"
             />
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <InputField
                 placeholder="City"
                 value={clientProfileData.city}
@@ -150,27 +172,27 @@ export default function CreateClientProfile() {
             </div>
           </section>
 
-          <div className="flex items-center justify-end gap-3">
+          <div className="flex items-center justify-end gap-4 pt-6 border-t border-n-3">
             <button
               type="button"
               onClick={() => {
                 resetInputField();
                 navigate(-1);
               }}
-              className="px-4 py-2 border rounded"
+              className="px-6 py-3 rounded-xl border border-n-3 text-n-6 font-medium hover:bg-n-2 hover:text-n-8 transition-colors"
             >
               Cancel
             </button>
 
             <button
               type="submit"
-              className="px-4 py-2 bg-primary-600 text-white bg-primary-3 rounded min-w-[140px] flex items-center justify-center"
+              className="px-8 py-3 bg-primary-3 text-white rounded-xl font-bold hover:bg-primary-4 hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:bg-primary-3 min-w-[160px] flex items-center justify-center"
               disabled={loading}
             >
               {loading ? (
                 <>
                   <svg
-                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    className="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -221,20 +243,22 @@ function CustomDropdown({ options, value, onChange, placeholder }) {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full h-10 px-3 rounded-md border border-gray-300 bg-white text-left flex items-center justify-between hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-3 focus:border-transparent ${
-          value ? "text-gray-900" : "text-gray-400"
-        }`}
+        className={`w-full h-12 px-4 rounded-xl border bg-white text-left flex items-center justify-between transition-all duration-200 ${
+          isOpen
+            ? "border-primary-3 ring-2 ring-primary-3/20"
+            : "border-n-3 hover:border-n-4"
+        } ${value ? "text-n-8" : "text-n-4"}`}
       >
         <span className="truncate block mr-4">{value || placeholder}</span>
         <ChevronDown
-          className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
-            isOpen ? "rotate-180" : ""
+          className={`w-5 h-5 text-n-4 transition-transform duration-200 ${
+            isOpen ? "rotate-180 text-primary-3" : ""
           }`}
         />
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-white rounded-md shadow-lg border border-gray-200 max-h-60 overflow-y-auto">
+        <div className="absolute z-50 w-full mt-2 bg-white rounded-xl border border-n-2 max-h-60 overflow-y-auto py-1">
           {options.map((option, index) => (
             <button
               key={index}
@@ -243,7 +267,7 @@ function CustomDropdown({ options, value, onChange, placeholder }) {
                 onChange(option);
                 setIsOpen(false);
               }}
-              className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center justify-between"
+              className="w-full px-4 py-3 text-left text-sm text-n-7 hover:bg-n-2 hover:text-primary-3 flex items-center justify-between transition-colors"
             >
               <span className="truncate pr-4">{option}</span>
               {value === option && (

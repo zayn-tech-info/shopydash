@@ -33,6 +33,14 @@ const createVendorProfile = async (req, res) => {
         message: `${field} already exists. Please choose another one.`,
       });
     }
+    if (error.name === "ValidationError") {
+      const messages = Object.values(error.errors).map((val) => val.message);
+      return res.status(400).json({
+        success: false,
+        message: messages[0] || "Validation error",
+      });
+    }
+
     res.status(500).json({
       success: false,
       message: error.message || "Internal server error",
@@ -126,6 +134,13 @@ const updateVendorProfile = async (req, res) => {
       data: { vendorProfile: updated },
     });
   } catch (error) {
+    if (error.name === "ValidationError") {
+      const messages = Object.values(error.errors).map((val) => val.message);
+      return res.status(400).json({
+        success: false,
+        message: messages[0] || "Validation error",
+      });
+    }
     res
       .status(500)
       .json({ success: false, message: error.message || "Server error" });

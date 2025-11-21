@@ -26,7 +26,9 @@ export function Login() {
           }
         }
       } catch (err) {
-        toast.error(err.message || "Google Login Failed");
+        const msg =
+          typeof err === "string" ? err : err?.message || "Google Login Failed";
+        toast.error(msg);
       }
     },
     onError: () => toast.error("Google Login Failed"),

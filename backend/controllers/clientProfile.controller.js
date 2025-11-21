@@ -38,7 +38,6 @@ const createClientProfile = async (req, res) => {
       },
     });
   } catch (error) {
- 
     if (error.code === 11000) {
       const field = Object.keys(error.keyPattern)[0];
       let message = "";
@@ -60,9 +59,10 @@ const createClientProfile = async (req, res) => {
     }
 
     if (error.name === "ValidationError") {
+      const messages = Object.values(error.errors).map((val) => val.message);
       return res.status(400).json({
         success: false,
-        message: "Validation error",
+        message: messages[0] || "Validation error",
         errors: error.errors,
       });
     }
@@ -140,6 +140,14 @@ const updateClientProfile = async (req, res) => {
       },
     });
   } catch (error) {
+    if (error.name === "ValidationError") {
+      const messages = Object.values(error.errors).map((val) => val.message);
+      return res.status(400).json({
+        success: false,
+        message: messages[0] || "Validation error",
+        errors: error.errors,
+      });
+    }
     res.status(500).json({
       success: false,
       message: error.message || "Internal server error",

@@ -102,7 +102,6 @@ export function Signup() {
     try {
       const result = await signup(payload);
       await checkAuth();
-      await createVendorProfile();
       toast.success("Account created successfully!");
       resetField();
 

@@ -32,9 +32,9 @@ export const useAuthStore = create((set) => ({
       return payload;
     } catch (err) {
       const serverMessage =
-        err?.response?.data?.message ??
-        err?.response?.data ??
-        err?.message ??
+        err?.response?.data?.message ||
+        (typeof err?.response?.data === "string" ? err.response.data : null) ||
+        err?.message ||
         "An unknown error occurred";
       console.error("Login error:", err);
       set({ error: serverMessage, isLogginIn: false });
@@ -65,9 +65,9 @@ export const useAuthStore = create((set) => ({
     } catch (err) {
       set({ isLogginIn: false });
       const serverMessage =
-        err?.response?.data?.message ??
-        err?.response?.data ??
-        err?.message ??
+        err?.response?.data?.message ||
+        (typeof err?.response?.data === "string" ? err.response.data : null) ||
+        err?.message ||
         "An unknown error occurred";
       set({ error: serverMessage });
       throw serverMessage;
@@ -87,9 +87,9 @@ export const useAuthStore = create((set) => ({
       return payload;
     } catch (err) {
       const serverMessage =
-        err?.response?.data?.message ??
-        err?.response?.data ??
-        err?.message ??
+        err?.response?.data?.message ||
+        (typeof err?.response?.data === "string" ? err.response.data : null) ||
+        err?.message ||
         "Failed to complete registration";
       throw new Error(serverMessage);
     }
@@ -105,9 +105,9 @@ export const useAuthStore = create((set) => ({
       set({ authUser: payload, isCheckingAuth: false, error: null });
     } catch (err) {
       const serverMessage =
-        err?.response?.data?.message ??
-        err?.response?.data ??
-        err?.message ??
+        err?.response?.data?.message ||
+        (typeof err?.response?.data === "string" ? err.response.data : null) ||
+        err?.message ||
         "An unknown error occurred";
       console.error("Check auth error:", err);
       set({ error: serverMessage, isCheckingAuth: false });
@@ -119,9 +119,9 @@ export const useAuthStore = create((set) => ({
       await api.post("/api/v1/auth/logout");
     } catch (err) {
       const serverMessage =
-        err?.response?.data?.message ??
-        err?.response?.data ??
-        err?.message ??
+        err?.response?.data?.message ||
+        (typeof err?.response?.data === "string" ? err.response.data : null) ||
+        err?.message ||
         "An unknown error occurred";
       console.error("Logout error:", err, serverMessage);
       set({ error: serverMessage });

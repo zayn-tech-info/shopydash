@@ -38,7 +38,7 @@ export function VendorAddress({ vendorProfile, authUser, className }) {
             School
           </div>
           <div className="text-n-8 font-medium text-sm">
-            {vendorProfile?.school || authUser?.school || "-"}
+            {vendorProfile?.schoolName|| authUser?.schoolName || "-"}
           </div>
         </div>
       </div>

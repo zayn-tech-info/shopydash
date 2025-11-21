@@ -14,7 +14,6 @@ const userSchema = mongoose.Schema(
     },
     username: {
       type: String,
-      // required: [true, "Username is required"],
       unique: [true, "Username alread exist"],
       trim: true,
       minlength: [4, "Username must be at least 4 characters long"],
@@ -22,7 +21,6 @@ const userSchema = mongoose.Schema(
     },
     email: {
       type: String,
-      // required: [true, "Email is required"],
       unique: [true, "Email alread exist"],
       trim: true,
       validate: {
@@ -35,6 +33,8 @@ const userSchema = mongoose.Schema(
     phoneNumber: {
       type: String,
       trim: true,
+      unique: true,
+      sparse: true,
     },
     schoolName: {
       type: String,
@@ -43,6 +43,14 @@ const userSchema = mongoose.Schema(
     schoolId: {
       type: Number,
       trim: true,
+      required: [
+        function () {
+          return !this.isGoogleAuth;
+        },
+        "School ID is a required field",
+      ],
+      unique: [true, "School ID alread exist"],
+      sparse: true,
     },
     schoolEmail: {
       type: String,

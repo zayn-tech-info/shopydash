@@ -119,11 +119,32 @@ const signup = async (req, res, next) => {
       });
     }
 
-    const user = await User.create(req.body);
+    const user = await User.create({ ...req.body, profileComplete: true });
 
     sendToken(user, "User created successfully", res, 201);
   } catch (err) {
     console.error(err);
+    if (err.code === 11000) {
+      const field = Object.keys(err.keyPattern)[0]; 
+      let message = "";
+
+      if (field === "phoneNumber") {
+        message = "This phone number is already registered";
+      } else if (field === "email") {
+        message = "This email is already registered";
+      } else if (field === "username") {
+        message = "This username is already taken";
+      } else if (field === "businessName") {
+        message = "This business name is already taken";
+      } else {
+        message = `This ${field} is already in use`;
+      }
+
+      return res.status(400).json({
+        success: false,
+        message: message,
+      });
+    }
     return res.status(500).json({
       success: false,
       message: err.message || "Server error",

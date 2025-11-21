@@ -57,9 +57,9 @@ export const useSignupStore = create((set) => ({
       set({ userData: res?.data });
     } catch (err) {
       const serverMessage =
-        err?.response?.data?.message ??
-        err?.response?.data ??
-        err?.message ??
+        err?.response?.data?.message ||
+        (typeof err?.response?.data === "string" ? err.response.data : null) ||
+        err?.message ||
         "An unknown error occurred";
       console.error("Signup error:", err);
       set({ error: serverMessage, isSigningUp: false });
