@@ -3,7 +3,6 @@ import { navigation } from "../constants";
 import { Link, NavLink } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import { useEffect } from "react";
-import { User } from "lucide-react";
 
 export function Header() {
   const { authUser } = useAuthStore();
@@ -14,6 +13,15 @@ export function Header() {
     };
     loadUser();
   }, [authUser]);
+
+  const renderNav = (nav, role) => {
+    if (nav === "Dashboard" && role !== "vendor") {
+      return null;
+    }
+    if (nav === "Wishlist" && role !== "client") {
+      return null;
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-n-1/90 backdrop-blur shadow-md">
@@ -42,6 +50,8 @@ export function Header() {
               ) {
                 to = "/vendor/profile";
               }
+              const navResult = renderNav(nav.text, authUser?.role);
+              if (navResult === null) return null;
 
               const Icon = nav.icon;
               return (

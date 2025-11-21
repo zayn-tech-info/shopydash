@@ -13,6 +13,15 @@ export function BottomNav() {
   const current = useMemo(() => {
     return location.pathname === "/" ? "/" : location.pathname;
   }, [location.pathname]);
+
+  const renderNav = (nav, role) => {
+    if (nav === "Dashboard" && role !== "vendor") {
+      return null;
+    }
+    if (nav === "Wishlist" && role !== "client") {
+      return null;
+    }
+  };
   return (
     <div className="md:hidden">
       <Paper
@@ -37,6 +46,8 @@ export function BottomNav() {
             ) {
               to = "/vendor/profile";
             }
+            const navResult = renderNav(nav.text, authUser?.role);
+            if (navResult === null) return null;
 
             const Icon = nav.icon;
             return (

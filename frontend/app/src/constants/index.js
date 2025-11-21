@@ -11,6 +11,7 @@ import {
   Sparkles,
   PenTool,
   Gem,
+  Vegan,
 } from "lucide-react";
 
 import {
@@ -31,11 +32,18 @@ export const navigation = [
     icon: Home,
   },
   {
+    id: 1,
+    text: "Products",
+    href: "/products",
+    icon: Vegan,
+  },
+  {
     id: 2,
-    text: "Sell",
-    href: "/sell",
+    text: "Wishlist",
+    href: "/wishlist",
     icon: ShoppingCart,
   },
+
   {
     id: 3,
     text: "Dashboard",
