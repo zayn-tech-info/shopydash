@@ -1,151 +1,101 @@
+const asyncErrorHandler = require("../errors/asyncErrorHandle");
+const customError = require("../errors/customError");
 const vendorProfileModel = require("../models/vendorProfile.model");
 
-const createVendorProfile = async (req, res) => {
-  try {
-    const userId = req.user && req.user._id;
-    if (!userId) {
-      return res.status(401).json({ success: false, message: "Unauthorized" });
-    }
-
-    const existingVendorProfile = await vendorProfileModel.findOne({ userId });
-
-    if (existingVendorProfile) {
-      return res.status(400).json({
-        success: false,
-        message: "Profile already exists for this vendor",
-      });
-    }
-
-    const payload = { ...req.body, userId };
-
-    const vendorProfile = await vendorProfileModel.create(payload);
-
-    res.status(201).json({
-      success: true,
-      message: "Profile created successfully",
-      data: { vendorProfile },
-    });
-  } catch (error) {
-    if (error.code === 11000) {
-      const field = Object.keys(error.keyPattern)[0];
-      return res.status(400).json({
-        success: false,
-        message: `${field} already exists. Please choose another one.`,
-      });
-    }
-    if (error.name === "ValidationError") {
-      const messages = Object.values(error.errors).map((val) => val.message);
-      return res.status(400).json({
-        success: false,
-        message: messages[0] || "Validation error",
-      });
-    }
-
-    res.status(500).json({
-      success: false,
-      message: error.message || "Internal server error",
-    });
+const createVendorProfile = asyncErrorHandler(async (req, res, next) => {
+  const userId = req.user && req.user._id;
+  if (!userId) {
+    const err = new customError("Unauthorized", 401);
+    return next(err);
   }
-};
 
-const getVendorProfile = async (req, res) => {
-  try {
-    const userId = req.user._id;
-    const vendorProfile = await vendorProfileModel.findOne({ userId });
+  const existingVendorProfile = await vendorProfileModel.findOne({ userId });
 
-    if (!vendorProfile) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Vendor profile not found" });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: {
-        vendorProfile,
-      },
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message || "Server error",
-    });
+  if (existingVendorProfile) {
+    const err = new customError("Vendor profile already exists", 409);
+    return next(err);
   }
-};
 
-const getPublicVendorProfile = async (req, res) => {
-  try {
-    const storeUsername = req.params.storeUsername;
+  const payload = { ...req.body, userId };
 
-    if (!storeUsername) {
-      return res.status(400).json({
-        success: false,
-        message: "storeUsername is required",
-      });
-    }
+  const vendorProfile = await vendorProfileModel.create(payload);
 
-    const vendorProfile = await vendorProfileModel.findOne({
-      storeUsername: storeUsername,
-    });
+  res.status(201).json({
+    success: true,
+    message: "Profile created successfully",
+    data: { vendorProfile },
+  });
+});
 
-    if (!vendorProfile) {
-      return res.status(404).json({
-        success: false,
-        message: "Vendor profile not found",
-      });
-    }
-    res.status(200).json({ success: true, data: { vendorProfile } });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message || "Server error",
-    });
+const getVendorProfile = asyncErrorHandler(async (req, res, next) => {
+  const userId = req.user?._id;
+
+  if (!userId) {
+    return next(new customError("Unauthorized", 401));
   }
-};
 
-const updateVendorProfile = async (req, res) => {
-  try {
-    const userId = req.user && req.user._id;
-    if (!userId)
-      return res.status(401).json({ success: false, message: "Unauthorized" });
+  const vendorProfile = await vendorProfileModel.findOne({ userId });
 
-    const vendorProfile = await vendorProfileModel.findOne({ userId });
-
-    if (!vendorProfile) {
-      return res.status(200).json({
-        success: false,
-        message: "Profile not found",
-      });
-    }
-    const updated = await vendorProfileModel.findOneAndUpdate(
-      { userId },
-      { $set: req.body },
-      { new: true, runValidators: true, upsert: false }
-    );
-
-    if (!updated)
-      return res
-        .status(404)
-        .json({ success: false, message: "Profile not found" });
-
-    res.status(200).json({
-      success: true,
-      message: "Profile updated",
-      data: { vendorProfile: updated },
-    });
-  } catch (error) {
-    if (error.name === "ValidationError") {
-      const messages = Object.values(error.errors).map((val) => val.message);
-      return res.status(400).json({
-        success: false,
-        message: messages[0] || "Validation error",
-      });
-    }
-    res
-      .status(500)
-      .json({ success: false, message: error.message || "Server error" });
+  if (!vendorProfile) {
+    const error = new customError("Vendor profile not found", 404);
+    return next(error);
   }
-};
+
+  res.status(200).json({
+    success: true,
+    data: {
+      vendorProfile,
+    },
+  });
+});
+
+const getPublicVendorProfile = asyncErrorHandler(async (req, res, next) => {
+  const storeUsername = req.params.storeUsername;
+
+  if (!storeUsername) {
+    const error = new customError("Store username is required", 400);
+    return next(error);
+  }
+
+  const vendorProfile = await vendorProfileModel.findOne({
+    storeUsername: storeUsername,
+  });
+
+  if (!vendorProfile) {
+    const error = new customError("Vendor profile not found", 404);
+    return next(error);
+  }
+  res.status(200).json({ success: true, data: { vendorProfile } });
+});
+
+const updateVendorProfile = asyncErrorHandler(async (req, res, next) => {
+  const userId = req.user && req.user._id;
+  if (!userId) {
+    const err = new customError("Unauthorized", 401);
+    return next(err);
+  }
+
+  const updates = { ...req.body };
+  delete updates.userId;
+  delete updates._id;
+
+  const updated = await vendorProfileModel.findOneAndUpdate(
+    { userId },
+    { $set: updates },
+    { new: true, runValidators: true, upsert: false }
+  );
+
+  if (!updated) {
+    const err = new customError("Profile not found", 404);
+    return next(err);
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "Profile updated",
+    data: { vendorProfile: updated },
+  });
+});
 
 module.exports = {
   createVendorProfile,

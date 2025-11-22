@@ -1,8 +1,10 @@
 const User = require("../models/auth.model");
 const jwt = require("jsonwebtoken");
 const util = require("util");
+const asyncErrorHandler = require("../errors/asyncErrorHandle");
+const customError = require("../errors/customError");
 
-const protectRoute = async (req, res, next) => {
+const protectRoute = asyncErrorHandler(async (req, res, next) => {
   let token;
   const jwtToken = req.headers.authorization;
 
@@ -22,18 +24,12 @@ const protectRoute = async (req, res, next) => {
   }
 
   let decodeToken;
-  try {
-    decodeToken = await util.promisify(jwt.verify)(
-      token,
-      process.env.JWT_SECRET_KEY
-    );
-  } catch (error) {
-    return res.status(401).json({
-      success: false,
-      message: error.message || "Invalid or malformed token",
-    });
-  }
- 
+
+  decodeToken = await util.promisify(jwt.verify)(
+    token,
+    process.env.JWT_SECRET_KEY
+  );
+
   const user = await User.findById(decodeToken.id);
 
   if (!user) {
@@ -44,33 +40,30 @@ const protectRoute = async (req, res, next) => {
   }
 
   if (await user.isPaswrdChanged(decodeToken.iat)) {
-    return res.status(401).json({
-      success: false,
-      message: "Password changed recently please login again ",
-    });
+    const error = new customError(
+      "Password changed recently please login again ",
+      401
+    );
+    return next(error);
   }
 
   req.user = user;
   next();
-};
+});
 
 const verifyRole = (...allowedRoles) => {
   return (req, res, next) => {
     if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        message: "Not Authorized",
-      });
+      const error = new customError("Not Authorized", 401);
+      return next(error);
     }
 
     const userRole = req.user.role;
     if (!allowedRoles.includes(userRole)) {
-      return res.status(401).json({
-        success: false,
-        message: "Access denied",
-      });
+      const error = new customError("Access denied", 401);
+      return next(error);
     }
-    next()
+    next();
   };
 };
 
