@@ -1,5 +1,6 @@
 import { BookOpen, Headset, Search, SearchIcon, Shirt } from "lucide-react";
 import { categories } from "../constants";
+import { useAuthStore } from "../store/authStore";
 
 export function HomeContent({
   value,
@@ -8,6 +9,7 @@ export function HomeContent({
   placeholder = "Search products, vendor…",
   className = "",
 }) {
+  const { authUser } = useAuthStore();
   function handleSubmit(e) {
     e.preventDefault();
     if (onSubmit) onSubmit(value);
@@ -19,7 +21,10 @@ export function HomeContent({
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
             <h1 className="h4 text-n-8">
-              Hi <span className="text-primary-3">User👋</span>
+              Hi{" "}
+              <span className="text-primary-3">
+                {authUser?.username || "User"}👋
+              </span>
             </h1>
             <p className="body-2 text-n-4 mt-1">
               Ready to shop or sell something today?

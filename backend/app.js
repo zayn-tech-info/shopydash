@@ -33,7 +33,7 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/vendorProfile", vendorProfile);
 app.use("/api/v1/clientProfile", clientProfile);
 
-app.all("*", (req, res, next) => {
+app.all(/(.*)/, (req, res, next) => {
   /*   res.status(404).json({
     success: false,
     message: `Could find ${req.originalUrl} on the server`,

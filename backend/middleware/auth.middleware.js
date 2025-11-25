@@ -39,9 +39,9 @@ const protectRoute = asyncErrorHandler(async (req, res, next) => {
     });
   }
 
-  if (await user.isPaswrdChanged(decodeToken.iat)) {
+  if (await user.isPasswordChanged(decodeToken.iat)) {
     const error = new customError(
-      "Password changed recently please login again ",
+      "Your password was changed recently. Please login again.",
       401
     );
     return next(error);
