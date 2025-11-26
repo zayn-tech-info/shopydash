@@ -20,7 +20,6 @@ const productSchema = mongoose.Schema(
       required: [true, "Please provide a product title"],
       trim: true,
       minlength: [3, "Product title must be at least 3 characters long"],
-      maxlength: [200, "Product title cannot exceed 200 characters"],
       index: true, 
     },
     description: {
@@ -63,15 +62,15 @@ const productSchema = mongoose.Schema(
         ],
         message: "Please select a valid category",
       },
-      index: true, // For faster filtering by category
+      index: true,
     },
     images: {
       type: [String],
       validate: {
         validator: function (v) {
-          return v && v.length > 0 && v.length <= 10;
+          return v && v.length > 0 && v.length <= 5;
         },
-        message: "Please provide at least 1 and at most 10 product images",
+        message: "Please provide at least 1 and at most 5 product images",
       },
       required: [true, "Please provide at least one product image"],
     },
@@ -79,7 +78,7 @@ const productSchema = mongoose.Schema(
       type: String,
       required: [true, "Please specify the school/campus"],
       trim: true,
-      index: true, // For faster filtering by school
+      index: true, 
     },
     location: {
       type: String,
@@ -93,7 +92,6 @@ const productSchema = mongoose.Schema(
       type: String,
       trim: true,
       maxlength: [100, "Hostel name cannot exceed 100 characters"],
-      // Optional field for closer distance validation
     },
     stock: {
       type: Number,
@@ -107,17 +105,15 @@ const productSchema = mongoose.Schema(
         message: "Stock must be a non-negative integer",
       },
     },
-    isActive: {
+    isInStock: {
       type: Boolean,
       default: true,
-      // Vendors can deactivate products without deleting them
     },
     views: {
       type: Number,
       default: 0,
       min: [0, "Views cannot be negative"],
     },
-    // Additional fields for enhanced functionality
     condition: {
       type: String,
       enum: {
@@ -138,7 +134,7 @@ const productSchema = mongoose.Schema(
     },
   },
   {
-    timestamps: true, // Automatically adds createdAt and updatedAt
+    timestamps: true,
   }
 );
 
