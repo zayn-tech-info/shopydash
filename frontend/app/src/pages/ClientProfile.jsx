@@ -84,11 +84,11 @@ export function ClientProfile() {
               <div className="flex items-start justify-between">
                 <div>
                   <h1 className="h3 text-n-8 mb-2">
-                    {clientProfile?.fullName}
+                    {clientProfile?.userId?.fullName}
                   </h1>
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-n-4 body-2">
                     <span className="font-code text-primary-3">
-                      @{clientProfile?.username || "-"}
+                      @{clientProfile?.userId?.username || "-"}
                     </span>
                     <span className="w-1 h-1 rounded-full bg-n-3"></span>
                     <span>
@@ -121,7 +121,7 @@ export function ClientProfile() {
             {/* Logout Button */}
             {authUser &&
               clientProfile &&
-              authUser._id === clientProfile.userId && (
+              authUser._id === clientProfile.userId?._id && (
                 <button
                   onClick={() => {
                     logout();

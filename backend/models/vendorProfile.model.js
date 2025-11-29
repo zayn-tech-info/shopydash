@@ -14,12 +14,7 @@ const vendorProfileSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    businessName: {
-      type: String,
-      unique: true,
-      trim: true,
-      sparse: true,
-    },
+
     storeUsername: {
       lowercase: true,
       type: String,
@@ -32,32 +27,7 @@ const vendorProfileSchema = new mongoose.Schema(
     businessCategory: {
       type: String,
     },
-    phoneNumber: {
-      type: String,
-      unique: true,
-      trim: true,
-    },
-    whatsAppNumber: {
-      type: String,
-      unique: true,
-      trim: true,
-      sparse: true,
-    },
-    email: {
-      type: String,
-      sparse: true,
-      unique: true,
-      trim: true,
-      validate: {
-        validator: function (v) {
-          return validator.isEmail(v);
-        },
-        message: (props) => `${props.value} is not a valid email address!`,
-      },
-    },
-    profileImage: {
-      type: String,
-    },
+
     coverImage: {
       type: String,
     },
@@ -65,18 +35,6 @@ const vendorProfileSchema = new mongoose.Schema(
     state: String,
     city: String,
     country: String,
-    /*     mapLocation: {
-      type: {
-        type: String,
-        enum: ["Point"],
-        default: "Point",
-      },
-      coordinates: {
-        type: [Number],
-        default: [0, 0],
-      },
-    },
- */
     address: {
       type: String,
     },
@@ -89,9 +47,7 @@ const vendorProfileSchema = new mongoose.Schema(
     country: {
       type: String,
     },
-    schoolName: {
-      type: String,
-    },
+
     website: {
       type: String,
       lowercase: true,

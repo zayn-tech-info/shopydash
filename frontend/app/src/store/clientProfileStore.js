@@ -23,16 +23,11 @@ const normalizeProfile = (incoming, previous = null) => {
 };
 
 const initialProfileData = {
-  fullName: "",
-  username: "",
-  phoneNumber: "",
   gender: "",
   address: "",
   city: "",
   state: "",
   country: "",
-  schoolName: "",
-  profileImage: "",
   preferredCategory: "",
   wishList: [],
 };

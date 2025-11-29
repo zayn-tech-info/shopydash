@@ -28,20 +28,13 @@ export function EditVendorProfile({ initialData, onClose }) {
     e.preventDefault();
     try {
       const payload = {
-        businessName: formData.businessName,
-        storeUsername: formData.storeUsername,
         storeDescription: formData.storeDescription,
         businessCategory: formData.businessCategory,
-        phoneNumber: formData.phoneNumber,
-        whatsAppNumber: formData.whatsAppNumber,
-        email: formData.email,
         address: formData.address,
         city: formData.city,
         state: formData.state,
         country: formData.country,
-        profileImage: formData.profileImage,
         coverImage: formData.coverImage,
-        schoolName: formData.schoolName,
         gallery: formData.gallery
           ? formData.gallery
               .split(",")
@@ -89,16 +82,28 @@ export function EditVendorProfile({ initialData, onClose }) {
 
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <InputField
-                label="Business name"
-                value={formData.businessName}
-                onChange={handleChange("businessName")}
-              />
-              <InputField
-                label="Store username"
-                value={formData.storeUsername}
-                onChange={handleChange("storeUsername")}
-              />
+              <div>
+                <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
+                  Business Name (Read-only)
+                </label>
+                <input
+                  type="text"
+                  value={formData?.userId?.businessName || ""}
+                  disabled
+                  className="w-full px-4 py-3 bg-n-2 border border-n-3 rounded-xl text-n-5 cursor-not-allowed"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
+                  Store Username (Read-only)
+                </label>
+                <input
+                  type="text"
+                  value={formData?.userId?.storeUsername || ""}
+                  disabled
+                  className="w-full px-4 py-3 bg-n-2 border border-n-3 rounded-xl text-n-5 cursor-not-allowed"
+                />
+              </div>
             </div>
 
             <div>
@@ -128,38 +133,54 @@ export function EditVendorProfile({ initialData, onClose }) {
                   placeholder="Select category"
                 />
               </div>
-              <InputField
-                label="Email"
-                value={formData.email}
-                onChange={handleChange("email")}
-              />
+              <div>
+                <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
+                  Email (Read-only)
+                </label>
+                <input
+                  type="text"
+                  value={formData?.userId?.email || ""}
+                  disabled
+                  className="w-full px-4 py-3 bg-n-2 border border-n-3 rounded-xl text-n-5 cursor-not-allowed"
+                />
+              </div>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
-                School
+                School (Read-only)
               </label>
-              <CustomDropdown
-                options={schools}
-                value={formData.schoolName || ""}
-                onChange={(value) =>
-                  setFormData((f) => ({ ...f, schoolName: value }))
-                }
-                placeholder="Select your school"
+              <input
+                type="text"
+                value={formData?.userId?.schoolName || ""}
+                disabled
+                className="w-full px-4 py-3 bg-n-2 border border-n-3 rounded-xl text-n-5 cursor-not-allowed"
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <InputField
-                label="Phone"
-                value={formData.phoneNumber}
-                onChange={handleChange("phoneNumber")}
-              />
-              <InputField
-                label="WhatsApp"
-                value={formData.whatsAppNumber}
-                onChange={handleChange("whatsAppNumber")}
-              />
+              <div>
+                <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
+                  Phone (Read-only)
+                </label>
+                <input
+                  type="text"
+                  value={formData?.userId?.phoneNumber || ""}
+                  disabled
+                  className="w-full px-4 py-3 bg-n-2 border border-n-3 rounded-xl text-n-5 cursor-not-allowed"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
+                  WhatsApp (Read-only)
+                </label>
+                <input
+                  type="text"
+                  value={formData?.userId?.whatsAppNumber || ""}
+                  disabled
+                  className="w-full px-4 py-3 bg-n-2 border border-n-3 rounded-xl text-n-5 cursor-not-allowed"
+                />
+              </div>
             </div>
 
             <InputField

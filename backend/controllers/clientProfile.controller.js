@@ -17,7 +17,15 @@ const createClientProfile = asyncErrorHandler(async (req, res, next) => {
     return next(err);
   }
 
-  const payload = { ...req.body, userId };
+  const {
+    fullName,
+    username,
+    phoneNumber,
+    schoolName,
+    profileImage,
+    ...allowedData
+  } = req.body;
+  const payload = { ...allowedData, userId };
 
   const clientProfile = await clientProfileSchema.create(payload);
 
@@ -33,7 +41,12 @@ const createClientProfile = asyncErrorHandler(async (req, res, next) => {
 const getClientProfile = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user && req.user._id;
 
-  const clientProfile = await clientProfileSchema.findOne({ userId });
+  const clientProfile = await clientProfileSchema
+    .findOne({ userId })
+    .populate(
+      "userId",
+      "fullName username email phoneNumber schoolName profilePic"
+    );
 
   if (!clientProfile) {
     const err = new customError("Profile not found", 404);
@@ -57,9 +70,18 @@ const updateClientProfile = asyncErrorHandler(async (req, res, next) => {
     return next(err);
   }
 
+  const updates = { ...req.body };
+  delete updates.userId;
+  delete updates._id;
+  delete updates.fullName;
+  delete updates.username;
+  delete updates.phoneNumber;
+  delete updates.schoolName;
+  delete updates.profileImage;
+
   const updatedClientProfile = await clientProfileSchema.findOneAndUpdate(
     { userId },
-    { $set: req.body },
+    { $set: updates },
     { new: true, runValidators: true, upsert: false }
   );
 

@@ -61,7 +61,7 @@ const userSchema = mongoose.Schema(
       sparse: true,
       validate: {
         validator: function (v) {
-          if (!v) return true; 
+          if (!v) return true;
           return /^(\+?\d{1,4}[\s-]?)?(\(?\d{1,4}\)?[\s-]?)?[\d\s-]{7,15}$/.test(
             v
           );
@@ -170,8 +170,7 @@ const userSchema = mongoose.Schema(
             v
           );
         },
-        message:
-          "Please provide a valid WhatsApp number (e.g., +234XXXXXXXX)",
+        message: "Please provide a valid WhatsApp number (e.g., +234XXXXXXXX)",
       },
     },
     logo: {

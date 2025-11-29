@@ -98,7 +98,7 @@ export default function VendorProfile() {
 
             <div className="absolute bottom-0 left-0 p-6 md:p-8 z-10 w-full">
               <h1 className="h2 text-white mb-2 drop-shadow-md">
-                {vendorProfile?.businessName}
+                {vendorProfile?.userId?.businessName}
               </h1>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-white/90 body-2">
                 <span className="font-code uppercase tracking-wider text-sm font-bold bg-white/20 backdrop-blur-md px-3 py-1 rounded-lg border border-white/10">
@@ -143,7 +143,7 @@ export default function VendorProfile() {
             {/* Logout Button */}
             {authUser &&
               vendorProfile &&
-              authUser._id === vendorProfile.userId && (
+              authUser._id === vendorProfile.userId?._id && (
                 <button
                   onClick={handleLogout}
                   className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-n-1 border border-n-3/20 hover:border-primary-3 text-n-6 hover:text-primary-3 rounded-2xl transition-all font-code text-sm font-bold uppercase tracking-wider shadow-sm"

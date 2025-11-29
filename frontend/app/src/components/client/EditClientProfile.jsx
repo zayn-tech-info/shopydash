@@ -53,31 +53,44 @@ export function EditClientProfile({ clientProfileData, onClose }) {
 
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <InputField
-                label="Full name"
-                value={clientProfileData.fullName}
-                onChange={handleChange("fullName")}
-              />
-              <InputField
-                label="Username"
-                value={clientProfileData.username}
-                onChange={handleChange("username")}
-              />
+              <div>
+                <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
+                  Full Name (Read-only)
+                </label>
+                <input
+                  type="text"
+                  value={clientProfileData?.userId?.fullName || ""}
+                  disabled
+                  className="w-full px-4 py-3 bg-n-2 border border-n-3 rounded-xl text-n-5 cursor-not-allowed"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
+                  Username (Read-only)
+                </label>
+                <input
+                  type="text"
+                  value={clientProfileData?.userId?.username || ""}
+                  disabled
+                  className="w-full px-4 py-3 bg-n-2 border border-n-3 rounded-xl text-n-5 cursor-not-allowed"
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <InputField
-                label="Phone"
-                value={clientProfileData.phoneNumber}
-                onChange={handleChange("phoneNumber")}
-              />
-              <InputField
-                label="WhatsApp"
-                value={clientProfileData.whatsAppNumber}
-                onChange={handleChange("whatsAppNumber")}
-              />
+              <div>
+                <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
+                  Phone (Read-only)
+                </label>
+                <input
+                  type="text"
+                  value={clientProfileData?.userId?.phoneNumber || ""}
+                  disabled
+                  className="w-full px-4 py-3 bg-n-2 border border-n-3 rounded-xl text-n-5 cursor-not-allowed"
+                />
+              </div>
+              {/* WhatsApp might not be in User model for clients, checking... */}
             </div>
-
             <InputField
               label="Address"
               value={clientProfileData.address}
@@ -86,13 +99,13 @@ export function EditClientProfile({ clientProfileData, onClose }) {
 
             <div>
               <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
-                School
+                School (Read-only)
               </label>
-              <CustomDropdown
-                options={schools}
-                value={clientProfileData.schoolName}
-                onChange={(value) => setInputField("schoolName", value)}
-                placeholder="Select your school"
+              <input
+                type="text"
+                value={clientProfileData?.userId?.schoolName || ""}
+                disabled
+                className="w-full px-4 py-3 bg-n-2 border border-n-3 rounded-xl text-n-5 cursor-not-allowed"
               />
             </div>
 

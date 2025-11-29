@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-// import { Loader } from "../components/Loader";
 import { useVendorProfileStore } from "../store/vendorProfileStore";
 import { useAuthStore } from "../store/authStore";
 import { InputField } from "../components/InputField";
@@ -51,12 +50,8 @@ export default function CreateVendorProfile() {
   }
 
   function validate() {
-    if (!profileData.businessName || !profileData.businessName.trim())
-      return "Business name is required";
-    if (!profileData.storeUsername || !profileData.storeUsername.trim())
-      return "Store username is required";
-    if (!profileData.phoneNumber || !profileData.phoneNumber.trim())
-      return "Phone number is required";
+    if (!profileData.storeDescription || !profileData.storeDescription.trim())
+      return "Store description is required";
     return null;
   }
 
@@ -100,20 +95,6 @@ export default function CreateVendorProfile() {
             <h2 className="text-xl font-bold text-n-8 border-b border-n-3 pb-2">
               Basic information
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <InputField
-                onChange={handleInputChange("businessName")}
-                label="Business name"
-                value={profileData.businessName}
-                placeholder="e.g. Vendora"
-              />
-              <InputField
-                label="Store name"
-                value={profileData.storeUsername}
-                onChange={handleInputChange("storeUsername")}
-                placeholder="e.g. vendora_001"
-              />
-            </div>
 
             <div>
               <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
@@ -138,32 +119,6 @@ export default function CreateVendorProfile() {
                 placeholder="Select category"
               />
             </div>
-          </section>
-
-          <section className="space-y-6">
-            <h2 className="text-xl font-bold text-n-8 border-b border-n-3 pb-2">
-              Contact
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <InputField
-                label="Phone number"
-                value={profileData.phoneNumber}
-                onChange={handleInputChange("phoneNumber")}
-                placeholder="+234..."
-              />
-              <InputField
-                label="WhatsApp number"
-                value={profileData.whatsAppNumber}
-                onChange={handleInputChange("whatsAppNummber")}
-                placeholder="+234..."
-              />
-            </div>
-            <InputField
-              label="Email"
-              value={profileData.email}
-              onChange={handleInputChange("email")}
-              placeholder="store@example.com"
-            />
           </section>
 
           <section className="space-y-6">

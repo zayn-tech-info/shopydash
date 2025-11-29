@@ -2,19 +2,13 @@ import { create } from "zustand";
 import { api } from "../lib/axios";
 
 const initialProfileData = {
-  businessName: "",
-  storeUsername: "",
   storeDescription: "",
   businessCategory: "",
-  phoneNumber: "",
-  whatsAppNummber: "",
-  email: "",
   coverImage: "",
   address: "",
   city: "",
   state: "",
   country: "",
-  schoolName: "",
   zipCode: "",
   accountNumber: "",
   paymentMethods: [],

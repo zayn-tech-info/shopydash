@@ -19,20 +19,20 @@ export function ClientAddress({ clientProfile, authUser, className }) {
         <div>
           <div className="font-medium text-sm">Phone</div>
           <div className="text-primary-4 mt-1">
-            {clientProfile?.phoneNumber || authUser?.phoneNumber || "-"}
+            {clientProfile?.userId?.phoneNumber || authUser?.phoneNumber || "-"}
           </div>
         </div>
 
         <div>
           <div className="font-medium text-sm">Email</div>
           <div className="text-primary-4 mt-1">
-            {clientProfile?.email || authUser?.email || "-"}
+            {clientProfile?.userId?.email || authUser?.email || "-"}
           </div>
         </div>
         <div>
           <div className="font-medium text-sm">School</div>
           <div className="text-primary-4 mt-1">
-            {clientProfile?.schoolName || authUser?.schoolName || "-"}
+            {clientProfile?.userId?.schoolName || authUser?.schoolName || "-"}
           </div>
         </div>
       </div>

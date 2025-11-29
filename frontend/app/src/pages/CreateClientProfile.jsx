@@ -32,12 +32,6 @@ export default function CreateClientProfile() {
   };
 
   function validate() {
-    if (!clientProfileData.fullName || !clientProfileData.fullName.trim())
-      return "Full name is required";
-    if (!clientProfileData.username || !clientProfileData.username.trim())
-      return "Username is required";
-    if (!clientProfileData.phoneNumber || !clientProfileData.phoneNumber.trim())
-      return "Phone number is required";
     return null;
   }
 
@@ -85,33 +79,9 @@ export default function CreateClientProfile() {
             <h2 className="text-xl font-bold text-n-8 border-b border-n-3 pb-2">
               Basic information
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <InputField
-                onChange={handleInputChange("fullName")}
-                label="Full Name"
-                value={clientProfileData.fullName}
-                placeholder="e.g. John Doe"
-              />
-              <InputField
-                label="Username"
-                value={clientProfileData.username}
-                onChange={handleInputChange("username")}
-                placeholder="e.g. johndoe"
-              />
-            </div>
+ 
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
-                  School Name
-                </label>
-                <CustomDropdown
-                  options={schools}
-                  value={clientProfileData.schoolName}
-                  onChange={(value) => setInputField("schoolName", value)}
-                  placeholder="Select your school"
-                />
-              </div>
               <div>
                 <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
                   Preferred Category
@@ -125,20 +95,6 @@ export default function CreateClientProfile() {
                   placeholder="Select a category"
                 />
               </div>
-            </div>
-          </section>
-
-          <section className="space-y-6">
-            <h2 className="text-xl font-bold text-n-8 border-b border-n-3 pb-2">
-              Contact
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <InputField
-                label="Phone number"
-                value={clientProfileData.phoneNumber}
-                onChange={handleInputChange("phoneNumber")}
-                placeholder="+234..."
-              />
             </div>
           </section>
 

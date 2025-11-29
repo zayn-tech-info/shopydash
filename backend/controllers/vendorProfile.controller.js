@@ -16,7 +16,16 @@ const createVendorProfile = asyncErrorHandler(async (req, res, next) => {
     return next(err);
   }
 
-  const payload = { ...req.body, userId };
+  const {
+    businessName,
+    email,
+    phoneNumber,
+    whatsAppNumber,
+    schoolName,
+    profileImage,
+    ...allowedData
+  } = req.body;
+  const payload = { ...allowedData, userId };
 
   const vendorProfile = await vendorProfileModel.create(payload);
 
@@ -34,7 +43,12 @@ const getVendorProfile = asyncErrorHandler(async (req, res, next) => {
     return next(new customError("Unauthorized", 401));
   }
 
-  const vendorProfile = await vendorProfileModel.findOne({ userId });
+  const vendorProfile = await vendorProfileModel
+    .findOne({ userId })
+    .populate(
+      "userId",
+      "businessName email phoneNumber whatsAppNumber schoolName logo isVerified"
+    );
 
   if (!vendorProfile) {
     const error = new customError("Vendor profile not found", 404);
@@ -57,9 +71,14 @@ const getPublicVendorProfile = asyncErrorHandler(async (req, res, next) => {
     return next(error);
   }
 
-  const vendorProfile = await vendorProfileModel.findOne({
-    storeUsername: storeUsername,
-  });
+  const vendorProfile = await vendorProfileModel
+    .findOne({
+      storeUsername: storeUsername,
+    })
+    .populate(
+      "userId",
+      "businessName email phoneNumber whatsAppNumber schoolName logo isVerified"
+    );
 
   if (!vendorProfile) {
     const error = new customError("Vendor profile not found", 404);
@@ -78,6 +97,12 @@ const updateVendorProfile = asyncErrorHandler(async (req, res, next) => {
   const updates = { ...req.body };
   delete updates.userId;
   delete updates._id;
+  delete updates.businessName;
+  delete updates.email;
+  delete updates.phoneNumber;
+  delete updates.whatsAppNumber;
+  delete updates.schoolName;
+  delete updates.profileImage;
 
   const updated = await vendorProfileModel.findOneAndUpdate(
     { userId },

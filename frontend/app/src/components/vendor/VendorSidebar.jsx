@@ -8,10 +8,12 @@ export default function VendorSidebar({
   onCopy,
 }) {
   const businessName =
-    vendorProfile?.businessName || authUser?.businessName || "Store";
+    vendorProfile?.userId?.businessName || authUser?.businessName || "Store";
   const username =
-    vendorProfile?.storeUsername || vendorProfile?.username || "vendor";
-  const profileImage = vendorProfile?.profileImage || Logo;
+    vendorProfile?.userId?.storeUsername ||
+    vendorProfile?.userId?.username ||
+    "vendor";
+  const profileImage = authUser?.profilePic || Logo;
 
   return (
     <aside className="bg-white rounded-2xl p-6 border border-n-3/20 shadow-sm w-full relative">
@@ -31,7 +33,6 @@ export default function VendorSidebar({
           )}
         </div>
 
- 
         <button
           onClick={onCopy}
           className="absolute top-2 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center text-n-7 hover:text-primary-3 shadow-sm border border-n-3/10 transition-colors"
@@ -43,7 +44,9 @@ export default function VendorSidebar({
         <h2 className="h4 text-n-8 text-center mb-1">{businessName}</h2>
         <p className="body-2 text-n-4 text-center font-code">@{username}</p>
 
-        {authUser && vendorProfile && authUser._id === vendorProfile.userId ? (
+        {authUser &&
+        vendorProfile &&
+        authUser._id === vendorProfile.userId?._id ? (
           <button
             onClick={openEdit}
             aria-label="Edit profile"

@@ -21,7 +21,7 @@ export function VendorAddress({ vendorProfile, authUser, className }) {
             Phone
           </div>
           <div className="text-n-8 font-medium text-sm">
-            {vendorProfile?.phoneNumber || authUser?.phoneNumber || "-"}
+            {vendorProfile?.userId?.phoneNumber || authUser?.phoneNumber || "-"}
           </div>
         </div>
 
@@ -30,7 +30,7 @@ export function VendorAddress({ vendorProfile, authUser, className }) {
             Email
           </div>
           <div className="text-n-8 font-medium text-sm break-all">
-            {vendorProfile?.email || authUser?.email || "-"}
+            {vendorProfile?.userId?.email || authUser?.email || "-"}
           </div>
         </div>
         <div>
@@ -38,7 +38,7 @@ export function VendorAddress({ vendorProfile, authUser, className }) {
             School
           </div>
           <div className="text-n-8 font-medium text-sm">
-            {vendorProfile?.schoolName|| authUser?.schoolName || "-"}
+            {vendorProfile?.userId?.schoolName || authUser?.schoolName || "-"}
           </div>
         </div>
       </div>

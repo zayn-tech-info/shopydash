@@ -7,10 +7,10 @@ import Logo from "../../assets/images/clientPfp.png";
 import { useClientProfileStore } from "../../store/clientProfileStore";
 
 export default function ProfileHeader({ clientProfile, authUser, openEdit }) {
-  const clientName = clientProfile?.fullName || authUser?.fullName || "Store";
-  const username =
-    clientProfile?.username || clientProfile?.username || "vendor";
-  const profileImage = clientProfile?.profileImage || Logo;
+  const clientName =
+    clientProfile?.userId?.fullName || authUser?.fullName || "Store";
+  const username = clientProfile?.userId?.username || "vendor";
+  const profileImage = clientProfile?.userId?.profilePic || Logo;
 
   return (
     <aside className="bg-white rounded-2xl p-6 border border-n-3/20 shadow-sm w-full">
@@ -26,7 +26,9 @@ export default function ProfileHeader({ clientProfile, authUser, openEdit }) {
         <h2 className="h4 text-n-8 text-center mb-1">{clientName}</h2>
         <p className="body-2 text-n-4 text-center font-code">@{username}</p>
 
-        {authUser && clientProfile && authUser._id === clientProfile.userId ? (
+        {authUser &&
+        clientProfile &&
+        authUser._id === clientProfile.userId?._id ? (
           <button
             onClick={openEdit}
             aria-label="Edit profile"
