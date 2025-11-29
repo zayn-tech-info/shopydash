@@ -1,6 +1,7 @@
 const clientProfileSchema = require("../models/clientProfile.model");
 const asyncErrorHandler = require("../errors/asyncErrorHandle");
 const customError = require("../errors/customError");
+const User = require("../models/auth.model");
 
 const createClientProfile = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user && req.user._id;
@@ -32,29 +33,6 @@ const createClientProfile = asyncErrorHandler(async (req, res, next) => {
   res.status(201).json({
     success: true,
     message: "Profile created successfully",
-    data: {
-      clientProfile,
-    },
-  });
-});
-
-const getClientProfile = asyncErrorHandler(async (req, res, next) => {
-  const userId = req.user && req.user._id;
-
-  const clientProfile = await clientProfileSchema
-    .findOne({ userId })
-    .populate(
-      "userId",
-      "fullName username email phoneNumber schoolName profilePic"
-    );
-
-  if (!clientProfile) {
-    const err = new customError("Profile not found", 404);
-    return next(err);
-  }
-
-  res.status(200).json({
-    success: true,
     data: {
       clientProfile,
     },
@@ -93,4 +71,4 @@ const updateClientProfile = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
-module.exports = { createClientProfile, getClientProfile, updateClientProfile };
+module.exports = { createClientProfile, updateClientProfile };

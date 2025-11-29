@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import ProfileHeader from "../components/client/ProfileHeader";
 import AboutAndWishlist from "../components/client/AboutAndWishlist";
 import { useAuthStore } from "../store/authStore";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useClientProfileStore } from "../store/clientProfileStore";
 import { EditClientProfile } from "../components/client/EditClientProfile";
 import { LogOut } from "lucide-react";
@@ -13,9 +13,7 @@ export function ClientProfile() {
   const loading = useClientProfileStore((state) => state.loading);
   const error = useClientProfileStore((state) => state.error);
   const clientProfile = useClientProfileStore((state) => state.clientProfile);
-  const getClientProfile = useClientProfileStore(
-    (state) => state.getClientProfile
-  );
+  const getProfile = useClientProfileStore((state) => state.getProfile);
   const clientProfileData = useClientProfileStore(
     (state) => state.clientProfileData
   );
@@ -26,6 +24,7 @@ export function ClientProfile() {
   const [showEditModal, setShowEditModal] = useState(false);
   const logout = useAuthStore((s) => s.logout);
   const navigate = useNavigate();
+  const params = useParams();
 
   const openEdit = () => {
     if (clientProfile) {
@@ -35,15 +34,27 @@ export function ClientProfile() {
   };
 
   useEffect(() => {
-    const fetchClientProfile = async () => {
+    const fetchProfile = async () => {
       try {
-        await getClientProfile();
+        const usernameToFetch = params?.username || authUser?.username;
+
+  
+        if (
+          clientProfile &&
+          clientProfile?.userId?.username === usernameToFetch
+        ) {
+          return;
+        }
+
+        if (usernameToFetch) {
+          await getProfile(usernameToFetch);
+        }
       } catch (err) {
         console.error("Failed to load client profile:", err);
       }
     };
-    fetchClientProfile();
-  }, [getClientProfile]);
+    fetchProfile();
+  }, [getProfile, params?.username, authUser?.username, clientProfile]);
 
   useEffect(() => {
     console.log(clientProfile);
@@ -77,9 +88,7 @@ export function ClientProfile() {
             </div>
           </div>
 
-          {/* Main Content */}
           <div className="lg:col-span-8 xl:col-span-9 space-y-8">
-            {/* Header Section for Desktop */}
             <div className="bg-white rounded-2xl p-8 border border-n-3/20 shadow-sm">
               <div className="flex items-start justify-between">
                 <div>

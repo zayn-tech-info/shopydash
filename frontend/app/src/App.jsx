@@ -18,6 +18,7 @@ import CreateClientProfile from "./pages/CreateClientProfile";
 import { CompleteProfileLanding } from "./pages/CompleteProfileLanding";
 import CompleteProfile from "./pages/CompleteProfile";
 import CompleteRegistration from "./pages/CompleteRegistration";
+import ProfileDispatcher from "./pages/ProfileDispatcher";
 
 const App = () => {
   const { checkAuth, authUser, isCheckingAuth } = useAuthStore();
@@ -62,7 +63,7 @@ const App = () => {
                   <Home />
                 ) : (
                   <Navigate to="/complete-user-registration" />
-                ) 
+                )
               ) : (
                 <Navigate to="/login" />
               )
@@ -105,28 +106,7 @@ const App = () => {
             }
           />
           <Route path="/vendor/dashboard" element={<VendorDashboard />} />
-          <Route path="store/:storeUsername" element={<VendorProfile />} />
-          <Route
-            path={
-              authUser && authUser.role === "vendor"
-                ? "/vendor/profile"
-                : "/profile"
-            }
-            element={
-              authUser && authUser.role === "vendor" ? (
-                authUser.hasProfile ? (
-                  <VendorProfile />
-                ) : (
-                  <Navigate to="/complete-profile-landing" />
-                )
-              ) : authUser && authUser.hasProfile ? (
-                <ClientProfile />
-              ) : (
-                <Navigate to="/complete-profile-landing" />
-              )
-            }
-          />
-
+          <Route path="/profile/:username" element={<ProfileDispatcher />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>

@@ -2,7 +2,6 @@ const express = require("express");
 const { protectRoute, verifyRole } = require("../middleware/auth.middleware");
 const {
   createClientProfile,
-  getClientProfile,
   updateClientProfile,
 } = require("../controllers/clientProfile.controller");
 
@@ -15,12 +14,6 @@ router.post(
   createClientProfile
 );
 
-router.get(
-  "/getClientProfile",
-  protectRoute,
-  verifyRole("client"),
-  getClientProfile
-);
 router.patch(
   "/updateClientProfile",
   protectRoute,

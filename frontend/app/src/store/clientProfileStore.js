@@ -49,14 +49,14 @@ export const useClientProfileStore = create((set, get) => ({
   setClientProfileData: (data) =>
     set({ clientProfileData: { ...initialProfileData, ...data } }),
 
-  getClientProfile: async (options = {}) => {
+  getProfile: async (username, options = {}) => {
     const opts =
       typeof options === "boolean" ? { silent: options } : options || {};
     const silent = !!opts.silent;
 
     if (!silent) set({ loading: true });
     try {
-      const res = await api.get("/api/v1/clientProfile/getClientProfile");
+      const res = await api.get(`/api/v1/profile/${username}`);
       const payload = res?.data?.data ?? res?.data ?? res;
 
       console.log("Client Profile API response:", res);
@@ -93,6 +93,9 @@ export const useClientProfileStore = create((set, get) => ({
 
   updateClientProfile: async (payload) => {
     try {
+      const currentProfile = get().clientProfile;
+      const username = currentProfile?.userId?.username;
+
       set({ updating: true, error: null });
       const res = await api.patch(
         "/api/v1/clientProfile/updateClientProfile",
@@ -115,11 +118,13 @@ export const useClientProfileStore = create((set, get) => ({
       });
 
       // silently refresh from server to ensure latest data is reflected everywhere
-      get()
-        .getClientProfile({ silent: true })
-        .catch((refreshErr) =>
-          console.error("Silent client profile refresh failed:", refreshErr)
-        );
+      if (username) {
+        get()
+          .getProfile(username, { silent: true })
+          .catch((refreshErr) =>
+            console.error("Silent client profile refresh failed:", refreshErr)
+          );
+      }
 
       return profile;
     } catch (error) {

@@ -32,26 +32,26 @@ export const navigation = [
     icon: Home,
   },
   {
-    id: 1,
+    id: 2,
     text: "Products",
     href: "/products",
     icon: Vegan,
   },
   {
-    id: 2,
+    id: 3,
     text: "Wishlist",
     href: "/wishlist",
     icon: ShoppingCart,
   },
 
   {
-    id: 3,
+    id: 4,
     text: "Dashboard",
     href: "vendor/dashboard",
     icon: LayoutDashboardIcon,
   },
   {
-    id: 4,
+    id: 5,
     text: "Profile",
     href: "/profile",
     icon: User,

@@ -1,7 +1,7 @@
 const express = require("express");
 const {
   createVendorProfile,
-  getVendorProfile,
+  // getVendorProfile,
   getPublicVendorProfile,
   updateVendorProfile,
 } = require("../controllers/vendorProfile.controller");
@@ -18,7 +18,8 @@ route.post(
 
 route.get("/store/:storeUsername", getPublicVendorProfile);
 
-route.get("/profile", protectRoute, verifyRole("vendor"), getVendorProfile);
+// route.get("/profile", protectRoute, verifyRole("vendor"));
+// getVendorProfile
 
 route.patch(
   "/updateVendorProfile",

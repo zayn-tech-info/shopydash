@@ -31,10 +31,6 @@ const vendorProfileSchema = new mongoose.Schema(
     coverImage: {
       type: String,
     },
-    address: String,
-    state: String,
-    city: String,
-    country: String,
     address: {
       type: String,
     },

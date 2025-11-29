@@ -10,10 +10,12 @@ export default function VendorSidebar({
   const businessName =
     vendorProfile?.userId?.businessName || authUser?.businessName || "Store";
   const username =
-    vendorProfile?.userId?.storeUsername ||
-    vendorProfile?.userId?.username ||
-    "vendor";
-  const profileImage = authUser?.profilePic || Logo;
+    vendorProfile?.storeUsername || vendorProfile?.userId?.username || "vendor";
+  const profileImage =
+    vendorProfile?.userId?.logo ||
+    vendorProfile?.userId?.profilePic ||
+    authUser?.profilePic ||
+    Logo;
 
   return (
     <aside className="bg-white rounded-2xl p-6 border border-n-3/20 shadow-sm w-full relative">

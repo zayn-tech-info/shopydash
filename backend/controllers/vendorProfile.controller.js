@@ -36,7 +36,7 @@ const createVendorProfile = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
-const getVendorProfile = asyncErrorHandler(async (req, res, next) => {
+/* const getVendorProfile = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user?._id;
 
   if (!userId) {
@@ -61,7 +61,7 @@ const getVendorProfile = asyncErrorHandler(async (req, res, next) => {
       vendorProfile,
     },
   });
-});
+}); */
 
 const getPublicVendorProfile = asyncErrorHandler(async (req, res, next) => {
   const storeUsername = req.params.storeUsername;
@@ -124,7 +124,7 @@ const updateVendorProfile = asyncErrorHandler(async (req, res, next) => {
 
 module.exports = {
   createVendorProfile,
-  getVendorProfile,
+  // getVendorProfile,
   getPublicVendorProfile,
   updateVendorProfile,
 };

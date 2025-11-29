@@ -60,14 +60,11 @@ export const useVendorProfileStore = create((set, get) => ({
     }
   },
 
-  getVendorProfile: async (username) => {
+  getProfile: async (username) => {
     try {
       set({ isGettingVendorProfile: true, error: null });
-      const url = username
-        ? `/api/v1/vendorProfile/store/${encodeURIComponent(username)}`
-        : `/api/v1/vendorProfile/profile`;
 
-      const res = await api.get(url);
+      const res = await api.get(`/api/v1/profile/${username}`);
       console.log("API response", res);
       const payload = res?.data?.data ?? res?.data ?? res;
       const profile = payload?.vendorProfile ?? payload;

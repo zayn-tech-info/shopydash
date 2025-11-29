@@ -43,12 +43,8 @@ export function Header() {
             {navigation.map((nav) => {
               let to = nav.href === "/home" ? "/" : nav.href;
 
-              if (
-                authUser &&
-                authUser.role === "vendor" &&
-                nav.href === "/profile"
-              ) {
-                to = "/vendor/profile";
+              if (authUser && nav.href === "/profile") {
+                to = `/profile/${authUser.username}`;
               }
               const navResult = renderNav(nav.text, authUser?.role);
               if (navResult === null) return null;

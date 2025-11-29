@@ -25,9 +25,7 @@ export default function VendorProfile() {
   );
 
   const vendorProfile = useVendorProfileStore((state) => state.vendorProfile);
-  const getVendorProfile = useVendorProfileStore(
-    (state) => state.getVendorProfile
-  );
+  const getProfile = useVendorProfileStore((state) => state.getProfile);
 
   const authUser = useAuthStore((s) => s.authUser);
   const logout = useAuthStore((s) => s.logout);
@@ -39,17 +37,26 @@ export default function VendorProfile() {
   const [formData, setFormData] = useState(null);
 
   useEffect(() => {
-    if (
-      location.pathname === "/profile" ||
-      location.pathname === "/vendor/profile"
-    ) {
-      getVendorProfile();
-    } else {
-      getVendorProfile(params?.storeUsername).catch((e) => {
-        console.error("Failed to get vendor profile:", e);
-      });
-    }
-  }, [params?.storeUsername, getVendorProfile, location.pathname]);
+    const fetchProfile = async () => {
+      try {
+        const usernameToFetch = params?.username || authUser?.username;
+        if (
+          vendorProfile &&
+          (vendorProfile?.userId?.username === usernameToFetch ||
+            vendorProfile?.storeUsername === usernameToFetch)
+        ) {
+          return;
+        }
+
+        if (usernameToFetch) {
+          await getProfile(usernameToFetch);
+        }
+      } catch (err) {
+        console.error("Failed to load vendor profile:", err);
+      }
+    };
+    fetchProfile();
+  }, [getProfile, params?.username, authUser?.username, vendorProfile]);
 
   const copyProfileLink = async () => {
     try {
