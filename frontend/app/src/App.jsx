@@ -19,6 +19,7 @@ import { CompleteProfileLanding } from "./pages/CompleteProfileLanding";
 import CompleteProfile from "./pages/CompleteProfile";
 import CompleteRegistration from "./pages/CompleteRegistration";
 import ProfileDispatcher from "./pages/ProfileDispatcher";
+import VendorProductUpload from "./pages/VendorProductUpload";
 
 const App = () => {
   const { checkAuth, authUser, isCheckingAuth } = useAuthStore();
@@ -106,6 +107,16 @@ const App = () => {
             }
           />
           <Route path="/vendor/dashboard" element={<VendorDashboard />} />
+          <Route
+            path="/vendor/upload"
+            element={
+              authUser && authUser.role === "vendor" ? (
+                <VendorProductUpload />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
           <Route path="/:username" element={<ProfileDispatcher />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
