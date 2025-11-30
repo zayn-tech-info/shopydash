@@ -44,7 +44,7 @@ export function Header() {
               let to = nav.href === "/home" ? "/" : nav.href;
 
               if (authUser && nav.href === "/profile") {
-                to = `/profile/${authUser.username}`;
+                to = `/${authUser.username}`;
               }
               const navResult = renderNav(nav.text, authUser?.role);
               if (navResult === null) return null;

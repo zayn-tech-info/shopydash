@@ -106,7 +106,7 @@ const App = () => {
             }
           />
           <Route path="/vendor/dashboard" element={<VendorDashboard />} />
-          <Route path="/profile/:username" element={<ProfileDispatcher />} />
+          <Route path="/:username" element={<ProfileDispatcher />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>

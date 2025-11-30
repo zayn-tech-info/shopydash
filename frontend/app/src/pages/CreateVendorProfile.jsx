@@ -22,7 +22,7 @@ export default function CreateVendorProfile() {
   const isCreatingProfile = useVendorProfileStore(
     (state) => state.isCreatingProfile
   );
-  const { updateUser } = useAuthStore();
+  const { updateUser, authUser } = useAuthStore();
 
   useEffect(() => {
     console.log(profileData);
@@ -65,7 +65,7 @@ export default function CreateVendorProfile() {
       updateUser({ hasProfile: true });
       toast.success("Profile created");
 
-      navigate("/vendor/profile");
+      navigate(`/${authUser?.username}`);
     } catch (e) {
       const errorMessage =
         e?.response?.data?.message || e?.message || "An error occurred";

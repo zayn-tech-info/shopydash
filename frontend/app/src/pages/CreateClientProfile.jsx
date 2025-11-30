@@ -44,9 +44,9 @@ export default function CreateClientProfile() {
       updateUser({ hasProfile: true });
       toast.success("Profile created");
       if (authUser?.role === "vendor") {
-        navigate("/vendor/profile");
+        navigate(`/${authUser?.username}`);
       } else {
-        navigate("/profile");
+        navigate(`/${authUser?.username}`);
       }
     } catch (e) {
       const errorMessage =
