@@ -1,0 +1,9 @@
+{
+  "simpleCodingTimeTracker.inactivityTimeout": 60,
+  "simpleCodingTimeTracker.focusTimeout": 59.5,
+  "simpleCodingTimeTracker.health.enableNotifications": false,
+  "simpleCodingTimeTracker.health.modalNotifications": true,
+  "simpleCodingTimeTracker.health.eyeRestInterval": 20,
+  "simpleCodingTimeTracker.health.stretchInterval": 30,
+  "simpleCodingTimeTracker.health.breakThreshold": 90
+}

@@ -33,8 +33,8 @@ export const navigation = [
   },
   {
     id: 2,
-    text: "Products",
-    href: "/products",
+    text: "Feeds",
+    href: "/feeds",
     icon: Vegan,
   },
   {
@@ -47,7 +47,7 @@ export const navigation = [
   {
     id: 4,
     text: "Dashboard",
-    href: "vendor/dashboard",
+    href: "/dashboard",
     icon: LayoutDashboardIcon,
   },
   {

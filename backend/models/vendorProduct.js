@@ -41,14 +41,9 @@ const productItemSchema = new mongoose.Schema({
     default: 1,
     min: [0, "Stock cannot be negative"],
   },
-  images: {
-    type: [String],
-    validate: {
-      validator: function (v) {
-        return v && v.length > 0;
-      },
-      message: "Each product must have at least one image",
-    },
+  image: {
+    type: String,
+    required: [true, "Product image is required"],
   },
 });
 
@@ -60,9 +55,9 @@ const vendorPostSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
-    content: {
+    caption: {
       type: String,
-      required: [true, "Post caption/content is required"],
+      required: [true, "Post caption is required"],
       trim: true,
     },
     products: {

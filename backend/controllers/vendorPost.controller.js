@@ -1,12 +1,10 @@
 const asyncErrorHandler = require("../errors/asyncErrorHandle");
 const customError = require("../errors/customError");
-const VendorPost = require("../models/vendorProduct"); // This file now exports the VendorPost model
+const VendorPost = require("../models/vendorProduct");
 const VendorProfile = require("../models/vendorProfile.model");
 
 const createPost = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user._id;
-
-  // 1. Verify Vendor Profile exists
   const vendorProfile = await VendorProfile.findOne({ userId });
   if (!vendorProfile) {
     return next(
@@ -17,21 +15,20 @@ const createPost = asyncErrorHandler(async (req, res, next) => {
     );
   }
 
-  const { content, products, school, location } = req.body;
-
-  // 2. Validate Products Count
+  const { caption, products, school, location } = req.body;
   if (!products || products.length < 4) {
     return next(
       new customError("You must upload at least 4 products per post.", 400)
     );
   }
 
-  // 3. Create the Post
+  const user = await require("../models/auth.model").findById(userId);
+
   const newPost = await VendorPost.create({
     vendorId: userId,
-    content,
+    caption,
     products,
-    school: school || vendorProfile.schoolName, // Fallback to profile school if not provided
+    school: school || vendorProfile.schoolName || user.schoolName,
     location,
   });
 
@@ -44,6 +41,16 @@ const createPost = asyncErrorHandler(async (req, res, next) => {
 
 const getMyPosts = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user._id;
+
+  const vendorProfile = await VendorProfile.findOne({ userId });
+  if (!vendorProfile) {
+    return next(
+      new customError(
+        "Vendor profile not found. Please complete your profile first.",
+        404
+      )
+    );
+  }
 
   const posts = await VendorPost.find({ vendorId: userId }).sort({
     createdAt: -1,
@@ -115,7 +122,6 @@ const deletePost = asyncErrorHandler(async (req, res, next) => {
     return next(new customError("Post not found", 404));
   }
 
-  // Verify ownership
   if (post.vendorId.toString() !== userId.toString()) {
     return next(
       new customError("You are not authorized to delete this post", 403)

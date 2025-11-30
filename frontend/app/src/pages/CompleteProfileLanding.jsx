@@ -11,7 +11,7 @@ export  function CompleteProfileLanding() {
   React.useEffect(() => {
     if (authUser?.hasProfile) {
       if (authUser.role === "vendor") {
-        navigate("/vendor/dashboard");
+        navigate("/dashboard");
       } else {
         navigate("/profile");
       }

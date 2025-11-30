@@ -20,6 +20,7 @@ import CompleteProfile from "./pages/CompleteProfile";
 import CompleteRegistration from "./pages/CompleteRegistration";
 import ProfileDispatcher from "./pages/ProfileDispatcher";
 import VendorProductUpload from "./pages/VendorProductUpload";
+import { VendorFloatingButton } from "./components/VendorFloatingButton";
 
 const App = () => {
   const { checkAuth, authUser, isCheckingAuth } = useAuthStore();
@@ -106,23 +107,15 @@ const App = () => {
               authUser ? <CompleteRegistration /> : <Navigate to="/login" />
             }
           />
-          <Route path="/vendor/dashboard" element={<VendorDashboard />} />
-          <Route
-            path="/vendor/upload"
-            element={
-              authUser && authUser.role === "vendor" ? (
-                <VendorProductUpload />
-              ) : (
-                <Navigate to="/" />
-              )
-            }
-          />
+          <Route path="/dashboard" element={<VendorDashboard />} />
+          <Route path="/vendor/add" element={<VendorProductUpload />} />
           <Route path="/:username" element={<ProfileDispatcher />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
       {authUser ? <Footer /> : ""}
       {authUser ? <BottomNav /> : ""}
+      <VendorFloatingButton />
       <Toaster />
     </div>
   );

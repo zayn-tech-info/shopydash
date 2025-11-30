@@ -1,30 +1,19 @@
+const cloudinary = require("cloudinary").v2;
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
 const asyncErrorHandler = require("../errors/asyncErrorHandle");
 const customError = require("../errors/customError");
+const fs = require("fs");
 
-// Ensure uploads directory exists
-const uploadDir = path.join(__dirname, "../uploads");
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-// Configure storage
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(
-      null,
-      file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname)
-    );
-  },
+ 
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARYAPI_KEY,
+  api_secret: process.env.CLOUDINARYAPI_API_SECRET,
 });
+ 
+const storage = multer.diskStorage({});
 
-// File filter
+ 
 const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith("image/")) {
     cb(null, true);
@@ -37,24 +26,29 @@ const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
+    fileSize: 5 * 1024 * 1024,  
   },
 });
 
+ 
 const uploadImages = asyncErrorHandler(async (req, res, next) => {
   if (!req.files || req.files.length === 0) {
     return next(new customError("Please upload at least one image", 400));
   }
 
-  // In a real production app, you would upload to Cloudinary here.
-  // For now, we return the local paths.
-  // We need to construct the full URL based on the server address
-  const protocol = req.protocol;
-  const host = req.get("host");
+  const fileUrls = [];
 
-  const fileUrls = req.files.map((file) => {
-    return `${protocol}://${host}/uploads/${file.filename}`;
-  });
+  for (const file of req.files) {
+    const uploaded = await cloudinary.uploader.upload(file.path, {
+      folder: "vendor/products",
+      allowed_formats: ["jpeg", "jpg", "png", "webp"],
+      transformation: [{ width: 1000, height: 1000, crop: "limit" }],
+    });
+
+    fileUrls.push(uploaded.secure_url);
+
+    fs.unlinkSync(file.path);
+  }
 
   res.status(200).json({
     success: true,
@@ -63,7 +57,8 @@ const uploadImages = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
+ 
 module.exports = {
-  uploadMiddleware: upload.array("images", 5), // Allow up to 5 images
+  uploadMiddleware: upload.array("images", 6),
   uploadImages,
 };

@@ -2,20 +2,15 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../lib/axios";
 import { StatsCards } from "../components/dashboard/StatsCards";
-import { ProductList } from "../components/dashboard/ProductList";
-import { AddProductModal } from "../components/dashboard/AddProductModal";
-import { Plus } from "lucide-react";
+import { PostList } from "../components/dashboard/PostList";
 import { toast } from "react-hot-toast";
 
 export default function VendorDashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [stats, setStats] = useState(null);
-  const [products, setProducts] = useState([]);
+  const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const vendorId = user?.data?._id || user?._id || user?.data?.id || user?.id;
 
   const fetchMe = useCallback(async () => {
     try {
@@ -31,23 +26,25 @@ export default function VendorDashboard() {
     }
   }, [navigate]);
 
-  const fetchDashboard = useCallback(async (me) => {
-    if (!me) return;
-    const id = me.data?._id || me.data?.id || me.id;
+  const fetchDashboard = useCallback(async () => {
     try {
-      const [statsRes, productsRes] = await Promise.all([
-        api.get(`/api/vendors/${id}/stats`).catch(() => ({ data: null })),
-        api
-          .get(`/api/vendors/${id}/products?page=1&pageSize=20`)
-          .catch(() => ({ data: { products: [] } })),
-      ]);
+      const res = await api.get("/api/v1/posts/my-posts");
+      const fetchedPosts = res.data.data.posts || [];
 
-      setStats(statsRes.data || null);
-      // standardize products array shape
-      const list = productsRes.data?.products || productsRes.data || [];
-      setProducts(list);
+      setPosts(fetchedPosts);
+      const totalProducts = fetchedPosts.reduce(
+        (acc, post) => acc + post.products.length,
+        0
+      );
+
+      setStats({
+        totalProducts: totalProducts,
+        totalViews: 0, // Not available yet
+        totalSales: 0, // Not available yet
+      });
     } catch (err) {
       console.error("dashboard fetch error", err);
+      toast.error("Failed to fetch dashboard data");
     } finally {
       setLoading(false);
     }
@@ -64,7 +61,7 @@ export default function VendorDashboard() {
           navigate("/");
           return;
         }
-        await fetchDashboard(me);
+        await fetchDashboard();
       } catch (err) {
         // handled above
       }
@@ -72,45 +69,31 @@ export default function VendorDashboard() {
     return () => (mounted = false);
   }, [fetchMe, fetchDashboard, navigate]);
 
-  const handleOpenModal = () => setIsModalOpen(true);
-  const handleCloseModal = () => setIsModalOpen(false);
+  const handleDeletePost = async (postId) => {
+    if (!window.confirm("Are you sure you want to delete this entire post?")) {
+      return;
+    }
 
-  const handleAddProduct = async (formData) => {
-    // optimistic UI: create temporary product and prepend
-    const tempId = `temp-${Date.now()}`;
-    const tempProduct = {
-      productId: tempId,
-      name: formData.name,
-      price: formData.price,
-      category: formData.category,
-      condition: formData.condition,
-      location: formData.location,
-      visibility: formData.visibility ?? true,
-      thumbnail:
-        formData.images && formData.images.length > 0
-          ? URL.createObjectURL(formData.images[0])
-          : undefined,
-      createdAt: new Date().toISOString(),
-    };
+    // Optimistic update
+    const previousPosts = [...posts];
+    setPosts(posts.filter((p) => p._id !== postId));
 
-    setProducts((p) => [tempProduct, ...p]);
-    handleCloseModal();
     try {
-      const id = vendorId;
-      const res = await api.post(`/api/vendors/${id}/products`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      const created = res.data?.data || res.data || res;
-      // replace temp product with actual
-      setProducts((p) =>
-        p.map((it) => (it.productId === tempId ? created : it))
+      await api.delete(`/api/v1/posts/${postId}`);
+      toast.success("Post deleted successfully");
+
+      // Update stats after deletion
+      const updatedPosts = posts.filter((p) => p._id !== postId);
+      const totalProducts = updatedPosts.reduce(
+        (acc, post) => acc + post.products.length,
+        0
       );
-      toast.success("Product added");
+      setStats((prev) => ({ ...prev, totalProducts }));
     } catch (err) {
-      // revert optimistic update
-      setProducts((p) => p.filter((it) => it.productId !== tempId));
-      console.error(err);
-      toast.error(err?.response?.data?.message || "Failed to add product");
+      // Revert on failure
+      setPosts(previousPosts);
+      console.error("Delete post error", err);
+      toast.error(err?.response?.data?.message || "Failed to delete post");
     }
   };
 
@@ -122,7 +105,7 @@ export default function VendorDashboard() {
             <img src="/logo192.png" alt="Vendora" className="w-8 h-8" />
             <div>
               <h1 className="text-xl font-semibold">Dashboard</h1>
-              <p className="text-sm text-gray-500">My Products</p>
+              <p className="text-sm text-gray-500">My Posts</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -143,55 +126,12 @@ export default function VendorDashboard() {
         <StatsCards stats={stats} loading={loading} />
 
         <div className="mt-6">
-          <ProductList
-            products={products}
+          <PostList
+            posts={posts}
             loading={loading}
-            onEdit={() => toast("Edit not implemented yet")}
-            onDelete={(id) => {
-              setProducts((p) => p.filter((x) => x.productId !== id));
-              toast.success("Product deleted (optimistic)");
-              // you should call DELETE API here
-            }}
-            onToggleVisibility={async (id, visible) => {
-              // optimistic toggle
-              setProducts((p) =>
-                p.map((it) =>
-                  it.productId === id ? { ...it, visibility: visible } : it
-                )
-              );
-              try {
-                await api.patch(
-                  `/api/vendors/${vendorId}/products/${id}/visibility`,
-                  { visibility: visible }
-                );
-                toast.success("Visibility updated");
-              } catch (err) {
-                // revert
-                setProducts((p) =>
-                  p.map((it) =>
-                    it.productId === id ? { ...it, visibility: !visible } : it
-                  )
-                );
-                toast.error("Failed to update visibility");
-              }
-            }}
+            onDelete={handleDeletePost}
           />
         </div>
-
-        {/* FAB */}
-        <button
-          onClick={handleOpenModal}
-          aria-label="Add product"
-          className="fixed bottom-6 right-6 w-14 h-14 md:w-16 md:h-16 rounded-full bg-[#F97316] text-white shadow-lg flex items-center justify-center"
-        >
-          <Plus size={20} aria-hidden="true" />
-        </button>
-
-        <AddProductModal
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-          onAdd={handleAddProduct}
-        />
       </div>
     </div>
   );

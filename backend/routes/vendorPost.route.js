@@ -16,6 +16,10 @@ const router = express.Router();
 
 // Public Routes
 router.get("/feed", getFeedPosts);
+
+// Protected Routes (Specific routes must come before dynamic routes like /:postId)
+router.get("/my-posts", protectRoute, verifyRole("vendor"), getMyPosts);
+
 router.get("/:postId", getPostById);
 
 // Protected Routes (Vendor Only)
@@ -26,7 +30,6 @@ router.post("/upload", verifyRole("vendor"), uploadMiddleware, uploadImages);
 
 // Post Management Routes
 router.post("/", verifyRole("vendor"), createPost);
-router.get("/my-posts", verifyRole("vendor"), getMyPosts);
 router.delete("/:postId", verifyRole("vendor"), deletePost);
 
 module.exports = router;

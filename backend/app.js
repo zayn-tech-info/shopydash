@@ -10,7 +10,7 @@ const authRouter = require("./routes/auth.route");
 const vendorProfile = require("./routes/vendorProfle.route");
 const clientProfile = require("./routes/clientProfile.route");
 const profile = require("./routes/profile.route");
-const vendorPostRouter = require("./routes/vendorPost.route");
+const vendorPost = require("./routes/vendorPost.route");
 
 connectDB();
 const app = express();
@@ -36,14 +36,10 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/vendorProfile", vendorProfile);
 app.use("/api/v1/clientProfile", clientProfile);
 app.use("/api/v1/profile", profile);
-app.use("/api/v1/posts", vendorPostRouter);
+app.use("/api/v1/posts", vendorPost);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.all(/(.*)/, (req, res, next) => {
-  /*   res.status(404).json({
-    success: false,
-    message: `Could find ${req.originalUrl} on the server`,
-  }); */
   const err = new customError(`Could find ${req.originalUrl} on the server`);
   next(err);
 });

@@ -6,12 +6,15 @@ import { useClientProfileStore } from "../store/clientProfileStore";
 import VendorProfile from "./VendorProfile";
 import ClientProfile from "./ClientProfile";
 import { ClientProfileSkeleton } from "../components/skeletons/ClientProfileSkeleton";
+import { useAuthStore } from "../store/authStore";
+import { Navigate } from "react-router-dom";
 
 export default function ProfileDispatcher() {
   const { username } = useParams();
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState(null);
   const [error, setError] = useState(null);
+  const { authUser } = useAuthStore();
 
   useEffect(() => {
     const checkRole = async () => {
@@ -51,12 +54,24 @@ export default function ProfileDispatcher() {
 
   if (loading) return <ClientProfileSkeleton />;
 
-  if (error)
+  if (error) {
+    if (authUser && (authUser.username === username || !username)) {
+      return (
+        <Navigate
+          to={
+            authUser.role === "vendor"
+              ? "/create-vendor-profile"
+              : "/create-client-profile"
+          }
+        />
+      );
+    }
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <div className="text-primary-3 body-1">{error}</div>
       </div>
     );
+  }
 
   if (role === "vendor") return <VendorProfile />;
   if (role === "client") return <ClientProfile />;

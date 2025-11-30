@@ -39,12 +39,12 @@ export function BottomNav() {
           {navigation.map((nav) => {
             let to = nav.href === "/home" ? "/" : nav.href;
 
-            if (
-              authUser &&
-              authUser.role === "vendor" &&
-              nav.href === "/profile"
-            ) {
-              to = "/vendor/profile";
+            if (nav.href === "/profile") {
+              if (authUser && authUser.username) {
+                to = `/${authUser.username}`;
+              } else {
+                to = "/login";
+              }
             }
             const navResult = renderNav(nav.text, authUser?.role);
             if (navResult === null) return null;
