@@ -7,6 +7,7 @@ import { useClientProfileStore } from "../store/clientProfileStore";
 import { EditClientProfile } from "../components/client/EditClientProfile";
 import { LogOut } from "lucide-react";
 import { ClientAddress } from "../components/client/ClientAddress";
+import { ClientProfileSkeleton } from "../components/skeletons/ClientProfileSkeleton";
 
 export function ClientProfile() {
   const authUser = useAuthStore((state) => state.authUser);
@@ -38,7 +39,6 @@ export function ClientProfile() {
       try {
         const usernameToFetch = params?.username || authUser?.username;
 
-  
         if (
           clientProfile &&
           clientProfile?.userId?.username === usernameToFetch
@@ -60,12 +60,7 @@ export function ClientProfile() {
     console.log(clientProfile);
   }, [clientProfile]);
 
-  if (loading)
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="text-n-4 body-1">Loading profile...</div>
-      </div>
-    );
+  if (loading) return <ClientProfileSkeleton />;
   if (error)
     return (
       <div className="flex items-center justify-center min-h-[50vh]">

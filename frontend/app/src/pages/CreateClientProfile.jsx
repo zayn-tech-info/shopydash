@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { Loader } from "../components/Loader";
 import { useClientProfileStore } from "../store/clientProfileStore";
 import { useAuthStore } from "../store/authStore";
 import { InputField } from "../components/InputField";
@@ -79,7 +78,6 @@ export default function CreateClientProfile() {
             <h2 className="text-xl font-bold text-n-8 border-b border-n-3 pb-2">
               Basic information
             </h2>
- 
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>

@@ -1,5 +1,6 @@
 import React from "react";
 import { ProductCard } from "./ProductCard";
+import { ProductListSkeleton } from "../skeletons/ProductListSkeleton";
 
 export function ProductList({
   products,
@@ -9,17 +10,7 @@ export function ProductList({
   onToggleVisibility,
 }) {
   if (loading) {
-    // show skeleton grid
-    return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div
-            key={i}
-            className="bg-white rounded-lg p-4 shadow-sm animate-pulse h-64"
-          />
-        ))}
-      </div>
-    );
+    return <ProductListSkeleton />;
   }
 
   if (!products || products.length === 0) {

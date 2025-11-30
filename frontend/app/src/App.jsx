@@ -11,7 +11,7 @@ import { Signup } from "./pages/Signup";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/authStore";
 import { BottomNav } from "./components/BottomNav";
-import { Loader } from "./components/Loader";
+import { AppSkeleton } from "./components/skeletons/AppSkeleton";
 import CreateVendorProfile from "./pages/CreateVendorProfile";
 import ClientProfile from "./pages/ClientProfile";
 import CreateClientProfile from "./pages/CreateClientProfile";
@@ -33,7 +33,7 @@ const App = () => {
   }, [location.pathname]);
 
   if (isCheckingAuth) {
-    return <Loader children="loading" />;
+    return <AppSkeleton />;
   }
 
   return (

@@ -5,7 +5,7 @@ import { useVendorProfileStore } from "../store/vendorProfileStore";
 import { useClientProfileStore } from "../store/clientProfileStore";
 import VendorProfile from "./VendorProfile";
 import ClientProfile from "./ClientProfile";
-import { Loader } from "../components/Loader";
+import { ClientProfileSkeleton } from "../components/skeletons/ClientProfileSkeleton";
 
 export default function ProfileDispatcher() {
   const { username } = useParams();
@@ -49,7 +49,7 @@ export default function ProfileDispatcher() {
     }
   }, [username]);
 
-  if (loading) return <Loader>Loading profile...</Loader>;
+  if (loading) return <ClientProfileSkeleton />;
 
   if (error)
     return (

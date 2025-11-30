@@ -5,11 +5,11 @@ import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { Edit, Link2, LogOut } from "lucide-react";
 import { useVendorProfileStore } from "../store/vendorProfileStore";
 import { useAuthStore } from "../store/authStore";
-import { Loader } from "../components/Loader";
 import { EditVendorProfile } from "../components/vendor/EditVendorProfile";
 import VendorSidebar from "../components/vendor/VendorSidebar";
 import AboutAndProducts from "../components/vendor/AboutAndProducts";
 import { VendorAddress } from "../components/vendor/VendorAddress";
+import { VendorProfileSkeleton } from "../components/skeletons/VendorProfileSkeleton";
 
 const normaliseDate = (date) => {
   try {
@@ -83,7 +83,7 @@ export default function VendorProfile() {
     }
   };
 
-  if (isGettingVendorProfile) return <Loader>Loading profile</Loader>;
+  if (isGettingVendorProfile) return <VendorProfileSkeleton />;
 
   return (
     <main className="py-8 bg-n-1 min-h-[80vh]">
