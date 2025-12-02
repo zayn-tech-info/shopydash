@@ -78,7 +78,7 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
   const posts = await VendorPost.find(query)
     .populate(
       "vendorId",
-      "businessName fullName whatsAppNumber phoneNumber username profilePic"
+      "businessName fullName whatsAppNumber phoneNumber username profilePic logo"
     )
     .sort({ createdAt: -1 })
     .skip((page - 1) * limit)

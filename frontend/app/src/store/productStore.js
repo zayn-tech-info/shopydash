@@ -9,6 +9,21 @@ export const useProductStore = create((set, get) => ({
   posts: [],
   isFetchingPosts: false,
 
+  feedPosts: [],
+  isFetchingFeedPosts: false,
+
+  getFeedPosts: async (params = {}) => {
+    set({ isFetchingFeedPosts: true });
+    try {
+      const res = await api.get("/api/v1/post/feed", { params });
+      set({ feedPosts: res.data.data.posts, isFetchingFeedPosts: false });
+    } catch (error) {
+      set({ isFetchingFeedPosts: false });
+      console.error(error);
+      // toast.error(error.response?.data?.message || "Failed to fetch feed");
+    }
+  },
+
   getMyPosts: async () => {
     set({ isFetchingPosts: true });
     try {
@@ -58,7 +73,7 @@ export const useProductStore = create((set, get) => ({
   },
 
   updatePost: async (id, postData) => {
-    set({ isCreatingPost: true }); 
+    set({ isCreatingPost: true });
     try {
       const res = await api.patch(`/api/v1/post/${id}`, postData);
       set({ isCreatingPost: false });

@@ -16,7 +16,36 @@ import "swiper/css/navigation";
 import { VendorsPost } from "../constants";
 
 export function NearByVendors({ posts }) {
-  const data = Array.isArray(posts) && posts.length > 0 ? posts : VendorsPost;
+  const rawPosts = posts || [];
+
+  // Map backend data to component format if it looks like backend data
+  const data = rawPosts.map((post) => {
+    // Check if it's backend data (has _id and vendorId object)
+    if (post._id && post.vendorId && typeof post.vendorId === "object") {
+      return {
+        id: post._id,
+        vendorName:
+          post.vendorId.businessName || post.vendorId.username || "Vendor",
+        vendorAvatar: post.vendorId.logo || post.vendorId.profilePic,
+        location: post.location,
+        postedAt: new Date(post.createdAt).toLocaleDateString(), // Simple formatting
+        caption: post.caption,
+        products: (post.products || []).map((p) => ({
+          id: p._id,
+          name: p.title,
+          image: p.image,
+          price: p.price,
+          rating: 5.0, // Default rating as it's not in product schema yet
+          description: p.description,
+        })),
+      };
+    }
+    return post;
+  });
+
+  // If no posts passed, fall back to dummy data ONLY if posts prop was undefined/null
+  // If posts is [], we should probably show empty state, but for now let's keep existing behavior or just show empty
+  const displayData = posts ? data : VendorsPost;
 
   const vendorSlug = (name = "") =>
     name
@@ -57,7 +86,7 @@ export function NearByVendors({ posts }) {
       </header>
 
       <div className="space-y-8">
-        {data.map((post, postIndex) => (
+        {displayData.map((post, postIndex) => (
           <article
             key={`${post.id ?? `post-${postIndex}`}`}
             className="bg-white border border-n-3/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
@@ -236,7 +265,7 @@ export function NearByVendors({ posts }) {
         ))}
       </div>
 
-      {data.length === 0 && (
+      {displayData.length === 0 && (
         <div className="mt-12 text-center">
           <p className="body-2 text-n-4">No nearby vendors found yet.</p>
         </div>
