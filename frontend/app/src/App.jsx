@@ -21,6 +21,7 @@ import CompleteRegistration from "./pages/CompleteRegistration";
 import ProfileDispatcher from "./pages/ProfileDispatcher";
 import VendorProductUpload from "./pages/VendorProductUpload";
 import { VendorFloatingButton } from "./components/VendorFloatingButton";
+import Feeds from "./pages/Feeds";
 
 const App = () => {
   const { checkAuth, authUser, isCheckingAuth } = useAuthStore();
@@ -109,6 +110,7 @@ const App = () => {
           />
           <Route path="/dashboard" element={<VendorDashboard />} />
           <Route path="/vendor/add" element={<VendorProductUpload />} />
+          <Route path="/feeds" element={<Feeds />} />
           <Route path="/:username" element={<ProfileDispatcher />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

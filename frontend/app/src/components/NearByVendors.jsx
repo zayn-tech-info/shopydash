@@ -14,8 +14,9 @@ import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import { VendorsPost } from "../constants";
+import { Link } from "react-router-dom";
 
-export function NearByVendors({ posts }) {
+export function NearByVendors({ posts, showHeader = true }) {
   const rawPosts = posts || [];
 
   // Map backend data to component format if it looks like backend data
@@ -74,16 +75,21 @@ export function NearByVendors({ posts }) {
 
   return (
     <section className="container mx-auto max-w-7xl px-4 md:px-8 mt-12">
-      <header className="flex items-center justify-between mb-6">
-        <h2 className="h4 text-n-8">Nearby vendors</h2>
-        <button
-          type="button"
-          className="font-code text-xs font-bold uppercase tracking-wider text-primary-3 hover:text-primary-4 transition-colors"
-          aria-label="See all nearby vendors"
-        >
-          See all
-        </button>
-      </header>
+      {showHeader && (
+        <header className="flex items-center justify-between mb-6">
+          <h2 className="h4 text-n-8">Nearby vendors</h2>
+          <Link to="/feeds">
+       
+            <button
+              type="button"
+              className="font-code text-xs font-bold uppercase tracking-wider text-primary-3 hover:text-primary-4 transition-colors"
+              aria-label="See all nearby vendors"
+            >
+              See all
+            </button>
+          </Link>
+        </header>
+      )}
 
       <div className="space-y-8">
         {displayData.map((post, postIndex) => (
