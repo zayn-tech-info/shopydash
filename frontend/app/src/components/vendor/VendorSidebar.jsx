@@ -12,8 +12,8 @@ export default function VendorSidebar({
   const username =
     vendorProfile?.storeUsername || vendorProfile?.userId?.username || "vendor";
   const profileImage =
-    vendorProfile?.userId?.logo ||
     vendorProfile?.userId?.profilePic ||
+    vendorProfile?.userId?.logo ||
     authUser?.profilePic ||
     Logo;
 

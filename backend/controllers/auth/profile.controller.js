@@ -4,6 +4,7 @@ const customError = require("../../errors/customError");
 const User = require("../../models/auth.model");
 
 const vendorProfileSchema = require("../../models/vendorProfile.model");
+const VendorPost = require("../../models/vendorProduct");
 
 const getProfile = asyncErrorHandler(async (req, res, next) => {
   const { username } = req.params;
@@ -24,7 +25,21 @@ const getProfile = asyncErrorHandler(async (req, res, next) => {
       .populate(
         "userId",
         "businessName username email phoneNumber whatsAppNumber schoolName logo isVerified"
-      );
+      )
+      .lean();
+
+    if (profile) {
+      const posts = await VendorPost.find({ vendorId: user._id })
+        .sort({ createdAt: -1 })
+        .lean();
+
+      const allProducts = posts.reduce((acc, post) => {
+        return acc.concat(post.products || []);
+      }, []);
+
+      profile.products = allProducts;
+    }
+
     profileKey = "vendorProfile";
   } else {
     profile = await clientProfileSchema

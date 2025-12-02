@@ -68,15 +68,18 @@ export default function AboutAndProducts({ vendor }) {
         )}
 
         {tab === "products" && (
-          <div className="space-y-4 animate-in fade-in duration-500">
-            {products.length === 0 && (
+          <div className="animate-in fade-in duration-500">
+            {products.length === 0 ? (
               <div className="text-center py-12">
                 <div className="text-n-4 body-2">No products uploaded yet.</div>
               </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                {products.map((p) => (
+                  <VendorProductItem key={p._id || p} product={p} />
+                ))}
+              </div>
             )}
-            {products.map((p) => (
-              <VendorProductItem key={p._id || p} product={p} />
-            ))}
           </div>
         )}
       </div>
