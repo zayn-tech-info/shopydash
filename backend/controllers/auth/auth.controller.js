@@ -1,10 +1,10 @@
-const asyncErrorHandler = require("../errors/asyncErrorHandle");
-const User = require("../models/auth.model");
-const ClientProfile = require("../models/clientProfile.model");
-const VendorProfile = require("../models/vendorProfile.model");
-const sendToken = require("../utils/sendToken");
+const asyncErrorHandler = require("../../errors/asyncErrorHandle");
+const User = require("../../models/auth.model");
+const ClientProfile = require("../../models/clientProfile.model");
+const VendorProfile = require("../../models/vendorProfile.model");
+const sendToken = require("../../utils/sendToken");
 const validator = require("validator");
-const customError = require("../errors/customError");
+const customError = require("../../errors/customError");
 
 const googleAuth = asyncErrorHandler(async (req, res, next) => {
   const { token } = req.body;

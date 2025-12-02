@@ -1,7 +1,8 @@
-const asyncErrorHandler = require("../errors/asyncErrorHandle");
-const customError = require("../errors/customError");
-const VendorPost = require("../models/vendorProduct");
-const VendorProfile = require("../models/vendorProfile.model");
+const asyncErrorHandler = require("../../errors/asyncErrorHandle");
+const customError = require("../../errors/customError");
+const VendorPost = require("../../models/vendorProduct");
+const VendorProfile = require("../../models/vendorProfile.model");
+const User = require("../../models/auth.model");
 
 const createPost = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user._id;
@@ -20,9 +21,13 @@ const createPost = asyncErrorHandler(async (req, res, next) => {
     return next(
       new customError("You must upload at least 4 products per post.", 400)
     );
+  } else if (!products.length > 6) {
+    return next(
+      new customError("You must upload at least 4 products per post.", 400)
+    );
   }
 
-  const user = await require("../models/auth.model").findById(userId);
+  const user = await User.findById(userId);
 
   const newPost = await VendorPost.create({
     vendorId: userId,
@@ -116,6 +121,12 @@ const deletePost = asyncErrorHandler(async (req, res, next) => {
   const { postId } = req.params;
   const userId = req.user._id;
 
+  const vendor = await VendorProfile.findOne({ userId });
+  if (!vendor) {
+    const error = new customError("Vendor not found", 404);
+    return next(error);
+  }
+
   const post = await VendorPost.findById(postId);
 
   if (!post) {
@@ -136,10 +147,49 @@ const deletePost = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
+const updatePost = asyncErrorHandler(async (req, res, next) => {
+  const { postId } = req.params;
+  const userId = req.user._id;
+  const { caption, products, location } = req.body;
+
+  const post = await VendorPost.findById(postId);
+
+  if (!post) {
+    return next(new customError("Post not found", 404));
+  }
+
+  if (post.vendorId.toString() !== userId.toString()) {
+    return next(
+      new customError("You are not authorized to update this post", 403)
+    );
+  }
+
+  if (products && products.length < 4) {
+    return next(
+      new customError("You must have at least 4 products in a post.", 400)
+    );
+  }
+
+  post.caption = caption || post.caption;
+  post.location = location || post.location;
+  if (products) {
+    post.products = products;
+  }
+
+  await post.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Post updated successfully",
+    data: { post },
+  });
+});
+
 module.exports = {
   createPost,
   getMyPosts,
   getFeedPosts,
   getPostById,
   deletePost,
+  updatePost,
 };

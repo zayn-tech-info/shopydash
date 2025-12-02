@@ -3,7 +3,7 @@ const { protectRoute, verifyRole } = require("../middleware/auth.middleware");
 const {
   createClientProfile,
   updateClientProfile,
-} = require("../controllers/clientProfile.controller");
+} = require("../controllers/client/clientProfile.controller");
 
 const router = express.Router();
 

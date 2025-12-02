@@ -1,9 +1,9 @@
-const clientProfileSchema = require("../models/clientProfile.model");
-const asyncErrorHandler = require("../errors/asyncErrorHandle");
-const customError = require("../errors/customError");
-const User = require("../models/auth.model");
+const clientProfileSchema = require("../../models/clientProfile.model");
+const asyncErrorHandler = require("../../errors/asyncErrorHandle");
+const customError = require("../../errors/customError");
+const User = require("../../models/auth.model");
 
-const vendorProfileSchema = require("../models/vendorProfile.model");
+const vendorProfileSchema = require("../../models/vendorProfile.model");
 
 const getProfile = asyncErrorHandler(async (req, res, next) => {
   const { username } = req.params;

@@ -4,13 +4,15 @@ import { api } from "../lib/axios";
 import { StatsCards } from "../components/dashboard/StatsCards";
 import { PostList } from "../components/dashboard/PostList";
 import { toast } from "react-hot-toast";
+import { LayoutDashboard } from "lucide-react";
+
+import { useProductStore } from "../store/productStore";
 
 export default function VendorDashboard() {
   const navigate = useNavigate();
+  const { posts, getMyPosts, deletePost, isFetchingPosts } = useProductStore();
   const [user, setUser] = useState(null);
   const [stats, setStats] = useState(null);
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   const fetchMe = useCallback(async () => {
     try {
@@ -26,13 +28,9 @@ export default function VendorDashboard() {
     }
   }, [navigate]);
 
-  const fetchDashboard = useCallback(async () => {
-    try {
-      const res = await api.get("/api/v1/posts/my-posts");
-      const fetchedPosts = res.data.data.posts || [];
-
-      setPosts(fetchedPosts);
-      const totalProducts = fetchedPosts.reduce(
+  useEffect(() => {
+    if (posts) {
+      const totalProducts = posts.reduce(
         (acc, post) => acc + post.products.length,
         0
       );
@@ -42,13 +40,8 @@ export default function VendorDashboard() {
         totalViews: 0, // Not available yet
         totalSales: 0, // Not available yet
       });
-    } catch (err) {
-      console.error("dashboard fetch error", err);
-      toast.error("Failed to fetch dashboard data");
-    } finally {
-      setLoading(false);
     }
-  }, []);
+  }, [posts]);
 
   useEffect(() => {
     let mounted = true;
@@ -61,40 +54,19 @@ export default function VendorDashboard() {
           navigate("/");
           return;
         }
-        await fetchDashboard();
+        await getMyPosts();
       } catch (err) {
         // handled above
       }
     })();
     return () => (mounted = false);
-  }, [fetchMe, fetchDashboard, navigate]);
+  }, [fetchMe, getMyPosts, navigate]);
 
   const handleDeletePost = async (postId) => {
     if (!window.confirm("Are you sure you want to delete this entire post?")) {
       return;
     }
-
-    // Optimistic update
-    const previousPosts = [...posts];
-    setPosts(posts.filter((p) => p._id !== postId));
-
-    try {
-      await api.delete(`/api/v1/posts/${postId}`);
-      toast.success("Post deleted successfully");
-
-      // Update stats after deletion
-      const updatedPosts = posts.filter((p) => p._id !== postId);
-      const totalProducts = updatedPosts.reduce(
-        (acc, post) => acc + post.products.length,
-        0
-      );
-      setStats((prev) => ({ ...prev, totalProducts }));
-    } catch (err) {
-      // Revert on failure
-      setPosts(previousPosts);
-      console.error("Delete post error", err);
-      toast.error(err?.response?.data?.message || "Failed to delete post");
-    }
+    await deletePost(postId);
   };
 
   return (
@@ -102,10 +74,9 @@ export default function VendorDashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <header className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
-            <img src="/logo192.png" alt="Vendora" className="w-8 h-8" />
+            <LayoutDashboard />
             <div>
               <h1 className="text-xl font-semibold">Dashboard</h1>
-              <p className="text-sm text-gray-500">My Posts</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -123,12 +94,12 @@ export default function VendorDashboard() {
           </div>
         </header>
 
-        <StatsCards stats={stats} loading={loading} />
+        <StatsCards stats={stats} loading={isFetchingPosts} />
 
         <div className="mt-6">
           <PostList
             posts={posts}
-            loading={loading}
+            loading={isFetchingPosts}
             onDelete={handleDeletePost}
           />
         </div>

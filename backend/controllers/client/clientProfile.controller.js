@@ -1,7 +1,7 @@
-const clientProfileSchema = require("../models/clientProfile.model");
-const asyncErrorHandler = require("../errors/asyncErrorHandle");
-const customError = require("../errors/customError");
-const User = require("../models/auth.model");
+const clientProfileSchema = require("../../models/clientProfile.model");
+const asyncErrorHandler = require("../../errors/asyncErrorHandle");
+const customError = require("../../errors/customError");
+const User = require("../../models/auth.model");
 
 const createClientProfile = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user && req.user._id;

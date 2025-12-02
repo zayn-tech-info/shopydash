@@ -36,7 +36,7 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/vendorProfile", vendorProfile);
 app.use("/api/v1/clientProfile", clientProfile);
 app.use("/api/v1/profile", profile);
-app.use("/api/v1/posts", vendorPost);
+app.use("/api/v1/post", vendorPost);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.all(/(.*)/, (req, res, next) => {

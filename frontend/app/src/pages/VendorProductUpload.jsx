@@ -1,31 +1,46 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useProductStore } from "../store/productStore";
 import { Plus, Loader } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { PostDetails } from "../components/vendor/PostDetails";
 import { ProductItem } from "../components/vendor/ProductItem";
 import toast from "react-hot-toast";
 
 const VendorProductUpload = () => {
   const navigate = useNavigate();
-  const { createPost, uploadImages, isCreatingPost, isUploading } =
+  const location = useLocation();
+  const editingPost = location.state?.post;
+
+  const { createPost, updatePost, uploadImages, isCreatingPost, isUploading } =
     useProductStore();
 
-  const [caption, setCaption] = useState("");
-  const [location, setLocation] = useState("");
-  const [products, setProducts] = useState([
-    {
-      id: 1,
-      title: "",
-      price: "",
-      description: "",
-      category: "",
-      condition: "New",
-      stock: 1,
+  const [caption, setCaption] = useState(editingPost?.caption || "");
+  const [postLocation, setPostLocation] = useState(editingPost?.location || "");
+  const [products, setProducts] = useState(
+    editingPost?.products.map((p) => ({
+      id: p._id || Date.now() + Math.random(),
+      title: p.title,
+      price: p.price,
+      description: p.description,
+      category: p.category,
+      condition: p.condition,
+      stock: p.stock,
       imageFile: null,
-      previewUrl: null,
-    },
-  ]);
+      previewUrl: p.image,
+    })) || [
+      {
+        id: 1,
+        title: "",
+        price: "",
+        description: "",
+        category: "",
+        condition: "New",
+        stock: 1,
+        imageFile: null,
+        previewUrl: null,
+      },
+    ]
+  );
 
   const addProduct = () => {
     setProducts([
@@ -81,7 +96,7 @@ const VendorProductUpload = () => {
         toast.error(`Product #${index}: Description is required`);
         return;
       }
-      if (!p.imageFile) {
+      if (!p.imageFile && !p.previewUrl) {
         toast.error(`Product #${index}: Image is required`);
         return;
       }
@@ -90,7 +105,11 @@ const VendorProductUpload = () => {
     try {
       const processedProducts = await Promise.all(
         products.map(async (p) => {
-          const imageUrls = await uploadImages([p.imageFile]);
+          let imageUrl = p.previewUrl;
+          if (p.imageFile) {
+            const imageUrls = await uploadImages([p.imageFile]);
+            imageUrl = imageUrls[0];
+          }
           return {
             title: p.title,
             price: Number(p.price),
@@ -98,16 +117,22 @@ const VendorProductUpload = () => {
             category: p.category,
             condition: p.condition,
             stock: Number(p.stock),
-            image: imageUrls[0],
+            image: imageUrl,
           };
         })
       );
 
-      await createPost({
+      const postData = {
         caption,
-        location,
+        location: postLocation,
         products: processedProducts,
-      });
+      };
+
+      if (editingPost) {
+        await updatePost(editingPost._id, postData);
+      } else {
+        await createPost(postData);
+      }
 
       navigate("/dashboard");
     } catch (error) {
@@ -119,10 +144,14 @@ const VendorProductUpload = () => {
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">New Post</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            {editingPost ? "Edit Post" : "New Post"}
+          </h1>
           <p className="mt-2 text-gray-600">
-            Share your latest products with the community. You must add at least
-            4 products.
+            {editingPost
+              ? "Update your post details."
+              : "Share your latest products with the community."}{" "}
+            You must add at least 4 products.
           </p>
         </div>
 
@@ -130,8 +159,8 @@ const VendorProductUpload = () => {
           <PostDetails
             caption={caption}
             setCaption={setCaption}
-            location={location}
-            setLocation={setLocation}
+            location={postLocation}
+            setLocation={setPostLocation}
           />
 
           <div className="space-y-6">
@@ -167,6 +196,8 @@ const VendorProductUpload = () => {
                   <Loader className="animate-spin" size={20} />
                   Processing...
                 </>
+              ) : editingPost ? (
+                "Update Post"
               ) : (
                 "Post Products"
               )}

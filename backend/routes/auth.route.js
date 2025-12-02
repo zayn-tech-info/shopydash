@@ -6,7 +6,7 @@ const {
   logout,
   googleAuth,
   completeRegistration,
-} = require("../controllers/auth.controller");
+} = require("../controllers/auth/auth.controller");
 const { protectRoute } = require("../middleware/auth.middleware");
 
 const route = express.Router();

@@ -4,7 +4,7 @@ const {
   // getVendorProfile,
   getPublicVendorProfile,
   updateVendorProfile,
-} = require("../controllers/vendorProfile.controller");
+} = require("../controllers/vendor/vendorProfile.controller");
 const { protectRoute, verifyRole } = require("../middleware/auth.middleware");
 
 const route = express.Router();

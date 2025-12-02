@@ -1,6 +1,6 @@
-const asyncErrorHandler = require("../errors/asyncErrorHandle");
-const customError = require("../errors/customError");
-const vendorProfileModel = require("../models/vendorProfile.model");
+const asyncErrorHandler = require("../../errors/asyncErrorHandle");
+const customError = require("../../errors/customError");
+const vendorProfileModel = require("../../models/vendorProfile.model");
 
 const createVendorProfile = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user && req.user._id;

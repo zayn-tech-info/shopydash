@@ -1,7 +1,7 @@
 const cloudinary = require("cloudinary").v2;
 const multer = require("multer");
-const asyncErrorHandler = require("../errors/asyncErrorHandle");
-const customError = require("../errors/customError");
+const asyncErrorHandler = require("../../errors/asyncErrorHandle");
+const customError = require("../../errors/customError");
 const fs = require("fs");
 
  
