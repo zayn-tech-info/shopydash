@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { api } from "../lib/axios";
-import { useAuthStore } from "./authStore";
 
 const initialProfileData = {
   storeDescription: "",
@@ -124,25 +123,18 @@ export const useVendorProfileStore = create((set, get) => ({
       const profile = payload?.vendorProfile ?? payload;
 
       set({ vendorProfile: profile });
-      const authUser = useAuthStore.getState().authUser;
-      if (authUser && profile?.userId?._id === authUser._id) {
-        useAuthStore.getState().updateUser(profile.userId);
-      }
 
       set({ isUpdatingVendorProfile: false, error: null });
-
-      console.log("Updated Vendor Profile:", profile);
 
       return profile;
     } catch (err) {
       const serverMessage =
-        err?.response?.data?.message ??
-        err?.response?.data ??
-        err?.message ??
+        err?.response?.data?.message ||
+        (typeof err?.response?.data === "string" ? err.response.data : null) ||
+        err?.message ||
         "An unknown error occurred";
-      console.error("update vendor profile error:", err);
+      console.error("Update vendor profile error:", err);
       set({ error: serverMessage, isUpdatingVendorProfile: false });
-
       throw serverMessage;
     }
   },

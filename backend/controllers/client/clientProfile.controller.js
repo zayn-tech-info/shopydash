@@ -43,42 +43,34 @@ const updateClientProfile = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user && req.user._id;
 
   const clientProfile = await clientProfileSchema.findOne({ userId });
-  if (!clientProfile) {
-    const err = new customError("Profile not found", 404);
+  const { gender, address, city, state, country, preferredCategory, wishList } =
+    req.body;
+
+  const updates = {
+    gender,
+    address,
+    city,
+    state,
+    country,
+    preferredCategory,
+    wishList,
+  };
+
+  const updated = await clientProfileSchema.findOneAndUpdate(
+    { userId },
+    { $set: updates },
+    { new: true, runValidators: true, upsert: false }
+  );
+
+  if (!updated) {
+    const err = new customError("Client profile not found", 404);
     return next(err);
   }
 
-  const updates = { ...req.body };
-  delete updates.userId;
-  delete updates._id;
-  delete updates.fullName;
-  delete updates.username;
-  delete updates.phoneNumber;
-  delete updates.schoolName;
-  delete updates.profileImage;
-
-  if (req.file) {
-    const filePath = `${req.protocol}://${req.get("host")}/uploads/${
-      req.file.filename
-    }`;
-    await User.findByIdAndUpdate(userId, { profilePic: filePath });
-  }
-
-  const updatedClientProfile = await clientProfileSchema
-    .findOneAndUpdate(
-      { userId },
-      { $set: updates },
-      { new: true, runValidators: true, upsert: false }
-    )
-    .populate(
-      "userId",
-      "fullName username email phoneNumber schoolName profilePic"
-    );
-
   res.status(200).json({
-    success: true,
+    status: "success",
     data: {
-      updatedClientProfile,
+      clientProfile: updated,
     },
   });
 });

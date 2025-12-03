@@ -8,8 +8,6 @@ const {
 } = require("../controllers/vendor/vendorProfile.controller");
 const { protectRoute, verifyRole } = require("../middleware/auth.middleware");
 
-const upload = require("../middleware/upload.middleware");
-
 const route = express.Router();
 
 route.post(
@@ -29,7 +27,6 @@ route.patch(
   "/updateVendorProfile",
   protectRoute,
   verifyRole("vendor"),
-  upload.single("logo"),
   updateVendorProfile
 );
 

@@ -1,8 +1,6 @@
-import { Edit, Share2, Camera } from "lucide-react";
+import { Edit, Share2 } from "lucide-react";
 import Logo from "../../assets/images/clientPfp.png";
 import { useVendorProfileStore } from "../../store/vendorProfileStore";
-import { useRef } from "react";
-import toast from "react-hot-toast";
 
 export default function VendorSidebar({
   authUser,
@@ -13,82 +11,30 @@ export default function VendorSidebar({
   const updateVendorProfile = useVendorProfileStore(
     (state) => state.updateVendorProfile
   );
-  const fileInputRef = useRef(null);
-
   const businessName =
     vendorProfile?.userId?.businessName || authUser?.businessName || "Store";
   const username =
     vendorProfile?.storeUsername || vendorProfile?.userId?.username || "vendor";
   const profileImage =
+    authUser?.logo ||
+    authUser?.profilePic ||
     vendorProfile?.userId?.logo ||
     vendorProfile?.userId?.profilePic ||
-    authUser?.profilePic ||
     Logo;
 
-  const isOwner =
-    authUser && vendorProfile && authUser._id === vendorProfile.userId?._id;
-
-  const handleImageClick = () => {
-    if (isOwner) {
-      fileInputRef.current?.click();
-    }
-  };
-
-  const handleFileChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("File size should be less than 5MB");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("logo", file);
-
-    try {
-      await updateVendorProfile(formData);
-      toast.success("Profile picture updated successfully");
-    } catch (error) {
-      toast.error("Failed to update profile picture");
-    }
-  };
+  const isOwner = authUser?._id === vendorProfile?.userId?._id;
 
   return (
     <aside className="bg-white rounded-2xl p-6 border border-n-3/20 shadow-sm w-full relative">
       <div className="flex flex-col items-center">
-        <div
-          className={`w-32 h-32 rounded-full overflow-hidden border-4 border-n-1 shadow-sm mb-4 relative group ${
-            isOwner ? "cursor-pointer" : ""
-          }`}
-          onClick={handleImageClick}
-        >
+        <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-n-1 shadow-sm mb-4 relative group">
           <img
             src={profileImage}
             alt={businessName}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
-          {isOwner && (
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <Camera className="text-white" size={24} />
-            </div>
-          )}
-
-          {vendorProfile?.active && (
-            <div
-              className="absolute bottom-4 right-4 w-5 h-5 bg-green-500 border-4 border-white rounded-full z-20"
-              title="Active"
-            ></div>
-          )}
+          {vendorProfile?.active && <div></div>}
         </div>
-
-        <input
-          type="file"
-          ref={fileInputRef}
-          className="hidden"
-          accept="image/*"
-          onChange={handleFileChange}
-        />
 
         <button
           onClick={onCopy}

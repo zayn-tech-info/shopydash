@@ -126,43 +126,56 @@ const updateVendorProfile = asyncErrorHandler(async (req, res, next) => {
     return next(err);
   }
 
-  const updates = { ...req.body };
-  delete updates.userId;
-  delete updates._id;
-  delete updates.businessName;
-  delete updates.email;
-  delete updates.phoneNumber;
-  delete updates.whatsAppNumber;
-  delete updates.schoolName;
-  delete updates.profileImage;
+  const {
+    storeDescription,
+    businessCategory,
+    address,
+    city,
+    state,
+    country,
+    zipCode,
+    accountNumber,
+    paymentMethods,
+    instagram,
+    facebook,
+    twitter,
+    storeUsername,
+  } = req.body;
 
-  if (req.file) {
-    const filePath = `${req.protocol}://${req.get("host")}/uploads/${
-      req.file.filename
-    }`;
-    await User.findByIdAndUpdate(userId, { logo: filePath });
-  }
+  const updates = {
+    storeDescription,
+    businessCategory,
+    address,
+    city,
+    state,
+    country,
+    zipCode,
+    accountNumber,
+    paymentMethods,
+    socialLinks: {
+      instagram,
+      facebook,
+      twitter,
+    },
+    storeUsername,
+  };
 
-  const updated = await vendorProfileModel
-    .findOneAndUpdate(
-      { userId },
-      { $set: updates },
-      { new: true, runValidators: true, upsert: false }
-    )
-    .populate(
-      "userId",
-      "businessName email phoneNumber whatsAppNumber schoolName logo isVerified profilePic"
-    );
+  const updated = await vendorProfileModel.findOneAndUpdate(
+    { userId },
+    { $set: updates },
+    { new: true, runValidators: true, upsert: false }
+  );
 
   if (!updated) {
-    const err = new customError("Profile not found", 404);
+    const err = new customError("Vendor profile not found", 404);
     return next(err);
   }
 
   res.status(200).json({
-    success: true,
-    message: "Profile updated",
-    data: { vendorProfile: updated },
+    status: "success",
+    data: {
+      vendorProfile: updated,
+    },
   });
 });
 

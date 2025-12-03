@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { api } from "../lib/axios";
-import { useAuthStore } from "./authStore";
 
 const normalizeProfile = (incoming, previous = null) => {
   if (!incoming && !previous) return null;
@@ -32,6 +31,7 @@ const initialProfileData = {
   preferredCategory: "",
   wishList: [],
 };
+
 export const useClientProfileStore = create((set, get) => ({
   clientProfileData: { ...initialProfileData },
   updating: false,
@@ -118,7 +118,6 @@ export const useClientProfileStore = create((set, get) => ({
         };
       });
 
- 
       const authUser = useAuthStore.getState().authUser;
       if (authUser && profile?.userId?._id === authUser._id) {
         useAuthStore.getState().updateUser(profile.userId);
@@ -137,7 +136,6 @@ export const useClientProfileStore = create((set, get) => ({
       const serverMessage =
         error?.response?.data?.message ??
         error?.response?.data ??
-        error?.message ??
         "An unknown error occurred";
       console.error("update client profile error:", error);
       set({ error: serverMessage, updating: false });
