@@ -40,7 +40,9 @@ app.use("/api/v1/post", vendorPost);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.all(/(.*)/, (req, res, next) => {
-  const err = new customError(`Could find ${req.originalUrl} on the server`);
+  const err = new customError(
+    `Could not find ${req.originalUrl} on the server`
+  );
   next(err);
 });
 

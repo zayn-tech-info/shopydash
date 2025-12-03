@@ -14,38 +14,36 @@ import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import { VendorsPost } from "../constants";
-import { Link } from "react-router-dom";
+import { Link, Links } from "react-router-dom";
 
 export function NearByVendors({ posts, showHeader = true }) {
   const rawPosts = posts || [];
 
-  // Map backend data to component format if it looks like backend data
   const data = rawPosts.map((post) => {
-    // Check if it's backend data (has _id and vendorId object)
-    if (post._id && post.vendorId && typeof post.vendorId === "object") {
+    if (post._id && post.vendorId) {
       return {
         id: post._id,
         vendorName:
           post.vendorId.businessName || post.vendorId.username || "Vendor",
         vendorAvatar: post.vendorId.logo || post.vendorId.profilePic,
         location: post.location,
-        postedAt: new Date(post.createdAt).toLocaleDateString(), // Simple formatting
+        postedAt: new Date(post.createdAt).toLocaleDateString(),
+        createdAt: post.createdAt,
         caption: post.caption,
         products: (post.products || []).map((p) => ({
           id: p._id,
           name: p.title,
           image: p.image,
           price: p.price,
-          rating: 5.0, // Default rating as it's not in product schema yet
+          rating: 5.0,
           description: p.description,
         })),
+        vendorUsername: post.vendorId.username,
       };
     }
     return post;
   });
 
-  // If no posts passed, fall back to dummy data ONLY if posts prop was undefined/null
-  // If posts is [], we should probably show empty state, but for now let's keep existing behavior or just show empty
   const displayData = posts ? data : VendorsPost;
 
   const vendorSlug = (name = "") =>
@@ -73,13 +71,30 @@ export function NearByVendors({ posts, showHeader = true }) {
     toast.success(`Buying ${product.name}…`, { id: `buy-${product.id}` });
   }
 
+  function getPostTime(post) {
+    if (!post?.createdAt) return { hour: 0, minutes: 0, seconds: 0 };
+    const postTime = new Date(post.createdAt);
+    const datenow = Date.now();
+
+    const diff = datenow - postTime.getTime();
+
+    const seconds = Math.floor(diff / 1000);
+    const min = Math.floor(seconds / 60);
+    const hour = Math.floor(min / 60);
+
+    return {
+      hour,
+      minutes: min % 60,
+      seconds: seconds % 60,
+    };
+  }
+
   return (
     <section className="container mx-auto max-w-7xl px-4 md:px-8 mt-12">
       {showHeader && (
         <header className="flex items-center justify-between mb-6">
           <h2 className="h4 text-n-8">Nearby vendors</h2>
           <Link to="/feeds">
-       
             <button
               type="button"
               className="font-code text-xs font-bold uppercase tracking-wider text-primary-3 hover:text-primary-4 transition-colors"
@@ -95,9 +110,8 @@ export function NearByVendors({ posts, showHeader = true }) {
         {displayData.map((post, postIndex) => (
           <article
             key={`${post.id ?? `post-${postIndex}`}`}
-            className="bg-white border border-n-3/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+            className="bg-white border border-gray-200 rounded-2xl overflow-hidden"
           >
-            {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-n-3/10">
               <div className="flex items-center gap-4 min-w-0">
                 {post.vendorAvatar ? (
@@ -112,15 +126,32 @@ export function NearByVendors({ posts, showHeader = true }) {
                   </div>
                 )}
                 <div className="min-w-0">
-                  <p className="font-bold text-n-8 truncate">
-                    {post.vendorName}
-                  </p>
+                  <div className="flex gap-3">
+                    <p className="font-bold text-n-8 truncate">
+                      {post.vendorName}
+                    </p>
+                  </div>
                   <p className="text-xs text-n-4 flex items-center gap-2 mt-0.5">
                     <span className="inline-flex items-center gap-1">
                       <MapPin size={12} /> {post.location}
                     </span>
-                    <span className="w-1 h-1 rounded-full bg-n-3"></span>
-                    <span>{post.postedAt}</span>
+
+                    <span>
+                      {(() => {
+                        const { hour, minutes, seconds } = getPostTime(post);
+                        if (hour >= 24) {
+                          return <span>• 1day ago</span>;
+                        } else if (hour >= 48) {
+                          return <span>• 2day ago</span>;
+                        } else if (hour >= 48) {
+                          return <span>• {post.postedAt}</span>;
+                        } else if (hour > 0) {
+                          return <span>• {hour}h ago</span>;
+                        }
+                        if (minutes > 0) return <span>• {minutes}min ago</span>;
+                        return <span>• {seconds}s ago</span>;
+                      })()}
+                    </span>
                   </p>
                 </div>
               </div>
@@ -165,7 +196,7 @@ export function NearByVendors({ posts, showHeader = true }) {
                     key={`${post.id ?? postIndex}-${p.id ?? `p-${pIndex}`}`}
                     className="h-auto"
                   >
-                    <div className="group relative bg-white rounded-xl border border-n-3/10 overflow-hidden hover:shadow-lg transition-all duration-300 h-full">
+                    <div className="group relative bg-white rounded-xl border border-gray-200 overflow-hidden h-full">
                       <div className="relative aspect-[4/5] bg-n-2/10 overflow-hidden">
                         <img
                           src={p.image}
@@ -252,14 +283,17 @@ export function NearByVendors({ posts, showHeader = true }) {
               </button>
             </div>
 
-            {/* Footer */}
             <div className="px-6 py-4 bg-white border-t border-n-3/10 flex items-center justify-end gap-3">
-              <button
-                type="button"
-                className="h-10 px-4 rounded-xl border border-n-3/20 text-n-6 font-code text-xs font-bold uppercase tracking-wider hover:border-primary-3 hover:text-primary-3 transition-colors"
+              <Link
+                to={`/${post.vendorUsername || vendorSlug(post.vendorName)}`}
               >
-                View profile
-              </button>
+                <button
+                  type="button"
+                  className="h-10 px-4 rounded-xl border border-n-3/20 text-n-6 font-code text-xs font-bold uppercase tracking-wider hover:border-primary-3 hover:text-primary-3 transition-colors"
+                >
+                  View profile
+                </button>
+              </Link>
               <button
                 type="button"
                 className="h-10 px-4 rounded-xl bg-primary-3 text-white font-code text-xs font-bold uppercase tracking-wider hover:bg-primary-4 transition-colors shadow-md shadow-primary-3/20 flex items-center gap-2"

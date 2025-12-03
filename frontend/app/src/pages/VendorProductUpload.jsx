@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useProductStore } from "../store/productStore";
+import { useAuthStore } from "../store/authStore";
 import { Plus, Loader } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { PostDetails } from "../components/vendor/PostDetails";
@@ -10,6 +11,14 @@ const VendorProductUpload = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const editingPost = location.state?.post;
+  const { authUser } = useAuthStore();
+
+  useEffect(() => {
+    if (authUser && !authUser.hasProfile) {
+      toast("Please complete your vendor profile first", { icon: "📝" });
+      navigate("/create-vendor-profile");
+    }
+  }, [authUser, navigate]);
 
   const { createPost, updatePost, uploadImages, isCreatingPost, isUploading } =
     useProductStore();

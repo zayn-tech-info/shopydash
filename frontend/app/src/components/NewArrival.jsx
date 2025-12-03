@@ -63,7 +63,7 @@ export function NewArrival({ withinHours = 24, limit = 8 }) {
         {arrivals.map((item, idx) => (
           <article
             key={`${item.id}-${idx}`}
-            className="group bg-white rounded-2xl border border-n-3/10 overflow-hidden hover:shadow-xl hover:shadow-n-3/10 transition-all duration-300 hover:-translate-y-1"
+            className="group bg-white rounded-2xl border border-gray-200 overflow-hidden"
           >
             <div className="relative aspect-square bg-n-2/10 overflow-hidden">
               <span className="absolute left-3 top-3 z-10 inline-flex items-center rounded-lg bg-primary-3/90 backdrop-blur-sm px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-sm">

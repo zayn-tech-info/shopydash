@@ -1,6 +1,7 @@
 const asyncErrorHandler = require("../../errors/asyncErrorHandle");
 const customError = require("../../errors/customError");
 const vendorProfileModel = require("../../models/vendorProfile.model");
+const User = require("../../models/auth.model");
 
 const createVendorProfile = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user && req.user._id;
@@ -27,13 +28,25 @@ const createVendorProfile = asyncErrorHandler(async (req, res, next) => {
   } = req.body;
   const payload = { ...allowedData, userId };
 
-  const vendorProfile = await vendorProfileModel.create(payload);
+  try {
+    const vendorProfile = await vendorProfileModel.create(payload);
 
-  res.status(201).json({
-    success: true,
-    message: "Profile created successfully",
-    data: { vendorProfile },
-  });
+    res.status(201).json({
+      success: true,
+      message: "Profile created successfully",
+      data: { vendorProfile },
+    });
+  } catch (error) {
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern)[0];
+      const err = new customError(
+        `This ${field} is already associated with another vendor profile.`,
+        409
+      );
+      return next(err);
+    }
+    return next(error);
+  }
 });
 
 /* const getVendorProfile = asyncErrorHandler(async (req, res, next) => {
@@ -77,7 +90,7 @@ const getPublicVendorProfile = asyncErrorHandler(async (req, res, next) => {
     })
     .populate(
       "userId",
-      "businessName email phoneNumber whatsAppNumber schoolName logo isVerified"
+      "businessName email phoneNumber whatsAppNumber schoolName logo isVerified profilePic"
     );
 
   if (!vendorProfile) {
@@ -85,6 +98,25 @@ const getPublicVendorProfile = asyncErrorHandler(async (req, res, next) => {
     return next(error);
   }
   res.status(200).json({ success: true, data: { vendorProfile } });
+});
+
+const getAllVendorsProfile = asyncErrorHandler(async (req, res, next) => {
+  const vendors = await User.find({ role: "vendor" }).select(
+    "username profilePic businessName whatsAppNumber"
+  );
+
+  if (!vendors || vendors.length === 0) {
+    const error = new customError("No vendor found", 404);
+    return next(error);
+  }
+
+  res.status(200).json({
+    success: true,
+    count: vendors.length,
+    data: {
+      vendors,
+    },
+  });
 });
 
 const updateVendorProfile = asyncErrorHandler(async (req, res, next) => {
@@ -104,11 +136,23 @@ const updateVendorProfile = asyncErrorHandler(async (req, res, next) => {
   delete updates.schoolName;
   delete updates.profileImage;
 
-  const updated = await vendorProfileModel.findOneAndUpdate(
-    { userId },
-    { $set: updates },
-    { new: true, runValidators: true, upsert: false }
-  );
+  if (req.file) {
+    const filePath = `${req.protocol}://${req.get("host")}/uploads/${
+      req.file.filename
+    }`;
+    await User.findByIdAndUpdate(userId, { logo: filePath });
+  }
+
+  const updated = await vendorProfileModel
+    .findOneAndUpdate(
+      { userId },
+      { $set: updates },
+      { new: true, runValidators: true, upsert: false }
+    )
+    .populate(
+      "userId",
+      "businessName email phoneNumber whatsAppNumber schoolName logo isVerified profilePic"
+    );
 
   if (!updated) {
     const err = new customError("Profile not found", 404);
@@ -127,4 +171,5 @@ module.exports = {
   // getVendorProfile,
   getPublicVendorProfile,
   updateVendorProfile,
+  getAllVendorsProfile,
 };

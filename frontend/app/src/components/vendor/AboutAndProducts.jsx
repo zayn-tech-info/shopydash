@@ -2,24 +2,13 @@ import React, { useState } from "react";
 import VendorProductItem from "./VendorProductItem";
 
 export default function AboutAndProducts({ vendor }) {
-  const [tab, setTab] = useState("about");
+  const [tab, setTab] = useState("products");
 
   const products = vendor?.products || [];
 
   return (
     <section>
       <div className="flex items-center gap-8 mb-8 border-b border-n-3/10">
-        <button
-          onClick={() => setTab("about")}
-          className={`pb-4 text-sm font-bold uppercase tracking-wider transition-colors relative ${
-            tab === "about" ? "text-primary-3" : "text-n-4 hover:text-n-6"
-          }`}
-        >
-          About
-          {tab === "about" && (
-            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary-3 rounded-t-full" />
-          )}
-        </button>
         <button
           onClick={() => setTab("products")}
           className={`pb-4 text-sm font-bold uppercase tracking-wider transition-colors relative ${
@@ -28,6 +17,17 @@ export default function AboutAndProducts({ vendor }) {
         >
           Products
           {tab === "products" && (
+            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary-3 rounded-t-full" />
+          )}
+        </button>
+        <button
+          onClick={() => setTab("about")}
+          className={`pb-4 text-sm font-bold uppercase tracking-wider transition-colors relative ${
+            tab === "about" ? "text-primary-3" : "text-n-4 hover:text-n-6"
+          }`}
+        >
+          About
+          {tab === "about" && (
             <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary-3 rounded-t-full" />
           )}
         </button>

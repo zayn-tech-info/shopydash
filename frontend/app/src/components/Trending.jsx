@@ -51,7 +51,7 @@ export function Trending({ items, limit = 8, title = "Trending Now" }) {
         {data.map((p, idx) => (
           <div
             key={`${p.id ?? p.name}-${p.vendorName ?? ""}-${idx}`}
-            className="group relative bg-white rounded-2xl border border-n-3/10 overflow-hidden hover:shadow-xl hover:shadow-n-3/10 transition-all duration-300 hover:-translate-y-1"
+            className="group relative bg-white rounded-2xl border border-gray-200 overflow-hidden"
           >
             <div className="relative aspect-[4/5] bg-n-2/10 overflow-hidden">
               <img

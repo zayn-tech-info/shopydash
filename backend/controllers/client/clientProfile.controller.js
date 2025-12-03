@@ -57,11 +57,23 @@ const updateClientProfile = asyncErrorHandler(async (req, res, next) => {
   delete updates.schoolName;
   delete updates.profileImage;
 
-  const updatedClientProfile = await clientProfileSchema.findOneAndUpdate(
-    { userId },
-    { $set: updates },
-    { new: true, runValidators: true, upsert: false }
-  );
+  if (req.file) {
+    const filePath = `${req.protocol}://${req.get("host")}/uploads/${
+      req.file.filename
+    }`;
+    await User.findByIdAndUpdate(userId, { profilePic: filePath });
+  }
+
+  const updatedClientProfile = await clientProfileSchema
+    .findOneAndUpdate(
+      { userId },
+      { $set: updates },
+      { new: true, runValidators: true, upsert: false }
+    )
+    .populate(
+      "userId",
+      "fullName username email phoneNumber schoolName profilePic"
+    );
 
   res.status(200).json({
     success: true,

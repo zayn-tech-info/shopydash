@@ -5,6 +5,8 @@ const {
   updateClientProfile,
 } = require("../controllers/client/clientProfile.controller");
 
+const upload = require("../middleware/upload.middleware");
+
 const router = express.Router();
 
 router.post(
@@ -18,6 +20,7 @@ router.patch(
   "/updateClientProfile",
   protectRoute,
   verifyRole("client"),
+  upload.single("profilePic"),
   updateClientProfile
 );
 module.exports = router;

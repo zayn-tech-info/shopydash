@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { api } from "../lib/axios";
+import { useAuthStore } from "./authStore";
 
 const initialProfileData = {
   storeDescription: "",
@@ -25,6 +26,7 @@ export const useVendorProfileStore = create((set, get) => ({
   isUpdatingVendorProfile: false,
   isGettingVendorProfile: false,
   error: null,
+  vendors: null,
 
   setProfileField: (field, value) => {
     set((state) => ({ profileData: { ...state.profileData, [field]: value } }));
@@ -87,6 +89,28 @@ export const useVendorProfileStore = create((set, get) => ({
     }
   },
 
+  getAllVendorProfile: async () => {
+    set({ isGettingVendorProfile: true });
+    try {
+      const response = await api.get("/api/v1/vendorProfile/allvendors");
+      console.log("Vendors :", response);
+      const payload = response?.data?.data ?? response?.vendor ?? response;
+
+      const vendors = payload?.vendors ?? payload;
+      set({ vendors });
+      return vendors;
+    } catch (err) {
+      const serverMessage =
+        err?.response?.data?.message ??
+        err?.response?.data ??
+        err?.message ??
+        "An unknown error occurred";
+      console.error("Failed to get vendors:", err);
+      set({ error: serverMessage, isGettingVendorProfile: false });
+
+      throw serverMessage;
+    }
+  },
   updateVendorProfile: async (data) => {
     set({ isUpdatingVendorProfile: true, error: null });
     try {
@@ -99,13 +123,15 @@ export const useVendorProfileStore = create((set, get) => ({
 
       const profile = payload?.vendorProfile ?? payload;
 
-      try {
-        await get().getVendorProfile();
-      } catch (e) {
-        set({ vendorProfile: profile });
+      set({ vendorProfile: profile });
+      const authUser = useAuthStore.getState().authUser;
+      if (authUser && profile?.userId?._id === authUser._id) {
+        useAuthStore.getState().updateUser(profile.userId);
       }
 
       set({ isUpdatingVendorProfile: false, error: null });
+
+      console.log("Updated Vendor Profile:", profile);
 
       return profile;
     } catch (err) {

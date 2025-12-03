@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { api } from "../lib/axios";
+import { useAuthStore } from "./authStore";
 
 const normalizeProfile = (incoming, previous = null) => {
   if (!incoming && !previous) return null;
@@ -117,7 +118,12 @@ export const useClientProfileStore = create((set, get) => ({
         };
       });
 
-      // silently refresh from server to ensure latest data is reflected everywhere
+ 
+      const authUser = useAuthStore.getState().authUser;
+      if (authUser && profile?.userId?._id === authUser._id) {
+        useAuthStore.getState().updateUser(profile.userId);
+      }
+
       if (username) {
         get()
           .getProfile(username, { silent: true })
