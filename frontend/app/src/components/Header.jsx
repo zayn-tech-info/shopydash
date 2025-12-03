@@ -21,6 +21,9 @@ export function Header() {
     if (nav === "Wishlist" && role !== "client") {
       return null;
     }
+    if (nav === "Profile" && !role) {
+      return null;
+    }
   };
 
   return (

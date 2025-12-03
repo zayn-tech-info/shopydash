@@ -15,9 +15,9 @@ const {
 
 const router = express.Router();
 
-router.use(protectRoute);
-
 router.get("/feed", getFeedPosts);
+
+router.use(protectRoute);
 router.get("/my-posts", verifyRole("vendor"), getMyPosts);
 router.post("/upload", verifyRole("vendor"), uploadMiddleware, uploadImages);
 

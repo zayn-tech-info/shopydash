@@ -201,6 +201,7 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user._id;
   const {
     role,
+    username,
     phoneNumber,
     schoolName,
     whatsAppNumber,
@@ -209,7 +210,14 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
     password,
   } = req.body;
 
-  if (!role || !phoneNumber || !schoolName || !whatsAppNumber || !password) {
+  if (
+    !role ||
+    !username ||
+    !phoneNumber ||
+    !schoolName ||
+    !whatsAppNumber ||
+    !password
+  ) {
     const err = new customError("All fields are required", 400);
     return next(err);
   }
@@ -226,6 +234,13 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
     return next(err);
   }
 
+  const existingUser = await User.findOne({ username });
+  if (existingUser && existingUser._id.toString() !== userId.toString()) {
+    const err = new customError("Username is already taken", 400);
+    return next(err);
+  }
+
+  user.username = username;
   user.role = role;
   user.phoneNumber = phoneNumber;
   user.schoolName = schoolName;

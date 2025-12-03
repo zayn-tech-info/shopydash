@@ -18,6 +18,7 @@ export default function CompleteRegistration() {
   const [loading, setLoading] = useState(false);
 
   const [role, setRole] = useState("client");
+  const [username, setUsername] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [schoolName, setSchoolName] = useState("");
   const [whatsAppNumber, setWhatsAppNumber] = useState("");
@@ -31,7 +32,13 @@ export default function CompleteRegistration() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!phoneNumber || !schoolName || !whatsAppNumber || !password) {
+    if (
+      !username ||
+      !phoneNumber ||
+      !schoolName ||
+      !whatsAppNumber ||
+      !password
+    ) {
       return toast.error("Please fill in all required fields");
     }
 
@@ -47,6 +54,7 @@ export default function CompleteRegistration() {
     try {
       await completeRegistration({
         role,
+        username,
         phoneNumber,
         schoolName,
         whatsAppNumber,
@@ -128,6 +136,20 @@ export default function CompleteRegistration() {
                 />
               </div>
             )}
+ 
+            <div className="mb-5">
+              <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
+                Username
+              </label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="e.g. johndoe123"
+                className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
+                required
+              />
+            </div>
 
             {/* Phone Number */}
             <div className="mb-5">

@@ -49,11 +49,21 @@ export default function VendorDashboard() {
       try {
         const me = await fetchMe();
         if (!mounted) return;
-        if (me && me.data?.role !== "vendor" && me.role !== "vendor") {
+
+        // Check role
+        if (me && me.role !== "vendor") {
           toast.error("You must be a vendor to access this page");
           navigate("/");
           return;
         }
+
+        // Check if profile exists
+        if (me && !me.hasProfile) {
+          toast("Please complete your vendor profile first", { icon: "📝" });
+          navigate("/create-vendor-profile");
+          return;
+        }
+
         await getMyPosts();
       } catch (err) {
         // handled above

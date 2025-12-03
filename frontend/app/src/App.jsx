@@ -47,28 +47,20 @@ const App = () => {
           <Route
             path="/"
             element={
-              authUser ? (
-                authUser.profileComplete ? (
-                  <Home />
-                ) : (
-                  <Navigate to="/complete-user-registration" />
-                )
+              authUser && !authUser.profileComplete ? (
+                <Navigate to="/complete-user-registration" />
               ) : (
-                <Navigate to="/login" />
+                <Home />
               )
             }
           />
           <Route
             path="/home"
             element={
-              authUser ? (
-                authUser.profileComplete ? (
-                  <Home />
-                ) : (
-                  <Navigate to="/complete-user-registration" />
-                )
+              authUser && !authUser.profileComplete ? (
+                <Navigate to="/complete-user-registration" />
               ) : (
-                <Navigate to="/login" />
+                <Home />
               )
             }
           />
