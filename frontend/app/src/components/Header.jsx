@@ -15,13 +15,15 @@ export function Header() {
   }, [authUser]);
 
   const renderNav = (nav, role) => {
+    if (!role) {
+      if (nav === "Dashboard" || nav === "Wishlist" || nav === "Profile") {
+        return null;
+      }
+    }
     if (nav === "Dashboard" && role !== "vendor") {
       return null;
     }
     if (nav === "Wishlist" && role !== "client") {
-      return null;
-    }
-    if (nav === "Profile" && !role) {
       return null;
     }
   };

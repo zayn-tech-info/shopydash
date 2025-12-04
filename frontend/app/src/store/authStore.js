@@ -125,8 +125,33 @@ export const useAuthStore = create((set) => ({
         "An unknown error occurred";
       console.error("Logout error:", err, serverMessage);
       set({ error: serverMessage });
-    } finally {
-      set({ authUser: null, role: "client", email: "", password: "" });
+    }
+  },
+
+  updateProfile: async (data) => {
+    set({ isUpdatingProfile: true, error: null });
+    try {
+      const res = await api.patch("/api/v1/auth/update", data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      const payload = res?.data?.updatedUser ?? res?.data?.data ?? res?.data;
+
+      set((state) => ({
+        authUser: { ...state.authUser, ...payload },
+        isUpdatingProfile: false,
+        error: null,
+      }));
+      return payload;
+    } catch (err) {
+      const serverMessage =
+        err?.response?.data?.message ||
+        (typeof err?.response?.data === "string" ? err.response.data : null) ||
+        err?.message ||
+        "Failed to update profile";
+      set({ error: serverMessage, isUpdatingProfile: false });
+      throw serverMessage;
     }
   },
 }));

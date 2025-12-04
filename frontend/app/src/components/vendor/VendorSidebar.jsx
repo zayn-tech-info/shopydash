@@ -1,16 +1,23 @@
-import { Edit, Share2 } from "lucide-react";
+import { Edit, Share2, Plus, LogOut } from "lucide-react";
 import Logo from "../../assets/images/clientPfp.png";
 import { useVendorProfileStore } from "../../store/vendorProfileStore";
+import { useAuthStore } from "../../store/authStore";
+import { useRef, useState } from "react";
+import { toast } from "react-hot-toast";
 
 export default function VendorSidebar({
   authUser,
   vendorProfile,
   openEdit,
   onCopy,
+  onLogout,
 }) {
   const updateVendorProfile = useVendorProfileStore(
     (state) => state.updateVendorProfile
   );
+  const updateProfile = useAuthStore((state) => state.updateProfile);
+  const getProfile = useVendorProfileStore((state) => state.getProfile);
+  const fileInputRef = useRef(null);
   const businessName =
     vendorProfile?.userId?.businessName || authUser?.businessName || "Store";
   const username =
@@ -24,16 +31,58 @@ export default function VendorSidebar({
 
   const isOwner = authUser?._id === vendorProfile?.userId?._id;
 
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("avatar", file);
+
+    try {
+      await updateProfile(formData);
+      toast.success("Profile picture updated successfully");
+      if (authUser.username) {
+        await getProfile(authUser.username);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to update profile picture");
+    }
+  };
+
   return (
     <aside className="bg-white rounded-2xl p-6 border border-n-3/20 shadow-sm w-full relative">
       <div className="flex flex-col items-center">
-        <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-n-1 shadow-sm mb-4 relative group">
-          <img
-            src={profileImage}
-            alt={businessName}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-          />
-          {vendorProfile?.active && <div></div>}
+        <div className="relative mb-4 group">
+          <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-n-2 shadow-sm relativ">
+            <img
+              src={profileImage}
+              alt={businessName}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            />
+            {vendorProfile?.active && (
+              <div className="absolute inset-0 bg-primary-3/10 pointer-events-none" />
+            )}
+          </div>
+
+          {isOwner && (
+            <>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="absolute bottom-0 right-0 p-2.5 bg-primary-3 text-white rounded-full border-4 border-white z-20"
+                title="Change profile picture"
+              >
+                <Plus size={18} />
+              </button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                onChange={handleImageUpload}
+                accept="image/*"
+              />
+            </>
+          )}
         </div>
 
         <button
@@ -91,9 +140,16 @@ export default function VendorSidebar({
             <div className="font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-1">
               Logged in as
             </div>
-            <div className="truncate text-n-6 font-medium">
+            <div className="truncate text-n-6 font-medium mb-2">
               {authUser?.fullName || authUser?.username || authUser?.email}
             </div>
+            <button
+              onClick={onLogout}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 mt-3 border border-n-3/20 rounded-xl text-xs font-bold uppercase tracking-wider text-n-5 hover:text-primary-3 hover:border-primary-3 transition-all"
+            >
+              <LogOut size={14} />
+              Logout
+            </button>
           </div>
         ) : (
           <div className="text-center">

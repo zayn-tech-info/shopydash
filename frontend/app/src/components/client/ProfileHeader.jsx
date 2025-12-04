@@ -1,11 +1,41 @@
-import { Edit } from "lucide-react";
+import { Edit, LogOut, Plus } from "lucide-react";
 import Logo from "../../assets/images/clientPfp.png";
 import { useClientProfileStore } from "../../store/clientProfileStore";
+import { useAuthStore } from "../../store/authStore";
+import { useRef } from "react";
+import { toast } from "react-hot-toast";
 
-export default function ProfileHeader({ clientProfile, authUser, openEdit }) {
+export default function ProfileHeader({
+  clientProfile,
+  authUser,
+  openEdit,
+  onLogout,
+}) {
   const updateClientProfile = useClientProfileStore(
     (state) => state.updateClientProfile
   );
+  const getProfile = useClientProfileStore((state) => state.getProfile);
+  const updateProfile = useAuthStore((state) => state.updateProfile);
+  const fileInputRef = useRef(null);
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("avatar", file);
+
+    try {
+      await updateProfile(formData);
+      toast.success("Profile picture updated successfully");
+      if (authUser.username) {
+        await getProfile(authUser.username);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to update profile picture");
+    }
+  };
 
   const clientName =
     clientProfile?.userId?.fullName || authUser?.fullName || "Store";
@@ -18,12 +48,32 @@ export default function ProfileHeader({ clientProfile, authUser, openEdit }) {
   return (
     <aside className="bg-white rounded-2xl p-6 border border-n-3/20 shadow-sm w-full">
       <div className="flex flex-col items-center">
-        <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-n-1 shadow-sm mb-4 relative group">
-          <img
-            src={profileImage}
-            alt={clientName}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-          />
+        <div className="relative mb-4 group">
+          <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-n-1 shadow-sm relative">
+            <img
+              src={profileImage}
+              alt={clientName}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            />
+          </div>
+          {isOwner && (
+            <>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="absolute bottom-0 right-0 p-2.5 bg-primary-3 text-white rounded-full border-4 border-white z-20"
+                title="Change profile picture"
+              >
+                <Plus size={18} />
+              </button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                onChange={handleImageUpload}
+                accept="image/*"
+              />
+            </>
+          )}
         </div>
 
         <h2 className="h4 text-n-8 text-center mb-1">{clientName}</h2>
@@ -54,9 +104,16 @@ export default function ProfileHeader({ clientProfile, authUser, openEdit }) {
             <div className="font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-1">
               Logged in as
             </div>
-            <div className="truncate text-n-6 font-medium">
+            <div className="truncate text-n-6 font-medium mb-2">
               {authUser?.fullName || authUser?.username || authUser?.email}
             </div>
+            <button
+              onClick={onLogout}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 mt-3 border border-n-3/20 rounded-xl text-xs font-bold uppercase tracking-wider text-n-5 hover:text-primary-3 hover:border-primary-3 transition-all"
+            >
+              <LogOut size={14} />
+              Logout
+            </button>
           </div>
         ) : (
           <div className="text-center">

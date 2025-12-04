@@ -4,16 +4,14 @@ const asyncErrorHandler = require("../../errors/asyncErrorHandle");
 const customError = require("../../errors/customError");
 const fs = require("fs");
 
- 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
   api_key: process.env.CLOUDINARYAPI_KEY,
   api_secret: process.env.CLOUDINARYAPI_API_SECRET,
 });
- 
-const storage = multer.diskStorage({});
 
- 
+const storage = multer.memoryStorage();
+
 const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith("image/")) {
     cb(null, true);
@@ -26,11 +24,28 @@ const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024,  
+    fileSize: 5 * 1024 * 1024,
   },
 });
 
- 
+const uploadToCloudinary = (buffer) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: "vendor/products",
+        allowed_formats: ["jpeg", "jpg", "png", "webp"],
+        transformation: [{ width: 1000, height: 1000, crop: "limit" }],
+        resource_type: "auto",
+      },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result);
+      }
+    );
+    stream.end(buffer);
+  });
+};
+
 const uploadImages = asyncErrorHandler(async (req, res, next) => {
   if (!req.files || req.files.length === 0) {
     return next(new customError("Please upload at least one image", 400));
@@ -39,15 +54,8 @@ const uploadImages = asyncErrorHandler(async (req, res, next) => {
   const fileUrls = [];
 
   for (const file of req.files) {
-    const uploaded = await cloudinary.uploader.upload(file.path, {
-      folder: "vendor/products",
-      allowed_formats: ["jpeg", "jpg", "png", "webp"],
-      transformation: [{ width: 1000, height: 1000, crop: "limit" }],
-    });
-
+    const uploaded = await uploadToCloudinary(file.buffer);
     fileUrls.push(uploaded.secure_url);
-
-    fs.unlinkSync(file.path);
   }
 
   res.status(200).json({
@@ -57,8 +65,9 @@ const uploadImages = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
- 
 module.exports = {
   uploadMiddleware: upload.array("images", 6),
+  changeAvatar: upload.single("avatar"),
   uploadImages,
+  cloudinary,
 };

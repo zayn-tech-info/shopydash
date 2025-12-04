@@ -79,6 +79,10 @@ export function ClientProfile() {
                 clientProfile={clientProfile}
                 authUser={authUser}
                 openEdit={openEdit}
+                onLogout={() => {
+                  logout();
+                  navigate("/login");
+                }}
               />
             </div>
           </div>
@@ -121,22 +125,6 @@ export function ClientProfile() {
                 clientProfile={clientProfile}
               />
             </div>
-
-            {/* Logout Button */}
-            {authUser &&
-              clientProfile &&
-              authUser._id === clientProfile.userId?._id && (
-                <button
-                  onClick={() => {
-                    logout();
-                    navigate("/login");
-                  }}
-                  className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-n-1 border border-n-3/20 hover:border-primary-3 text-n-6 hover:text-primary-3 rounded-2xl transition-all font-code text-sm font-bold uppercase tracking-wider shadow-sm"
-                >
-                  <LogOut size={18} />
-                  Logout
-                </button>
-              )}
           </div>
         </div>
       </div>

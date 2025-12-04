@@ -1,8 +1,8 @@
 import { toast } from "react-hot-toast";
 import Logo from "../assets/images/vendora_logo.png";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { Edit, Link2, LogOut } from "lucide-react";
+import { Edit, Link2, LogOut, Plus } from "lucide-react";
 import { useVendorProfileStore } from "../store/vendorProfileStore";
 import { useAuthStore } from "../store/authStore";
 import { EditVendorProfile } from "../components/vendor/EditVendorProfile";
@@ -29,12 +29,39 @@ export default function VendorProfile() {
 
   const authUser = useAuthStore((s) => s.authUser);
   const logout = useAuthStore((s) => s.logout);
+  const checkAuth = useAuthStore((s) => s.checkAuth);
+  const updateProfile = useAuthStore((s) => s.updateProfile);
   const navigate = useNavigate();
 
   const params = useParams();
   const location = useLocation();
   const [showEditModal, setShowEditModal] = useState(false);
   const [formData, setFormData] = useState(null);
+  const fileInputRef = useRef(null);
+
+  const isOwner = authUser?._id === vendorProfile?.userId?._id;
+  const displayProfileImage = isOwner
+    ? authUser?.profilePic || vendorProfile?.userId?.profilePic || Logo
+    : vendorProfile?.userId?.profilePic || Logo;
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("avatar", file);
+
+    try {
+      await updateProfile(formData);
+      toast.success("Profile picture updated successfully");
+      if (authUser.username) {
+        await getProfile(authUser.username);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to update profile picture");
+    }
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -76,6 +103,7 @@ export default function VendorProfile() {
   const handleLogout = async () => {
     try {
       await logout();
+      await checkAuth();
     } catch (e) {
       console.error("Logout failed", e);
     } finally {
@@ -93,6 +121,7 @@ export default function VendorProfile() {
           <div className="w-full h-32 md:h-48 lg:h-56 bg-n-3 relative">
             {vendorProfile?.coverImage ? (
               <img
+                name="avatar"
                 src={vendorProfile.coverImage}
                 alt="cover"
                 className="w-full h-full object-cover"
@@ -100,7 +129,6 @@ export default function VendorProfile() {
             ) : (
               <div className="w-full h-full bg-gradient-to-r from-primary-3 to-primary-4" />
             )}
-            {/* Overlay gradient for better text visibility if needed */}
             <div className="absolute inset-0 bg-gradient-to-t from-n-8/80 via-n-8/20 to-transparent" />
 
             <div className="absolute bottom-0 left-0 p-6 md:p-8 z-10 w-full">
@@ -125,9 +153,9 @@ export default function VendorProfile() {
                 authUser={authUser}
                 onCopy={copyProfileLink}
                 openEdit={openEdit}
-                onLogout={() => {
-                  logout();
-                  navigate("/login");
+                onLogout={async () => {
+                  await logout();
+                  window.location.href = "/login";
                 }}
               />
             </div>
@@ -146,19 +174,6 @@ export default function VendorProfile() {
                 authUser={authUser}
               />
             </div>
-
-            {/* Logout Button */}
-            {authUser &&
-              vendorProfile &&
-              authUser._id === vendorProfile.userId?._id && (
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-n-1 border border-n-3/20 hover:border-primary-3 text-n-6 hover:text-primary-3 rounded-2xl transition-all font-code text-sm font-bold uppercase tracking-wider shadow-sm"
-                >
-                  <LogOut size={18} />
-                  Logout
-                </button>
-              )}
           </div>
         </div>
 

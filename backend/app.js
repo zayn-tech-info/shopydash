@@ -43,7 +43,7 @@ app.all(/(.*)/, (req, res, next) => {
   const err = new customError(
     `Could not find ${req.originalUrl} on the server`
   );
-  next(err);
+next(err);
 });
 
 app.use(globalErrorHandler);

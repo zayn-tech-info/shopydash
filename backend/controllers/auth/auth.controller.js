@@ -5,6 +5,7 @@ const VendorProfile = require("../../models/vendorProfile.model");
 const sendToken = require("../../utils/sendToken");
 const validator = require("validator");
 const customError = require("../../errors/customError");
+const { cloudinary } = require("../vendor/upload.controller");
 
 const googleAuth = asyncErrorHandler(async (req, res, next) => {
   const { token } = req.body;
@@ -162,22 +163,21 @@ const login = asyncErrorHandler(async (req, res, next) => {
   sendToken(user, "Logged in successfully", res, 200, hasProfile);
 });
 
-const logout = asyncErrorHandler((req, res, next) => {
+const logout = (req, res, next) => {
   const isProduction = process.env.NODE_ENV === "production";
 
   res.cookie("token", "", {
     httpOnly: true,
     secure: isProduction,
     maxAge: 0,
-
     sameSite: isProduction ? "none" : "lax",
   });
 
-  return res.status(200).json({
+  res.status(200).json({
     success: true,
     message: "User logged out successfully",
   });
-});
+};
 
 const checkAuth = asyncErrorHandler(async (req, res, next) => {
   if (!req.user) {
@@ -259,6 +259,89 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
+const filterField = (obj, ...allowedFields) => {
+  const filteredfields = {};
+  Object.keys(obj).forEach((key) => {
+    if (allowedFields.includes(key)) {
+      filteredfields[key] = obj[key];
+    }
+  });
+  return filteredfields;
+};
+
+const updateUser = asyncErrorHandler(async (req, res, next) => {
+  const userId = req.user._id;
+
+  if (req.body.password || req.body.email || req.body.role) {
+    const error = new customError(
+      "You are not allowed to update email, password, or role here.",
+      400
+    );
+    return next(error);
+  }
+
+  const allowedFields = [
+    "fullName",
+    "phoneNumber",
+    "schoolName",
+    "businessName",
+    "profilePic",
+  ];
+
+  let filteredBody = filterField(req.body, ...allowedFields);
+
+  if (req.file) {
+    try {
+      const uploadToCloudinary = (buffer) => {
+        return new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            {
+              folder: "vendor/avatars",
+              allowed_formats: ["jpeg", "jpg", "png", "webp"],
+              transformation: [{ width: 500, height: 500, crop: "limit" }],
+              resource_type: "auto",
+            },
+            (error, result) => {
+              if (error) return reject(error);
+              resolve(result);
+            }
+          );
+          stream.end(buffer);
+        });
+      };
+
+      const uploaded = await uploadToCloudinary(req.file.buffer);
+      filteredBody.profilePic = uploaded.secure_url;
+    } catch (error) {
+      console.error("Cloudinary upload error:", error);
+      return next(new customError("Image upload failed", 500));
+    }
+  }
+
+  console.log("Updating user with:", filteredBody);
+
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    { $set: filteredBody },
+    {
+      new: true,
+      runValidators: true,
+      context: "query",
+    }
+  );
+
+  if (!updatedUser) {
+    const error = new customError("User not found", 404);
+    return next(error);
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "Profile updated successfully",
+    updatedUser,
+  });
+});
+
 module.exports = {
   signup,
   login,
@@ -266,4 +349,5 @@ module.exports = {
   checkAuth,
   googleAuth,
   completeRegistration,
+  updateUser,
 };
