@@ -11,9 +11,6 @@ export default function ProfileHeader({
   openEdit,
   onLogout,
 }) {
-  const updateClientProfile = useClientProfileStore(
-    (state) => state.updateClientProfile
-  );
   const getProfile = useClientProfileStore((state) => state.getProfile);
   const updateProfile = useAuthStore((state) => state.updateProfile);
   const fileInputRef = useRef(null);
@@ -37,13 +34,18 @@ export default function ProfileHeader({
     }
   };
 
-  const clientName =
-    clientProfile?.userId?.fullName || authUser?.fullName || "Store";
-  const username = clientProfile?.userId?.username || "vendor";
-  const profileImage = clientProfile?.userId?.profilePic || Logo;
-
   const isOwner =
     authUser && clientProfile && authUser._id === clientProfile.userId?._id;
+
+  const clientName =
+    clientProfile?.userId?.fullName ||
+    (isOwner ? authUser?.fullName : null) ||
+    "Store";
+  const username = clientProfile?.userId?.username || "vendor";
+
+  const profileImage = isOwner
+    ? authUser?.profilePic
+    : clientProfile?.userId?.profilePic || Logo;
 
   return (
     <aside className="bg-white rounded-2xl p-6 border border-n-3/20 shadow-sm w-full">
@@ -100,7 +102,7 @@ export default function ProfileHeader({
 
       <div className="mt-6 pt-4 border-t border-n-3/10 text-sm">
         {authUser ? (
-          <div className="text-center text-sm md:block hidden">
+          <div className="text-center text-sm hidden lg:block">
             <div className="font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-1">
               Logged in as
             </div>

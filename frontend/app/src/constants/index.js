@@ -37,12 +37,6 @@ export const navigation = [
     href: "/feeds",
     icon: Vegan,
   },
-  {
-    id: 3,
-    text: "Wishlist",
-    href: "/wishlist",
-    icon: ShoppingCart,
-  },
 
   {
     id: 4,

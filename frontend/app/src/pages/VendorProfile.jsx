@@ -177,6 +177,25 @@ export default function VendorProfile() {
           </div>
         </div>
 
+ 
+        {authUser && (
+          <div className="lg:hidden mt-8 bg-white rounded-2xl p-6 border border-n-3/20 shadow-sm text-center">
+            <div className="font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-1">
+              Logged in as
+            </div>
+            <div className="truncate text-n-6 font-medium mb-2">
+              {authUser?.fullName || authUser?.username || authUser?.email}
+            </div>
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 mt-3 border border-n-3/20 rounded-xl text-xs font-bold uppercase tracking-wider text-n-5 hover:text-primary-3 hover:border-primary-3 transition-all"
+            >
+              <LogOut size={14} />
+              Logout
+            </button>
+          </div>
+        )}
+
         {showEditModal && formData ? (
           <EditVendorProfile
             initialData={formData}

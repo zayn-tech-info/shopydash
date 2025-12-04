@@ -2,7 +2,6 @@ const clientProfileSchema = require("../../models/clientProfile.model");
 const asyncErrorHandler = require("../../errors/asyncErrorHandle");
 const customError = require("../../errors/customError");
 const User = require("../../models/auth.model");
-
 const vendorProfileSchema = require("../../models/vendorProfile.model");
 const VendorPost = require("../../models/vendorProduct");
 
@@ -24,7 +23,7 @@ const getProfile = asyncErrorHandler(async (req, res, next) => {
       .findOne({ userId: user._id })
       .populate(
         "userId",
-        "businessName username email phoneNumber whatsAppNumber schoolName logo isVerified"
+        "businessName username email phoneNumber whatsAppNumber schoolName profilePic"
       )
       .lean();
 

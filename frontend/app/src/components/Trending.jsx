@@ -88,7 +88,7 @@ export function Trending({ items, limit = 8, title = "Trending Now" }) {
               {p.vendorName && (
                 <div className="absolute inset-0 hidden md:flex items-center justify-center bg-n-8/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <a
-                    href={`/vendor/${vendorSlug(p.vendorName)}`}
+                    href={`/p/${vendorSlug(p.vendorName)}`}
                     className="inline-flex items-center justify-center rounded-xl bg-white text-n-8 font-code text-xs font-bold uppercase tracking-wider px-4 py-3 hover:bg-primary-3 hover:text-white transition-colors shadow-lg"
                   >
                     View Shop

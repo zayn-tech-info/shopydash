@@ -18,18 +18,15 @@ export default function VendorSidebar({
   const updateProfile = useAuthStore((state) => state.updateProfile);
   const getProfile = useVendorProfileStore((state) => state.getProfile);
   const fileInputRef = useRef(null);
+  const isOwner = authUser?._id === vendorProfile?.userId?._id;
+
   const businessName =
-    vendorProfile?.userId?.businessName || authUser?.businessName || "Store";
+    vendorProfile?.userId?.businessName ||
+    (isOwner ? authUser?.businessName : null) ||
+    "Store";
   const username =
     vendorProfile?.storeUsername || vendorProfile?.userId?.username || "vendor";
-  const profileImage =
-    authUser?.logo ||
-    authUser?.profilePic ||
-    vendorProfile?.userId?.logo ||
-    vendorProfile?.userId?.profilePic ||
-    Logo;
-
-  const isOwner = authUser?._id === vendorProfile?.userId?._id;
+  const profileImage = isOwner ? authUser?.profilePic : vendorProfile?.userId?.profilePic || Logo; 
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -136,7 +133,7 @@ export default function VendorSidebar({
 
       <div className="mt-6 pt-4 border-t border-n-3/10 text-sm">
         {authUser ? (
-          <div className="text-center text-sm md:block hidden">
+          <div className="text-center text-sm hidden lg:block">
             <div className="font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-1">
               Logged in as
             </div>

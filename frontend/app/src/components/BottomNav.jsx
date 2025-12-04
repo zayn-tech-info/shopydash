@@ -14,11 +14,10 @@ export function BottomNav() {
     return location.pathname === "/" ? "/" : location.pathname;
   }, [location.pathname]);
 
+  if (!authUser) return null;
+
   const renderNav = (nav, role) => {
     if (nav === "Dashboard" && role !== "vendor") {
-      return null;
-    }
-    if (nav === "Wishlist" && role !== "client") {
       return null;
     }
   };
@@ -41,7 +40,7 @@ export function BottomNav() {
 
             if (nav.href === "/profile") {
               if (authUser && authUser.username) {
-                to = `/${authUser.username}`;
+                to = `/p/${authUser.username}`;
               } else {
                 to = "/login";
               }

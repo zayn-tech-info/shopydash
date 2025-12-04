@@ -103,7 +103,7 @@ const App = () => {
           <Route path="/dashboard" element={<VendorDashboard />} />
           <Route path="/vendor/add" element={<VendorProductUpload />} />
           <Route path="/feeds" element={<Feeds />} />
-          <Route path="/:username" element={<ProfileDispatcher />} />
+          <Route path="/p/:username" element={<ProfileDispatcher />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>

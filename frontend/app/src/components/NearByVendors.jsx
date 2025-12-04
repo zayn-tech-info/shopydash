@@ -2,7 +2,6 @@ import {
   MapPin,
   Star,
   MessageCircle,
-  ShoppingBag,
   ShoppingCart,
   MoreHorizontal,
   ChevronLeft,
@@ -15,8 +14,10 @@ import "swiper/css";
 import "swiper/css/navigation";
 import { VendorsPost } from "../constants";
 import { Link, Links } from "react-router-dom";
+import { useCartStore } from "../store/cartStore";
 
 export function NearByVendors({ posts, showHeader = true }) {
+  const addToCart = useCartStore((state) => state.addToCart);
   const rawPosts = posts || [];
 
   const data = rawPosts.map((post) => {
@@ -62,13 +63,10 @@ export function NearByVendors({ posts, showHeader = true }) {
   }
 
   function handleAddToCart(product) {
+    addToCart(product);
     toast.success(`${product.name} added to cart`, {
       id: `cart-${product.id}`,
     });
-  }
-
-  function handleBuyNow(product) {
-    toast.success(`Buying ${product.name}…`, { id: `buy-${product.id}` });
   }
 
   function getPostTime(post) {
@@ -218,46 +216,19 @@ export function NearByVendors({ posts, showHeader = true }) {
                             {p.rating?.toFixed ? p.rating.toFixed(1) : p.rating}
                           </span>
                         </div>
-
-                        {/* Actions overlay (desktop) */}
-                        <div className="absolute inset-0 hidden md:flex flex-col items-center justify-center gap-2 bg-n-8/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4">
-                          <button
-                            type="button"
-                            onClick={() => handleAddToCart(p)}
-                            className="w-full h-10 flex items-center justify-center gap-2 rounded-xl bg-white text-n-8 font-code text-xs font-bold uppercase tracking-wider hover:bg-n-2 transition-colors"
-                          >
-                            <ShoppingCart size={14} /> Add
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleBuyNow(p)}
-                            className="w-full h-10 flex items-center justify-center gap-2 rounded-xl bg-primary-3 text-white font-code text-xs font-bold uppercase tracking-wider hover:bg-primary-4 transition-colors"
-                          >
-                            <ShoppingBag size={14} /> Buy
-                          </button>
-                        </div>
                       </div>
 
-                      <div className="p-3 md:hidden">
+                      <div className="p-3">
                         <h4 className="font-bold text-xs text-n-8 truncate mb-2">
                           {p.name}
                         </h4>
-                        <div className="flex gap-2">
-                          <button
-                            type="button"
-                            onClick={() => handleAddToCart(p)}
-                            className="flex-1 h-8 flex items-center justify-center rounded-lg border border-n-3/20 text-n-8"
-                          >
-                            <ShoppingCart size={14} />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleBuyNow(p)}
-                            className="flex-1 h-8 flex items-center justify-center rounded-lg bg-primary-3 text-white"
-                          >
-                            <ShoppingBag size={14} />
-                          </button>
-                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleAddToCart(p)}
+                          className="w-full h-9 flex items-center justify-center gap-2 rounded-lg bg-primary-3 text-white font-code text-[10px] font-bold uppercase tracking-wider hover:bg-primary-4 transition-colors"
+                        >
+                          <ShoppingCart size={14} /> Add to cart
+                        </button>
                       </div>
                     </div>
                   </SwiperSlide>
@@ -285,7 +256,7 @@ export function NearByVendors({ posts, showHeader = true }) {
 
             <div className="px-6 py-4 bg-white border-t border-n-3/10 flex items-center justify-end gap-3">
               <Link
-                to={`/${post.vendorUsername || vendorSlug(post.vendorName)}`}
+                to={`/p/${post.vendorUsername || vendorSlug(post.vendorName)}`}
               >
                 <button
                   type="button"

@@ -72,7 +72,7 @@ export function FeaturedVendor({ limit = 5 }) {
             </div>
 
             <div className="mt-5">
-              <Link to={`/${vendor.username}`}>
+              <Link to={`/p/${vendor.username}`}>
                 <button
                   type="button"
                   className="w-full h-10 inline-flex items-center justify-center rounded-xl bg-n-8 text-white font-code text-xs font-bold uppercase tracking-wider hover:bg-n-6 transition-colors shadow-md"

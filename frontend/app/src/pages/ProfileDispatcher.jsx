@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import { LogOut } from "lucide-react";
 import { api } from "../lib/axios";
 import { useVendorProfileStore } from "../store/vendorProfileStore";
 import { useClientProfileStore } from "../store/clientProfileStore";
@@ -14,7 +15,14 @@ export default function ProfileDispatcher() {
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState(null);
   const [error, setError] = useState(null);
-  const { authUser } = useAuthStore();
+  const { authUser, logout, checkAuth } = useAuthStore();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    await checkAuth();
+    navigate("/login");
+  };
 
   useEffect(() => {
     const checkRole = async () => {
@@ -23,6 +31,8 @@ export default function ProfileDispatcher() {
       try {
         const res = await api.get(`/api/v1/profile/${username}`);
         const data = res.data.data;
+
+        console.log("Profile dispatcher data", data);
 
         if (data.vendorProfile) {
           setRole("vendor");
@@ -55,7 +65,15 @@ export default function ProfileDispatcher() {
   if (loading) return <ClientProfileSkeleton />;
 
   if (error) {
-    if (authUser && (authUser.username === username || !username)) {
+    const isCurrentUser =
+      authUser &&
+      (!username ||
+        username === "undefined" ||
+        username === "null" ||
+        authUser.username === username ||
+        authUser.username.toLowerCase() === username.toLowerCase());
+
+    if (isCurrentUser) {
       return (
         <Navigate
           to={
@@ -67,8 +85,17 @@ export default function ProfileDispatcher() {
       );
     }
     return (
-      <div className="flex items-center justify-center min-h-[50vh]">
+      <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
         <div className="text-primary-3 body-1">{error}</div>
+        {authUser && (
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-4 py-2 border border-n-3/20 rounded-xl text-xs font-bold uppercase tracking-wider text-n-5 hover:text-primary-3 hover:border-primary-3 transition-all"
+          >
+            <LogOut size={14} />
+            Logout
+          </button>
+        )}
       </div>
     );
   }

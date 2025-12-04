@@ -37,8 +37,8 @@ export default function VendorDashboard() {
 
       setStats({
         totalProducts: totalProducts,
-        totalViews: 0, // Not available yet
-        totalSales: 0, // Not available yet
+        totalViews: 0,  
+        totalSales: 0,
       });
     }
   }, [posts]);

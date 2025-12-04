@@ -49,7 +49,7 @@ export function HomeContent({
                 <>
                   <h1 className="h4 text-n-8">
                     Hi{" "}
-                    <span className="text-primary-3">
+                    <span className="text-primary-3 break-all">
                       {authUser.username}👋
                     </span>
                   </h1>

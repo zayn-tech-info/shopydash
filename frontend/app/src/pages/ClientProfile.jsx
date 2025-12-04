@@ -23,7 +23,7 @@ export function ClientProfile() {
   );
 
   const [showEditModal, setShowEditModal] = useState(false);
-  const logout = useAuthStore((s) => s.logout);
+  const { logout, checkAuth } = useAuthStore();
   const navigate = useNavigate();
   const params = useParams();
 
@@ -72,15 +72,15 @@ export function ClientProfile() {
     <main className="py-12 bg-n-1 min-h-[80vh]">
       <div className="container">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Left Sidebar - Profile Info */}
           <div className="lg:col-span-4 xl:col-span-3">
             <div className="sticky top-24 space-y-6">
               <ProfileHeader
                 clientProfile={clientProfile}
                 authUser={authUser}
                 openEdit={openEdit}
-                onLogout={() => {
-                  logout();
+                onLogout={async () => {
+                  await logout();
+                  await checkAuth();
                   navigate("/login");
                 }}
               />
@@ -113,12 +113,10 @@ export function ClientProfile() {
               </div>
             </div>
 
-            {/* Content Section */}
             <div className="bg-white rounded-2xl p-8 border border-n-3/20 shadow-sm min-h-[400px]">
               <AboutAndWishlist clientProfile={clientProfile} />
             </div>
 
-            {/* Contact Info Section */}
             <div className="bg-white rounded-2xl p-8 border border-n-3/20 shadow-sm">
               <ClientAddress
                 authUser={authUser}
@@ -127,6 +125,28 @@ export function ClientProfile() {
             </div>
           </div>
         </div>
+
+        {authUser && (
+          <div className="lg:hidden mt-8 bg-white rounded-2xl p-6 border border-n-3/20 shadow-sm text-center">
+            <div className="font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-1">
+              Logged in as
+            </div>
+            <div className="truncate text-n-6 font-medium mb-2">
+              {authUser?.fullName || authUser?.username || authUser?.email}
+            </div>
+            <button
+              onClick={async () => {
+                await logout();
+                await checkAuth();
+                navigate("/login");
+              }}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 mt-3 border border-n-3/20 rounded-xl text-xs font-bold uppercase tracking-wider text-n-5 hover:text-primary-3 hover:border-primary-3 transition-all"
+            >
+              <LogOut size={14} />
+              Logout
+            </button>
+          </div>
+        )}
       </div>
 
       {showEditModal && clientProfileData ? (

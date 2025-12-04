@@ -81,7 +81,7 @@ export function NewArrival({ withinHours = 24, limit = 8 }) {
               {item.vendorName && (
                 <div className="absolute inset-0 hidden md:flex items-center justify-center bg-n-8/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <a
-                    href={`/${vendorSlug(item.vendorName)}`}
+                    href={`/p/${vendorSlug(item.vendorName)}`}
                     className="inline-flex items-center justify-center rounded-xl bg-white text-n-8 font-code text-xs font-bold uppercase tracking-wider px-4 py-3 hover:bg-primary-3 hover:text-white transition-colors shadow-lg"
                   >
                     View Shop
@@ -108,11 +108,10 @@ export function NewArrival({ withinHours = 24, limit = 8 }) {
                 ) : null}
               </div>
 
-              {/* Mobile quick link to vendor profile */}
               {item.vendorName && (
                 <div className="mt-3 md:hidden pt-3 border-t border-n-3/10">
                   <a
-                    href={`/${vendorSlug(item.vendorName)}`}
+                    href={`/p/${vendorSlug(item.vendorName)}`}
                     className="block text-center font-code text-[10px] font-bold uppercase tracking-wider text-primary-3"
                   >
                     View Shop
