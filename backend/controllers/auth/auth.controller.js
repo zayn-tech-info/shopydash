@@ -6,6 +6,7 @@ const sendToken = require("../../utils/sendToken");
 const validator = require("validator");
 const customError = require("../../errors/customError");
 const { cloudinary } = require("../vendor/upload.controller");
+const { checkUserHasProfile } = require("../../utils/profileHelper");
 
 const googleAuth = asyncErrorHandler(async (req, res, next) => {
   const { token } = req.body;
@@ -27,14 +28,7 @@ const googleAuth = asyncErrorHandler(async (req, res, next) => {
   let user = await User.findOne({ email });
 
   if (user) {
-    let hasProfile = false;
-    if (user.role === "client") {
-      const profile = await ClientProfile.findOne({ userId: user._id });
-      hasProfile = !!profile;
-    } else if (user.role === "vendor") {
-      const profile = await VendorProfile.findOne({ userId: user._id });
-      hasProfile = !!profile;
-    }
+    const hasProfile = await checkUserHasProfile(user);
     sendToken(user, "Logged in successfully", res, 200, hasProfile);
   } else {
     const baseUsername = email.split("@")[0];
@@ -147,18 +141,7 @@ const login = asyncErrorHandler(async (req, res, next) => {
     return next(err);
   }
 
-  let hasProfile = false;
-  if (user.role === "client") {
-    const profile = await ClientProfile.findOne({ userId: user._id });
-    hasProfile = !!profile;
-  } else if (user.role === "vendor") {
-    const profile = await VendorProfile.findOne({ userId: user._id });
-    hasProfile = !!profile;
-  }
-
-  const userResponse = { ...user.toObject(), hasProfile };
-
-  user.hasProfile = hasProfile;
+  const hasProfile = await checkUserHasProfile(user);
 
   sendToken(user, "Logged in successfully", res, 200, hasProfile);
 });
@@ -185,14 +168,7 @@ const checkAuth = asyncErrorHandler(async (req, res, next) => {
     return next(err);
   }
 
-  let hasProfile = false;
-  if (req.user.role === "client") {
-    const profile = await ClientProfile.findOne({ userId: req.user._id });
-    hasProfile = !!profile;
-  } else if (req.user.role === "vendor") {
-    const profile = await VendorProfile.findOne({ userId: req.user._id });
-    hasProfile = !!profile;
-  }
+  const hasProfile = await checkUserHasProfile(req.user);
 
   res.status(200).json({ ...req.user.toObject(), hasProfile });
 });
@@ -234,7 +210,8 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
     return next(err);
   }
 
-  const existingUser = await User.findOne({ username });
+  // Use lean() and select only _id for faster check
+  const existingUser = await User.findOne({ username }).select("_id").lean();
   if (existingUser && existingUser._id.toString() !== userId.toString()) {
     const err = new customError("Username is already taken", 400);
     return next(err);

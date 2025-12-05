@@ -10,7 +10,11 @@ const createVendorProfile = asyncErrorHandler(async (req, res, next) => {
     return next(err);
   }
 
-  const existingVendorProfile = await vendorProfileModel.findOne({ userId });
+  // Use lean() and select only _id for faster check
+  const existingVendorProfile = await vendorProfileModel
+    .findOne({ userId })
+    .select("_id")
+    .lean();
 
   if (existingVendorProfile) {
     const err = new customError("Vendor profile already exists", 409);
@@ -101,9 +105,10 @@ const getPublicVendorProfile = asyncErrorHandler(async (req, res, next) => {
 });
 
 const getAllVendorsProfile = asyncErrorHandler(async (req, res, next) => {
-  const vendors = await User.find({ role: "vendor" }).select(
-    "username profilePic businessName whatsAppNumber"
-  );
+  // Use lean() for better performance since we're only reading data
+  const vendors = await User.find({ role: "vendor" })
+    .select("username profilePic businessName whatsAppNumber")
+    .lean();
 
   if (!vendors || vendors.length === 0) {
     const error = new customError("No vendor found", 404);
