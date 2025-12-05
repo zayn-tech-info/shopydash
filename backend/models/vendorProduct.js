@@ -1,19 +1,24 @@
 const mongoose = require("mongoose");
 
 const productItemSchema = new mongoose.Schema({
+  vendorId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
   title: {
     type: String,
     required: [true, "Product title is required"],
+    trim: true,
+  },
+  description: {
+    type: String,
     trim: true,
   },
   price: {
     type: Number,
     required: [true, "Product price is required"],
     min: [0, "Price cannot be negative"],
-  },
-  description: {
-    type: String,
-    trim: true,
   },
   category: {
     type: String,
@@ -31,19 +36,19 @@ const productItemSchema = new mongoose.Schema({
       "Other",
     ],
   },
-  condition: {
+  image: {
     type: String,
-    enum: ["New", "Like New", "Good", "Fair", "Used"],
-    default: "New",
+    required: [true, "Product image is required"],
   },
   stock: {
     type: Number,
     default: 1,
     min: [0, "Stock cannot be negative"],
   },
-  image: {
+  condition: {
     type: String,
-    required: [true, "Product image is required"],
+    enum: ["New", "Like New", "Good", "Fair", "Used"],
+    default: "New",
   },
 });
 
