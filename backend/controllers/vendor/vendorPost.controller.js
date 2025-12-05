@@ -6,7 +6,25 @@ const User = require("../../models/auth.model");
 
 const createPost = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user._id;
-  const vendorProfile = await VendorProfile.findOne({ userId });
+  const { caption, products, school, location } = req.body;
+
+  // Validate products early to avoid unnecessary DB queries
+  if (!products || products.length < 4) {
+    return next(
+      new customError("You must upload at least 4 products per post.", 400)
+    );
+  } else if (products.length > 6) {
+    return next(
+      new customError("You can upload at most 6 products per post.", 400)
+    );
+  }
+
+  // Execute queries in parallel for better performance
+  const [vendorProfile, user] = await Promise.all([
+    VendorProfile.findOne({ userId }).select("schoolName").lean(),
+    User.findById(userId).select("schoolName").lean(),
+  ]);
+
   if (!vendorProfile) {
     return next(
       new customError(
@@ -15,19 +33,6 @@ const createPost = asyncErrorHandler(async (req, res, next) => {
       )
     );
   }
-
-  const { caption, products, school, location } = req.body;
-  if (!products || products.length < 4) {
-    return next(
-      new customError("You must upload at least 4 products per post.", 400)
-    );
-  } else if (!products.length > 6) {
-    return next(
-      new customError("You must upload at least 4 products per post.", 400)
-    );
-  }
-
-  const user = await User.findById(userId);
 
   const newPost = await VendorPost.create({
     vendorId: userId,
@@ -47,7 +52,10 @@ const createPost = asyncErrorHandler(async (req, res, next) => {
 const getMyPosts = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user._id;
 
-  const vendorProfile = await VendorProfile.findOne({ userId });
+  // Use lean() and select only _id for faster check
+  const vendorProfile = await VendorProfile.findOne({ userId })
+    .select("_id")
+    .lean();
   if (!vendorProfile) {
     return next(
       new customError(
@@ -57,9 +65,10 @@ const getMyPosts = asyncErrorHandler(async (req, res, next) => {
     );
   }
 
-  const posts = await VendorPost.find({ vendorId: userId }).sort({
-    createdAt: -1,
-  });
+  // Use lean() for better performance since we're only reading data
+  const posts = await VendorPost.find({ vendorId: userId })
+    .sort({ createdAt: -1 })
+    .lean();
 
   res.status(200).json({
     success: true,
@@ -75,24 +84,31 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
     query.school = school;
   }
 
-  const posts = await VendorPost.find(query)
-    .populate(
-      "vendorId",
-      "businessName fullName whatsAppNumber phoneNumber username profilePic logo"
-    )
-    .sort({ createdAt: -1 })
-    .skip((page - 1) * limit)
-    .limit(parseInt(limit));
+  // Enforce maximum limit to prevent resource exhaustion
+  const pageLimit = Math.min(parseInt(limit), 50);
+  const currentPage = Math.max(parseInt(page), 1);
 
-  const total = await VendorPost.countDocuments(query);
+  // Use lean() for better performance and execute queries in parallel
+  const [posts, total] = await Promise.all([
+    VendorPost.find(query)
+      .populate(
+        "vendorId",
+        "businessName fullName whatsAppNumber phoneNumber username profilePic logo"
+      )
+      .sort({ createdAt: -1 })
+      .skip((currentPage - 1) * pageLimit)
+      .limit(pageLimit)
+      .lean(),
+    VendorPost.countDocuments(query),
+  ]);
 
   res.status(200).json({
     success: true,
     data: {
       posts,
       pagination: {
-        currentPage: parseInt(page),
-        totalPages: Math.ceil(total / limit),
+        currentPage,
+        totalPages: Math.ceil(total / pageLimit),
         totalItems: total,
       },
     },
@@ -102,10 +118,13 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
 const getPostById = asyncErrorHandler(async (req, res, next) => {
   const { postId } = req.params;
 
-  const post = await VendorPost.findById(postId).populate(
-    "vendorId",
-    "businessName fullName whatsAppNumber phoneNumber username profilePic"
-  );
+  // Use lean() for better performance
+  const post = await VendorPost.findById(postId)
+    .populate(
+      "vendorId",
+      "businessName fullName whatsAppNumber phoneNumber username profilePic"
+    )
+    .lean();
 
   if (!post) {
     return next(new customError("Post not found", 404));
@@ -121,13 +140,15 @@ const deletePost = asyncErrorHandler(async (req, res, next) => {
   const { postId } = req.params;
   const userId = req.user._id;
 
-  const vendor = await VendorProfile.findOne({ userId });
+  // Use lean() and select only _id for faster check
+  const vendor = await VendorProfile.findOne({ userId }).select("_id").lean();
   if (!vendor) {
     const error = new customError("Vendor not found", 404);
     return next(error);
   }
 
-  const post = await VendorPost.findById(postId);
+  // Use select to only fetch necessary fields for authorization check
+  const post = await VendorPost.findById(postId).select("vendorId");
 
   if (!post) {
     return next(new customError("Post not found", 404));

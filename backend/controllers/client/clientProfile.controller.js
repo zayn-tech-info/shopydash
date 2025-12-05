@@ -11,7 +11,11 @@ const createClientProfile = asyncErrorHandler(async (req, res, next) => {
     return next(err);
   }
 
-  const existingClientProfile = await clientProfileSchema.findOne({ userId });
+  // Use lean() and select only _id for faster check
+  const existingClientProfile = await clientProfileSchema
+    .findOne({ userId })
+    .select("_id")
+    .lean();
 
   if (existingClientProfile) {
     const err = new customError("Profile already exist", 400);
@@ -42,7 +46,6 @@ const createClientProfile = asyncErrorHandler(async (req, res, next) => {
 const updateClientProfile = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user && req.user._id;
 
-  const clientProfile = await clientProfileSchema.findOne({ userId });
   const { gender, address, city, state, country, preferredCategory, wishList } =
     req.body;
 

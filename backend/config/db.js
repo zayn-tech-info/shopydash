@@ -15,6 +15,11 @@ const connectDB = async () => {
   try {
     await mongoose.connect(uri, {
       serverSelectionTimeoutMS: 10000,
+      // Connection pooling configuration for better performance
+      maxPoolSize: 10, // Maximum number of connections in the pool
+      minPoolSize: 2,  // Minimum number of connections in the pool
+      socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+      family: 4, // Use IPv4, skip trying IPv6
     });
     console.log("Database connected successfully");
   } catch (error) {

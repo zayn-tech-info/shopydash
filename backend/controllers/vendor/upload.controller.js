@@ -51,12 +51,20 @@ const uploadImages = asyncErrorHandler(async (req, res, next) => {
     return next(new customError("Please upload at least one image", 400));
   }
 
-  const fileUrls = [];
-
-  for (const file of req.files) {
-    const uploaded = await uploadToCloudinary(file.buffer);
-    fileUrls.push(uploaded.secure_url);
+  // Limit maximum number of files to prevent resource exhaustion
+  if (req.files.length > 10) {
+    return next(
+      new customError("Maximum of 10 images allowed per upload", 400)
+    );
   }
+
+  // Upload images in parallel for better performance
+  const uploadPromises = req.files.map((file) =>
+    uploadToCloudinary(file.buffer)
+  );
+
+  const uploadedResults = await Promise.all(uploadPromises);
+  const fileUrls = uploadedResults.map((result) => result.secure_url);
 
   res.status(200).json({
     success: true,

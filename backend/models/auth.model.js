@@ -237,4 +237,13 @@ userSchema.methods.isPasswordChanged = function (jwtTimeStamp) {
 
   return jwtTimeStamp < passwordChangedTimeStamp;
 };
+
+// Add indexes for frequently queried fields to improve performance
+userSchema.index({ email: 1 });
+userSchema.index({ username: 1 });
+userSchema.index({ schoolId: 1 });
+userSchema.index({ role: 1 });
+userSchema.index({ phoneNumber: 1 });
+userSchema.index({ businessName: 1 });
+
 module.exports = mongoose.model("User", userSchema);
