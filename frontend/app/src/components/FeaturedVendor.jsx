@@ -16,14 +16,12 @@ const getInitials = (name = "") =>
 export function FeaturedVendor({ limit = 5 }) {
   const { vendors, getAllVendorProfile } = useVendorProfileStore();
 
-  console.log(vendors);
-
   useEffect(() => {
     async function getVendors() {
       await getAllVendorProfile();
     }
     getVendors();
-  }, []);
+  }, [getAllVendorProfile]);
 
   if (!vendors) return null;
 

@@ -40,7 +40,6 @@ export const useVendorProfileStore = create((set, get) => ({
         "/api/v1/vendorProfile/createVendorProfile",
         data
       );
-      console.log("API response", res);
       const payload = res?.data?.data ?? res?.data ?? res;
 
       set({
@@ -66,7 +65,6 @@ export const useVendorProfileStore = create((set, get) => ({
       set({ isGettingVendorProfile: true, error: null });
 
       const res = await api.get(`/api/v1/profile/${username}`);
-      console.log("API response", res);
       const payload = res?.data?.data ?? res?.data ?? res;
       const profile = payload?.vendorProfile ?? payload;
       set({
@@ -92,7 +90,6 @@ export const useVendorProfileStore = create((set, get) => ({
     set({ isGettingVendorProfile: true });
     try {
       const response = await api.get("/api/v1/vendorProfile/allvendors");
-      console.log("Vendors :", response);
       const payload = response?.data?.data ?? response?.vendor ?? response;
 
       const vendors = payload?.vendors ?? payload;
@@ -117,14 +114,15 @@ export const useVendorProfileStore = create((set, get) => ({
         `/api/v1/vendorProfile/updateVendorProfile`,
         data
       );
-      console.log("API response", res);
       const payload = res?.data?.data ?? res?.data ?? res;
 
       const profile = payload?.vendorProfile ?? payload;
 
-      set({ vendorProfile: profile });
-
-      set({ isUpdatingVendorProfile: false, error: null });
+      set({ 
+        vendorProfile: profile,
+        isUpdatingVendorProfile: false, 
+        error: null 
+      });
 
       return profile;
     } catch (err) {

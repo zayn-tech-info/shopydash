@@ -46,15 +46,10 @@ export const useSignupStore = create((set) => ({
 
   signup: async (data) => {
     set({ isSigningUp: true, error: null });
-    console.log("Recieved Data: ", data);
     try {
       const res = await api.post("/api/v1/auth/signup", data);
-
-      console.log("API response", res);
       const payload = res?.data?.data ?? res?.data ?? res;
       set({ userData: payload, isSigningUp: false, error: null });
-
-      set({ userData: res?.data });
     } catch (err) {
       const serverMessage =
         err?.response?.data?.message ||

@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { api } from "../lib/axios";
+import { useAuthStore } from "./authStore";
 
 const normalizeProfile = (incoming, previous = null) => {
   if (!incoming && !previous) return null;
@@ -60,16 +61,11 @@ export const useClientProfileStore = create((set, get) => ({
       const res = await api.get(`/api/v1/profile/${username}`);
       const payload = res?.data?.data ?? res?.data ?? res;
 
-      console.log("Client Profile API response:", res);
-      console.log("Client Profile payload:", payload);
-
       let profile =
         payload?.clientProfile ??
         payload?.profile ??
         payload?.client ??
         payload;
-
-      console.log("Resolved client profile:", profile);
       const normalized = normalizeProfile(profile, get().clientProfile);
       const nextState = {
         clientProfile: normalized,

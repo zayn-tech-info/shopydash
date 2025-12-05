@@ -1,7 +1,7 @@
-import React from "react";
+import React, { memo } from "react";
 import { ShoppingCart, Edit3, Trash2, Eye } from "lucide-react";
 
-export function ProductCard({ product, onEdit, onDelete, onToggleVisibility }) {
+function ProductCardComponent({ product, onEdit, onDelete, onToggleVisibility }) {
   return (
     <div className="bg-white rounded-lg overflow-hidden shadow-sm border">
       <div className="relative aspect-[4/5] bg-gray-100">
@@ -62,3 +62,5 @@ export function ProductCard({ product, onEdit, onDelete, onToggleVisibility }) {
     </div>
   );
 }
+
+export const ProductCard = memo(ProductCardComponent);

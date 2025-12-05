@@ -4,7 +4,7 @@ import VendorDashboard from "./pages/VendorDashboard";
 import VendorProfile from "./pages/VendorProfile";
 import NotFound from "./pages/NotFound";
 import { Header } from "./components/Header";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Footer } from "./components/Footer";
 import { Login } from "./pages/Login";
 import { Signup } from "./pages/Signup";
@@ -24,12 +24,15 @@ import { VendorFloatingButton } from "./components/VendorFloatingButton";
 import Feeds from "./pages/Feeds";
 
 const App = () => {
-  const { checkAuth, authUser, isCheckingAuth } = useAuthStore();
+  const authUser = useAuthStore((state) => state.authUser);
+  const isCheckingAuth = useAuthStore((state) => state.isCheckingAuth);
+  const checkAuth = useAuthStore((state) => state.checkAuth);
   const location = useLocation();
 
   useEffect(() => {
     checkAuth();
-  }, [checkAuth]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0 });

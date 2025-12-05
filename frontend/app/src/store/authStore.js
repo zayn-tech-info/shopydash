@@ -22,10 +22,8 @@ export const useAuthStore = create((set) => ({
 
   login: async (data) => {
     set({ isLogginIn: true, error: null });
-    console.log("Recieved Data: ", data);
     try {
       const res = await api.post("/api/v1/auth/login", data);
-      console.log("API response: ", res);
       const payload = res?.data?.data ?? res?.data ?? res;
 
       set({ authUser: payload, isLogginIn: false, error: null });
@@ -99,8 +97,6 @@ export const useAuthStore = create((set) => ({
     set({ isCheckingAuth: true, error: null });
     try {
       const res = await api.get("/api/v1/auth/check");
-      console.log("API response: ", res);
-
       const payload = res?.data?.data ?? res?.data ?? res;
       set({ authUser: payload, isCheckingAuth: false, error: null });
     } catch (err) {

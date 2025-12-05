@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import ProfileHeader from "../components/client/ProfileHeader";
 import AboutAndWishlist from "../components/client/AboutAndWishlist";
 import { useAuthStore } from "../store/authStore";
@@ -27,12 +27,12 @@ export function ClientProfile() {
   const navigate = useNavigate();
   const params = useParams();
 
-  const openEdit = () => {
+  const openEdit = useCallback(() => {
     if (clientProfile) {
       setClientProfileData(clientProfile);
     }
     setShowEditModal(true);
-  };
+  }, [clientProfile, setClientProfileData]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -56,9 +56,7 @@ export function ClientProfile() {
     fetchProfile();
   }, [getProfile, params?.username, authUser?.username, clientProfile]);
 
-  useEffect(() => {
-    console.log(clientProfile);
-  }, [clientProfile]);
+
 
   if (loading) return <ClientProfileSkeleton />;
   if (error)

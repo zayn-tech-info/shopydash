@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, memo } from "react";
 import VendorProductItem from "./VendorProductItem";
 
-export default function AboutAndProducts({ vendor }) {
+function AboutAndProducts({ vendor }) {
   const [tab, setTab] = useState("products");
 
   const products = vendor?.products || [];
@@ -86,3 +86,5 @@ export default function AboutAndProducts({ vendor }) {
     </section>
   );
 }
+
+export default memo(AboutAndProducts);
