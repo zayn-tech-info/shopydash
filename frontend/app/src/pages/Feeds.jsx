@@ -22,7 +22,7 @@ export default function Feeds() {
       const res = await api.get("/api/v1/post/feed", { params });
       setPosts(res.data.data.posts);
     } catch (error) {
-      console.error("Error fetching posts:", error);
+      // Error silently handled - user can retry
     } finally {
       setLoading(false);
     }

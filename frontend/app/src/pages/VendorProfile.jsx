@@ -58,7 +58,6 @@ export default function VendorProfile() {
         await getProfile(authUser.username);
       }
     } catch (error) {
-      console.error(error);
       toast.error("Failed to update profile picture");
     }
   }, [authUser.username, updateProfile, getProfile]);

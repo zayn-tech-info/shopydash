@@ -138,9 +138,10 @@ export function NearByVendors({ posts, showHeader = true }) {
                       {(() => {
                         const { hour, minutes, seconds } = getPostTime(post);
                         if (hour >= 48) {
-                          return <span>• {post.postedAt}</span>;
+                          const days = Math.floor(hour / 24);
+                          return <span>• {days} day{days > 1 ? 's' : ''} ago</span>;
                         } else if (hour >= 24) {
-                          return <span>• 1day ago</span>;
+                          return <span>• 1 day ago</span>;
                         } else if (hour > 0) {
                           return <span>• {hour}h ago</span>;
                         }
