@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { api } from "../lib/axios";
 import { NearByVendors } from "../components/NearByVendors";
 import { Search, MapPin, School, X } from "lucide-react";
@@ -13,54 +13,48 @@ export default function Feeds() {
   const [selectedLocation, setSelectedLocation] = useState("");
   const [isSearchActive, setIsSearchActive] = useState(false);
 
-  useEffect(() => {
-    fetchPosts();
-  }, [selectedSchool, selectedLocation]); // Re-fetch when filters change
-
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     setLoading(true);
     try {
       const params = { limit: 100 };
       if (selectedSchool) params.school = selectedSchool;
-      // Note: Backend currently only supports school filtering.
-      // Location filtering might need backend update or client-side filtering.
 
       const res = await api.get("/api/v1/post/feed", { params });
-      let fetchedPosts = res.data.data.posts;
-
-      // Client-side filtering for location if backend doesn't support it yet
-      if (selectedLocation) {
-        fetchedPosts = fetchedPosts.filter((post) =>
-          post.location.toLowerCase().includes(selectedLocation.toLowerCase())
-        );
-      }
-
-      // Client-side filtering for search query (caption or vendor name)
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        fetchedPosts = fetchedPosts.filter(
-          (post) =>
-            post.caption?.toLowerCase().includes(query) ||
-            post.vendorId?.businessName?.toLowerCase().includes(query) ||
-            post.vendorId?.username?.toLowerCase().includes(query)
-        );
-      }
-
-      setPosts(fetchedPosts);
+      setPosts(res.data.data.posts);
     } catch (error) {
       console.error("Error fetching posts:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedSchool]);
 
-  // Handle search input change with debounce could be better, but simple for now
   useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchPosts();
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
+    fetchPosts();
+  }, [fetchPosts]);
+
+  // Apply client-side filters for better performance
+  const filteredPosts = useMemo(() => {
+    return posts.filter((post) => {
+      // Filter by location
+      if (selectedLocation && !post.location.toLowerCase().includes(selectedLocation.toLowerCase())) {
+        return false;
+      }
+
+      // Filter by search query (caption or vendor name)
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        const matchesCaption = post.caption?.toLowerCase().includes(query);
+        const matchesBusinessName = post.vendorId?.businessName?.toLowerCase().includes(query);
+        const matchesUsername = post.vendorId?.username?.toLowerCase().includes(query);
+        
+        if (!matchesCaption && !matchesBusinessName && !matchesUsername) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [posts, selectedLocation, searchQuery]);
 
   return (
     <div className="relative min-h-screen">
@@ -157,7 +151,7 @@ export default function Feeds() {
         {loading ? (
           <FeedSkeleton />
         ) : (
-          <NearByVendors posts={posts} showHeader={false} />
+          <NearByVendors posts={filteredPosts} showHeader={false} />
         )}
       </div>
     </div>

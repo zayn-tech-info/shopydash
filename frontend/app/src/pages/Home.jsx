@@ -10,11 +10,13 @@ import { Testimonial } from "../components/Testimonial";
 import { useProductStore } from "../store/productStore";
 
 export function Home() {
-  const { getFeedPosts, feedPosts } = useProductStore();
+  const feedPosts = useProductStore((state) => state.feedPosts);
+  const getFeedPosts = useProductStore((state) => state.getFeedPosts);
 
   useEffect(() => {
     getFeedPosts();
-  }, [getFeedPosts]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Fragment>

@@ -1,4 +1,6 @@
-export default function VendorProductItem({ product }) {
+import { memo } from "react";
+
+function VendorProductItem({ product }) {
   const title =
     product?.title || product?.name || `Product ${product?._id || ""}`;
   const img =
@@ -36,3 +38,5 @@ export default function VendorProductItem({ product }) {
     </div>
   );
 }
+
+export default memo(VendorProductItem);

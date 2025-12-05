@@ -1,6 +1,6 @@
 import { toast } from "react-hot-toast";
 import Logo from "../assets/images/vendora_logo.png";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { Edit, Link2, LogOut, Plus } from "lucide-react";
 import { useVendorProfileStore } from "../store/vendorProfileStore";
@@ -44,7 +44,7 @@ export default function VendorProfile() {
     ? authUser?.profilePic || vendorProfile?.userId?.profilePic || Logo
     : vendorProfile?.userId?.profilePic || Logo;
 
-  const handleImageUpload = async (e) => {
+  const handleImageUpload = useCallback(async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
@@ -61,7 +61,7 @@ export default function VendorProfile() {
       console.error(error);
       toast.error("Failed to update profile picture");
     }
-  };
+  }, [authUser.username, updateProfile, getProfile]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -85,7 +85,7 @@ export default function VendorProfile() {
     fetchProfile();
   }, [getProfile, params?.username, authUser?.username, vendorProfile]);
 
-  const copyProfileLink = async () => {
+  const copyProfileLink = useCallback(async () => {
     try {
       const url = window.location.href;
       await navigator.clipboard.writeText(url);
@@ -93,14 +93,14 @@ export default function VendorProfile() {
     } catch (e) {
       toast.error("Could not copy link");
     }
-  };
+  }, []);
 
-  const openEdit = () => {
+  const openEdit = useCallback(() => {
     setFormData(vendorProfile || null);
     setShowEditModal(true);
-  };
+  }, [vendorProfile]);
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     try {
       await logout();
       await checkAuth();
@@ -109,7 +109,7 @@ export default function VendorProfile() {
     } finally {
       navigate("/login");
     }
-  };
+  }, [logout, checkAuth, navigate]);
 
   if (isGettingVendorProfile) return <VendorProfileSkeleton />;
 

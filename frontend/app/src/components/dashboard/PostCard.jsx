@@ -1,3 +1,4 @@
+import { memo } from "react";
 import {
   Trash2,
   MapPin,
@@ -15,7 +16,7 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 
-const ProductItem = ({ product }) => (
+const ProductItem = memo(({ product }) => (
   <div className="group/item relative flex flex-col gap-3">
     <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl bg-gray-100 border-2">
       <img
@@ -55,9 +56,9 @@ const ProductItem = ({ product }) => (
       </p>
     </div>
   </div>
-);
+));
 
-export function PostCard({ post, onDelete }) {
+function PostCardComponent({ post, onDelete }) {
   const { deletePost } = useProductStore();
   const navigate = useNavigate();
 
@@ -154,3 +155,5 @@ export function PostCard({ post, onDelete }) {
     </div>
   );
 }
+
+export const PostCard = memo(PostCardComponent);

@@ -8,13 +8,8 @@ import { useEffect } from "react";
 
 export function Header() {
   const { authUser } = useAuthStore();
-
-  useEffect(() => {
-    const loadUser = async () => {
-      console.log(authUser);
-    };
-    loadUser();
-  }, [authUser]);
+  const cart = useCartStore((state) => state.cart);
+  const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   const renderNav = (nav, role) => {
     if (!role) {
@@ -41,11 +36,9 @@ export function Header() {
                 size={24}
                 className="text-n-6 group-hover:text-primary-3 transition-colors"
               />
-              {useCartStore((state) => state.cart).length > 0 && (
+              {cart.length > 0 && (
                 <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-primary-3 rounded-full min-w-[1.25rem] h-5">
-                  {useCartStore((state) =>
-                    state.cart.reduce((acc, item) => acc + item.quantity, 0)
-                  )}
+                  {cartCount}
                 </span>
               )}
             </div>
@@ -117,11 +110,9 @@ export function Header() {
                 size={24}
                 className="text-n-6 group-hover:text-primary-3 transition-colors"
               />
-              {useCartStore((state) => state.cart).length > 0 && (
+              {cart.length > 0 && (
                 <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-primary-3 rounded-full min-w-[1.25rem] h-5">
-                  {useCartStore((state) =>
-                    state.cart.reduce((acc, item) => acc + item.quantity, 0)
-                  )}
+                  {cartCount}
                 </span>
               )}
             </div>
