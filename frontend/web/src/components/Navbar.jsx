@@ -1,5 +1,5 @@
 import { Menu, X } from "lucide-react";
-import Logo from "../assets/vendora_logo.png";
+import Logo from "../assets/images/vendora_logo.png";
 import { navigation } from "../constant";
 import { Button } from "./Button";
 import { useState } from "react";
