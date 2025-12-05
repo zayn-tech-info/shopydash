@@ -39,13 +39,13 @@ export const navigation = [
   },
 
   {
-    id: 4,
+    id: 3,
     text: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboardIcon,
   },
   {
-    id: 5,
+    id: 4,
     text: "Profile",
     href: "/profile",
     icon: User,

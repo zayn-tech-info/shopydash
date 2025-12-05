@@ -10,6 +10,7 @@ import { Login } from "./pages/Login";
 import { Signup } from "./pages/Signup";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/authStore";
+import { useCartStore } from "./store/cartStore";
 import { BottomNav } from "./components/BottomNav";
 import { AppSkeleton } from "./components/skeletons/AppSkeleton";
 import CreateVendorProfile from "./pages/CreateVendorProfile";
@@ -22,17 +23,24 @@ import ProfileDispatcher from "./pages/ProfileDispatcher";
 import VendorProductUpload from "./pages/VendorProductUpload";
 import { VendorFloatingButton } from "./components/VendorFloatingButton";
 import Feeds from "./pages/Feeds";
+import CartPage from "./pages/CartPage";
 
 const App = () => {
   const authUser = useAuthStore((state) => state.authUser);
   const isCheckingAuth = useAuthStore((state) => state.isCheckingAuth);
   const checkAuth = useAuthStore((state) => state.checkAuth);
+  const { getCart } = useCartStore();
   const location = useLocation();
 
   useEffect(() => {
     checkAuth();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (authUser) {
+      getCart();
+    }
+  }, [authUser, getCart]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0 });
@@ -107,6 +115,11 @@ const App = () => {
           <Route path="/vendor/add" element={<VendorProductUpload />} />
           <Route path="/feeds" element={<Feeds />} />
           <Route path="/p/:username" element={<ProfileDispatcher />} />
+          <Route
+            path="/cart"
+            // element={authUser ? <CartPage /> : <Navigate to="/login" />}
+            element={<CartPage />}
+          />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>

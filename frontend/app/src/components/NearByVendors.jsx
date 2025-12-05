@@ -15,10 +15,16 @@ import "swiper/css/navigation";
 import { VendorsPost } from "../constants";
 import { Link, Links } from "react-router-dom";
 import { useCartStore } from "../store/cartStore";
+import { useEffect } from "react";
 
 export function NearByVendors({ posts, showHeader = true }) {
   const addToCart = useCartStore((state) => state.addToCart);
+  const getCart = useCartStore((state) => state.getCart);
   const rawPosts = posts || [];
+
+  useEffect(() => {
+    getCart();
+  }, []);
 
   const data = rawPosts.map((post) => {
     if (post._id && post.vendorId) {
@@ -62,11 +68,16 @@ export function NearByVendors({ posts, showHeader = true }) {
       .toUpperCase();
   }
 
-  function handleAddToCart(product) {
-    addToCart(product);
-    toast.success(`${product.name} added to cart`, {
-      id: `cart-${product.id}`,
-    });
+  async function handleAddToCart(product, postId) {
+    try {
+      await addToCart({
+        productId: product.id,
+        quantity: 1,
+        vendorPostId: postId,
+      });
+    } catch (error) {
+      toast.error(error.message || "Failed to add to cart");
+    }
   }
 
   function getPostTime(post) {
@@ -139,7 +150,11 @@ export function NearByVendors({ posts, showHeader = true }) {
                         const { hour, minutes, seconds } = getPostTime(post);
                         if (hour >= 48) {
                           const days = Math.floor(hour / 24);
-                          return <span>• {days} day{days > 1 ? 's' : ''} ago</span>;
+                          return (
+                            <span>
+                              • {days} day{days > 1 ? "s" : ""} ago
+                            </span>
+                          );
                         } else if (hour >= 24) {
                           return <span>• 1 day ago</span>;
                         } else if (hour > 0) {
@@ -223,7 +238,7 @@ export function NearByVendors({ posts, showHeader = true }) {
                         </h4>
                         <button
                           type="button"
-                          onClick={() => handleAddToCart(p)}
+                          onClick={() => handleAddToCart(p, post.id)}
                           className="w-full h-9 flex items-center justify-center gap-2 rounded-lg bg-primary-3 text-white font-code text-[10px] font-bold uppercase tracking-wider hover:bg-primary-4 transition-colors"
                         >
                           <ShoppingCart size={14} /> Add to cart

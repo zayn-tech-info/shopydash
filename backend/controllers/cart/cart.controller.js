@@ -6,7 +6,7 @@ const customError = require("../../errors/customError");
 
 const getCart = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user._id;
-  const user = await User.findOne({ userId });
+  const user = await User.findById(userId);
 
   if (!user) {
     const error = new customError("User not found", 404);
@@ -18,8 +18,11 @@ const getCart = asyncErrorHandler(async (req, res, next) => {
     select: "businessName schoolName username profilePic",
   });
   if (!cart) {
-    const error = new customError("Cart is empty", 400);
-    return next(error);
+    return res.status(200).json({
+      cart: {
+        items: [],
+      },
+    });
   }
   res.status(200).json({ cart });
 });
@@ -66,7 +69,6 @@ const addToCart = asyncErrorHandler(async (req, res, next) => {
     if (itemIndex > -1) {
       let productItem = cart.items[itemIndex];
       productItem.quantity += Number(quantity);
-      cart.items[itemIndex] = productId;
     } else {
       cart.items.push({
         productId,
@@ -111,7 +113,69 @@ const addToCart = asyncErrorHandler(async (req, res, next) => {
   }
 });
 
+const updateCartItemQuantity = asyncErrorHandler(async (req, res, next) => {
+  const userId = req.user._id;
+  const { productId, quantity } = req.body;
+
+  if (!productId || quantity === undefined) {
+    const error = new customError("Product ID and quantity are required", 400);
+    return next(error);
+  }
+
+  const cart = await Cart.findOne({ userId });
+
+  if (!cart) {
+    const error = new customError("Cart not found", 404);
+    return next(error);
+  }
+
+  const itemIndex = cart.items.findIndex(
+    (p) => p.productId.toString() === productId
+  );
+
+  if (itemIndex > -1) {
+    if (quantity > 0) {
+      cart.items[itemIndex].quantity = Number(quantity);
+    } else {
+      // Remove item if quantity is 0 or less
+      cart.items.splice(itemIndex, 1);
+    }
+    await cart.save();
+    res.status(200).json({ cart });
+  } else {
+    const error = new customError("Item not found in cart", 404);
+    return next(error);
+  }
+});
+
+const removeFromCart = asyncErrorHandler(async (req, res, next) => {
+  const userId = req.user._id;
+  const { productId } = req.body;
+
+  if (!productId) {
+    const error = new customError("Product ID is required", 400);
+    return next(error);
+  }
+
+  const cart = await Cart.findOne({ userId });
+
+  if (!cart) {
+    const error = new customError("Cart not found", 404);
+    return next(error);
+  }
+
+  cart.items = cart.items.filter(
+    (item) => item.productId.toString() !== productId
+  );
+
+  await cart.save();
+
+  res.status(200).json({ cart });
+});
+
 module.exports = {
   getCart,
   addToCart,
+  updateCartItemQuantity,
+  removeFromCart,
 };

@@ -24,6 +24,10 @@ const cartItemSchema = new mongoose.Schema({
     required: true,
     min: 0,
   },
+  image: {
+    type: String,
+    required: true,
+  },
   quantity: {
     type: Number,
     default: 1,
@@ -51,7 +55,7 @@ const cartSchema = new mongoose.Schema(
 
 cartSchema.pre("save", function (next) {
   this.totalPrice = this.items.reduce(
-    (total, item) => total + item.price * item.qty,
+    (total, item) => total + item.price * item.quantity,
     0
   );
   next();
