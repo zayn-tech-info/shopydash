@@ -8,7 +8,8 @@ const VendorPost = require("../../models/vendorProduct");
 const getProfile = asyncErrorHandler(async (req, res, next) => {
   const { username } = req.params;
 
-  const user = await User.findOne({ username });
+  // Use lean() for better performance
+  const user = await User.findOne({ username }).lean();
 
   if (!user) {
     const error = new customError("User not found", 404);
@@ -19,19 +20,24 @@ const getProfile = asyncErrorHandler(async (req, res, next) => {
   let profileKey;
 
   if (user.role === "vendor") {
-    profile = await vendorProfileSchema
-      .findOne({ userId: user._id })
-      .populate(
-        "userId",
-        "businessName username email phoneNumber whatsAppNumber schoolName profilePic"
-      )
-      .lean();
-
-    if (profile) {
-      const posts = await VendorPost.find({ vendorId: user._id })
+    // Execute queries in parallel for better performance
+    const [vendorProfile, posts] = await Promise.all([
+      vendorProfileSchema
+        .findOne({ userId: user._id })
+        .populate(
+          "userId",
+          "businessName username email phoneNumber whatsAppNumber schoolName profilePic"
+        )
+        .lean(),
+      VendorPost.find({ vendorId: user._id })
+        .select("products")
         .sort({ createdAt: -1 })
-        .lean();
+        .lean(),
+    ]);
 
+    profile = vendorProfile;
+
+    if (profile && posts.length > 0) {
       const allProducts = posts.reduce((acc, post) => {
         return acc.concat(post.products || []);
       }, []);
@@ -46,7 +52,8 @@ const getProfile = asyncErrorHandler(async (req, res, next) => {
       .populate(
         "userId",
         "fullName username email phoneNumber schoolName profilePic"
-      );
+      )
+      .lean();
     profileKey = "clientProfile";
   }
 
