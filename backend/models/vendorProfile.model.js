@@ -107,7 +107,6 @@ const vendorProfileSchema = new mongoose.Schema(
   }
 );
 
-// Add indexes for frequently queried fields to improve performance
 vendorProfileSchema.index({ userId: 1 });
 vendorProfileSchema.index({ storeUsername: 1 });
 vendorProfileSchema.index({ businessCategory: 1 });

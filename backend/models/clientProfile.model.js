@@ -57,7 +57,6 @@ const clientProfileSchema = new mongoose.Schema({
   },
 });
 
-// Add index for frequently queried field to improve performance
 clientProfileSchema.index({ userId: 1 });
 
 module.exports = mongoose.model("ClientProfile", clientProfileSchema);

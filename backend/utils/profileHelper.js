@@ -1,11 +1,6 @@
 const ClientProfile = require("../models/clientProfile.model");
 const VendorProfile = require("../models/vendorProfile.model");
 
-/**
- * Check if a user has a profile (client or vendor)
- * @param {Object} user - User object with _id and role
- * @returns {Promise<boolean>} - True if profile exists, false otherwise
- */
 const checkUserHasProfile = async (user) => {
   if (!user || !user._id || !user.role) {
     return false;

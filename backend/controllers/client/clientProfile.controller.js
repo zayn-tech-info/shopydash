@@ -11,7 +11,6 @@ const createClientProfile = asyncErrorHandler(async (req, res, next) => {
     return next(err);
   }
 
-  // Use lean() and select only _id for faster check
   const existingClientProfile = await clientProfileSchema
     .findOne({ userId })
     .select("_id")

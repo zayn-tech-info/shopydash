@@ -24,16 +24,16 @@ const googleAuth = asyncErrorHandler(async (req, res, next) => {
   }
 
   const { email, name, picture } = await response.json();
-
   let user = await User.findOne({ email });
 
   if (user) {
     const hasProfile = await checkUserHasProfile(user);
     sendToken(user, "Logged in successfully", res, 200, hasProfile);
   } else {
-    const baseUsername = email.split("@")[0];
-    const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-    const username = `${baseUsername}${randomSuffix}`;
+    let username = email.split("@")[0].replace(/[^a-zA-Z0-9_.]/g, "");
+    if (username.length < 3) {
+      username = `${username}${Math.floor(Math.random() * 1000)}`;
+    }
 
     user = await User.create({
       email,
@@ -46,6 +46,68 @@ const googleAuth = asyncErrorHandler(async (req, res, next) => {
 
     sendToken(user, "Account created successfully", res, 201, false);
   }
+});
+
+const completeRegistration = asyncErrorHandler(async (req, res, next) => {
+  const userId = req.user._id;
+  const {
+    role,
+    username,
+    phoneNumber,
+    schoolName,
+    whatsAppNumber,
+    businessName,
+    schoolId,
+    password,
+  } = req.body;
+
+  if (
+    !role ||
+    !username ||
+    !phoneNumber ||
+    !schoolName ||
+    !whatsAppNumber ||
+    !password
+  ) {
+    const err = new customError("All fields are required", 400);
+    return next(err);
+  }
+
+  if (role === "vendor" && !businessName) {
+    const err = new customError("Business name is required for vendors", 400);
+    return next(err);
+  }
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    const err = new customError("User not found", 404);
+    return next(err);
+  }
+
+  const existingUser = await User.findOne({ username }).select("_id").lean();
+  if (existingUser && existingUser._id.toString() !== userId.toString()) {
+    const err = new customError("Username is already taken", 400);
+    return next(err);
+  }
+
+  user.username = username;
+  user.role = role;
+  user.phoneNumber = phoneNumber;
+  user.schoolName = schoolName;
+  user.whatsAppNumber = whatsAppNumber;
+  user.password = password;
+  user.businessName = role === "vendor" ? businessName : undefined;
+  user.schoolId = schoolId ? Number(schoolId) : undefined;
+  user.profileComplete = true;
+
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Registration completed successfully",
+    data: { user: user.toObject(), hasProfile: false },
+  });
 });
 
 const signup = asyncErrorHandler(async (req, res, next) => {
@@ -173,69 +235,6 @@ const checkAuth = asyncErrorHandler(async (req, res, next) => {
   res.status(200).json({ ...req.user.toObject(), hasProfile });
 });
 
-const completeRegistration = asyncErrorHandler(async (req, res, next) => {
-  const userId = req.user._id;
-  const {
-    role,
-    username,
-    phoneNumber,
-    schoolName,
-    whatsAppNumber,
-    businessName,
-    schoolId,
-    password,
-  } = req.body;
-
-  if (
-    !role ||
-    !username ||
-    !phoneNumber ||
-    !schoolName ||
-    !whatsAppNumber ||
-    !password
-  ) {
-    const err = new customError("All fields are required", 400);
-    return next(err);
-  }
-
-  if (role === "vendor" && !businessName) {
-    const err = new customError("Business name is required for vendors", 400);
-    return next(err);
-  }
-
-  const user = await User.findById(userId);
-
-  if (!user) {
-    const err = new customError("User not found", 404);
-    return next(err);
-  }
-
-  // Use lean() and select only _id for faster check
-  const existingUser = await User.findOne({ username }).select("_id").lean();
-  if (existingUser && existingUser._id.toString() !== userId.toString()) {
-    const err = new customError("Username is already taken", 400);
-    return next(err);
-  }
-
-  user.username = username;
-  user.role = role;
-  user.phoneNumber = phoneNumber;
-  user.schoolName = schoolName;
-  user.whatsAppNumber = whatsAppNumber;
-  user.password = password;
-  user.businessName = role === "vendor" ? businessName : undefined;
-  user.schoolId = schoolId ? Number(schoolId) : undefined;
-  user.profileComplete = true;
-
-  await user.save();
-
-  res.status(200).json({
-    success: true,
-    message: "Registration completed successfully",
-    data: { user: user.toObject(), hasProfile: false },
-  });
-});
-
 const filterField = (obj, ...allowedFields) => {
   const filteredfields = {};
   Object.keys(obj).forEach((key) => {
@@ -294,8 +293,6 @@ const updateUser = asyncErrorHandler(async (req, res, next) => {
       return next(new customError("Image upload failed", 500));
     }
   }
-
-  console.log("Updating user with:", filteredBody);
 
   const updatedUser = await User.findByIdAndUpdate(
     userId,

@@ -8,7 +8,6 @@ const VendorPost = require("../../models/vendorProduct");
 const getProfile = asyncErrorHandler(async (req, res, next) => {
   const { username } = req.params;
 
-  // Use lean() for better performance
   const user = await User.findOne({ username }).lean();
 
   if (!user) {
@@ -20,7 +19,6 @@ const getProfile = asyncErrorHandler(async (req, res, next) => {
   let profileKey;
 
   if (user.role === "vendor") {
-    // Execute queries in parallel for better performance
     const [vendorProfile, posts] = await Promise.all([
       vendorProfileSchema
         .findOne({ userId: user._id })

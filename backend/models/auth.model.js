@@ -28,10 +28,10 @@ const userSchema = mongoose.Schema(
       maxlength: [30, "Username cannot exceed 30 characters"],
       validate: {
         validator: function (v) {
-          return /^[a-z0-9_]+$/.test(v);
+          return /^[a-z0-9_.]+$/.test(v);
         },
         message:
-          "Username can only contain lowercase letters, numbers, and underscores",
+          "Username can only contain lowercase letters, numbers, underscores, and dots",
       },
     },
     email: {
@@ -238,7 +238,6 @@ userSchema.methods.isPasswordChanged = function (jwtTimeStamp) {
   return jwtTimeStamp < passwordChangedTimeStamp;
 };
 
-// Add indexes for frequently queried fields to improve performance
 userSchema.index({ email: 1 });
 userSchema.index({ username: 1 });
 userSchema.index({ schoolId: 1 });
