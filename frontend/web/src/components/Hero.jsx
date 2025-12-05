@@ -1,5 +1,5 @@
 import { MessageCircle } from "lucide-react";
-import HeroImg from "../assets/images/hero_sec";
+import HeroImg from "../assets/images/hero_sec.png";
 import { Button } from "./Button";
 
 export function Hero() {
