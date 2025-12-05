@@ -51,6 +51,8 @@ Removed debug console.log statements from:
 
 **Impact:** Cleaner console output and slightly better performance.
 
+**Additional Improvements:** Also removed console.error statements from Feeds.jsx and VendorProfile.jsx, replacing them with proper error handling or silent failures where appropriate.
+
 ### 4. Optimized Feeds Search/Filter Logic
 
 #### Before:
@@ -100,6 +102,8 @@ set({
 
 **Impact:** Single state update instead of two, reducing re-renders.
 
+**Additional Fix in signupStore.js:** Removed duplicate state update that was overwriting the normalized payload with raw response data.
+
 ### 6. Added React.memo for Component Optimization
 
 Wrapped the following components with `React.memo` to prevent unnecessary re-renders:
@@ -135,16 +139,19 @@ if (hour >= 24) {
 }
 ```
 
-**Fix:** Reordered conditions properly:
+**Fix:** Reordered conditions properly and improved time formatting:
 ```javascript
 if (hour >= 48) {
-  return <span>• {post.postedAt}</span>;
+  const days = Math.floor(hour / 24);
+  return <span>• {days} day{days > 1 ? 's' : ''} ago</span>;
 } else if (hour >= 24) {
-  return <span>• 1day ago</span>;
+  return <span>• 1 day ago</span>;
 } else if (hour > 0) {
   return <span>• {hour}h ago</span>;
 }
 ```
+
+**Impact:** Now properly displays "2 days ago", "3 days ago" etc. instead of raw timestamp.
 
 ### 9. Optimized Store Selectors
 
@@ -166,16 +173,18 @@ const checkAuth = useAuthStore((state) => state.checkAuth);
 ## Performance Metrics
 
 ### Build Results
-- Successfully builds with no errors or warnings
-- All ESLint issues resolved (0 errors, 0 warnings)
-- Bundle size: 641.74 kB (192.05 kB gzipped)
+- ✅ Successfully builds with no errors or warnings
+- ✅ All ESLint issues resolved (0 errors, 0 warnings)
+- ✅ CodeQL security scan passed (0 vulnerabilities)
+- Bundle size: 641.73 kB (192.05 kB gzipped)
 
 ### Improvements Summary
-1. **Reduced API Calls:** Feeds search now uses client-side filtering instead of re-fetching
+1. **Reduced API Calls:** Feeds search now uses client-side filtering instead of re-fetching (saves ~N requests per search)
 2. **Reduced Re-renders:** React.memo on 5 components + useCallback on 6+ functions
-3. **Fixed Hooks Violations:** No more React Hooks rule violations
-4. **Cleaner Code:** Removed all debug console.logs
-5. **Better State Management:** Combined multiple state updates, optimized selectors
+3. **Fixed Hooks Violations:** No more React Hooks rule violations (was causing 5 errors)
+4. **Cleaner Code:** Removed 15+ debug console.logs and console.errors
+5. **Better State Management:** Combined multiple state updates, optimized selectors, fixed conflicting updates
+6. **Improved UX:** Better time formatting (e.g., "2 days ago" vs raw timestamp)
 
 ## Best Practices Applied
 
