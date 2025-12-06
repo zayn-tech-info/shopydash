@@ -15,7 +15,7 @@ const getCart = asyncErrorHandler(async (req, res, next) => {
 
   const cart = await Cart.findOne({ userId }).populate({
     path: "items.vendorId",
-    select: "businessName schoolName username profilePic",
+    select: "businessName schoolName username profilePic whatsAppNumber",
   });
   if (!cart) {
     return res.status(200).json({
@@ -146,8 +146,6 @@ const updateCartItemQuantity = asyncErrorHandler(async (req, res, next) => {
     return next(error);
   }
 });
-
- 
 
 const removeFromCart = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user._id;

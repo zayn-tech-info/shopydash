@@ -10,8 +10,13 @@ import {
   Store,
   MapPin,
   Dot,
+  MessageCircle,
 } from "lucide-react";
+import { useAuthStore } from "../store/authStore";
+import { useState } from "react";
 import { motion } from "framer-motion";
+import CheckoutModal from "../components/cart/CheckoutModal";
+import { openWhatsApp } from "../utils/whatsappUtils";
 
 const CartPage = () => {
   const {
@@ -22,10 +27,46 @@ const CartPage = () => {
     getCartCount,
     getCart,
   } = useCartStore();
+  const { authUser } = useAuthStore();
+  const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
+  const [groupedItems, setGroupedItems] = useState({});
 
   useEffect(() => {
     getCart();
   }, [getCart]);
+
+  const getGroupedItems = () => {
+    const groups = {};
+    cart.forEach((item) => {
+      const vendorId = item.vendorId?._id;
+      if (!vendorId) return;
+      if (!groups[vendorId]) {
+        groups[vendorId] = {
+          vendor: item.vendorId,
+          items: [],
+          total: 0,
+        };
+      }
+      groups[vendorId].items.push(item);
+      groups[vendorId].total += item.price * item.quantity;
+    });
+    return groups;
+  };
+
+  const handleCheckout = () => {
+    const groups = getGroupedItems();
+    setGroupedItems(groups);
+    const vendorIds = Object.keys(groups);
+
+    if (vendorIds.length === 0) return;
+    if (vendorIds.length === 1) {
+      // Single vendor - open WhatsApp directly
+      const group = groups[vendorIds[0]];
+      openWhatsApp(group.vendor, group.items, group.total, authUser);
+    } else {
+      setIsCheckoutModalOpen(true);
+    }
+  };
 
   const subtotal = useMemo(() => {
     return cart.reduce((total, item) => total + item.price * item.quantity, 0);
@@ -195,8 +236,12 @@ const CartPage = () => {
                 </div>
               </div>
 
-              <button className="w-full mt-8 bg-black text-white py-4 rounded-xl font-bold hover:bg-gray-800 transition-all duration-300 shadow-lg shadow-gray-200 active:scale-[0.98]">
-                Proceed to Checkout
+              <button
+                onClick={handleCheckout}
+                className="w-full mt-8 bg-black text-white py-4 rounded-xl font-bold hover:bg-gray-800 transition-all duration-300 shadow-lg shadow-gray-200 active:scale-[0.98] flex items-center justify-center gap-2"
+              >
+                <span>Proceed to Checkout</span>
+                <MessageCircle size={20} />
               </button>
 
               <div className="mt-6 flex items-center justify-center gap-2 text-sm text-gray-500">
@@ -207,8 +252,13 @@ const CartPage = () => {
           </div>
         </div>
       </div>
+      <CheckoutModal
+        isOpen={isCheckoutModalOpen}
+        onClose={() => setIsCheckoutModalOpen(false)}
+        groupedItems={groupedItems}
+        authUser={authUser}
+      />
     </div>
   );
 };
-
 export default CartPage;
