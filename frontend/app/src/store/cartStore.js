@@ -58,7 +58,6 @@ export const useCartStore = create((set, get) => ({
       return;
     }
 
-    // Optimistic update
     const previousCart = get().cart;
     set({
       cart: previousCart.map((item) =>
@@ -69,7 +68,6 @@ export const useCartStore = create((set, get) => ({
     try {
       await api.patch("/api/v1/cart/update", { productId, quantity });
     } catch (error) {
-      // Revert if failed
       set({ cart: previousCart });
       toast.error(error.response?.data?.message || "Failed to update quantity");
     }

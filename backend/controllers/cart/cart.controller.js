@@ -137,7 +137,6 @@ const updateCartItemQuantity = asyncErrorHandler(async (req, res, next) => {
     if (quantity > 0) {
       cart.items[itemIndex].quantity = Number(quantity);
     } else {
-      // Remove item if quantity is 0 or less
       cart.items.splice(itemIndex, 1);
     }
     await cart.save();
@@ -147,6 +146,8 @@ const updateCartItemQuantity = asyncErrorHandler(async (req, res, next) => {
     return next(error);
   }
 });
+
+ 
 
 const removeFromCart = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user._id;

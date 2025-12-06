@@ -8,6 +8,8 @@ import {
   ShoppingBag,
   ArrowRight,
   Store,
+  MapPin,
+  Dot,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -29,8 +31,7 @@ const CartPage = () => {
     return cart.reduce((total, item) => total + item.price * item.quantity, 0);
   }, [cart]);
 
-  const shipping = 500; // Example fixed shipping or calculated
-  const total = subtotal + shipping;
+  const total = subtotal;
 
   if (isLoading && cart.length === 0) {
     return (
@@ -87,10 +88,10 @@ const CartPage = () => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   key={item._id || item.productId} // Fallback key
-                  className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col sm:flex-row gap-6 relative overflow-hidden group"
+                  className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100 flex flex-col sm:flex-row gap-4 sm:gap-6 relative overflow-hidden group"
                 >
                   {/* Product Image */}
-                  <div className="w-full sm:w-32 h-32 flex-shrink-0 bg-gray-100 rounded-xl overflow-hidden">
+                  <div className="w-full h-48 sm:w-32 sm:h-32 flex-shrink-0 bg-gray-100 rounded-xl overflow-hidden">
                     <img
                       src={item.image}
                       alt={item.title}
@@ -106,15 +107,24 @@ const CartPage = () => {
                           <h3 className="text-lg font-bold text-gray-900 line-clamp-1">
                             {item.title}
                           </h3>
-                          <div className="flex items-center text-sm text-gray-500 mt-1">
-                            <Store size={14} className="mr-1" />
-                            <span>
-                              {item.vendorId?.businessName || "Vendor"}
-                            </span>
+                          <div className="flex flex-wrap items-center my-1 text-gray-500 gap-x-2 gap-y-1">
+                            <div className="flex items-center text-sm text-gray-500">
+                              <Store size={14} className="mr-1" />
+                              <span>
+                                {item.vendorId?.businessName || "Vendor"}
+                              </span>
+                            </div>
+                            <Dot className="hidden sm:block" />
+                            <div>
+                              <p className="text-xs text-gray-400 mt-1 sm:mt-0">
+                                {item.school}
+                              </p>
+                            </div>
                           </div>
-                          <p className="text-xs text-gray-400 mt-1">
-                            {item.school}, {item.location}
-                          </p>
+                          <div className="flex items-center text-primary-3 gap-2 mt-1">
+                            <MapPin size={14} />
+                            <p className="text-xs ">{item.location}</p>
+                          </div>
                         </div>
                         <button
                           onClick={() => removeFromCart(item.productId)}
@@ -172,10 +182,6 @@ const CartPage = () => {
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal</span>
                   <span>₦{subtotal.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-gray-600">
-                  <span>Shipping Estimate</span>
-                  <span>₦{shipping.toLocaleString()}</span>
                 </div>
 
                 <div className="border-t border-gray-100 pt-4 mt-4">
