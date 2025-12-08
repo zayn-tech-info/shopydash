@@ -6,9 +6,8 @@ const User = require("../../models/auth.model");
 
 const createPost = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user._id;
-  const { caption, products, school, location } = req.body;
+  const { caption, products, school, location, state, lga, area } = req.body;
 
-  // Validate products early to avoid unnecessary DB queries
   if (!products || products.length < 4) {
     return next(
       new customError("You must upload at least 4 products per post.", 400)
@@ -40,6 +39,9 @@ const createPost = asyncErrorHandler(async (req, res, next) => {
     products,
     school: school || vendorProfile.schoolName || user.schoolName,
     location,
+    state,
+    lga,
+    area,
   });
 
   res.status(201).json({
@@ -84,6 +86,18 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
     query.school = school;
   }
 
+  // Filter by user location if available
+  if (req.user) {
+    if (req.user.state) query.state = req.user.state;
+    if (req.user.lga) query.lga = req.user.lga;
+    // We optionally filter by area if needed, but strict state/lga match is key
+    // if (req.user.area) query.area = req.user.area;
+  } else if (req.query.state && req.query.lga) {
+    query.state = req.query.state;
+    query.lga = req.query.lga;
+    if (req.query.area) query.area = req.query.area;
+  }
+
   // Enforce maximum limit to prevent resource exhaustion
   const pageLimit = Math.min(parseInt(limit), 50);
   const currentPage = Math.max(parseInt(page), 1);
@@ -100,6 +114,44 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
       .limit(pageLimit)
       .lean(),
     VendorPost.countDocuments(query),
+  ]);
+
+  res.status(200).json({
+    success: true,
+    data: {
+      posts,
+      pagination: {
+        currentPage,
+        totalPages: Math.ceil(total / pageLimit),
+        totalItems: total,
+      },
+    },
+  });
+});
+
+const getFeedPost = asyncErrorHandler(async (req, res, next) => {
+  /*   const { school, page = 1, limit = 10 } = req.query;
+
+  const query = {};
+  if (school) {
+    query.school = school;
+  } */
+
+  // Enforce maximum limit to prevent resource exhaustion
+  /*   const pageLimit = Math.min(parseInt(limit), 50);
+  const currentPage = Math.max(parseInt(page), 1); */
+
+  // Use lean() for better performance and execute queries in parallel
+  const [posts, total] = await Promise.all([
+    VendorPost.find(query).populate(
+      "vendorId",
+      "businessName fullName whatsAppNumber phoneNumber username profilePic logo"
+    ),
+    /*       .sort({ createdAt: -1 })
+      .skip((currentPage - 1) * pageLimit)
+      .limit(pageLimit)
+      .lean(),
+    VendorPost.countDocuments(query), */
   ]);
 
   res.status(200).json({
@@ -171,7 +223,7 @@ const deletePost = asyncErrorHandler(async (req, res, next) => {
 const updatePost = asyncErrorHandler(async (req, res, next) => {
   const { postId } = req.params;
   const userId = req.user._id;
-  const { caption, products, location } = req.body;
+  const { caption, products, location, state, lga, area } = req.body;
 
   const post = await VendorPost.findById(postId);
 
@@ -193,6 +245,9 @@ const updatePost = asyncErrorHandler(async (req, res, next) => {
 
   post.caption = caption || post.caption;
   post.location = location || post.location;
+  post.state = state || post.state;
+  post.lga = lga || post.lga;
+  post.area = area || post.area;
   if (products) {
     post.products = products;
   }

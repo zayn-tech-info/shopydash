@@ -8,6 +8,8 @@ const initialProfileData = {
   address: "",
   city: "",
   state: "",
+  lga: "",
+  area: "",
   country: "",
   zipCode: "",
   accountNumber: "",
@@ -118,10 +120,10 @@ export const useVendorProfileStore = create((set, get) => ({
 
       const profile = payload?.vendorProfile ?? payload;
 
-      set({ 
+      set({
         vendorProfile: profile,
-        isUpdatingVendorProfile: false, 
-        error: null 
+        isUpdatingVendorProfile: false,
+        error: null,
       });
 
       return profile;

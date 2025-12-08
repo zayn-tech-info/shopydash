@@ -6,6 +6,7 @@ import { useAuthStore } from "../store/authStore";
 import { InputField } from "../components/InputField";
 import { schools, preferredCategories } from "../constants";
 import { ChevronDown, Check } from "lucide-react";
+import LocationSelector from "../components/LocationSelector";
 
 export default function CreateClientProfile() {
   const navigate = useNavigate();
@@ -44,9 +45,9 @@ export default function CreateClientProfile() {
       updateUser({ hasProfile: true });
       toast.success("Profile created");
       if (authUser?.role === "vendor") {
-        navigate(`/${authUser?.username}`);
+        navigate(`/p/${authUser?.username}`);
       } else {
-        navigate(`/${authUser?.username}`);
+        navigate(`/p/${authUser?.username}`);
       }
     } catch (e) {
       const errorMessage =
@@ -107,17 +108,18 @@ export default function CreateClientProfile() {
               placeholder="Street address"
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <InputField
-                placeholder="City"
-                value={clientProfileData.city}
-                onChange={handleInputChange("city")}
-              />
-              <InputField
-                placeholder="State"
-                value={clientProfileData.state}
-                onChange={handleInputChange("state")}
-              />
+            <LocationSelector
+              selectedState={clientProfileData.state}
+              setSelectedState={(val) => setInputField("state", val)}
+              selectedArea={clientProfileData.area}
+              setSelectedArea={(val) => {
+                setInputField("area", val);
+                setInputField("city", val);
+              }}
+              schoolName={authUser?.schoolName}
+            />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <InputField
                 placeholder="Country"
                 value={clientProfileData.country}

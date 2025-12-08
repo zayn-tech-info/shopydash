@@ -12,6 +12,7 @@ const clientProfile = require("./routes/clientProfile.route");
 const profile = require("./routes/profile.route");
 const vendorPost = require("./routes/vendorPost.route");
 const cartRouter = require("./routes/cart.route");
+const locationRouter = require("./routes/location.route");
 
 connectDB();
 const app = express();
@@ -39,6 +40,7 @@ app.use("/api/v1/clientProfile", clientProfile);
 app.use("/api/v1/profile", profile);
 app.use("/api/v1/post", vendorPost);
 app.use("/api/v1/cart", cartRouter);
+app.use("/api/v1/locations", locationRouter);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.all(/(.*)/, (req, res, next) => {

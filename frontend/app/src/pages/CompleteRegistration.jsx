@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useAuthStore } from "../store/authStore";
 import { schools } from "../constants";
+import LocationSelector from "../components/LocationSelector";
 
 export default function CompleteRegistration() {
   const navigate = useNavigate();
@@ -24,8 +25,12 @@ export default function CompleteRegistration() {
   const [whatsAppNumber, setWhatsAppNumber] = useState("");
   const [businessName, setBusinessName] = useState("");
   const [schoolId, setSchoolId] = useState("");
+
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [selectedState, setSelectedState] = useState("");
+  const [selectedLga, setSelectedLga] = useState("");
+  const [selectedArea, setSelectedArea] = useState("");
 
   const isClient = role === "client";
 
@@ -37,7 +42,9 @@ export default function CompleteRegistration() {
       !phoneNumber ||
       !schoolName ||
       !whatsAppNumber ||
-      !password
+      !password ||
+      !selectedState ||
+      !selectedArea
     ) {
       return toast.error("Please fill in all required fields");
     }
@@ -61,6 +68,8 @@ export default function CompleteRegistration() {
         businessName: isClient ? undefined : businessName,
         schoolId: schoolId ? Number(schoolId) : undefined,
         password,
+        state: selectedState,
+        area: selectedArea,
       });
 
       toast.success("Registration completed successfully!");
@@ -136,7 +145,7 @@ export default function CompleteRegistration() {
                 />
               </div>
             )}
- 
+
             <div className="mb-5">
               <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
                 Username
@@ -165,6 +174,14 @@ export default function CompleteRegistration() {
                 required
               />
             </div>
+
+            <LocationSelector
+              selectedState={selectedState}
+              setSelectedState={setSelectedState}
+              selectedArea={selectedArea}
+              setSelectedArea={setSelectedArea}
+              schoolName={schoolName}
+            />
 
             {/* School Name */}
             <div className="mb-5">

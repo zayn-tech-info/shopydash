@@ -59,6 +59,9 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
     businessName,
     schoolId,
     password,
+    state,
+    lga,
+    area,
   } = req.body;
 
   if (
@@ -99,6 +102,9 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
   user.password = password;
   user.businessName = role === "vendor" ? businessName : undefined;
   user.schoolId = schoolId ? Number(schoolId) : undefined;
+  user.state = state;
+  user.lga = lga;
+  user.area = area;
   user.profileComplete = true;
 
   await user.save();
@@ -262,6 +268,9 @@ const updateUser = asyncErrorHandler(async (req, res, next) => {
     "schoolName",
     "businessName",
     "profilePic",
+    "state",
+    "lga",
+    "area",
   ];
 
   let filteredBody = filterField(req.body, ...allowedFields);

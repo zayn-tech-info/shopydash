@@ -45,14 +45,25 @@ const createClientProfile = asyncErrorHandler(async (req, res, next) => {
 const updateClientProfile = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user && req.user._id;
 
-  const { gender, address, city, state, country, preferredCategory, wishList } =
-    req.body;
+  const {
+    gender,
+    address,
+    city,
+    state,
+    lga,
+    area,
+    country,
+    preferredCategory,
+    wishList,
+  } = req.body;
 
   const updates = {
     gender,
     address,
     city,
     state,
+    lga,
+    area,
     country,
     preferredCategory,
     wishList,

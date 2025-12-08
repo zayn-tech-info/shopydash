@@ -188,6 +188,18 @@ const userSchema = mongoose.Schema(
     passwordChangedAt: {
       type: Date,
     },
+    state: {
+      type: String,
+      trim: true,
+    },
+    lga: {
+      type: String,
+      trim: true,
+    },
+    area: {
+      type: String,
+      trim: true,
+    },
   },
   {
     timestamps: true,

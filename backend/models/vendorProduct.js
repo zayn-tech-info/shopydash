@@ -83,6 +83,18 @@ const vendorPostSchema = new mongoose.Schema(
       type: String,
       required: [true, "Location is required (e.g., Under G)"],
     },
+    state: {
+      type: String,
+      trim: true,
+    },
+    lga: {
+      type: String,
+      trim: true,
+    },
+    area: {
+      type: String,
+      trim: true,
+    },
     likes: {
       type: Number,
       default: 0,

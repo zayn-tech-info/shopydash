@@ -1,4 +1,15 @@
-export const PostDetails = ({ caption, setCaption, location, setLocation }) => {
+import LocationSelector from "../LocationSelector";
+
+export const PostDetails = ({
+  caption,
+  setCaption,
+  selectedState,
+  setSelectedState,
+  selectedLga,
+  setSelectedLga,
+  selectedArea,
+  setSelectedArea,
+}) => {
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
       <h2 className="text-xl font-semibold mb-4">Post Details</h2>
@@ -16,19 +27,15 @@ export const PostDetails = ({ caption, setCaption, location, setLocation }) => {
             required
           />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Location (e.g., Under G, Moremi Hall)
-          </label>
-          <input
-            type="text"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-            placeholder="Where can buyers find you?"
-            required
-          />
-        </div>
+
+        <LocationSelector
+          selectedState={selectedState}
+          setSelectedState={setSelectedState}
+          selectedLga={selectedLga}
+          setSelectedLga={setSelectedLga}
+          selectedArea={selectedArea}
+          setSelectedArea={setSelectedArea}
+        />
       </div>
     </div>
   );

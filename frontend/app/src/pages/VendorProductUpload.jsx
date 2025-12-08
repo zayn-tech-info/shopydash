@@ -24,7 +24,9 @@ const VendorProductUpload = () => {
     useProductStore();
 
   const [caption, setCaption] = useState(editingPost?.caption || "");
-  const [postLocation, setPostLocation] = useState(editingPost?.location || "");
+  const [selectedState, setSelectedState] = useState(editingPost?.state || "");
+  const [selectedLga, setSelectedLga] = useState(editingPost?.lga || "");
+  const [selectedArea, setSelectedArea] = useState(editingPost?.area || "");
   const [products, setProducts] = useState(
     editingPost?.products.map((p) => ({
       id: p._id || Date.now() + Math.random(),
@@ -133,7 +135,12 @@ const VendorProductUpload = () => {
 
       const postData = {
         caption,
-        location: postLocation,
+        location: [selectedArea, selectedLga, selectedState]
+          .filter(Boolean)
+          .join(", "),
+        state: selectedState,
+        lga: selectedLga,
+        area: selectedArea,
         products: processedProducts,
       };
 
@@ -168,8 +175,12 @@ const VendorProductUpload = () => {
           <PostDetails
             caption={caption}
             setCaption={setCaption}
-            location={postLocation}
-            setLocation={setPostLocation}
+            selectedState={selectedState}
+            setSelectedState={setSelectedState}
+            selectedLga={selectedLga}
+            setSelectedLga={setSelectedLga}
+            selectedArea={selectedArea}
+            setSelectedArea={setSelectedArea}
           />
 
           <div className="space-y-6">

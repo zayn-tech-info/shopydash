@@ -40,6 +40,12 @@ const vendorProfileSchema = new mongoose.Schema(
     state: {
       type: String,
     },
+    lga: {
+      type: String,
+    },
+    area: {
+      type: String,
+    },
     country: {
       type: String,
     },

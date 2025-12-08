@@ -28,6 +28,8 @@ const initialProfileData = {
   address: "",
   city: "",
   state: "",
+  lga: "",
+  area: "",
   country: "",
   preferredCategory: "",
   wishList: [],
