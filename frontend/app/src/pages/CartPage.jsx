@@ -41,7 +41,7 @@ const CartPage = () => {
       const vendorId = item.vendorId?._id;
       if (!vendorId) return;
       if (!groups[vendorId]) {
-        groups[vendorId] = {
+        groups[vendorId] = { 
           vendor: item.vendorId,
           items: [],
           total: 0,
@@ -60,7 +60,6 @@ const CartPage = () => {
 
     if (vendorIds.length === 0) return;
     if (vendorIds.length === 1) {
-      // Single vendor - open WhatsApp directly
       const group = groups[vendorIds[0]];
       openWhatsApp(group.vendor, group.items, group.total, authUser);
     } else {
