@@ -16,6 +16,7 @@ import { VendorsPost } from "../constants";
 import { Link, Links } from "react-router-dom";
 import { useCartStore } from "../store/cartStore";
 import { useEffect } from "react";
+import UserAvatar from "./UserAvatar";
 
 export function NearByVendors({ posts, showHeader = true }) {
   const addToCart = useCartStore((state) => state.addToCart);
@@ -58,15 +59,6 @@ export function NearByVendors({ posts, showHeader = true }) {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "");
-
-  function initials(name = "") {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase();
-  }
 
   async function handleAddToCart(product, postId) {
     try {
@@ -123,17 +115,11 @@ export function NearByVendors({ posts, showHeader = true }) {
           >
             <div className="flex items-center justify-between px-6 py-4 border-b border-n-3/10">
               <div className="flex items-center gap-4 min-w-0">
-                {post.vendorAvatar ? (
-                  <img
-                    src={post.vendorAvatar}
-                    alt={post.vendorName}
-                    className="w-10 h-10 rounded-full object-cover border border-n-3/10"
-                  />
-                ) : (
-                  <div className="w-10 h-10 rounded-full bg-primary-3/10 text-primary-3 flex items-center justify-center font-code text-xs font-bold">
-                    {initials(post.vendorName)}
-                  </div>
-                )}
+                <UserAvatar
+                  profilePic={post.vendorAvatar}
+                  alt={post.vendorName}
+                  className="w-10 h-10 border border-n-3/10"
+                />
                 <div className="min-w-0">
                   <div className="flex gap-3">
                     <p className="font-bold text-n-8 truncate">

@@ -1,16 +1,8 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import {
-  GraduationCap,
-  Store,
-  ChevronDown,
-  Check,
-  Eye,
-  EyeOff,
-} from "lucide-react";
+import { GraduationCap, Store, Eye, EyeOff } from "lucide-react";
 import { useAuthStore } from "../store/authStore";
-import { api } from "../lib/axios";
 import LocationSelector from "../components/LocationSelector";
 
 export default function CompleteRegistration() {
@@ -28,32 +20,9 @@ export default function CompleteRegistration() {
 
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [selectedState, setSelectedState] = useState("");
-  const [selectedLga, setSelectedLga] = useState("");
   const [selectedArea, setSelectedArea] = useState("");
 
   const isClient = role === "client";
-
-  const [schools, setSchools] = useState([]);
-  const [loadingSchools, setLoadingSchools] = useState(false);
-
-  useEffect(() => {
-    const fetchSchools = async () => {
-      try {
-        setLoadingSchools(true);
-        const res = await api.get("/api/v1/locations/schools");
-        if (res.data.success) {
-          setSchools(res.data.schools);
-        }
-      } catch (error) {
-        console.error("Failed to fetch schools", error);
-        toast.error("Could not load school list");
-      } finally {
-        setLoadingSchools(false);
-      }
-    };
-    fetchSchools();
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -64,7 +33,6 @@ export default function CompleteRegistration() {
       !schoolName ||
       !whatsAppNumber ||
       !password ||
-      !selectedState ||
       !selectedArea
     ) {
       return toast.error("Please fill in all required fields");
@@ -89,8 +57,8 @@ export default function CompleteRegistration() {
         businessName: isClient ? undefined : businessName,
         schoolId: schoolId ? Number(schoolId) : undefined,
         password,
-        state: selectedState,
         area: selectedArea,
+        state: "Nigeria",
       });
 
       toast.success("Registration completed successfully!");
@@ -115,7 +83,6 @@ export default function CompleteRegistration() {
           </div>
 
           <form onSubmit={handleSubmit} className="px-8 pb-8">
-            {/* Role Selection */}
             <div className="mb-6">
               <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
                 I am a
@@ -150,7 +117,6 @@ export default function CompleteRegistration() {
               </div>
             </div>
 
-            {/* Business Name (Vendor only) */}
             {!isClient && (
               <div className="mb-5">
                 <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
@@ -181,7 +147,6 @@ export default function CompleteRegistration() {
               />
             </div>
 
-            {/* Phone Number */}
             <div className="mb-5">
               <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
                 Phone Number
@@ -197,28 +162,12 @@ export default function CompleteRegistration() {
             </div>
 
             <LocationSelector
-              selectedState={selectedState}
-              setSelectedState={setSelectedState}
+              schoolName={schoolName}
+              setSchoolName={setSchoolName}
               selectedArea={selectedArea}
               setSelectedArea={setSelectedArea}
-              schoolName={schoolName}
             />
 
-            {/* School Name */}
-            <div className="mb-5">
-              <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
-                School Name
-              </label>
-              <Combobox
-                options={schools}
-                value={schoolName}
-                onChange={setSchoolName}
-                placeholder="Put the school full name"
-                loading={loadingSchools}
-              />
-            </div>
-
-            {/* Student ID */}
             <div className="mb-5">
               <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
                 Student ID (Optional)
@@ -232,7 +181,6 @@ export default function CompleteRegistration() {
               />
             </div>
 
-            {/* WhatsApp Number */}
             <div className="mb-5">
               <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
                 WhatsApp Number
@@ -288,82 +236,6 @@ export default function CompleteRegistration() {
           </form>
         </div>
       </div>
-    </div>
-  );
-}
-
-function Combobox({ options, value, onChange, placeholder, loading }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
-
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  return (
-    <div className="relative" ref={dropdownRef}>
-      <div className="relative">
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => {
-            onChange(e.target.value);
-            setIsOpen(true);
-          }}
-          onFocus={() => setIsOpen(true)}
-          placeholder={placeholder}
-          className={`w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-left flex items-center justify-between ${
-            value ? "text-n-8" : "text-n-4/50"
-          } pr-12`}
-        />
-        <div className="absolute right-0 top-0 h-full px-4 flex items-center justify-center pointer-events-none text-n-4">
-          {loading ? (
-            <div className="w-5 h-5 border-2 border-primary-3 border-t-transparent rounded-full animate-spin" />
-          ) : (
-            <ChevronDown
-              className={`w-5 h-5 transition-transform ${
-                isOpen ? "rotate-180" : ""
-              }`}
-            />
-          )}
-        </div>
-      </div>
-
-      {isOpen && !loading && options.length > 0 && (
-        <div className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-n-3/10 max-h-60 overflow-y-auto overflow-x-hidden py-2 animate-in fade-in zoom-in-95 duration-200">
-          {options
-            .filter((opt) => opt.toLowerCase().includes(value.toLowerCase()))
-            .map((option, index) => (
-              <button
-                key={index}
-                type="button"
-                onClick={() => {
-                  onChange(option);
-                  setIsOpen(false);
-                }}
-                className="w-full px-4 py-2.5 text-left text-sm text-n-6 hover:bg-primary-3/5 hover:text-primary-3 transition-colors flex items-center justify-between group"
-              >
-                <span className="truncate pr-4">{option}</span>
-                {value === option && (
-                  <Check className="w-4 h-4 text-primary-3 flex-shrink-0" />
-                )}
-              </button>
-            ))}
-          {options.filter((opt) =>
-            opt.toLowerCase().includes(value.toLowerCase())
-          ).length === 0 && (
-            <div className="px-4 py-3 text-sm text-n-4 text-center">
-              No matching schools found. <br /> You can continue with "{value}"
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 }

@@ -1,12 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 
-const VendorProfileAllowedPaymentMethods = [
-  "bank_transfer",
-  "paystack",
-  "credit_card",
-];
-
 const vendorProfileSchema = new mongoose.Schema(
   {
     userId: {
@@ -46,9 +40,6 @@ const vendorProfileSchema = new mongoose.Schema(
     area: {
       type: String,
     },
-    country: {
-      type: String,
-    },
 
     website: {
       type: String,
@@ -80,28 +71,6 @@ const vendorProfileSchema = new mongoose.Schema(
         ref: "Product",
       },
     ],
-    accountNumber: {
-      type: String,
-      trim: true,
-    },
-    paymentMethods: {
-      type: [String],
-      validate: {
-        validator: function (methods) {
-          return (
-            Array.isArray(methods) &&
-            methods.every((m) => VendorProfileAllowedPaymentMethods.includes(m))
-          );
-        },
-        message: (props) =>
-          `Invalid payment method(s): ${
-            props.value
-          }. Allowed values are: ${VendorProfileAllowedPaymentMethods.join(
-            ", "
-          )}.`,
-      },
-      default: [],
-    },
     socialLinks: {
       instagram: String,
       facebook: String,

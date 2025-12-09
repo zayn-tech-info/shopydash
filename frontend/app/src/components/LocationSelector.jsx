@@ -1,19 +1,37 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ChevronDown, MapPin, Check, Search } from "lucide-react";
-import { nigeriaData } from "../constants/nigeriaData";
+import { ChevronDown, Check } from "lucide-react";
 import { api } from "../lib/axios";
 
 export default function LocationSelector({
-  selectedState,
-  setSelectedState,
+  schoolName,
+  setSchoolName,
   selectedArea,
   setSelectedArea,
-  schoolName,
 }) {
-  const [states, setStates] = useState(nigeriaData.map((s) => s.state));
+  const [schools, setSchools] = useState([]);
+  const [loadingSchools, setLoadingSchools] = useState(false);
+
   const [areaSuggestions, setAreaSuggestions] = useState([]);
   const [loadingAreas, setLoadingAreas] = useState(false);
   const [showAreaDropdown, setShowAreaDropdown] = useState(false);
+  const [showSchoolDropdown, setShowSchoolDropdown] = useState(false);
+
+  useEffect(() => {
+    const fetchSchools = async () => {
+      try {
+        setLoadingSchools(true);
+        const res = await api.get("/api/v1/locations/schools");
+        if (res.data.success) {
+          setSchools(res.data.schools);
+        }
+      } catch (error) {
+        console.error("Failed to fetch schools", error);
+      } finally {
+        setLoadingSchools(false);
+      }
+    };
+    fetchSchools();
+  }, []);
 
   useEffect(() => {
     const fetchAreas = async () => {
@@ -41,16 +59,20 @@ export default function LocationSelector({
     return () => clearTimeout(delayDebounceFn);
   }, [selectedArea, schoolName]);
 
-  const handleStateChange = (val) => {
-    setSelectedState(val);
-  };
-
   const handleAreaSelect = (val) => {
     setSelectedArea(val);
     setShowAreaDropdown(false);
+
+    if (!areaSuggestions.includes(val)) {
+      api
+        .post("/api/v1/locations/areas", { schoolName, areaName: val })
+        .catch((err) => console.error("Auto-add area failed", err));
+    }
   };
 
+  const schoolDropdownRef = useRef(null);
   const areaDropdownRef = useRef(null);
+
   useEffect(() => {
     function handleClickOutside(event) {
       if (
@@ -59,6 +81,12 @@ export default function LocationSelector({
       ) {
         setShowAreaDropdown(false);
       }
+      if (
+        schoolDropdownRef.current &&
+        !schoolDropdownRef.current.contains(event.target)
+      ) {
+        setShowSchoolDropdown(false);
+      }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -66,14 +94,78 @@ export default function LocationSelector({
 
   return (
     <div className="space-y-4">
-      <CustomSelect
-        label="State"
-        value={selectedState}
-        onChange={handleStateChange}
-        options={states}
-        placeholder="Select State"
-        mapOption={(opt) => opt}
-      />
+      <div className="relative mb-5" ref={schoolDropdownRef}>
+        <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
+          School Name
+        </label>
+        <div className="relative">
+          <input
+            type="text"
+            value={schoolName}
+            onChange={(e) => {
+              setSchoolName(e.target.value);
+              setShowSchoolDropdown(true);
+            }}
+            onFocus={() => setShowSchoolDropdown(true)}
+            placeholder="Select your university..."
+            className={`w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-left flex items-center justify-between ${
+              schoolName ? "text-n-8" : "text-n-4/50"
+            } pr-12`}
+          />
+          <button
+            type="button"
+            onClick={() => setShowSchoolDropdown(!showSchoolDropdown)}
+            className="absolute right-0 top-0 h-full px-4 flex items-center justify-center text-n-4 hover:text-primary-3 transition-colors outline-none"
+          >
+            {loadingSchools ? (
+              <div className="w-5 h-5 border-2 border-primary-3 border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <ChevronDown
+                className={`w-5 h-5 transition-transform duration-200 ${
+                  showSchoolDropdown ? "rotate-180" : ""
+                }`}
+              />
+            )}
+          </button>
+
+          {showSchoolDropdown && !loadingSchools && (
+            <div className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-n-3/10 max-h-60 overflow-y-auto py-2 animate-in fade-in zoom-in-95 duration-200">
+              {schools
+                .filter((s) =>
+                  (s || "")
+                    .toLowerCase()
+                    .includes((schoolName || "").toLowerCase())
+                )
+                .map((school, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => {
+                      setSchoolName(school);
+                      setShowSchoolDropdown(false);
+                      setSelectedArea("");
+                    }}
+                    className="w-full px-4 py-2.5 text-left text-sm text-n-6 hover:bg-primary-3/5 hover:text-primary-3 transition-colors flex items-center justify-between group"
+                  >
+                    <span className="truncate pr-4">{school}</span>
+                    {schoolName === school && (
+                      <Check className="w-4 h-4 text-primary-3 flex-shrink-0" />
+                    )}
+                  </button>
+                ))}
+              {schools.filter((s) =>
+                (s || "")
+                  .toLowerCase()
+                  .includes((schoolName || "").toLowerCase())
+              ).length === 0 && (
+                <div className="p-3 text-center text-sm text-n-4">
+                  No matching schools.
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
 
       <div className="relative mb-5" ref={areaDropdownRef}>
         <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
@@ -101,13 +193,7 @@ export default function LocationSelector({
           <button
             type="button"
             disabled={!schoolName}
-            onClick={() => {
-              if (!showAreaDropdown) {
-                setShowAreaDropdown(true);
-              } else {
-                setShowAreaDropdown(false);
-              }
-            }}
+            onClick={() => setShowAreaDropdown(!showAreaDropdown)}
             className="absolute right-0 top-0 h-full px-4 flex items-center justify-center text-n-4 hover:text-primary-3 transition-colors disabled:opacity-50 disabled:cursor-not-allowed outline-none"
           >
             <ChevronDown
@@ -119,44 +205,47 @@ export default function LocationSelector({
 
           {showAreaDropdown && schoolName && (
             <div className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-n-3/10 max-h-60 overflow-y-auto py-2 animate-in fade-in zoom-in-95 duration-200">
-              {loadingAreas && areaSuggestions.length === 0 && (
+              {loadingAreas && (
                 <div className="p-3 text-center text-sm text-n-4">
                   Loading suggestions...
                 </div>
               )}
 
-              {!loadingAreas && areaSuggestions.length === 0 && (
-                <div className="p-3 text-center text-sm text-n-4">
-                  {selectedArea ? (
-                    <span>
-                      No existing areas found. You can add "
-                      <strong>{selectedArea}</strong>".
-                    </span>
-                  ) : (
-                    <span>No saved areas yet. Type to add one.</span>
+              {!loadingAreas && (
+                <>
+                  {areaSuggestions.map((area, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => handleAreaSelect(area)}
+                      className="w-full px-4 py-2.5 text-left text-sm text-n-6 hover:bg-primary-3/5 hover:text-primary-3 transition-colors flex items-center justify-between group"
+                    >
+                      <span className="truncate pr-4">{area}</span>
+                      {selectedArea === area && (
+                        <Check className="w-4 h-4 text-primary-3 flex-shrink-0" />
+                      )}
+                    </button>
+                  ))}
+                  {/* Allow selecting what the user typed if it's not in suggestions */}
+                  {selectedArea && !areaSuggestions.includes(selectedArea) && (
+                    <button
+                      type="button"
+                      onClick={() => handleAreaSelect(selectedArea)}
+                      className="w-full px-4 py-2.5 text-left text-sm text-n-6 hover:bg-primary-3/5 hover:text-primary-3 transition-colors flex items-center justify-between group border-t border-n-3/10"
+                    >
+                      <span className="truncate pr-4">
+                        Use "{selectedArea}"
+                      </span>
+                    </button>
                   )}
-                </div>
+                </>
               )}
-
-              {areaSuggestions.map((area, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => handleAreaSelect(area)}
-                  className="w-full px-4 py-2.5 text-left text-sm text-n-6 hover:bg-primary-3/5 hover:text-primary-3 transition-colors flex items-center justify-between group"
-                >
-                  <span className="truncate pr-4">{area}</span>
-                  {selectedArea === area && (
-                    <Check className="w-4 h-4 text-primary-3 flex-shrink-0" />
-                  )}
-                </button>
-              ))}
             </div>
           )}
         </div>
         {!schoolName && (
           <p className="text-xs text-red-400 mt-1">
-            Please select/enter your school first.
+            Please select your school first.
           </p>
         )}
       </div>

@@ -11,6 +11,20 @@ export const useProductStore = create((set, get) => ({
 
   feedPosts: [],
   isFetchingFeedPosts: false,
+  searchResults: [],
+  isSearching: false,
+
+  searchProducts: async (params) => {
+    set({ isSearching: true });
+    try {
+      const res = await api.get("/api/v1/post/search", { params });
+      set({ searchResults: res.data.data.products, isSearching: false });
+    } catch (error) {
+      set({ isSearching: false });
+      console.error(error);
+      toast.error("Search failed");
+    }
+  },
 
   getFeedPosts: async (params = {}) => {
     set({ isFetchingFeedPosts: true });

@@ -1,5 +1,5 @@
 import { Edit, LogOut, Plus } from "lucide-react";
-import Logo from "../../assets/images/clientPfp.png";
+import UserAvatar from "../UserAvatar";
 import { useClientProfileStore } from "../../store/clientProfileStore";
 import { useAuthStore } from "../../store/authStore";
 import { useRef } from "react";
@@ -45,17 +45,17 @@ export default function ProfileHeader({
 
   const profileImage = isOwner
     ? authUser?.profilePic
-    : clientProfile?.userId?.profilePic || Logo;
+    : clientProfile?.userId?.profilePic;
 
   return (
     <aside className="bg-white rounded-2xl p-6 border border-n-3/20 shadow-sm w-full">
       <div className="flex flex-col items-center">
         <div className="relative mb-4 group">
-          <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-n-1 shadow-sm relative">
-            <img
-              src={profileImage}
+          <div className="w-32 h-32 rounded-full border-4 border-n-1 shadow-sm relative">
+            <UserAvatar
+              profilePic={profileImage}
               alt={clientName}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              className="w-full h-full transition-transform duration-500 group-hover:scale-105"
             />
           </div>
           {isOwner && (

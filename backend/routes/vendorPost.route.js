@@ -7,6 +7,7 @@ const {
   getPostById,
   deletePost,
   updatePost,
+  searchPosts,
 } = require("../controllers/vendor/vendorPost.controller");
 const {
   uploadMiddleware,
@@ -16,6 +17,9 @@ const {
 const router = express.Router();
 
 router.get("/feed", getFeedPosts);
+
+// Public search route
+router.get("/search", searchPosts);
 
 router.use(protectRoute);
 router.get("/my-posts", verifyRole("vendor"), getMyPosts);

@@ -9,10 +9,12 @@ export function ClientAddress({ clientProfile, authUser, className }) {
           <div className="mt-1 text-primary-4 text-base">
             {clientProfile?.address || "-"}
           </div>
-          <div className="text-primary-4 mt-1">
-            {[clientProfile?.city, clientProfile?.state, clientProfile?.country]
-              .filter(Boolean)
-              .join(", ")}
+        </div>
+
+        <div>
+          <div className="font-medium text-sm">School Area</div>
+          <div className="mt-1 text-primary-4 text-base">
+            {clientProfile?.area || clientProfile?.city || "-"}
           </div>
         </div>
 

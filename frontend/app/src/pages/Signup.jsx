@@ -1,3 +1,4 @@
+import { useState } from "react";
 import logoUrl from "../assets/images/vendora_logo.png";
 import { useSignupStore } from "../store/signupStore";
 import { useVendorProfileStore } from "../store/vendorProfileStore";
@@ -12,6 +13,7 @@ export function Signup() {
   const createVendorProfile = useVendorProfileStore(
     (state) => state.createVendorProfile
   );
+  const [hasChosenRole, setHasChosenRole] = useState(false);
   const {
     role,
     showPassword,
@@ -145,56 +147,72 @@ export function Signup() {
             <div className="grid grid-cols-2 p-1 bg-n-2/10 rounded-xl">
               <button
                 type="button"
-                onClick={() => switchTo("client")}
+                onClick={() => {
+                  switchTo("client");
+                  setHasChosenRole(true);
+                }}
                 className={[
                   "flex items-center justify-center gap-2 rounded-lg py-3 text-sm font-bold uppercase tracking-wider transition-all duration-300",
-                  isClient
-                    ? "bg-white text-primary-3 shadow-sm"
-                    : "text-n-4 hover:text-n-6 hover:bg-white/50",
+                  isClient && hasChosenRole
+                    ? "bg-primary-3 text-white shadow-lg shadow-primary-3/25 scale-[1.02]"
+                    : "bg-transparent text-n-4 hover:text-primary-3 hover:bg-white/50",
                 ].join(" ")}
               >
-                <GraduationCap className="w-4 h-4" />
+                <GraduationCap
+                  className={`w-4 h-4 ${
+                    isClient && hasChosenRole ? "text-white" : "text-inherit"
+                  }`}
+                />
                 Student
               </button>
               <button
                 type="button"
-                onClick={() => switchTo("vendor")}
+                onClick={() => {
+                  switchTo("vendor");
+                  setHasChosenRole(true);
+                }}
                 className={[
                   "flex items-center justify-center gap-2 rounded-lg py-3 text-sm font-bold uppercase tracking-wider transition-all duration-300",
-                  !isClient
-                    ? "bg-white text-primary-3 shadow-sm"
-                    : "text-n-4 hover:text-n-6 hover:bg-white/50",
+                  !isClient && hasChosenRole
+                    ? "bg-primary-3 text-white shadow-lg shadow-primary-3/25 scale-[1.02]"
+                    : "bg-transparent text-n-4 hover:text-primary-3 hover:bg-white/50",
                 ].join(" ")}
               >
-                <Store className="w-4 h-4" />
+                <Store
+                  className={`w-4 h-4 ${
+                    !isClient && hasChosenRole ? "text-white" : "text-inherit"
+                  }`}
+                />
                 Vendor
               </button>
             </div>
           </div>
 
-          <div className="mt-2">
-            <SignupForm
-              onSubmit={onSubmit}
-              fullName={fullName}
-              setField={setField}
-              isClient={isClient}
-              username={username}
-              email={email}
-              schoolId={schoolId}
-              phoneNumber={phoneNumber}
-              whatsAppNumber={whatsAppNumber}
-              schoolName={schoolName}
-              businessName={businessName}
-              showPassword={showPassword}
-              password={password}
-              toggleShowPassword={toggleShowPassword}
-              isSigningUp={isSigningUp}
-              error={error}
-            />
-          </div>
+          {hasChosenRole && (
+            <div className="mt-2 animate-in fade-in slide-in-from-top-4 duration-500">
+              <SignupForm
+                onSubmit={onSubmit}
+                fullName={fullName}
+                setField={setField}
+                isClient={isClient}
+                username={username}
+                email={email}
+                schoolId={schoolId}
+                phoneNumber={phoneNumber}
+                whatsAppNumber={whatsAppNumber}
+                schoolName={schoolName}
+                businessName={businessName}
+                showPassword={showPassword}
+                password={password}
+                toggleShowPassword={toggleShowPassword}
+                isSigningUp={isSigningUp}
+                error={error}
+              />
+            </div>
+          )}
 
           {/* Footer */}
-          <div className="px-8 pb-8">
+          <div className="px-8 pb-8 mt-5">
             <p className="text-center text-xs text-n-4">
               By signing up, you agree to our{" "}
               <a

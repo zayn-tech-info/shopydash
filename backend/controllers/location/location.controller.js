@@ -1,8 +1,9 @@
 const asyncErrorHandler = require("../../errors/asyncErrorHandle");
 const User = require("../../models/auth.model");
+const School = require("../../models/school.model");
+const SchoolArea = require("../../models/schoolArea.model");
 
- 
-const schoolData = {
+const initialSchoolData = {
   "Ladoke Akintola University of Technology": [
     "Under G",
     "Adenike",
@@ -189,11 +190,39 @@ const schoolData = {
   "University of Abuja": ["Gwagwalada", "Giri", "Mini Campus"],
 };
 
+const seedDatabase = async () => {
+  try {
+    const schoolCount = await School.countDocuments();
+    if (schoolCount === 0) {
+      console.log("Seeding Schools...");
+      for (const [schoolName, areas] of Object.entries(initialSchoolData)) {
+        await School.create({ name: schoolName });
+        for (const area of areas) {
+          await SchoolArea.create({ name: area, schoolName: schoolName });
+        }
+      }
+      console.log("Seeding Complete.");
+    }
+  } catch (error) {
+    console.error("Seeding error:", error);
+  }
+};
+
+seedDatabase();
+
 const getSchools = asyncErrorHandler(async (req, res, next) => {
-  const schools = Object.keys(schoolData).sort();
+  const { search } = req.query;
+  const query = {};
+
+  if (search) {
+    query.name = { $regex: search, $options: "i" };
+  }
+
+  const schools = await School.find(query).sort({ name: 1 });
+
   res.status(200).json({
     success: true,
-    schools,
+    schools: schools.map((s) => s.name),
   });
 });
 
@@ -212,59 +241,97 @@ const getSchoolAreas = asyncErrorHandler(async (req, res, next) => {
   };
 
   if (search) {
-    matchStage.area = { $regex: search, $options: "i" };
-  } else {
-    matchStage.area = { $exists: true, $ne: "" };
+    matchStage.name = { $regex: search, $options: "i" };
   }
 
-  let dbAreas = await User.find(matchStage).distinct("area");
-  dbAreas = dbAreas.filter((a) => a && a.trim() !== "");
+  let areas = await SchoolArea.find(matchStage).sort({ name: 1 });
 
-  let mappedAreas = [];
+  if (areas.length === 0) {
+    const allSchoolNames = await SchoolArea.distinct("schoolName");
 
-  const schoolKey = Object.keys(schoolData).find(
-    (key) => key.toLowerCase() === schoolName.toLowerCase()
-  );
+    const matchingSchool = allSchoolNames.find(
+      (dbName) =>
+        schoolName.toLowerCase().includes(dbName.toLowerCase()) ||
+        dbName.toLowerCase().includes(schoolName.toLowerCase())
+    );
 
-  if (schoolKey) {
-    mappedAreas = schoolData[schoolKey];
-  } else {
- 
-    const normalizedSchoolName = schoolName
-      .toLowerCase()
-      .replace(/[^a-z0-9]/g, "");
-
-    for (const [key, areas] of Object.entries(schoolData)) {
-      const normalizedKey = key.toLowerCase().replace(/[^a-z0-9]/g, "");
-      if (
-        normalizedSchoolName.includes(normalizedKey) ||
-        normalizedKey.includes(normalizedSchoolName)
-      ) {
-        // Be careful with short matches, but for Full Names it's safer
-        if (normalizedSchoolName.length > 3) {
-          mappedAreas = areas;
-          break;
-        }
-      }
+    if (matchingSchool) {
+      matchStage.schoolName = matchingSchool;
+      areas = await SchoolArea.find(matchStage).sort({ name: 1 });
     }
   }
 
-  if (search) {
-    const searchLower = search.toLowerCase();
-    mappedAreas = mappedAreas.filter((a) =>
-      a.toLowerCase().includes(searchLower)
-    );
+  let areaNames = areas.map((a) => a.name);
+
+  const userMatch = { schoolName: schoolName };
+  if (matchStage.schoolName && matchStage.schoolName !== schoolName) {
+    userMatch.schoolName = matchStage.schoolName;
   }
 
-  const combinedAreas = [...new Set([...dbAreas, ...mappedAreas])].sort();
+  if (search) {
+    userMatch.area = { $regex: search, $options: "i" };
+  } else {
+    userMatch.area = { $exists: true, $ne: "" };
+  }
+
+  const userAreas = await User.find(userMatch).distinct("area");
+
+  const combined = [...new Set([...areaNames, ...userAreas])]
+    .filter((a) => a && a.trim().length > 0)
+    .sort();
 
   res.status(200).json({
     success: true,
-    areas: combinedAreas,
+    areas: combined,
+  });
+});
+
+const addSchoolArea = asyncErrorHandler(async (req, res, next) => {
+  const { schoolName, areaName } = req.body;
+
+  if (!schoolName || !areaName) {
+    return res.status(400).json({
+      success: false,
+      message: "School name and Area name are required",
+    });
+  }
+
+  // Normalize
+  // Title Case logic: "under g" -> "Under G"
+  const normalizedArea = areaName
+    .toLowerCase()
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+
+  // Check existence
+  const existing = await SchoolArea.findOne({
+    schoolName,
+    name: { $regex: new RegExp(`^${normalizedArea}$`, "i") },
+  });
+
+  if (existing) {
+    return res.status(200).json({
+      success: true,
+      message: "Area already exists",
+      area: existing,
+    });
+  }
+
+  const newArea = await SchoolArea.create({
+    schoolName,
+    name: normalizedArea,
+  });
+
+  res.status(201).json({
+    success: true,
+    message: "Area added successfully",
+    area: newArea,
   });
 });
 
 module.exports = {
   getSchoolAreas,
   getSchools,
+  addSchoolArea,
 };

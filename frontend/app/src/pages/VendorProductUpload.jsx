@@ -24,8 +24,7 @@ const VendorProductUpload = () => {
     useProductStore();
 
   const [caption, setCaption] = useState(editingPost?.caption || "");
-  const [selectedState, setSelectedState] = useState(editingPost?.state || "");
-  const [selectedLga, setSelectedLga] = useState(editingPost?.lga || "");
+  const [schoolName, setSchoolName] = useState(editingPost?.school || "");
   const [selectedArea, setSelectedArea] = useState(editingPost?.area || "");
   const [products, setProducts] = useState(
     editingPost?.products.map((p) => ({
@@ -135,11 +134,8 @@ const VendorProductUpload = () => {
 
       const postData = {
         caption,
-        location: [selectedArea, selectedLga, selectedState]
-          .filter(Boolean)
-          .join(", "),
-        state: selectedState,
-        lga: selectedLga,
+        location: selectedArea, // Simplified location
+        school: schoolName,
         area: selectedArea,
         products: processedProducts,
       };
@@ -175,10 +171,8 @@ const VendorProductUpload = () => {
           <PostDetails
             caption={caption}
             setCaption={setCaption}
-            selectedState={selectedState}
-            setSelectedState={setSelectedState}
-            selectedLga={selectedLga}
-            setSelectedLga={setSelectedLga}
+            schoolName={schoolName}
+            setSchoolName={setSchoolName}
             selectedArea={selectedArea}
             setSelectedArea={setSelectedArea}
           />

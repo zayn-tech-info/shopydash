@@ -75,11 +75,7 @@ export function LoginForm() {
               type="text"
               value={email || username || schoolId}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder={
-                role === "client"
-                  ? "e.g. john.doe@uni.edu or 20231234"
-                  : "e.g. vendor@shop.com"
-              }
+              placeholder="e.g. email@address.com or Student ID"
               className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
               autoComplete="username"
               required

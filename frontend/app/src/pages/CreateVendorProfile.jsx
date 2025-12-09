@@ -35,21 +35,6 @@ export default function CreateVendorProfile() {
 
   const isSubmitting = !!isCreatingProfile;
 
-  const paymentOptions = [
-    { id: "bank_transfer", label: "Bank transfer" },
-    { id: "paystack", label: "paystack" },
-    { id: "credit_card", label: "Credit / Debit" },
-  ];
-
-  function togglePayment(method) {
-    const current = profileData.paymentMethods || [];
-    const exists = current.includes(method);
-    setProfileField(
-      "paymentMethods",
-      exists ? current.filter((m) => m !== method) : [...current, method]
-    );
-  }
-
   function validate() {
     if (!profileData.storeDescription || !profileData.storeDescription.trim())
       return "Store description is required";
@@ -139,58 +124,15 @@ export default function CreateVendorProfile() {
               selectedArea={profileData.area}
               setSelectedArea={(val) => {
                 setProfileField("area", val);
-                // Sync city with area
                 setProfileField("city", val);
               }}
               schoolName={authUser?.schoolName}
             />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <InputField
-                placeholder="Country"
-                value={profileData.country}
-                onChange={handleInputChange("country")}
-              />
-            </div>
           </section>
 
           <section className="space-y-6">
             <h2 className="text-xl font-bold text-n-8 border-b border-n-3 pb-2">
-              Payments & bank
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {paymentOptions.map((p) => (
-                <label
-                  className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all duration-200 ${
-                    (profileData.paymentMethods || []).includes(p.id)
-                      ? "border-primary-3 bg-primary-3/5 ring-1 ring-primary-3/20"
-                      : "border-n-3 hover:border-n-4 bg-white"
-                  }`}
-                  key={p.id}
-                >
-                  <input
-                    type="checkbox"
-                    className="w-5 h-5 text-primary-3 rounded border-gray-300 focus:ring-primary-3"
-                    checked={(profileData.paymentMethods || []).includes(p.id)}
-                    onChange={() => togglePayment(p.id)}
-                  />
-                  <span className="text-sm font-medium text-n-7">
-                    {p.label}
-                  </span>
-                </label>
-              ))}
-            </div>
-
-            <InputField
-              label="Account number"
-              onChange={handleInputChange("accountNumber")}
-              placeholder="Bank account number"
-            />
-          </section>
-
-          <section className="space-y-6">
-            <h2 className="text-xl font-bold text-n-8 border-b border-n-3 pb-2">
-              Social & settings
+              Socials
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <InputField

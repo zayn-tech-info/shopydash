@@ -3,15 +3,7 @@ import { Link } from "react-router-dom";
 import { VendorsPost } from "../constants";
 import { useVendorProfileStore } from "../store/vendorProfileStore";
 import { useEffect } from "react";
-
-const getInitials = (name = "") =>
-  name
-    .split(" ")
-    .map((n) => n[0])
-    .filter(Boolean)
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
+import UserAvatar from "./UserAvatar";
 
 export function FeaturedVendor({ limit = 5 }) {
   const { vendors, getAllVendorProfile } = useVendorProfileStore();
@@ -43,18 +35,11 @@ export function FeaturedVendor({ limit = 5 }) {
             className="group rounded-2xl border border-n-3/10 bg-white p-5 hover:shadow-xl hover:shadow-n-3/10 transition-all duration-300 hover:-translate-y-1"
           >
             <div className="flex items-center gap-4">
-              {vendor.profilePic ? (
-                <img
-                  src={vendor.profilePic}
-                  alt={`${vendor.businessName} avatar`}
-                  className="h-14 w-14 rounded-full object-cover border-2 border-n-1 shadow-sm"
-                  loading="lazy"
-                />
-              ) : (
-                <div className="h-14 w-14 rounded-full bg-primary-3/10 text-primary-3 flex items-center justify-center font-code font-bold text-lg">
-                  {getInitials(vendor.businessName)}
-                </div>
-              )}
+              <UserAvatar
+                profilePic={vendor.profilePic}
+                alt={`${vendor.businessName} avatar`}
+                className="h-14 w-14 border-2 border-n-1 shadow-sm"
+              />
 
               <div className="min-w-0">
                 <p className="truncate font-bold text-n-8 text-lg">

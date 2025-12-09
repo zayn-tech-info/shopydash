@@ -3,10 +3,8 @@ import LocationSelector from "../LocationSelector";
 export const PostDetails = ({
   caption,
   setCaption,
-  selectedState,
-  setSelectedState,
-  selectedLga,
-  setSelectedLga,
+  schoolName,
+  setSchoolName,
   selectedArea,
   setSelectedArea,
 }) => {
@@ -29,10 +27,8 @@ export const PostDetails = ({
         </div>
 
         <LocationSelector
-          selectedState={selectedState}
-          setSelectedState={setSelectedState}
-          selectedLga={selectedLga}
-          setSelectedLga={setSelectedLga}
+          schoolName={schoolName}
+          setSchoolName={setSchoolName}
           selectedArea={selectedArea}
           setSelectedArea={setSelectedArea}
         />

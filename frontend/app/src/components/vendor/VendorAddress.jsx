@@ -9,10 +9,14 @@ export function VendorAddress({ vendorProfile, authUser, className }) {
           <div className="text-n-8 font-medium text-sm">
             {vendorProfile?.address || "-"}
           </div>
-          <div className="text-n-6 text-sm mt-0.5">
-            {[vendorProfile?.city, vendorProfile?.state, vendorProfile?.country]
-              .filter(Boolean)
-              .join(", ")}
+        </div>
+
+        <div>
+          <div className="font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-1">
+            School Area
+          </div>
+          <div className="text-n-8 font-medium text-sm">
+            {vendorProfile?.area || vendorProfile?.city || "-"}
           </div>
         </div>
 

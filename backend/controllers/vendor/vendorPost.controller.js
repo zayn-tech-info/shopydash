@@ -261,6 +261,104 @@ const updatePost = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
+const searchPosts = asyncErrorHandler(async (req, res, next) => {
+  const { search, school, area, page = 1, limit = 20 } = req.query;
+
+  const pageLimit = Math.min(parseInt(limit), 50);
+  const currentPage = Math.max(parseInt(page), 1);
+  const skip = (currentPage - 1) * pageLimit;
+
+  // Build the aggregation pipeline
+  const pipeline = [];
+
+  // Stage 1: Match Posts by School and Area
+  const matchStage = {};
+  if (school) matchStage.school = school;
+  if (area) matchStage.area = { $regex: area, $options: "i" };
+
+  if (Object.keys(matchStage).length > 0) {
+    pipeline.push({ $match: matchStage });
+  }
+
+  // Stage 2: Unwind Products to filter them individually
+  pipeline.push({ $unwind: "$products" });
+
+  // Stage 3: Match Product Title (if search text is provided)
+  if (search) {
+    pipeline.push({
+      $match: {
+        "products.title": { $regex: search, $options: "i" },
+      },
+    });
+  }
+
+  // Stage 4: Sort by creation date (newest first)
+  pipeline.push({ $sort: { createdAt: -1 } });
+
+  // Stage 5: Pagination (Skip and Limit)
+  pipeline.push({ $skip: skip });
+  pipeline.push({ $limit: pageLimit });
+
+  // Stage 6: Lookup Vendor Details
+  pipeline.push({
+    $lookup: {
+      from: "users",
+      localField: "vendorId",
+      foreignField: "_id",
+      as: "vendor",
+    },
+  });
+
+  // Stage 7: Unwind Vendor array
+  pipeline.push({
+    $unwind: {
+      path: "$vendor",
+      preserveNullAndEmptyArrays: true, // Keep products even if vendor lookup fails (though unlikely)
+    },
+  });
+
+  // Stage 8: Project the final structure
+  pipeline.push({
+    $project: {
+      _id: "$products._id", // Product ID becomes the main ID
+      title: "$products.title",
+      price: "$products.price",
+      image: "$products.image",
+      description: "$products.description",
+      condition: "$products.condition",
+      category: "$products.category",
+      postId: "$_id", // Reference to the parent post
+      postedAt: "$createdAt",
+      school: "$school",
+      area: "$area",
+      location: "$location",
+      vendor: {
+        _id: "$vendor._id",
+        businessName: "$vendor.businessName",
+        username: "$vendor.username",
+        profilePic: "$vendor.profilePic",
+        logo: "$vendor.logo",
+        phoneNumber: "$vendor.phoneNumber",
+        whatsAppNumber: "$vendor.whatsAppNumber",
+      },
+    },
+  });
+
+  const products = await VendorPost.aggregate(pipeline);
+
+  // Optional: Get total count for pagination (simplified, separate count query might be needed for perfect pagination)
+  // For now, we return the results.
+
+  res.status(200).json({
+    success: true,
+    data: {
+      products,
+      page: currentPage,
+      limit: pageLimit,
+    },
+  });
+});
+
 module.exports = {
   createPost,
   getMyPosts,
@@ -268,4 +366,5 @@ module.exports = {
   getPostById,
   deletePost,
   updatePost,
+  searchPosts,
 };

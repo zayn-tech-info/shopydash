@@ -1,6 +1,5 @@
 import { useAuthStore } from "../store/authStore";
 import { useGoogleLogin } from "@react-oauth/google";
-import { ShoppingBag, GraduationCap, Eye, EyeOff } from "lucide-react";
 import logoUrl from "../assets/images/vendora_logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -56,43 +55,6 @@ export function Login() {
             <p className="body-2 text-n-4">
               Buy. Sell. Connect — right on campus.
             </p>
-          </div>
-
-          <div className="mt-8 px-6">
-            <div className="grid grid-cols-2 p-1 bg-n-2/10 rounded-xl">
-              <button
-                type="button"
-                onClick={() => {
-                  setRole("vendor");
-                  resetloginField();
-                }}
-                className={[
-                  "flex items-center justify-center gap-2 rounded-lg py-3 text-sm font-bold uppercase tracking-wider transition-all duration-300",
-                  role === "vendor"
-                    ? "bg-white text-primary-3 shadow-sm"
-                    : "text-n-4 hover:text-n-6 hover:bg-white/50",
-                ].join(" ")}
-              >
-                <ShoppingBag className="w-4 h-4" />
-                Vendor
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setRole("client");
-                  resetloginField();
-                }}
-                className={[
-                  "flex items-center justify-center gap-2 rounded-lg py-3 text-sm font-bold uppercase tracking-wider transition-all duration-300",
-                  role === "client"
-                    ? "bg-white text-primary-3 shadow-sm"
-                    : "text-n-4 hover:text-n-6 hover:bg-white/50",
-                ].join(" ")}
-              >
-                <GraduationCap className="w-4 h-4" />
-                Student
-              </button>
-            </div>
           </div>
 
           <div className="mt-6 px-8">

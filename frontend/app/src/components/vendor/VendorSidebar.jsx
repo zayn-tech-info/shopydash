@@ -1,5 +1,5 @@
 import { Edit, Share2, Plus, LogOut } from "lucide-react";
-import Logo from "../../assets/images/clientPfp.png";
+import UserAvatar from "../UserAvatar";
 import { useVendorProfileStore } from "../../store/vendorProfileStore";
 import { useAuthStore } from "../../store/authStore";
 import { useRef, useState } from "react";
@@ -26,7 +26,9 @@ export default function VendorSidebar({
     "Store";
   const username =
     vendorProfile?.storeUsername || vendorProfile?.userId?.username || "vendor";
-  const profileImage = isOwner ? authUser?.profilePic : vendorProfile?.userId?.profilePic || Logo; 
+  const profileImage = isOwner
+    ? authUser?.profilePic
+    : vendorProfile?.userId?.profilePic;
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -51,14 +53,14 @@ export default function VendorSidebar({
     <aside className="bg-white rounded-2xl p-6 border border-n-3/20 shadow-sm w-full relative">
       <div className="flex flex-col items-center">
         <div className="relative mb-4 group">
-          <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-n-2 shadow-sm relativ">
-            <img
-              src={profileImage}
+          <div className="w-32 h-32 rounded-full border-2 border-n-2 shadow-sm relative">
+            <UserAvatar
+              profilePic={profileImage}
               alt={businessName}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              className="w-full h-full transition-transform duration-500 group-hover:scale-105"
             />
             {vendorProfile?.active && (
-              <div className="absolute inset-0 bg-primary-3/10 pointer-events-none" />
+              <div className="absolute inset-0 bg-primary-3/10 pointer-events-none rounded-full" />
             )}
           </div>
 

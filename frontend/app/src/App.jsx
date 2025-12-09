@@ -24,6 +24,7 @@ import VendorProductUpload from "./pages/VendorProductUpload";
 import { VendorFloatingButton } from "./components/VendorFloatingButton";
 import Feeds from "./pages/Feeds";
 import CartPage from "./pages/CartPage";
+import SearchProducts from "./pages/SearchProducts";
 
 const App = () => {
   const authUser = useAuthStore((state) => state.authUser);
@@ -114,6 +115,7 @@ const App = () => {
           <Route path="/dashboard" element={<VendorDashboard />} />
           <Route path="/vendor/add" element={<VendorProductUpload />} />
           <Route path="/feeds" element={<Feeds />} />
+          <Route path="/search" element={<SearchProducts />} />
           <Route path="/p/:username" element={<ProfileDispatcher />} />
           <Route
             path="/cart"
