@@ -10,7 +10,7 @@ import {
   EyeOff,
 } from "lucide-react";
 import { useAuthStore } from "../store/authStore";
-import { schools } from "../constants";
+import { api } from "../lib/axios";
 import LocationSelector from "../components/LocationSelector";
 
 export default function CompleteRegistration() {
@@ -33,6 +33,27 @@ export default function CompleteRegistration() {
   const [selectedArea, setSelectedArea] = useState("");
 
   const isClient = role === "client";
+
+  const [schools, setSchools] = useState([]);
+  const [loadingSchools, setLoadingSchools] = useState(false);
+
+  useEffect(() => {
+    const fetchSchools = async () => {
+      try {
+        setLoadingSchools(true);
+        const res = await api.get("/api/v1/locations/schools");
+        if (res.data.success) {
+          setSchools(res.data.schools);
+        }
+      } catch (error) {
+        console.error("Failed to fetch schools", error);
+        toast.error("Could not load school list");
+      } finally {
+        setLoadingSchools(false);
+      }
+    };
+    fetchSchools();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -188,11 +209,12 @@ export default function CompleteRegistration() {
               <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
                 School Name
               </label>
-              <CustomDropdown
+              <Combobox
                 options={schools}
                 value={schoolName}
                 onChange={setSchoolName}
-                placeholder="Select your school"
+                placeholder="Put the school full name"
+                loading={loadingSchools}
               />
             </div>
 
@@ -270,7 +292,7 @@ export default function CompleteRegistration() {
   );
 }
 
-function CustomDropdown({ options, value, onChange, placeholder }) {
+function Combobox({ options, value, onChange, placeholder, loading }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -286,41 +308,60 @@ function CustomDropdown({ options, value, onChange, placeholder }) {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className={`w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-left flex items-center justify-between ${
-          value ? "text-n-8" : "text-n-4/50"
-        } ${
-          isOpen ? "bg-white border-primary-3 ring-4 ring-primary-3/10" : ""
-        }`}
-      >
-        <span className="truncate block mr-4">{value || placeholder}</span>
-        <ChevronDown
-          className={`w-5 h-5 text-n-4 transition-transform duration-200 ${
-            isOpen ? "rotate-180" : ""
-          }`}
+      <div className="relative">
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => {
+            onChange(e.target.value);
+            setIsOpen(true);
+          }}
+          onFocus={() => setIsOpen(true)}
+          placeholder={placeholder}
+          className={`w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-left flex items-center justify-between ${
+            value ? "text-n-8" : "text-n-4/50"
+          } pr-12`}
         />
-      </button>
+        <div className="absolute right-0 top-0 h-full px-4 flex items-center justify-center pointer-events-none text-n-4">
+          {loading ? (
+            <div className="w-5 h-5 border-2 border-primary-3 border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <ChevronDown
+              className={`w-5 h-5 transition-transform ${
+                isOpen ? "rotate-180" : ""
+              }`}
+            />
+          )}
+        </div>
+      </div>
 
-      {isOpen && (
+      {isOpen && !loading && options.length > 0 && (
         <div className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-n-3/10 max-h-60 overflow-y-auto overflow-x-hidden py-2 animate-in fade-in zoom-in-95 duration-200">
-          {options.map((option, index) => (
-            <button
-              key={index}
-              type="button"
-              onClick={() => {
-                onChange(option);
-                setIsOpen(false);
-              }}
-              className="w-full px-4 py-2.5 text-left text-sm text-n-6 hover:bg-primary-3/5 hover:text-primary-3 transition-colors flex items-center justify-between group"
-            >
-              <span className="truncate pr-4">{option}</span>
-              {value === option && (
-                <Check className="w-4 h-4 text-primary-3 flex-shrink-0" />
-              )}
-            </button>
-          ))}
+          {options
+            .filter((opt) => opt.toLowerCase().includes(value.toLowerCase()))
+            .map((option, index) => (
+              <button
+                key={index}
+                type="button"
+                onClick={() => {
+                  onChange(option);
+                  setIsOpen(false);
+                }}
+                className="w-full px-4 py-2.5 text-left text-sm text-n-6 hover:bg-primary-3/5 hover:text-primary-3 transition-colors flex items-center justify-between group"
+              >
+                <span className="truncate pr-4">{option}</span>
+                {value === option && (
+                  <Check className="w-4 h-4 text-primary-3 flex-shrink-0" />
+                )}
+              </button>
+            ))}
+          {options.filter((opt) =>
+            opt.toLowerCase().includes(value.toLowerCase())
+          ).length === 0 && (
+            <div className="px-4 py-3 text-sm text-n-4 text-center">
+              No matching schools found. <br /> You can continue with "{value}"
+            </div>
+          )}
         </div>
       )}
     </div>

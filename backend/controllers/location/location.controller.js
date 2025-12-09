@@ -1,8 +1,9 @@
 const asyncErrorHandler = require("../../errors/asyncErrorHandle");
 const User = require("../../models/auth.model");
 
-const schoolAreaMap = {
-  lautech: [
+ 
+const schoolData = {
+  "Ladoke Akintola University of Technology": [
     "Under G",
     "Adenike",
     "Stadium",
@@ -50,7 +51,7 @@ const schoolAreaMap = {
     "Ogbagun",
     "Oke Alapata",
   ],
-  unilag: [
+  "University of Lagos": [
     "Akoka",
     "Yaba",
     "Bariga",
@@ -72,7 +73,7 @@ const schoolAreaMap = {
     "Mariere",
     "Jaja",
   ],
-  ui: [
+  "University of Ibadan": [
     "Agbowo",
     "Orogun",
     "Ojoo",
@@ -87,7 +88,7 @@ const schoolAreaMap = {
     "UI Quarters",
     "Abadina",
   ],
-  oau: [
+  "Obafemi Awolowo University": [
     "Lagere",
     "Mayfair",
     "Asherifa",
@@ -99,8 +100,12 @@ const schoolAreaMap = {
     "Sabo",
     "Moore",
     "Iloro",
+    "Oduduwa Estate",
+    "Damico Area",
+    "Parakin Estate",
+    "Omole",
   ],
-  futa: [
+  "Federal University of Technology Akure": [
     "South Gate",
     "North Gate",
     "West Gate",
@@ -112,7 +117,7 @@ const schoolAreaMap = {
     "Oja Oba",
     "Alagbaka",
   ],
-  unilorin: [
+  "University of Ilorin": [
     "Tanke",
     "Oke Odo",
     "Chapel",
@@ -124,7 +129,73 @@ const schoolAreaMap = {
     "Challenge",
     "Post Office",
   ],
+  "Covenant University": ["Canaanland", "Ota", "Iju", "Atan", "Bells"],
+  "Bayero University Kano": ["Danbare", "Rimin Gata", "Kofar Famfo", "Campus"],
+  "Ahmadu Bello University": ["Samaru", "Kongo", "Zaria City", "Giwa"],
+  "Landmark University": ["Omu-Aran", "Campus"],
+  "University of Nigeria Nsukka": [
+    "Nsukka",
+    "Odim Gate",
+    "Beach",
+    "Hilltop",
+    "Behind Flat",
+    "Enugu Campus",
+  ],
+  "Federal University of Technology Minna": [
+    "Bosso",
+    "Gidan Kwano",
+    "Lut",
+    "Maikunkele",
+  ],
+  "University of Benin": ["Ekosodin", "BDPA", "Ugbowo", "June 12", "Ekenwan"],
+  "University of Port Harcourt": [
+    "Choba",
+    "Alakahia",
+    "Rumuekini",
+    "Ofrima",
+    "Abuja Campus",
+  ],
+  "Lagos State University": [
+    "Iyana Iba",
+    "Ojo",
+    "Igando",
+    "Okokomaiko",
+    "Epe Campus",
+  ],
+  "Federal University of Agriculture Abeokuta": [
+    "Camp",
+    "Obantoko",
+    "Alabata",
+    "Isolu",
+  ],
+  "Afe Babalola University": ["Erinfun", "Poly Road", "Ado Ekiti", "Campus"],
+  "Ekiti State University": ["Iworoko", "Osekita", "Ado Ekiti"],
+  "Federal University of Technology Owerri": [
+    "Ihiagwa",
+    "Eziobodo",
+    "Umuchima",
+    "Obinze",
+  ],
+  "Federal University of Oye Ekiti": ["Oye Ekiti", "Ikole Ekiti", "Ayegbaju"],
+  "Nnamdi Azikiwe University": ["Ifite", "Aroma", "Temp Site", "Okofia"],
+  "Usmanu Danfodiyo University Sokoto": ["Sokoto", "Dundaye", "Wamakko"],
+  "Abia State University": ["Uturu", "Okigwe"],
+  "Kwara State University": ["Malete", "Shao", "Ilorin"],
+  "University of Calabar": ["Etta Agbor", "Satellie Town", "Calabar"],
+  "University of Jos": ["Bauchi Ring Road", "Farin Gada", "Rusau"],
+  "University of Uyo": ["Ikpa Road", "Use Offot", "Itam"],
+  "Rivers State University": ["Nkpolu", "Diobu", "Mile 3"],
+  "Olabisi Onabanjo University": ["Ago Iwoye", "Oru", "Ijebu Igbo"],
+  "University of Abuja": ["Gwagwalada", "Giri", "Mini Campus"],
 };
+
+const getSchools = asyncErrorHandler(async (req, res, next) => {
+  const schools = Object.keys(schoolData).sort();
+  res.status(200).json({
+    success: true,
+    schools,
+  });
+});
 
 const getSchoolAreas = asyncErrorHandler(async (req, res, next) => {
   const { schoolName, search } = req.query;
@@ -149,15 +220,32 @@ const getSchoolAreas = asyncErrorHandler(async (req, res, next) => {
   let dbAreas = await User.find(matchStage).distinct("area");
   dbAreas = dbAreas.filter((a) => a && a.trim() !== "");
 
-  const normalizedSchoolName = schoolName
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, "");
   let mappedAreas = [];
 
-  for (const [key, areas] of Object.entries(schoolAreaMap)) {
-    if (normalizedSchoolName.includes(key)) {
-      mappedAreas = areas;
-      break;
+  const schoolKey = Object.keys(schoolData).find(
+    (key) => key.toLowerCase() === schoolName.toLowerCase()
+  );
+
+  if (schoolKey) {
+    mappedAreas = schoolData[schoolKey];
+  } else {
+ 
+    const normalizedSchoolName = schoolName
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "");
+
+    for (const [key, areas] of Object.entries(schoolData)) {
+      const normalizedKey = key.toLowerCase().replace(/[^a-z0-9]/g, "");
+      if (
+        normalizedSchoolName.includes(normalizedKey) ||
+        normalizedKey.includes(normalizedSchoolName)
+      ) {
+        // Be careful with short matches, but for Full Names it's safer
+        if (normalizedSchoolName.length > 3) {
+          mappedAreas = areas;
+          break;
+        }
+      }
     }
   }
 
@@ -178,4 +266,5 @@ const getSchoolAreas = asyncErrorHandler(async (req, res, next) => {
 
 module.exports = {
   getSchoolAreas,
+  getSchools,
 };
