@@ -1,6 +1,8 @@
 import { memo } from "react";
+import { useAuthStore } from "../../store/authStore";
 
 function VendorProductItem({ product }) {
+  const { authUser } = useAuthStore();
   const title =
     product?.title || product?.name || `Product ${product?._id || ""}`;
   const img =
@@ -31,9 +33,11 @@ function VendorProductItem({ product }) {
           {product?.shortDescription || product?.description || ""}
         </div>
 
-        <button className="w-full py-2 rounded-lg bg-n-2 text-n-8 text-xs font-bold uppercase tracking-wider hover:bg-primary-3 hover:text-white transition-all duration-300">
-          Message
-        </button>
+        {authUser?.role !== "vendor" && (
+          <button className="w-full py-2 rounded-lg bg-n-2 text-n-8 text-xs font-bold uppercase tracking-wider hover:bg-primary-3 hover:text-white transition-all duration-300">
+            Message
+          </button>
+        )}
       </div>
     </div>
   );

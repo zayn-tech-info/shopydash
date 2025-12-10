@@ -2,7 +2,13 @@ import { motion } from "framer-motion";
 import { X, MessageCircle, ExternalLink } from "lucide-react";
 import { openWhatsApp } from "../../utils/whatsappUtils";
 
-const CheckoutModal = ({ isOpen, onClose, groupedItems, authUser }) => {
+const CheckoutModal = ({
+  isOpen,
+  onClose,
+  groupedItems,
+  authUser,
+  userProfile,
+}) => {
   if (!isOpen) return null;
 
   return (
@@ -76,7 +82,13 @@ const CheckoutModal = ({ isOpen, onClose, groupedItems, authUser }) => {
 
               <button
                 onClick={() =>
-                  openWhatsApp(group.vendor, group.items, group.total, authUser)
+                  openWhatsApp(
+                    group.vendor,
+                    group.items,
+                    group.total,
+                    authUser,
+                    userProfile
+                  )
                 }
                 className="w-full py-2.5 bg-[#25D366] hover:bg-[#128C7E] text-white rounded-xl font-semibold transition-colors flex items-center justify-center gap-2"
               >

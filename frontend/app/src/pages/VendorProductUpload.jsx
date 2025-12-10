@@ -15,7 +15,7 @@ const VendorProductUpload = () => {
 
   useEffect(() => {
     if (authUser && !authUser.hasProfile) {
-      toast("Please complete your vendor profile first", { icon: "📝" });
+      toast("Please complete your vendor profile first");
       navigate("/create-vendor-profile");
     }
   }, [authUser, navigate]);

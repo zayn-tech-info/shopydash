@@ -1,8 +1,19 @@
-export const generateWhatsAppMessage = (vendor, items, total, authUser) => {
+export const generateWhatsAppMessage = (
+  vendor,
+  items,
+  total,
+  authUser,
+  userProfile
+) => {
   const userName = authUser?.fullName || authUser?.username || "A Customer";
   const userPhone = authUser?.phoneNumber || "";
-  const userLocation = authUser?.schoolName || "Not specified";
-  const userSchool = authUser?.schoolName || "";
+  const userAddress =
+    userProfile?.address ||
+    userProfile?.location ||
+    authUser?.address ||
+    "Not specified";
+  const userSchool =
+    userProfile?.schoolName || authUser?.schoolName || "Not specified";
 
   let message = `*New Order from ${userName}*\n\n`;
   message += `I would like to purchase:\n\n`;
@@ -19,20 +30,26 @@ export const generateWhatsAppMessage = (vendor, items, total, authUser) => {
 
   message += `*Delivery Details:*\n\n`;
   message += `Name: ${userName}\n\n`;
-  message += `Location: ${userLocation}\n\n`;
+  message += `Address: ${userAddress}\n\n`;
   message += `School: ${userSchool}\n\n`;
   message += `Phone: ${userPhone}\n\n`;
 
   return message;
 };
 
-export const openWhatsApp = (vendor, items, total, authUser) => {
+export const openWhatsApp = (vendor, items, total, authUser, userProfile) => {
   if (!vendor?.whatsAppNumber) {
     alert("This vendor does not have a WhatsApp number connected.");
     return;
   }
 
-  const message = generateWhatsAppMessage(vendor, items, total, authUser);
+  const message = generateWhatsAppMessage(
+    vendor,
+    items,
+    total,
+    authUser,
+    userProfile
+  );
 
   // Basic phone number cleaning (remove spacing, ensure it works with wa.me)
   const cleanPhone = vendor.whatsAppNumber.replace(/[^\d+]/g, "");

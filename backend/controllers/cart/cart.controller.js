@@ -13,6 +13,10 @@ const getCart = asyncErrorHandler(async (req, res, next) => {
     return next(error);
   }
 
+  if (user.role === "vendor") {
+    return next(new customError("Vendors cannot access cart", 403));
+  }
+
   const cart = await Cart.findOne({ userId }).populate({
     path: "items.vendorId",
     select: "businessName schoolName username profilePic whatsAppNumber",
@@ -35,6 +39,10 @@ const addToCart = asyncErrorHandler(async (req, res, next) => {
     return next(error);
   }
 
+  if (user.role === "vendor") {
+    return next(new customError("Vendors cannot perform cart operations", 403));
+  }
+
   const { productId, quantity, vendorPostId } = req.body;
 
   if (!productId || !quantity || !vendorPostId) {
@@ -50,6 +58,12 @@ const addToCart = asyncErrorHandler(async (req, res, next) => {
   if (!productPost) {
     const error = new customError("Product post not found", 404);
     return next(error);
+  }
+
+  if (productPost.vendorId.toString() === userId.toString()) {
+    return next(
+      new customError("You cannot add your own products to cart", 403)
+    );
   }
 
   const product = productPost.products.id(productId);
@@ -115,6 +129,12 @@ const addToCart = asyncErrorHandler(async (req, res, next) => {
 
 const updateCartItemQuantity = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user._id;
+  const user = await User.findById(userId);
+
+  if (user && user.role === "vendor") {
+    return next(new customError("Vendors cannot perform cart operations", 403));
+  }
+
   const { productId, quantity } = req.body;
 
   if (!productId || quantity === undefined) {
@@ -149,6 +169,12 @@ const updateCartItemQuantity = asyncErrorHandler(async (req, res, next) => {
 
 const removeFromCart = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user._id;
+  const user = await User.findById(userId);
+
+  if (user && user.role === "vendor") {
+    return next(new customError("Vendors cannot perform cart operations", 403));
+  }
+
   const { productId } = req.body;
 
   if (!productId) {

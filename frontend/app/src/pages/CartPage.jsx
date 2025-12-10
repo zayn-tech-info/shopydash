@@ -17,6 +17,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import CheckoutModal from "../components/cart/CheckoutModal";
 import { openWhatsApp } from "../utils/whatsappUtils";
+import { useClientProfileStore } from "../store/clientProfileStore";
 
 const CartPage = () => {
   const {
@@ -28,8 +29,16 @@ const CartPage = () => {
     getCart,
   } = useCartStore();
   const { authUser } = useAuthStore();
+  const { clientProfile, getProfile } = useClientProfileStore();
+
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
   const [groupedItems, setGroupedItems] = useState({});
+
+  useEffect(() => {
+    if (authUser && authUser.username && !clientProfile) {
+      getProfile(authUser.username, { silent: true });
+    }
+  }, [authUser, clientProfile, getProfile]);
 
   useEffect(() => {
     getCart();
@@ -41,7 +50,7 @@ const CartPage = () => {
       const vendorId = item.vendorId?._id;
       if (!vendorId) return;
       if (!groups[vendorId]) {
-        groups[vendorId] = { 
+        groups[vendorId] = {
           vendor: item.vendorId,
           items: [],
           total: 0,
@@ -61,7 +70,13 @@ const CartPage = () => {
     if (vendorIds.length === 0) return;
     if (vendorIds.length === 1) {
       const group = groups[vendorIds[0]];
-      openWhatsApp(group.vendor, group.items, group.total, authUser);
+      openWhatsApp(
+        group.vendor,
+        group.items,
+        group.total,
+        authUser,
+        clientProfile
+      );
     } else {
       setIsCheckoutModalOpen(true);
     }
@@ -256,6 +271,7 @@ const CartPage = () => {
         onClose={() => setIsCheckoutModalOpen(false)}
         groupedItems={groupedItems}
         authUser={authUser}
+        userProfile={clientProfile}
       />
     </div>
   );

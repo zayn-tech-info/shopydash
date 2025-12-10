@@ -119,8 +119,9 @@ const App = () => {
           <Route path="/p/:username" element={<ProfileDispatcher />} />
           <Route
             path="/cart"
-            // element={authUser ? <CartPage /> : <Navigate to="/login" />}
-            element={<CartPage />}
+            element={
+              authUser?.role === "vendor" ? <Navigate to="/" /> : <CartPage />
+            }
           />
           <Route path="*" element={<NotFound />} />
         </Routes>

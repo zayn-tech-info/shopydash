@@ -1,60 +1,153 @@
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { api } from "../lib/axios";
 import { NearByVendors } from "../components/NearByVendors";
-import { Search, MapPin, School, X } from "lucide-react";
-import { schools } from "../constants";
+import {
+  Search,
+  MapPin,
+  School,
+  X,
+  ChevronDown,
+  Check,
+  Loader,
+} from "lucide-react";
 import { FeedSkeleton } from "../components/skeletons/FeedSkeleton";
 
+import { useSearchParams } from "react-router-dom";
+
 export default function Feeds() {
+  const [searchParams] = useSearchParams();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedSchool, setSelectedSchool] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState("");
+
+  // Initialize from URL params
+  const [searchQuery, setSearchQuery] = useState(
+    searchParams.get("search") || ""
+  );
+
+  // School Selection State
+  const [selectedSchool, setSelectedSchool] = useState(
+    searchParams.get("school") || ""
+  );
+  const [schools, setSchools] = useState([]);
+  const [loadingSchools, setLoadingSchools] = useState(false);
+  const [showSchoolDropdown, setShowSchoolDropdown] = useState(false);
+
+  // Location/Area Selection State
+  const [selectedLocation, setSelectedLocation] = useState(
+    searchParams.get("area") || ""
+  );
+  const [areaSuggestions, setAreaSuggestions] = useState([]);
+  const [loadingAreas, setLoadingAreas] = useState(false);
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+
   const [isSearchActive, setIsSearchActive] = useState(false);
 
+  const schoolDropdownRef = useRef(null);
+  const locationDropdownRef = useRef(null);
+
+  // Fetch Schools
+  useEffect(() => {
+    const fetchSchools = async () => {
+      try {
+        setLoadingSchools(true);
+        const res = await api.get("/api/v1/locations/schools");
+        if (res.data.success) {
+          setSchools(res.data.schools);
+        }
+      } catch (error) {
+        console.error("Failed to fetch schools", error);
+        setSchools([]);
+      } finally {
+        setLoadingSchools(false);
+      }
+    };
+    fetchSchools();
+  }, []);
+
+  // Fetch Areas when School changes or user types in location
+  useEffect(() => {
+    const fetchAreas = async () => {
+      if (!selectedSchool) {
+        setAreaSuggestions([]);
+        return;
+      }
+      try {
+        setLoadingAreas(true);
+        const res = await api.get(`/api/v1/locations/areas`, {
+          params: {
+            schoolName: selectedSchool,
+            search: selectedLocation,
+          },
+        });
+        setAreaSuggestions(res.data.areas);
+      } catch (error) {
+        console.error("Failed to fetch areas", error);
+      } finally {
+        setLoadingAreas(false);
+      }
+    };
+
+    const delayDebounceFn = setTimeout(() => {
+      fetchAreas();
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [selectedLocation, selectedSchool]);
+
+  // Handle Click Outside for Dropdowns
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        schoolDropdownRef.current &&
+        !schoolDropdownRef.current.contains(event.target)
+      ) {
+        setShowSchoolDropdown(false);
+      }
+      if (
+        locationDropdownRef.current &&
+        !locationDropdownRef.current.contains(event.target)
+      ) {
+        setShowLocationDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Fetch Feed Posts
   const fetchPosts = useCallback(async () => {
     setLoading(true);
     try {
       const params = { limit: 100 };
       if (selectedSchool) params.school = selectedSchool;
+      if (selectedLocation) params.area = selectedLocation;
+      if (searchQuery) params.search = searchQuery;
 
       const res = await api.get("/api/v1/post/feed", { params });
       setPosts(res.data.data.posts);
     } catch (error) {
-      // Error silently handled - user can retry
+      // Error silently handled
+      console.error(error);
     } finally {
       setLoading(false);
     }
-  }, [selectedSchool]);
+  }, [selectedSchool, selectedLocation, searchQuery]);
 
+  // Debounce fetchPosts when searchQuery changes
   useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
+    const delayDebounceFn = setTimeout(() => {
+      fetchPosts();
+    }, 500);
 
-  // Apply client-side filters for better performance
-  const filteredPosts = useMemo(() => {
-    return posts.filter((post) => {
-      // Filter by location
-      if (selectedLocation && !post.location.toLowerCase().includes(selectedLocation.toLowerCase())) {
-        return false;
-      }
+    return () => clearTimeout(delayDebounceFn);
+  }, [fetchPosts, searchQuery]);
 
-      // Filter by search query (caption or vendor name)
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        const matchesCaption = post.caption?.toLowerCase().includes(query);
-        const matchesBusinessName = post.vendorId?.businessName?.toLowerCase().includes(query);
-        const matchesUsername = post.vendorId?.username?.toLowerCase().includes(query);
-        
-        if (!matchesCaption && !matchesBusinessName && !matchesUsername) {
-          return false;
-        }
-      }
+  // Handle immediate fetch for filters
+  useEffect(() => {
+    if (!searchQuery) fetchPosts();
+  }, [selectedSchool, selectedLocation]);
 
-      return true;
-    });
-  }, [posts, selectedLocation, searchQuery]);
+  const filteredPosts = posts; // Direct assignment since filtering is now backend-side
 
   return (
     <div className="relative min-h-screen">
@@ -94,6 +187,8 @@ export default function Feeds() {
                     onClick={() => {
                       setIsSearchActive(false);
                       setSearchQuery("");
+                      setSelectedSchool("");
+                      setSelectedLocation("");
                     }}
                     className="p-1 hover:bg-n-3/20 rounded-full text-n-4 transition-colors"
                   >
@@ -106,39 +201,145 @@ export default function Feeds() {
               <div
                 className={`grid grid-cols-1 md:grid-cols-2 gap-4 px-4 transition-all duration-300 overflow-hidden ${
                   isSearchActive
-                    ? "max-h-40 mt-4 pb-4 opacity-100"
+                    ? "max-h-40 mt-4 pb-4 opacity-100 overflow-visible"
                     : "max-h-0 opacity-0"
                 }`}
               >
-                <div className="space-y-2">
+                {/* School Filter */}
+                <div className="space-y-2 relative" ref={schoolDropdownRef}>
                   <label className="text-xs font-bold text-n-4 uppercase tracking-wider flex items-center gap-2">
                     <School size={14} /> School
                   </label>
-                  <select
-                    value={selectedSchool}
-                    onChange={(e) => setSelectedSchool(e.target.value)}
-                    className="w-full h-10 px-3 rounded-lg bg-n-2/30 border-none outline-none text-sm text-n-8 focus:ring-1 focus:ring-primary-3"
-                  >
-                    <option value="">All Schools</option>
-                    {schools.map((school, index) => (
-                      <option key={index} value={school}>
-                        {school}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={selectedSchool}
+                      onChange={(e) => {
+                        setSelectedSchool(e.target.value);
+                        setShowSchoolDropdown(true);
+                      }}
+                      onFocus={() => setShowSchoolDropdown(true)}
+                      placeholder="All Schools"
+                      className="w-full h-10 px-3 pr-10 rounded-lg bg-n-2/30 border-none outline-none text-sm text-n-8 focus:ring-1 focus:ring-primary-3 focus:bg-white transition-colors"
+                    />
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-n-4">
+                      {loadingSchools ? (
+                        <Loader className="animate-spin w-4 h-4" />
+                      ) : (
+                        <ChevronDown
+                          className={`w-4 h-4 transition-transform ${
+                            showSchoolDropdown ? "rotate-180" : ""
+                          }`}
+                        />
+                      )}
+                    </div>
+
+                    {showSchoolDropdown && (
+                      <div className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-n-3/10 max-h-60 overflow-y-auto py-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedSchool("");
+                            setShowSchoolDropdown(false);
+                          }}
+                          className="w-full px-4 py-2 text-left text-sm text-n-6 hover:bg-primary-3/5 hover:text-primary-3 transition-colors flex items-center justify-between"
+                        >
+                          <span className="font-medium">All Schools</span>
+                          {selectedSchool === "" && (
+                            <Check className="w-4 h-4 text-primary-3" />
+                          )}
+                        </button>
+                        {schools
+                          .filter((s) =>
+                            s
+                              .toLowerCase()
+                              .includes(selectedSchool.toLowerCase())
+                          )
+                          .map((school, index) => (
+                            <button
+                              key={index}
+                              type="button"
+                              onClick={() => {
+                                setSelectedSchool(school);
+                                setShowSchoolDropdown(false);
+                                setSelectedLocation("");
+                              }}
+                              className="w-full px-4 py-2 text-left text-sm text-n-6 hover:bg-primary-3/5 hover:text-primary-3 transition-colors flex items-center justify-between"
+                            >
+                              <span>{school}</span>
+                              {selectedSchool === school && (
+                                <Check className="w-4 h-4 text-primary-3" />
+                              )}
+                            </button>
+                          ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="space-y-2">
+                {/* Location Filter */}
+                <div className="space-y-2 relative" ref={locationDropdownRef}>
                   <label className="text-xs font-bold text-n-4 uppercase tracking-wider flex items-center gap-2">
                     <MapPin size={14} /> Location
                   </label>
-                  <input
-                    type="text"
-                    placeholder="Filter by location..."
-                    value={selectedLocation}
-                    onChange={(e) => setSelectedLocation(e.target.value)}
-                    className="w-full h-10 px-3 rounded-lg bg-n-2/30 border-none outline-none text-sm text-n-8 focus:ring-1 focus:ring-primary-3"
-                  />
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder={
+                        selectedSchool
+                          ? `Filter by location around ${selectedSchool}...`
+                          : "Select a school first"
+                      }
+                      value={selectedLocation}
+                      onChange={(e) => {
+                        setSelectedLocation(e.target.value);
+                        setShowLocationDropdown(true);
+                      }}
+                      onFocus={() => setShowLocationDropdown(true)}
+                      disabled={!selectedSchool}
+                      className={`w-full h-10 px-3 pr-10 rounded-lg bg-n-2/30 border-none outline-none text-sm text-n-8 focus:ring-1 focus:ring-primary-3 focus:bg-white transition-colors ${
+                        !selectedSchool ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
+                    />
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-n-4">
+                      {loadingAreas ? (
+                        <Loader className="animate-spin w-4 h-4" />
+                      ) : (
+                        <ChevronDown
+                          className={`w-4 h-4 transition-transform ${
+                            showLocationDropdown ? "rotate-180" : ""
+                          }`}
+                        />
+                      )}
+                    </div>
+
+                    {showLocationDropdown && selectedSchool && (
+                      <div className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-n-3/10 max-h-60 overflow-y-auto py-2">
+                        {areaSuggestions.length > 0 ? (
+                          areaSuggestions.map((area, index) => (
+                            <button
+                              key={index}
+                              type="button"
+                              onClick={() => {
+                                setSelectedLocation(area);
+                                setShowLocationDropdown(false);
+                              }}
+                              className="w-full px-4 py-2 text-left text-sm text-n-6 hover:bg-primary-3/5 hover:text-primary-3 transition-colors flex items-center justify-between"
+                            >
+                              <span>{area}</span>
+                              {selectedLocation === area && (
+                                <Check className="w-4 h-4 text-primary-3" />
+                              )}
+                            </button>
+                          ))
+                        ) : (
+                          <div className="px-4 py-2 text-sm text-n-4">
+                            No areas found
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

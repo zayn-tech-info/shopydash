@@ -17,10 +17,12 @@ import { Link, Links } from "react-router-dom";
 import { useCartStore } from "../store/cartStore";
 import { useEffect } from "react";
 import UserAvatar from "./UserAvatar";
+import { useAuthStore } from "../store/authStore";
 
 export function NearByVendors({ posts, showHeader = true }) {
   const addToCart = useCartStore((state) => state.addToCart);
   const getCart = useCartStore((state) => state.getCart);
+  const { authUser } = useAuthStore();
   const rawPosts = posts || [];
 
   useEffect(() => {
@@ -34,6 +36,7 @@ export function NearByVendors({ posts, showHeader = true }) {
         vendorName:
           post.vendorId.businessName || post.vendorId.username || "Vendor",
         vendorAvatar: post.vendorId.logo || post.vendorId.profilePic,
+        vendorOwnerId: post.vendorId._id,
         location: post.location,
         postedAt: new Date(post.createdAt).toLocaleDateString(),
         createdAt: post.createdAt,
@@ -222,13 +225,15 @@ export function NearByVendors({ posts, showHeader = true }) {
                         <h4 className="font-bold text-xs text-n-8 truncate mb-2">
                           {p.name}
                         </h4>
-                        <button
-                          type="button"
-                          onClick={() => handleAddToCart(p, post.id)}
-                          className="w-full h-9 flex items-center justify-center gap-2 rounded-lg bg-primary-3 text-white font-code text-[10px] font-bold uppercase tracking-wider hover:bg-primary-4 transition-colors"
-                        >
-                          <ShoppingCart size={14} /> Add to cart
-                        </button>
+                        {authUser?.role !== "vendor" && (
+                          <button
+                            type="button"
+                            onClick={() => handleAddToCart(p, post.id)}
+                            className="w-full h-9 flex items-center justify-center gap-2 rounded-lg bg-primary-3 text-white font-code text-[10px] font-bold uppercase tracking-wider hover:bg-primary-4 transition-colors"
+                          >
+                            <ShoppingCart size={14} /> Add to cart
+                          </button>
+                        )}
                       </div>
                     </div>
                   </SwiperSlide>
@@ -255,22 +260,28 @@ export function NearByVendors({ posts, showHeader = true }) {
             </div>
 
             <div className="px-6 py-4 bg-white border-t border-n-3/10 flex items-center justify-end gap-3">
-              <Link
-                to={`/p/${post.vendorUsername || vendorSlug(post.vendorName)}`}
-              >
-                <button
-                  type="button"
-                  className="h-10 px-4 rounded-xl border border-n-3/20 text-n-6 font-code text-xs font-bold uppercase tracking-wider hover:border-primary-3 hover:text-primary-3 transition-colors"
-                >
-                  View profile
-                </button>
-              </Link>
-              <button
-                type="button"
-                className="h-10 px-4 rounded-xl bg-primary-3 text-white font-code text-xs font-bold uppercase tracking-wider hover:bg-primary-4 transition-colors shadow-md shadow-primary-3/20 flex items-center gap-2"
-              >
-                <MessageCircle size={16} /> Message
-              </button>
+              {authUser?.role !== "vendor" && (
+                <>
+                  <Link
+                    to={`/p/${
+                      post.vendorUsername || vendorSlug(post.vendorName)
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      className="h-10 px-4 rounded-xl border border-n-3/20 text-n-6 font-code text-xs font-bold uppercase tracking-wider hover:border-primary-3 hover:text-primary-3 transition-colors"
+                    >
+                      View profile
+                    </button>
+                  </Link>
+                  <button
+                    type="button"
+                    className="h-10 px-4 rounded-xl bg-primary-3 text-white font-code text-xs font-bold uppercase tracking-wider hover:bg-primary-4 transition-colors shadow-md shadow-primary-3/20 flex items-center gap-2"
+                  >
+                    <MessageCircle size={16} /> Message
+                  </button>
+                </>
+              )}
             </div>
           </article>
         ))}

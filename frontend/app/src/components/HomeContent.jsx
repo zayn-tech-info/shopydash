@@ -1,18 +1,18 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
-  BookOpen,
-  Headset,
   Search,
   SearchIcon,
-  Shirt,
   MapPin,
   School,
   X,
   ChevronDown,
+  Check,
+  Loader,
 } from "lucide-react";
-import { categories, schools } from "../constants";
+import { categories } from "../constants";
 import { useAuthStore } from "../store/authStore";
+import { api } from "../lib/axios";
 
 export function HomeContent({
   value,
@@ -22,13 +22,106 @@ export function HomeContent({
   className = "",
 }) {
   const { authUser } = useAuthStore();
+  const navigate = useNavigate();
   const [isSearchActive, setIsSearchActive] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // School Selection State
   const [selectedSchool, setSelectedSchool] = useState("");
+  const [schools, setSchools] = useState([]);
+  const [loadingSchools, setLoadingSchools] = useState(false);
+  const [showSchoolDropdown, setShowSchoolDropdown] = useState(false);
+
+  // Location/Area Selection State
   const [selectedLocation, setSelectedLocation] = useState("");
+  const [areaSuggestions, setAreaSuggestions] = useState([]);
+  const [loadingAreas, setLoadingAreas] = useState(false);
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+  const locationDropdownRef = useRef(null);
+  const schoolDropdownRef = useRef(null);
+
+  // Fetch Schools
+  useEffect(() => {
+    const fetchSchools = async () => {
+      try {
+        setLoadingSchools(true);
+        const res = await api.get("/api/v1/locations/schools");
+        if (res.data.success) {
+          setSchools(res.data.schools);
+        }
+      } catch (error) {
+        console.error("Failed to fetch schools", error);
+        setSchools([]);
+      } finally {
+        setLoadingSchools(false);
+      }
+    };
+    fetchSchools();
+  }, []);
+
+  // Fetch Areas
+  useEffect(() => {
+    const fetchAreas = async () => {
+      if (!selectedSchool) {
+        setAreaSuggestions([]);
+        return;
+      }
+      try {
+        setLoadingAreas(true);
+        const res = await api.get(`/api/v1/locations/areas`, {
+          params: {
+            schoolName: selectedSchool,
+            search: selectedLocation,
+          },
+        });
+        setAreaSuggestions(res.data.areas);
+      } catch (error) {
+        console.error("Failed to fetch areas", error);
+      } finally {
+        setLoadingAreas(false);
+      }
+    };
+
+    const delayDebounceFn = setTimeout(() => {
+      fetchAreas();
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [selectedLocation, selectedSchool]);
+
+  // Handle Click Outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        schoolDropdownRef.current &&
+        !schoolDropdownRef.current.contains(event.target)
+      ) {
+        setShowSchoolDropdown(false);
+      }
+      if (
+        locationDropdownRef.current &&
+        !locationDropdownRef.current.contains(event.target)
+      ) {
+        setShowLocationDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   function handleSubmit(e) {
     e.preventDefault();
-    if (onSubmit) onSubmit(value);
+    if (onSubmit) {
+      onSubmit(value);
+    } else {
+      // Navigate to feeds with query params if no external onSubmit is provided
+      const params = new URLSearchParams();
+      if (value) params.append("search", value);
+      if (selectedSchool) params.append("school", selectedSchool);
+      if (selectedLocation) params.append("area", selectedLocation);
+
+      navigate(`/feeds?${params.toString()}`);
+    }
   }
 
   return (
@@ -147,45 +240,152 @@ export function HomeContent({
                     <div
                       className={`grid grid-cols-1 md:grid-cols-2 gap-4 transition-all duration-500 ease-in-out overflow-hidden ${
                         isSearchActive
-                          ? "max-h-60 opacity-100 mt-4 px-1 pb-1"
+                          ? "max-h-60 opacity-100 mt-4 px-1 pb-1 overflow-visible"
                           : "max-h-0 opacity-0 mt-0"
                       }`}
                     >
-                      <div className="space-y-2">
+                      {/* School Filter */}
+                      <div
+                        className="space-y-2 relative"
+                        ref={schoolDropdownRef}
+                      >
                         <label className="text-xs font-bold text-n-4 uppercase tracking-wider flex items-center gap-2 ml-1">
                           <School size={14} /> School
                         </label>
                         <div className="relative">
-                          <select
+                          <input
+                            type="text"
                             value={selectedSchool}
-                            onChange={(e) => setSelectedSchool(e.target.value)}
-                            className="w-full h-11 px-4 rounded-xl bg-n-2/30 border border-transparent outline-none text-sm text-n-8 focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all appearance-none cursor-pointer"
-                          >
-                            <option value="">All Schools</option>
-                            {schools.map((school, index) => (
-                              <option key={index} value={school}>
-                                {school}
-                              </option>
-                            ))}
-                          </select>
-                          <ChevronDown
-                            size={16}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-n-4"
+                            onChange={(e) => {
+                              setSelectedSchool(e.target.value);
+                              setShowSchoolDropdown(true);
+                            }}
+                            onFocus={() => setShowSchoolDropdown(true)}
+                            placeholder="All Schools"
+                            className="w-full h-11 px-4 pr-10 rounded-xl bg-n-2/30 border border-transparent outline-none text-sm text-n-8 focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all cursor-pointer"
                           />
+                          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-n-4">
+                            {loadingSchools ? (
+                              <Loader className="animate-spin w-4 h-4" />
+                            ) : (
+                              <ChevronDown
+                                className={`w-4 h-4 transition-transform ${
+                                  showSchoolDropdown ? "rotate-180" : ""
+                                }`}
+                              />
+                            )}
+                          </div>
+
+                          {showSchoolDropdown && (
+                            <div className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-n-3/10 max-h-60 overflow-y-auto py-2">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSelectedSchool("");
+                                  setShowSchoolDropdown(false);
+                                }}
+                                className="w-full px-4 py-2 text-left text-sm text-n-6 hover:bg-primary-3/5 hover:text-primary-3 transition-colors flex items-center justify-between"
+                              >
+                                <span className="font-medium">All Schools</span>
+                                {selectedSchool === "" && (
+                                  <Check className="w-4 h-4 text-primary-3" />
+                                )}
+                              </button>
+                              {schools
+                                .filter((s) =>
+                                  s
+                                    .toLowerCase()
+                                    .includes(selectedSchool.toLowerCase())
+                                )
+                                .map((school, index) => (
+                                  <button
+                                    key={index}
+                                    type="button"
+                                    onClick={() => {
+                                      setSelectedSchool(school);
+                                      setShowSchoolDropdown(false);
+                                      setSelectedLocation("");
+                                    }}
+                                    className="w-full px-4 py-2 text-left text-sm text-n-6 hover:bg-primary-3/5 hover:text-primary-3 transition-colors flex items-center justify-between"
+                                  >
+                                    <span>{school}</span>
+                                    {selectedSchool === school && (
+                                      <Check className="w-4 h-4 text-primary-3" />
+                                    )}
+                                  </button>
+                                ))}
+                            </div>
+                          )}
                         </div>
                       </div>
 
-                      <div className="space-y-2">
+                      {/* Location Filter */}
+                      <div
+                        className="space-y-2 relative"
+                        ref={locationDropdownRef}
+                      >
                         <label className="text-xs font-bold text-n-4 uppercase tracking-wider flex items-center gap-2 ml-1">
                           <MapPin size={14} /> Location
                         </label>
-                        <input
-                          type="text"
-                          placeholder="Filter by location..."
-                          value={selectedLocation}
-                          onChange={(e) => setSelectedLocation(e.target.value)}
-                          className="w-full h-11 px-4 rounded-xl bg-n-2/30 border border-transparent outline-none text-sm text-n-8 focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all"
-                        />
+                        <div className="relative">
+                          <input
+                            type="text"
+                            placeholder={
+                              selectedSchool
+                                ? `Filter by location around...`
+                                : "Select a school first"
+                            }
+                            value={selectedLocation}
+                            onChange={(e) => {
+                              setSelectedLocation(e.target.value);
+                              setShowLocationDropdown(true);
+                            }}
+                            onFocus={() => setShowLocationDropdown(true)}
+                            disabled={!selectedSchool}
+                            className={`w-full h-11 px-4 pr-10 rounded-xl bg-n-2/30 border border-transparent outline-none text-sm text-n-8 focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all ${
+                              !selectedSchool
+                                ? "opacity-50 cursor-not-allowed"
+                                : ""
+                            }`}
+                          />
+                          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-n-4">
+                            {loadingAreas ? (
+                              <Loader className="animate-spin w-4 h-4" />
+                            ) : (
+                              <ChevronDown
+                                className={`w-4 h-4 transition-transform ${
+                                  showLocationDropdown ? "rotate-180" : ""
+                                }`}
+                              />
+                            )}
+                          </div>
+                          {showLocationDropdown && selectedSchool && (
+                            <div className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-n-3/10 max-h-60 overflow-y-auto py-2">
+                              {areaSuggestions.length > 0 ? (
+                                areaSuggestions.map((area, index) => (
+                                  <button
+                                    key={index}
+                                    type="button"
+                                    onClick={() => {
+                                      setSelectedLocation(area);
+                                      setShowLocationDropdown(false);
+                                    }}
+                                    className="w-full px-4 py-2 text-left text-sm text-n-6 hover:bg-primary-3/5 hover:text-primary-3 transition-colors flex items-center justify-between"
+                                  >
+                                    <span>{area}</span>
+                                    {selectedLocation === area && (
+                                      <Check className="w-4 h-4 text-primary-3" />
+                                    )}
+                                  </button>
+                                ))
+                              ) : (
+                                <div className="px-4 py-2 text-sm text-n-4">
+                                  No areas found
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>

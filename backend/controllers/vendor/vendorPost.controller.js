@@ -33,10 +33,15 @@ const createPost = asyncErrorHandler(async (req, res, next) => {
     );
   }
 
+  const productsWithVendorId = products.map((product) => ({
+    ...product,
+    vendorId: userId,
+  }));
+
   const newPost = await VendorPost.create({
     vendorId: userId,
     caption,
-    products,
+    products: productsWithVendorId,
     school: school || vendorProfile.schoolName || user.schoolName,
     location,
     state,
@@ -86,16 +91,28 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
     query.school = school;
   }
 
-  // Filter by user location if available
-  if (req.user) {
-    if (req.user.state) query.state = req.user.state;
-    if (req.user.lga) query.lga = req.user.lga;
-    // We optionally filter by area if needed, but strict state/lga match is key
-    // if (req.user.area) query.area = req.user.area;
-  } else if (req.query.state && req.query.lga) {
-    query.state = req.query.state;
-    query.lga = req.query.lga;
-    if (req.query.area) query.area = req.query.area;
+  if (req.query.area) {
+    query.area = { $regex: req.query.area, $options: "i" };
+  }
+
+  // Text Search Filter (Caption or Product Title)
+  if (req.query.search) {
+    const searchRegex = { $regex: req.query.search, $options: "i" };
+    query.$or = [
+      { caption: searchRegex },
+      { "products.title": searchRegex },
+      { "products.description": searchRegex },
+    ];
+  }
+
+  if (!school && !req.query.area) {
+    if (req.user) {
+      if (req.user.state) query.state = req.user.state;
+      if (req.user.lga) query.lga = req.user.lga;
+    } else if (req.query.state && req.query.lga) {
+      query.state = req.query.state;
+      query.lga = req.query.lga;
+    }
   }
 
   // Enforce maximum limit to prevent resource exhaustion
@@ -249,7 +266,7 @@ const updatePost = asyncErrorHandler(async (req, res, next) => {
   post.lga = lga || post.lga;
   post.area = area || post.area;
   if (products) {
-    post.products = products;
+    post.products = products.map((p) => ({ ...p, vendorId: userId }));
   }
 
   await post.save();
