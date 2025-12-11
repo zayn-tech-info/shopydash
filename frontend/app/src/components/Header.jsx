@@ -30,21 +30,19 @@ export function Header() {
         </Link>
 
         <div className="flex items-center gap-4">
-          {authUser?.role !== "vendor" && (
-            <Link to="/cart" className="relative group md:hidden">
-              <div className="p-2 rounded-full hover:bg-n-2/50 transition-colors">
-                <ShoppingCart
-                  size={24}
-                  className="text-n-6 group-hover:text-primary-3 transition-colors"
-                />
-                {cart.length > 0 && (
-                  <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-primary-3 rounded-full min-w-[1.25rem] h-5">
-                    {cartCount}
-                  </span>
-                )}
-              </div>
-            </Link>
-          )}
+          <Link to="/cart" className="relative group md:hidden">
+            <div className="p-2 rounded-full hover:bg-n-2/50 transition-colors">
+              <ShoppingCart
+                size={24}
+                className="text-n-6 group-hover:text-primary-3 transition-colors"
+              />
+              {cart.length > 0 && (
+                <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-primary-3 rounded-full min-w-[1.25rem] h-5">
+                  {cartCount}
+                </span>
+              )}
+            </div>
+          </Link>
 
           <Link className={`${authUser ? "hidden" : "block"}`} to="/login">
             <button className="px-5 py-2 rounded-md font-medium hover:bg-primary-2 transition-colors duration-500 text-n-1 bg-primary-3 md:hidden">
@@ -63,6 +61,7 @@ export function Header() {
               }
               const navResult = renderNav(nav.text, authUser?.role);
               if (navResult === null) return null;
+              if (nav.text === "Cart") return null;
 
               const Icon = nav.icon;
               return (
@@ -106,21 +105,19 @@ export function Header() {
             </li> */}
           </ul>
 
-          {authUser?.role !== "vendor" && (
-            <Link to="/cart" className="relative group mr-5">
-              <div className="p-2 rounded-full hover:bg-n-2/50 transition-colors">
-                <ShoppingCart
-                  size={24}
-                  className="text-n-6 group-hover:text-primary-3 transition-colors"
-                />
-                {cart.length > 0 && (
-                  <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-primary-3 rounded-full min-w-[1.25rem] h-5">
-                    {cartCount}
-                  </span>
-                )}
-              </div>
-            </Link>
-          )}
+          <Link to="/cart" className="relative group mr-5">
+            <div className="p-2 rounded-full hover:bg-n-2/50 transition-colors">
+              <ShoppingCart
+                size={24}
+                className="text-n-6 group-hover:text-primary-3 transition-colors"
+              />
+              {cart.length > 0 && (
+                <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-primary-3 rounded-full min-w-[1.25rem] h-5">
+                  {cartCount}
+                </span>
+              )}
+            </div>
+          </Link>
 
           <Link className={`${authUser ? "hidden" : "block"}`} to="/login">
             <button className="px-5 py-1 rounded-md font-medium hover:bg-primary-2 transition-colors duration-500 text-n-1 bg-primary-3">

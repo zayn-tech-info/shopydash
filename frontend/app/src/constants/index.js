@@ -45,6 +45,12 @@ export const navigation = [
     icon: LayoutDashboardIcon,
   },
   {
+    id: 5,
+    text: "Cart",
+    href: "/cart",
+    icon: ShoppingCart,
+  },
+  {
     id: 4,
     text: "Profile",
     href: "/profile",

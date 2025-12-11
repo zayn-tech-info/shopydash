@@ -37,7 +37,11 @@ const getProfile = asyncErrorHandler(async (req, res, next) => {
 
     if (profile && posts.length > 0) {
       const allProducts = posts.reduce((acc, post) => {
-        return acc.concat(post.products || []);
+        const productsWithPostId = (post.products || []).map((product) => ({
+          ...product,
+          vendorPostId: post._id.toString(),
+        }));
+        return acc.concat(productsWithPostId);
       }, []);
 
       profile.products = allProducts;

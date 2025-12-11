@@ -76,7 +76,11 @@ function AboutAndProducts({ vendor }) {
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 {products.map((p) => (
-                  <VendorProductItem key={p._id || p} product={p} />
+                  <VendorProductItem
+                    key={p._id || p}
+                    product={p}
+                    vendorId={vendor?._id}
+                  />
                 ))}
               </div>
             )}

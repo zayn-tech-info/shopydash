@@ -117,12 +117,7 @@ const App = () => {
           <Route path="/feeds" element={<Feeds />} />
           <Route path="/search" element={<SearchProducts />} />
           <Route path="/p/:username" element={<ProfileDispatcher />} />
-          <Route
-            path="/cart"
-            element={
-              authUser?.role === "vendor" ? <Navigate to="/" /> : <CartPage />
-            }
-          />
+          <Route path="/cart" element={<CartPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>

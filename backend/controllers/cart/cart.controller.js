@@ -13,10 +13,6 @@ const getCart = asyncErrorHandler(async (req, res, next) => {
     return next(error);
   }
 
-  if (user.role === "vendor") {
-    return next(new customError("Vendors cannot access cart", 403));
-  }
-
   const cart = await Cart.findOne({ userId }).populate({
     path: "items.vendorId",
     select: "businessName schoolName username profilePic whatsAppNumber",
@@ -37,10 +33,6 @@ const addToCart = asyncErrorHandler(async (req, res, next) => {
   if (!user) {
     const error = new customError("User not found", 404);
     return next(error);
-  }
-
-  if (user.role === "vendor") {
-    return next(new customError("Vendors cannot perform cart operations", 403));
   }
 
   const { productId, quantity, vendorPostId } = req.body;
@@ -131,10 +123,6 @@ const updateCartItemQuantity = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user._id;
   const user = await User.findById(userId);
 
-  if (user && user.role === "vendor") {
-    return next(new customError("Vendors cannot perform cart operations", 403));
-  }
-
   const { productId, quantity } = req.body;
 
   if (!productId || quantity === undefined) {
@@ -170,10 +158,6 @@ const updateCartItemQuantity = asyncErrorHandler(async (req, res, next) => {
 const removeFromCart = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user._id;
   const user = await User.findById(userId);
-
-  if (user && user.role === "vendor") {
-    return next(new customError("Vendors cannot perform cart operations", 403));
-  }
 
   const { productId } = req.body;
 

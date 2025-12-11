@@ -225,7 +225,7 @@ export function NearByVendors({ posts, showHeader = true }) {
                         <h4 className="font-bold text-xs text-n-8 truncate mb-2">
                           {p.name}
                         </h4>
-                        {authUser?.role !== "vendor" && (
+                        {authUser?._id !== post.vendorOwnerId && (
                           <button
                             type="button"
                             onClick={() => handleAddToCart(p, post.id)}
@@ -260,7 +260,7 @@ export function NearByVendors({ posts, showHeader = true }) {
             </div>
 
             <div className="px-6 py-4 bg-white border-t border-n-3/10 flex items-center justify-end gap-3">
-              {authUser?.role !== "vendor" && (
+              {authUser?._id !== post.vendorOwnerId && (
                 <>
                   <Link
                     to={`/p/${

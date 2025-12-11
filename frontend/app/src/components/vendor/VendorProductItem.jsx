@@ -1,13 +1,45 @@
 import { memo } from "react";
 import { useAuthStore } from "../../store/authStore";
+import { useCartStore } from "../../store/cartStore";
+import { ShoppingCart } from "lucide-react";
+import toast from "react-hot-toast";
 
-function VendorProductItem({ product }) {
+function VendorProductItem({ product, vendorId }) {
   const { authUser } = useAuthStore();
+  const addToCart = useCartStore((state) => state.addToCart);
+
   const title =
     product?.title || product?.name || `Product ${product?._id || ""}`;
   const img =
     product?.images?.[0] || product?.image || "/public/product-placeholder.png";
   const price = product?.price ? `₦${product.price}` : null;
+
+  const handleAddToCart = async () => {
+    try {
+      if (!authUser) {
+        toast.error("Please login to add items to cart");
+        return;
+      }
+
+      const postId =
+        product.vendorPostId || product.sectionId || product.postId; // Fallback attempts
+
+      if (!postId) {
+        toast.error("Unable to add this item: Missing post reference");
+        console.error("Product missing vendorPostId:", product);
+        return;
+      }
+
+      await addToCart({
+        productId: product._id,
+        quantity: 1,
+        vendorPostId: postId,
+      });
+    } catch (error) {
+      // Error handling is mostly in store, but safety check
+      console.error(error);
+    }
+  };
 
   return (
     <div className="bg-white border border-n-3/20 rounded-xl p-3 flex flex-col gap-3 h-full group hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
@@ -33,9 +65,14 @@ function VendorProductItem({ product }) {
           {product?.shortDescription || product?.description || ""}
         </div>
 
-        {authUser?.role !== "vendor" && (
-          <button className="w-full py-2 rounded-lg bg-n-2 text-n-8 text-xs font-bold uppercase tracking-wider hover:bg-primary-3 hover:text-white transition-all duration-300">
-            Message
+        {authUser?._id !==
+          (product?.vendorId?._id || product?.vendorId || vendorId) && (
+          <button
+            onClick={handleAddToCart}
+            className="w-full h-10 rounded-xl bg-primary-3 text-white font-code text-xs font-bold uppercase tracking-wider px-2 flex text-nowrap items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-95"
+          >
+            <ShoppingCart size={16} />
+            Add to cart
           </button>
         )}
       </div>
