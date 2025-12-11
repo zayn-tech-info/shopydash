@@ -18,7 +18,6 @@ const createPost = asyncErrorHandler(async (req, res, next) => {
     );
   }
 
-  // Execute queries in parallel for better performance
   const [vendorProfile, user] = await Promise.all([
     VendorProfile.findOne({ userId }).select("schoolName").lean(),
     User.findById(userId).select("schoolName").lean(),
@@ -59,7 +58,6 @@ const createPost = asyncErrorHandler(async (req, res, next) => {
 const getMyPosts = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user._id;
 
-  // Use lean() and select only _id for faster check
   const vendorProfile = await VendorProfile.findOne({ userId })
     .select("_id")
     .lean();
@@ -72,7 +70,6 @@ const getMyPosts = asyncErrorHandler(async (req, res, next) => {
     );
   }
 
-  // Use lean() for better performance since we're only reading data
   const posts = await VendorPost.find({ vendorId: userId })
     .sort({ createdAt: -1 })
     .lean();
@@ -95,7 +92,6 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
     query.area = { $regex: req.query.area, $options: "i" };
   }
 
-  // Text Search Filter (Caption or Product Title)
   if (req.query.search) {
     const searchRegex = { $regex: req.query.search, $options: "i" };
     query.$or = [
@@ -115,11 +111,9 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
     }
   }
 
-  // Enforce maximum limit to prevent resource exhaustion
   const pageLimit = Math.min(parseInt(limit), 50);
   const currentPage = Math.max(parseInt(page), 1);
 
-  // Use lean() for better performance and execute queries in parallel
   const [posts, total] = await Promise.all([
     VendorPost.find(query)
       .populate(
@@ -154,11 +148,9 @@ const getFeedPost = asyncErrorHandler(async (req, res, next) => {
     query.school = school;
   } */
 
-  // Enforce maximum limit to prevent resource exhaustion
-  /*   const pageLimit = Math.min(parseInt(limit), 50);
-  const currentPage = Math.max(parseInt(page), 1); */
+  const pageLimit = Math.min(parseInt(limit), 50);
+  const currentPage = Math.max(parseInt(page), 1);
 
-  // Use lean() for better performance and execute queries in parallel
   const [posts, total] = await Promise.all([
     VendorPost.find(query).populate(
       "vendorId",
@@ -187,7 +179,6 @@ const getFeedPost = asyncErrorHandler(async (req, res, next) => {
 const getPostById = asyncErrorHandler(async (req, res, next) => {
   const { postId } = req.params;
 
-  // Use lean() for better performance
   const post = await VendorPost.findById(postId)
     .populate(
       "vendorId",
@@ -209,14 +200,12 @@ const deletePost = asyncErrorHandler(async (req, res, next) => {
   const { postId } = req.params;
   const userId = req.user._id;
 
-  // Use lean() and select only _id for faster check
   const vendor = await VendorProfile.findOne({ userId }).select("_id").lean();
   if (!vendor) {
     const error = new customError("Vendor not found", 404);
     return next(error);
   }
 
-  // Use select to only fetch necessary fields for authorization check
   const post = await VendorPost.findById(postId).select("vendorId");
 
   if (!post) {
@@ -285,10 +274,8 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
   const currentPage = Math.max(parseInt(page), 1);
   const skip = (currentPage - 1) * pageLimit;
 
-  // Build the aggregation pipeline
   const pipeline = [];
 
-  // Stage 1: Match Posts by School and Area
   const matchStage = {};
   if (school) matchStage.school = school;
   if (area) matchStage.area = { $regex: area, $options: "i" };
@@ -297,10 +284,8 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
     pipeline.push({ $match: matchStage });
   }
 
-  // Stage 2: Unwind Products to filter them individually
   pipeline.push({ $unwind: "$products" });
 
-  // Stage 3: Match Product Title (if search text is provided)
   if (search) {
     pipeline.push({
       $match: {
@@ -344,7 +329,7 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
       description: "$products.description",
       condition: "$products.condition",
       category: "$products.category",
-      postId: "$_id", // Reference to the parent post
+      postId: { $toString: "$_id" },
       postedAt: "$createdAt",
       school: "$school",
       area: "$area",
@@ -376,6 +361,165 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
+const getFreshProducts = asyncErrorHandler(async (req, res, next) => {
+  const { limit = 8 } = req.query;
+  const pageLimit = Math.min(parseInt(limit), 20);
+
+  const AdayAgo = new Date(Date.now() - 48 * 60 * 60 * 1000);
+
+  const pipeline = [
+    {
+      $match: {
+        createdAt: { $gte: AdayAgo },
+      },
+    },
+
+    { $unwind: "$products" },
+
+    {
+      $lookup: {
+        from: "vendorprofiles",
+        localField: "vendorId",
+        foreignField: "userId",
+        as: "vendorProfile",
+      },
+    },
+    {
+      $unwind: {
+        path: "$vendorProfile",
+        preserveNullAndEmptyArrays: false,
+      },
+    },
+
+    {
+      $match: {
+        "vendorProfile.rating": { $gte: 0 },
+      },
+    },
+
+    {
+      $lookup: {
+        from: "users",
+        localField: "vendorId",
+        foreignField: "_id",
+        as: "vendorUser",
+      },
+    },
+    {
+      $unwind: {
+        path: "$vendorUser",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+
+    { $sort: { createdAt: -1 } },
+
+    { $limit: pageLimit },
+
+    {
+      $project: {
+        _id: "$products._id",
+        title: "$products.title",
+        price: "$products.price",
+        image: "$products.image",
+        description: "$products.description",
+        vendorPostId: { $toString: "$_id" },
+        vendorId: "$vendorId",
+        postedAt: "$createdAt",
+        rating: "$vendorProfile.rating",
+        vendor: {
+          businessName: "$vendorUser.businessName",
+          username: "$vendorUser.username",
+          profilePic: "$vendorUser.profilePic",
+        },
+      },
+    },
+  ];
+
+  const products = await VendorPost.aggregate(pipeline);
+
+  res.status(200).json({
+    success: true,
+    data: { products },
+  });
+});
+
+const getTrendingProducts = asyncErrorHandler(async (req, res, next) => {
+  const { limit = 20 } = req.query;
+  const pageLimit = Math.min(parseInt(limit), 20);
+
+  const pipeline = [
+    { $unwind: "$products" },
+
+    {
+      $lookup: {
+        from: "vendorprofiles",
+        localField: "vendorId",
+        foreignField: "userId",
+        as: "vendorProfile",
+      },
+    },
+    {
+      $unwind: {
+        path: "$vendorProfile",
+        preserveNullAndEmptyArrays: false,
+      },
+    },
+
+    {
+      $match: {
+        "vendorProfile.rating": { $gte: 2 },
+      },
+    },
+
+    {
+      $lookup: {
+        from: "users",
+        localField: "vendorId",
+        foreignField: "_id",
+        as: "vendorUser",
+      },
+    },
+    {
+      $unwind: {
+        path: "$vendorUser",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+
+    { $sort: { likes: -1, "vendorProfile.rating": -1 } },
+
+    { $limit: pageLimit },
+
+    {
+      $project: {
+        _id: "$products._id",
+        title: "$products.title",
+        price: "$products.price",
+        image: "$products.image",
+        description: "$products.description",
+        vendorPostId: { $toString: "$_id" },
+        vendorId: "$vendorId",
+        postedAt: "$createdAt",
+        rating: "$vendorProfile.rating",
+        likes: "$likes",
+        vendor: {
+          businessName: "$vendorUser.businessName",
+          username: "$vendorUser.username",
+          profilePic: "$vendorUser.profilePic",
+        },
+      },
+    },
+  ];
+
+  const products = await VendorPost.aggregate(pipeline);
+
+  res.status(200).json({
+    success: true,
+    data: { products },
+  });
+});
+
 module.exports = {
   createPost,
   getMyPosts,
@@ -384,4 +528,6 @@ module.exports = {
   deletePost,
   updatePost,
   searchPosts,
+  getFreshProducts,
+  getTrendingProducts,
 };

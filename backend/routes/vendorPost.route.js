@@ -8,6 +8,8 @@ const {
   deletePost,
   updatePost,
   searchPosts,
+  getFreshProducts,
+  getTrendingProducts,
 } = require("../controllers/vendor/vendorPost.controller");
 const {
   uploadMiddleware,
@@ -19,7 +21,9 @@ const router = express.Router();
 router.get("/feed", getFeedPosts);
 
 // Public search route
-router.get("/search", searchPosts);
+router.get("/search", searchPosts); 
+router.get("/fresh", getFreshProducts);
+router.get("/trending", getTrendingProducts);
 
 router.use(protectRoute);
 router.get("/my-posts", verifyRole("vendor"), getMyPosts);

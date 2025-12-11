@@ -22,7 +22,7 @@ function VendorProductItem({ product, vendorId }) {
       }
 
       const postId =
-        product.vendorPostId || product.sectionId || product.postId; // Fallback attempts
+        product.vendorPostId || product.sectionId || product.postId; //
 
       if (!postId) {
         toast.error("Unable to add this item: Missing post reference");
@@ -36,7 +36,6 @@ function VendorProductItem({ product, vendorId }) {
         vendorPostId: postId,
       });
     } catch (error) {
-      // Error handling is mostly in store, but safety check
       console.error(error);
     }
   };
@@ -61,20 +60,35 @@ function VendorProductItem({ product, vendorId }) {
           </div>
         )}
 
-        <div className="text-xs text-n-5 line-clamp-2 mb-3 leading-relaxed flex-1">
-          {product?.shortDescription || product?.description || ""}
-        </div>
-
-        {authUser?._id !==
-          (product?.vendorId?._id || product?.vendorId || vendorId) && (
-          <button
-            onClick={handleAddToCart}
-            className="w-full h-10 rounded-xl bg-primary-3 text-white font-code text-xs font-bold uppercase tracking-wider px-2 flex text-nowrap items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-95"
-          >
-            <ShoppingCart size={16} />
-            Add to cart
-          </button>
+        {product?.vendor && (
+          <div className="flex items-center gap-2 mb-3">
+            <img
+              src={
+                product.vendor.profilePic || "/assets/avatar-placeholder.svg"
+              }
+              alt={product.vendor.businessName}
+              className="w-6 h-6 rounded-full object-cover border border-n-3"
+              onError={(e) => {
+                e.target.src = "/assets/avatar-placeholder.svg";
+              }}
+            />
+            <span className="text-xs text-n-5 font-medium truncate">
+              {product.vendor.businessName || product.vendor.username}
+            </span>
+          </div>
         )}
+
+        {authUser?._id &&
+          String(authUser._id) !==
+            String(product?.vendorId?._id || product?.vendorId || vendorId) && (
+            <button
+              onClick={handleAddToCart}
+              className="w-full h-10 rounded-xl bg-primary-3 text-white font-code text-xs font-bold uppercase tracking-wider hover:bg-primary-4 transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-95"
+            >
+              <ShoppingCart size={16} />
+              Add to cart
+            </button>
+          )}
       </div>
     </div>
   );

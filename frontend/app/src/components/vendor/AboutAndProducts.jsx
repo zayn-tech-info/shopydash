@@ -79,7 +79,7 @@ function AboutAndProducts({ vendor }) {
                   <VendorProductItem
                     key={p._id || p}
                     product={p}
-                    vendorId={vendor?._id}
+                    vendorId={vendor?.userId?._id}
                   />
                 ))}
               </div>

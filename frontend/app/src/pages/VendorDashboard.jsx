@@ -36,9 +36,8 @@ export default function VendorDashboard() {
       );
 
       setStats({
-        totalProducts: totalProducts,
-        totalViews: 0,  
-        totalSales: 0,
+        productCount: totalProducts,
+        activeListings: posts.length,
       });
     }
   }, [posts]);
