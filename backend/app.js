@@ -7,6 +7,7 @@ const globalErrorHandler = require("./errors/globalError.controller");
 const customError = require("./errors/customError");
 const sanitizeInputs = require("./middleware/sanitize.middleware");
 const securityHeaders = require("./middleware/security.middleware");
+const csrfProtection = require("./middleware/csrf.middleware");
 
 const authRouter = require("./routes/auth.route");
 const vendorProfile = require("./routes/vendorProfle.route");
@@ -39,6 +40,9 @@ app.use(securityHeaders);
 app.use(cookieParser());
 
 app.use(express.json());
+
+// CSRF protection for state-changing requests
+app.use(csrfProtection);
 
 // Sanitize all inputs to prevent NoSQL injection
 app.use(sanitizeInputs);
