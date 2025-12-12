@@ -2,6 +2,7 @@ const asyncErrorHandler = require("../../errors/asyncErrorHandle");
 const User = require("../../models/auth.model");
 const School = require("../../models/school.model");
 const SchoolArea = require("../../models/schoolArea.model");
+const { createSafeRegex } = require("../../utils/regex");
 
 const initialSchoolData = {
   "Ladoke Akintola University of Technology": [
@@ -194,17 +195,15 @@ const seedDatabase = async () => {
   try {
     const schoolCount = await School.countDocuments();
     if (schoolCount === 0) {
-      console.log("Seeding Schools...");
       for (const [schoolName, areas] of Object.entries(initialSchoolData)) {
         await School.create({ name: schoolName });
         for (const area of areas) {
           await SchoolArea.create({ name: area, schoolName: schoolName });
         }
       }
-      console.log("Seeding Complete.");
     }
   } catch (error) {
-    console.error("Seeding error:", error);
+    // Seeding error handled silently to avoid production log pollution
   }
 };
 
@@ -215,7 +214,7 @@ const getSchools = asyncErrorHandler(async (req, res, next) => {
   const query = {};
 
   if (search) {
-    query.name = { $regex: search, $options: "i" };
+    query.name = createSafeRegex(search);
   }
 
   const schools = await School.find(query).sort({ name: 1 });
@@ -241,7 +240,7 @@ const getSchoolAreas = asyncErrorHandler(async (req, res, next) => {
   };
 
   if (search) {
-    matchStage.name = { $regex: search, $options: "i" };
+    matchStage.name = createSafeRegex(search);
   }
 
   let areas = await SchoolArea.find(matchStage).sort({ name: 1 });
@@ -269,7 +268,7 @@ const getSchoolAreas = asyncErrorHandler(async (req, res, next) => {
   }
 
   if (search) {
-    userMatch.area = { $regex: search, $options: "i" };
+    userMatch.area = createSafeRegex(search);
   } else {
     userMatch.area = { $exists: true, $ne: "" };
   }
