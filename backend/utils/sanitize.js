@@ -61,10 +61,10 @@ const sanitizeSearchQuery = (query) => {
     return "";
   }
 
-  // Remove special regex characters that could be exploited
-  // But keep basic alphanumeric, spaces, and safe punctuation
+  // Remove special characters that could be exploited
+  // Keep alphanumeric, spaces, and basic safe punctuation (no @ to prevent email injection)
   return query
-    .replace(/[^\w\s\-.,@]/gi, "")
+    .replace(/[^\w\s\-.,]/gi, "")
     .trim()
     .slice(0, 200); // Limit length
 };

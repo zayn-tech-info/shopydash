@@ -33,3 +33,5 @@ const uploadMultiple = asyncErrorHandler(async (req, res, next) => {
     data: { urls: imagesUrls },
   });
 });
+
+module.exports = { uploadMultiple };

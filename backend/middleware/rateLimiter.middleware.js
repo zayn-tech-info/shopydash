@@ -28,10 +28,9 @@ const createRateLimiter = (
   message = "Too many requests, please try again later"
 ) => {
   return (req, res, next) => {
-    // Skip rate limiting in development
-    if (process.env.NODE_ENV === "development") {
-      return next();
-    }
+    // Use more generous limits in development
+    const limit =
+      process.env.NODE_ENV === "development" ? maxRequests * 10 : maxRequests;
 
     const identifier = req.ip || req.connection.remoteAddress || "unknown";
     const now = Date.now();
@@ -53,7 +52,7 @@ const createRateLimiter = (
       return next();
     }
 
-    if (userData.count >= maxRequests) {
+    if (userData.count >= limit) {
       const err = new customError(message, 429);
       return next(err);
     }
