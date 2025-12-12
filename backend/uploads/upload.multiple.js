@@ -1,6 +1,7 @@
 const express = require("express");
 const multer = require("multer");
 const asyncErrorHandler = require("../errors/asyncErrorHandle");
+const customError = require("../errors/customError");
 const cloudinary = require("cloudinary").v2;
 
 cloudinary.config({
@@ -11,9 +12,12 @@ cloudinary.config({
 
 const uploadMultiple = asyncErrorHandler(async (req, res, next) => {
   const images = req.files;
-  console.log(images);
 
-  const imagesUrls = {};
+  if (!images || images.length === 0) {
+    return next(new customError("No files uploaded", 400));
+  }
+
+  const imagesUrls = [];
   
   for (const image of images) {
     const result = await cloudinary.uploader.upload(image.path, {
@@ -22,4 +26,10 @@ const uploadMultiple = asyncErrorHandler(async (req, res, next) => {
 
     imagesUrls.push(result.secure_url);
   }
+
+  res.status(200).json({
+    success: true,
+    message: "Images uploaded successfully",
+    data: { urls: imagesUrls },
+  });
 });

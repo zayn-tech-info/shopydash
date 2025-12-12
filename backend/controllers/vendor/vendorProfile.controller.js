@@ -53,33 +53,6 @@ const createVendorProfile = asyncErrorHandler(async (req, res, next) => {
   }
 });
 
-/* const getVendorProfile = asyncErrorHandler(async (req, res, next) => {
-  const userId = req.user?._id;
-
-  if (!userId) {
-    return next(new customError("Unauthorized", 401));
-  }
-
-  const vendorProfile = await vendorProfileModel
-    .findOne({ userId })
-    .populate(
-      "userId",
-      "businessName email phoneNumber whatsAppNumber schoolName logo isVerified"
-    );
-
-  if (!vendorProfile) {
-    const error = new customError("Vendor profile not found", 404);
-    return next(error);
-  }
-
-  res.status(200).json({
-    success: true,
-    data: {
-      vendorProfile,
-    },
-  });
-}); */
-
 const getPublicVendorProfile = asyncErrorHandler(async (req, res, next) => {
   const storeUsername = req.params.storeUsername;
 
@@ -190,7 +163,6 @@ const updateVendorProfile = asyncErrorHandler(async (req, res, next) => {
 
 module.exports = {
   createVendorProfile,
-  // getVendorProfile,
   getPublicVendorProfile,
   updateVendorProfile,
   getAllVendorsProfile,

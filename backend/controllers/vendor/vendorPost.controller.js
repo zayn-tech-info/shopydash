@@ -3,6 +3,7 @@ const customError = require("../../errors/customError");
 const VendorPost = require("../../models/vendorProduct");
 const VendorProfile = require("../../models/vendorProfile.model");
 const User = require("../../models/auth.model");
+const { createSafeRegex } = require("../../utils/regex");
 
 const createPost = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user._id;
@@ -89,11 +90,11 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
   }
 
   if (req.query.area) {
-    query.area = { $regex: req.query.area, $options: "i" };
+    query.area = createSafeRegex(req.query.area);
   }
 
   if (req.query.search) {
-    const searchRegex = { $regex: req.query.search, $options: "i" };
+    const searchRegex = createSafeRegex(req.query.search);
     query.$or = [
       { caption: searchRegex },
       { "products.title": searchRegex },
@@ -125,42 +126,6 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
       .limit(pageLimit)
       .lean(),
     VendorPost.countDocuments(query),
-  ]);
-
-  res.status(200).json({
-    success: true,
-    data: {
-      posts,
-      pagination: {
-        currentPage,
-        totalPages: Math.ceil(total / pageLimit),
-        totalItems: total,
-      },
-    },
-  });
-});
-
-const getFeedPost = asyncErrorHandler(async (req, res, next) => {
-  /*   const { school, page = 1, limit = 10 } = req.query;
-
-  const query = {};
-  if (school) {
-    query.school = school;
-  } */
-
-  const pageLimit = Math.min(parseInt(limit), 50);
-  const currentPage = Math.max(parseInt(page), 1);
-
-  const [posts, total] = await Promise.all([
-    VendorPost.find(query).populate(
-      "vendorId",
-      "businessName fullName whatsAppNumber phoneNumber username profilePic logo"
-    ),
-    /*       .sort({ createdAt: -1 })
-      .skip((currentPage - 1) * pageLimit)
-      .limit(pageLimit)
-      .lean(),
-    VendorPost.countDocuments(query), */
   ]);
 
   res.status(200).json({
@@ -278,7 +243,7 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
 
   const matchStage = {};
   if (school) matchStage.school = school;
-  if (area) matchStage.area = { $regex: area, $options: "i" };
+  if (area) matchStage.area = createSafeRegex(area);
 
   if (Object.keys(matchStage).length > 0) {
     pipeline.push({ $match: matchStage });
@@ -289,7 +254,7 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
   if (search) {
     pipeline.push({
       $match: {
-        "products.title": { $regex: search, $options: "i" },
+        "products.title": createSafeRegex(search),
       },
     });
   }

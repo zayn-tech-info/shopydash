@@ -5,6 +5,8 @@ const cookieParser = require("cookie-parser");
 const connectDB = require("./config/db");
 const globalErrorHandler = require("./errors/globalError.controller");
 const customError = require("./errors/customError");
+const sanitizeInputs = require("./middleware/sanitize.middleware");
+const securityHeaders = require("./middleware/security.middleware");
 
 const authRouter = require("./routes/auth.route");
 const vendorProfile = require("./routes/vendorProfle.route");
@@ -31,9 +33,16 @@ app.use(
   })
 );
 
+// Add security headers
+app.use(securityHeaders);
+
 app.use(cookieParser());
 
 app.use(express.json());
+
+// Sanitize all inputs to prevent NoSQL injection
+app.use(sanitizeInputs);
+
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/vendorProfile", vendorProfile);
 app.use("/api/v1/clientProfile", clientProfile);

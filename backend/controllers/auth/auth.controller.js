@@ -298,7 +298,6 @@ const updateUser = asyncErrorHandler(async (req, res, next) => {
       const uploaded = await uploadToCloudinary(req.file.buffer);
       filteredBody.profilePic = uploaded.secure_url;
     } catch (error) {
-      console.error("Cloudinary upload error:", error);
       return next(new customError("Image upload failed", 500));
     }
   }
