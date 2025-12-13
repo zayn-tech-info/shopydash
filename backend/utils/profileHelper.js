@@ -20,7 +20,6 @@ const checkUserHasProfile = async (user) => {
     }
     return false;
   } catch (error) {
-    // Return false on error to prevent authentication bypass
     return false;
   }
 };

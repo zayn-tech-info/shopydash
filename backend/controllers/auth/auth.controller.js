@@ -1,7 +1,5 @@
 const asyncErrorHandler = require("../../errors/asyncErrorHandle");
 const User = require("../../models/auth.model");
-const ClientProfile = require("../../models/clientProfile.model");
-const VendorProfile = require("../../models/vendorProfile.model");
 const sendToken = require("../../utils/sendToken");
 const validator = require("validator");
 const customError = require("../../errors/customError");
@@ -19,8 +17,8 @@ const googleAuth = asyncErrorHandler(async (req, res, next) => {
   );
 
   if (!response.ok) {
-    const err = new customError("Failed to fetch user info from Google", 400);
-    return next(err);
+    const error = new customError("Failed to fetch user info from Google", 400);
+    return next(error);
   }
 
   const { email, name, picture } = await response.json();
@@ -60,7 +58,7 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
     schoolId,
     password,
     state,
-    lga,
+    country,
     area,
   } = req.body;
 
@@ -103,8 +101,8 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
   user.businessName = role === "vendor" ? businessName : undefined;
   user.schoolId = schoolId ? Number(schoolId) : undefined;
   user.state = state;
-  user.lga = lga;
   user.area = area;
+  user.country = country;
   user.profileComplete = true;
 
   await user.save();

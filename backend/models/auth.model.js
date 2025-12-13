@@ -192,7 +192,7 @@ const userSchema = mongoose.Schema(
       type: String,
       trim: true,
     },
-    lga: {
+    country: {
       type: String,
       trim: true,
     },
