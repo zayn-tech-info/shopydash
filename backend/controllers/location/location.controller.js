@@ -191,21 +191,17 @@ const initialSchoolData = {
   "University of Abuja": ["Gwagwalada", "Giri", "Mini Campus"],
 };
 
-const seedDatabase = async () => {
-  try {
-    const schoolCount = await School.countDocuments();
-    if (schoolCount === 0) {
-      for (const [schoolName, areas] of Object.entries(initialSchoolData)) {
-        await School.create({ name: schoolName });
-        for (const area of areas) {
-          await SchoolArea.create({ name: area, schoolName: schoolName });
-        }
+const seedDatabase = asyncErrorHandler(async () => {
+  const schoolCount = await School.countDocuments();
+  if (schoolCount === 0) {
+    for (const [schoolName, areas] of Object.entries(initialSchoolData)) {
+      await School.create({ name: schoolName });
+      for (const area of areas) {
+        await SchoolArea.create({ name: area, schoolName: schoolName });
       }
     }
-  } catch (error) {
-    // Seeding error handled silently to avoid production log pollution
   }
-};
+});
 
 seedDatabase();
 
