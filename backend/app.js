@@ -11,8 +11,8 @@ const csrfProtection = require("./middleware/csrf.middleware");
 
 const authRouter = require("./routes/auth.route");
 const vendorProfile = require("./routes/vendorProfle.route");
-const clientProfile = require("./routes/clientProfile.route");
-const profile = require("./routes/profile.route");
+const clientProfileRouter = require("./routes/clientProfile.route");
+const profileRouter = require("./routes/profile.route");
 const vendorPost = require("./routes/vendorPost.route");
 const cartRouter = require("./routes/cart.route");
 const locationRouter = require("./routes/location.route");
@@ -49,8 +49,8 @@ app.use(sanitizeInputs);
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/vendorProfile", vendorProfile);
-app.use("/api/v1/clientProfile", clientProfile);
-app.use("/api/v1/profile", profile);
+app.use("/api/v1/clientProfile", clientProfileRouter);
+app.use("/api/v1/profile", profileRouter);
 app.use("/api/v1/post", vendorPost);
 app.use("/api/v1/cart", cartRouter);
 app.use("/api/v1/locations", locationRouter);

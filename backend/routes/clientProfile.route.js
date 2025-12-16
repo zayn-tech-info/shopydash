@@ -1,23 +1,15 @@
 const express = require("express");
 const { protectRoute, verifyRole } = require("../middleware/auth.middleware");
 const {
-  createClientProfile,
-  updateClientProfile,
+  create,
+  update,
 } = require("../controllers/client/clientProfile.controller");
 
-const router = express.Router();
+const clientProfileRouter = express.Router();
 
-router.post(
-  "/createClientProfile",
-  protectRoute,
-  verifyRole("client"),
-  createClientProfile
-);
+clientProfileRouter
+  .route("/")
+  .post(protectRoute, verifyRole("client"), create)
+  .patch(protectRoute, verifyRole("client"), update);
 
-router.patch(
-  "/updateClientProfile",
-  protectRoute,
-  verifyRole("client"),
-  updateClientProfile
-);
-module.exports = router;
+module.exports = clientProfileRouter;

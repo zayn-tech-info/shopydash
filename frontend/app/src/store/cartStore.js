@@ -20,7 +20,7 @@ export const useCartStore = create((set, get) => ({
   addToCart: async ({ productId, quantity, vendorPostId }) => {
     set({ isLoading: true, error: null });
     try {
-      const res = await api.post("/api/v1/cart/add", {
+      const res = await api.post("/api/v1/cart/", {
         productId,
         quantity,
         vendorPostId,
@@ -45,7 +45,7 @@ export const useCartStore = create((set, get) => ({
     });
 
     try {
-      await api.post("/api/v1/cart/remove", { productId });
+      await api.delete("/api/v1/cart/", { data: { productId } });
     } catch (error) {
       set({ cart: previousCart });
       toast.error(error.response?.data?.message || "Failed to remove item");
@@ -66,7 +66,7 @@ export const useCartStore = create((set, get) => ({
     });
 
     try {
-      await api.patch("/api/v1/cart/update", { productId, quantity });
+      await api.patch("/api/v1/cart/", { productId, quantity });
     } catch (error) {
       set({ cart: previousCart });
       toast.error(error.response?.data?.message || "Failed to update quantity");

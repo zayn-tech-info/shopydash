@@ -5,10 +5,10 @@ const {
   addSchoolArea,
 } = require("../controllers/location/location.controller");
 
-const router = express.Router();
+const locationRouter = express.Router();
 
-router.get("/areas", getSchoolAreas);
-router.post("/areas", addSchoolArea);
-router.get("/schools", getSchools);
+locationRouter.get("/areas", getSchoolAreas);
+locationRouter.post("/areas", addSchoolArea);
+locationRouter.get("/schools", getSchools);
 
-module.exports = router;
+module.exports = locationRouter;

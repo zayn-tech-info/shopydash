@@ -97,7 +97,7 @@ export const useClientProfileStore = create((set, get) => ({
 
       set({ updating: true, error: null });
       const res = await api.patch(
-        "/api/v1/clientProfile/updateClientProfile",
+        "/api/v1/clientProfile/",
         payload
       );
       const payloadRes = res?.data?.data ?? res?.data ?? res;
@@ -144,7 +144,7 @@ export const useClientProfileStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const res = await api.post(
-        "/api/v1/clientProfile/createClientProfile",
+        "/api/v1/clientProfile/",
         profileData
       );
       const payload = res?.data?.data ?? res?.data ?? res;

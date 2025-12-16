@@ -5,7 +5,7 @@ const User = require("../../models/auth.model");
 const vendorProfileSchema = require("../../models/vendorProfile.model");
 const VendorPost = require("../../models/vendorProduct");
 
-const getProfile = asyncErrorHandler(async (req, res, next) => {
+const get = asyncErrorHandler(async (req, res, next) => {
   const { username } = req.params;
 
   const user = await User.findOne({ username }).lean();
@@ -68,4 +68,4 @@ const getProfile = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
-module.exports = { getProfile };
+module.exports = { get };

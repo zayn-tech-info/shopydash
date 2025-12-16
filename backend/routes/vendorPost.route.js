@@ -4,9 +4,9 @@ const {
   createPost,
   getMyPosts,
   getFeedPosts,
-  getPostById,
-  deletePost,
-  updatePost,
+  getById,
+  remove,
+  update,
   searchPosts,
   getFreshProducts,
   getTrendingProducts,
@@ -16,23 +16,29 @@ const {
   uploadImages,
 } = require("../controllers/vendor/upload.controller");
 
-const router = express.Router();
+const vendorPostRouter = express.Router();
 
-router.get("/feed", getFeedPosts);
+vendorPostRouter.get("/feed", getFeedPosts);
 
-// Public search route
-router.get("/search", searchPosts); 
-router.get("/fresh", getFreshProducts);
-router.get("/trending", getTrendingProducts);
+vendorPostRouter.get("/search", searchPosts);
+vendorPostRouter.get("/fresh", getFreshProducts);
+vendorPostRouter.get("/trending", getTrendingProducts);
 
-router.use(protectRoute);
-router.get("/my-posts", verifyRole("vendor"), getMyPosts);
-router.post("/upload", verifyRole("vendor"), uploadMiddleware, uploadImages);
+vendorPostRouter.use(protectRoute);
+vendorPostRouter.get("/my-posts", verifyRole("vendor"), getMyPosts);
+vendorPostRouter.post(
+  "/upload",
+  verifyRole("vendor"),
+  uploadMiddleware,
+  uploadImages
+);
 
-router.post("/", verifyRole("vendor"), createPost);
+vendorPostRouter.post("/", verifyRole("vendor"), createPost);
 
-router.get("/:postId", getPostById);
-router.patch("/:postId", verifyRole("vendor"), updatePost);
-router.delete("/:postId", protectRoute, verifyRole("vendor"), deletePost);
+vendorPostRouter
+  .route("/:postId")
+  .get(getById)
+  .patch(verifyRole("vendor"), update)
+  .delete(protectRoute, verifyRole("vendor"), remove);
 
-module.exports = router;
+module.exports = vendorPostRouter;

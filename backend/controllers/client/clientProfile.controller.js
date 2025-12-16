@@ -3,7 +3,7 @@ const asyncErrorHandler = require("../../errors/asyncErrorHandle");
 const customError = require("../../errors/customError");
 const User = require("../../models/auth.model");
 
-const createClientProfile = asyncErrorHandler(async (req, res, next) => {
+const create = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user && req.user._id;
 
   if (!userId) {
@@ -42,7 +42,7 @@ const createClientProfile = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
-const updateClientProfile = asyncErrorHandler(async (req, res, next) => {
+const update = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user && req.user._id;
 
   const {
@@ -88,4 +88,4 @@ const updateClientProfile = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
-module.exports = { createClientProfile, updateClientProfile };
+module.exports = { create, update };

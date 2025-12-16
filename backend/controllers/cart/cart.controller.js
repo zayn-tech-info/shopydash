@@ -4,7 +4,7 @@ const User = require("../../models/auth.model");
 const Cart = require("../../models/cart.model");
 const customError = require("../../errors/customError");
 
-const getCart = asyncErrorHandler(async (req, res, next) => {
+const get = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user._id;
   const user = await User.findById(userId);
 
@@ -27,7 +27,7 @@ const getCart = asyncErrorHandler(async (req, res, next) => {
   res.status(200).json({ cart });
 });
 
-const addToCart = asyncErrorHandler(async (req, res, next) => {
+const add = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user._id;
   const user = await User.findById(userId);
   if (!user) {
@@ -119,7 +119,7 @@ const addToCart = asyncErrorHandler(async (req, res, next) => {
   }
 });
 
-const updateCartItemQuantity = asyncErrorHandler(async (req, res, next) => {
+const updateItemQuantity = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user._id;
   const user = await User.findById(userId);
 
@@ -155,7 +155,7 @@ const updateCartItemQuantity = asyncErrorHandler(async (req, res, next) => {
   }
 });
 
-const removeFromCart = asyncErrorHandler(async (req, res, next) => {
+const remove = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user._id;
   const user = await User.findById(userId);
 
@@ -179,12 +179,12 @@ const removeFromCart = asyncErrorHandler(async (req, res, next) => {
 
   await cart.save();
 
-  res.status(200).json({ cart });
+  res.status(204).json({ cart });
 });
 
 module.exports = {
-  getCart,
-  addToCart,
-  updateCartItemQuantity,
-  removeFromCart,
+  get,
+  add,
+  updateItemQuantity,
+  remove,
 };

@@ -141,7 +141,7 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
-const getPostById = asyncErrorHandler(async (req, res, next) => {
+const getById = asyncErrorHandler(async (req, res, next) => {
   const { postId } = req.params;
 
   const post = await VendorPost.findById(postId)
@@ -161,7 +161,7 @@ const getPostById = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
-const deletePost = asyncErrorHandler(async (req, res, next) => {
+const remove = asyncErrorHandler(async (req, res, next) => {
   const { postId } = req.params;
   const userId = req.user._id;
 
@@ -191,7 +191,7 @@ const deletePost = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
-const updatePost = asyncErrorHandler(async (req, res, next) => {
+const update = asyncErrorHandler(async (req, res, next) => {
   const { postId } = req.params;
   const userId = req.user._id;
   const { caption, products, location, state, lga, area } = req.body;
@@ -489,9 +489,9 @@ module.exports = {
   createPost,
   getMyPosts,
   getFeedPosts,
-  getPostById,
-  deletePost,
-  updatePost,
+  getById,
+  remove,
+  update,
   searchPosts,
   getFreshProducts,
   getTrendingProducts,
