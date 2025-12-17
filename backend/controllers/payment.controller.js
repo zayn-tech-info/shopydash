@@ -76,6 +76,10 @@ const initializePayment = async (req, res) => {
 
     const amountInKobo = plan.price * 100;
 
+    const baseUrl =
+      req.headers.origin || process.env.CLIENT_URL || "http://localhost:5173";
+    const callbackUrl = `${baseUrl}/pricing`;
+
     const paystackResponse = await paystackRequest(
       "/transaction/initialize",
       "POST",
@@ -83,6 +87,7 @@ const initializePayment = async (req, res) => {
         email: user.email,
         amount: amountInKobo,
         currency: "NGN",
+        callback_url: callbackUrl,
         metadata: {
           userId: userId,
           planKey: planKey,
@@ -164,11 +169,10 @@ const webhook = async (req, res) => {
         });
       }
 
- 
       const startDate = new Date();
       const endDate = new Date();
       endDate.setDate(endDate.getDate() + 30);
- 
+
       await Subscription.findOneAndUpdate(
         { user: userId },
         {

@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import { Check, Loader2 } from "lucide-react";
 import { useAuthStore } from "../store/authStore";
 import { useSubscriptionStore } from "../store/subscriptionStore";
@@ -7,17 +8,27 @@ import toast from "react-hot-toast";
 
 const PricingPage = () => {
   const { authUser } = useAuthStore();
-  const { initializePayment, isInitializing } = useSubscriptionStore();
+  const { initializePayment, initializingPlan } = useSubscriptionStore();
 
   const navigate = useNavigate();
 
-  const handleSubscribe = (planSlug) => {
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const reference = params.get("reference");
+
+    if (reference) {
+      toast.success("Payment processing! Your plan will be active shortly.");
+      navigate("/pricing", { replace: true });
+    }
+  }, [navigate]);
+
+  const handleSubscribe = async (planSlug) => {
     if (!authUser) {
       toast.error("Please login to subscribe");
       navigate("/login");
       return;
     }
-    initializePayment(planSlug);
+    await initializePayment(planSlug);
   };
 
   return (
@@ -103,11 +114,17 @@ const PricingPage = () => {
                     plan.popular
                       ? "bg-primary-3 text-white hover:bg-primary-4 hover:shadow-primary-3/25"
                       : "bg-n-7 text-white hover:bg-n-8"
-                  } ${isInitializing ? "opacity-75 cursor-not-allowed" : ""}`}
+                  } ${
+                    initializingPlan === plan.slug
+                      ? "opacity-100 cursor-wait"
+                      : initializingPlan
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }`}
                   onClick={() => handleSubscribe(plan.slug)}
-                  disabled={isInitializing}
+                  disabled={!!initializingPlan}
                 >
-                  {isInitializing ? (
+                  {initializingPlan === plan.slug ? (
                     <>
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                       Processing...
