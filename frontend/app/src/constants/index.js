@@ -10,8 +10,11 @@ import {
   Palette,
   Sparkles,
   PenTool,
-  Gem,
+  Crown,
   Vegan,
+  Gem,
+  Zap,
+  Star,
 } from "lucide-react";
 
 import {
@@ -36,6 +39,12 @@ export const navigation = [
     text: "Feeds",
     href: "/feeds",
     icon: Vegan,
+  },
+  {
+    id: 6,
+    text: "Pricing",
+    href: "/pricing",
+    icon: Crown,
   },
 
   {
@@ -239,4 +248,67 @@ export const preferredCategories = [
   "Art & Crafts",
   "Books & Study Materials",
   "Others",
+];
+
+export const plans = [
+  {
+    id: "boost",
+    name: "Vendly Boost",
+    slug: "vendly-boost",
+    icon: Zap,
+    price: "₦ 750",
+    period: "/month",
+    description: "Get noticed and reach more students instantly.",
+    features: [
+      "Your posts appear higher on students' feeds",
+      '"Boosted Vendor" badge on profile',
+      "2x more impressions from buyers",
+      "Priority in location-based search results",
+    ],
+    cta: "Get Boost",
+    popular: false,
+    color: "bg-blue-500",
+  },
+  {
+    id: "pro",
+    name: "Vendly Pro",
+    slug: "vendly-pro",
+    icon: Star,
+    price: "₦ 1,500",
+    period: "/month",
+    description: "Professional tools to brand and grow your store.",
+    features: [
+      "All in Vendly Boost",
+      "Product upload limit increased to (8)",
+      "Post upload limit increased to (5) per day",
+      "Custom storefront banner & brand colors",
+      "Product performance insights",
+      "Option to pin one post to top of store",
+    ],
+    cta: "Go Pro",
+    popular: true,
+    color: "bg-primary-3",
+  },
+  {
+    id: "max",
+    name: "Vendly Max",
+    slug: "vendly-max",
+    icon: Crown,
+    price: "₦ 3,000",
+    period: "/month",
+    description: "Maximum visibility and power for serious sellers.",
+    features: [
+      "All in Vendly Pro",
+      "Higher product upload limit (10)",
+      "Post upload limit increased to (20) per day",
+      "Advanced analytics dashboards",
+      "Priority Support",
+      "Post scheduling",
+      "Vendor Verification Badge",
+      "Your profile suggested to all users",
+    ],
+    cta: "Unlock Max",
+    popular: false,
+    color: "bg-purple-600",
+  },
 ];

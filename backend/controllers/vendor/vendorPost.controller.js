@@ -7,15 +7,62 @@ const { createSafeRegex } = require("../../utils/regex");
 
 const createPost = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user._id;
-  const { caption, products, school, location, state, lga, area } = req.body;
+  const { caption, products, school, location, state, area } = req.body;
 
-  if (!products || products.length < 4) {
+  const limitConfig = req.subscription?.config?.limits || {
+    productsPerPost: 4,
+    postPerDay: 3,
+  };
+
+  const MIN_PRODUCTS = 3;
+
+  if (!products || products.length < MIN_PRODUCTS) {
     return next(
-      new customError("You must upload at least 4 products per post.", 400)
+      new customError(
+        `You must upload at least ${MIN_PRODUCTS} product per post.`,
+        400
+      )
     );
-  } else if (products.length > 6) {
+  }
+
+  if (products.length > limitConfig.productsPerPost) {
     return next(
-      new customError("You can upload at most 6 products per post.", 400)
+      new customError(
+        `Your plan allows max ${limitConfig.productsPerPost} products per post. Upgrade to add more.`,
+        400
+      )
+    );
+  }
+
+  // Check Photo Limits
+  if (limitConfig.maxPhotosPerProduct) {
+    for (const p of products) {
+      if (p.images && p.images.length > limitConfig.maxPhotosPerProduct) {
+        return next(
+          new customError(
+            `Your plan allows max ${limitConfig.maxPhotosPerProduct} photos per product. Upgrade to add more.`,
+            400
+          )
+        );
+      }
+    }
+  }
+
+  // Check Post Per Day Limit
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+
+  const postsToday = await VendorPost.countDocuments({
+    vendorId: userId,
+    createdAt: { $gte: startOfDay },
+  });
+
+  if (postsToday >= limitConfig.postPerDay) {
+    return next(
+      new customError(
+        `You have reached your daily post limit of ${limitConfig.postPerDay}. Upgrade to post more.`,
+        400
+      )
     );
   }
 
@@ -259,14 +306,57 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
     });
   }
 
-  // Stage 4: Sort by creation date (newest first)
-  pipeline.push({ $sort: { createdAt: -1 } });
+  // Stage 4: Lookup Subscription for Global Priority sorting
+  pipeline.push({
+    $lookup: {
+      from: "subscriptions",
+      let: { vendorId: "$vendorId" },
+      pipeline: [
+        {
+          $match: {
+            $expr: {
+              $and: [
+                { $eq: ["$user", "$$vendorId"] },
+                { $eq: ["$status", "active"] },
+                { $gt: ["$endDate", new Date()] },
+              ],
+            },
+          },
+        },
+      ],
+      as: "subscription",
+    },
+  });
 
-  // Stage 5: Pagination (Skip and Limit)
+  pipeline.push({
+    $addFields: {
+      subscription: { $arrayElemAt: ["$subscription", 0] },
+    },
+  });
+
+  pipeline.push({
+    $addFields: {
+      priorityScore: {
+        $switch: {
+          branches: [
+            { case: { $eq: ["$subscription.plan", "Vendly Max"] }, then: 30 },
+            { case: { $eq: ["$subscription.plan", "Vendly Pro"] }, then: 20 },
+            { case: { $eq: ["$subscription.plan", "Vendly Boost"] }, then: 10 },
+          ],
+          default: 0,
+        },
+      },
+    },
+  });
+
+  // Stage 5: Sort by Priority then Creation Date
+  pipeline.push({ $sort: { priorityScore: -1, createdAt: -1 } });
+
+  // Stage 6: Pagination (Skip and Limit)
   pipeline.push({ $skip: skip });
   pipeline.push({ $limit: pageLimit });
 
-  // Stage 6: Lookup Vendor Details
+  // Stage 7: Lookup Vendor Details
   pipeline.push({
     $lookup: {
       from: "users",
@@ -276,18 +366,18 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
     },
   });
 
-  // Stage 7: Unwind Vendor array
+  // Stage 8: Unwind Vendor array
   pipeline.push({
     $unwind: {
       path: "$vendor",
-      preserveNullAndEmptyArrays: true, // Keep products even if vendor lookup fails (though unlikely)
+      preserveNullAndEmptyArrays: true,
     },
   });
 
-  // Stage 8: Project the final structure
+  // Stage 9: Project the final structure
   pipeline.push({
     $project: {
-      _id: "$products._id", // Product ID becomes the main ID
+      _id: "$products._id",
       title: "$products.title",
       price: "$products.price",
       image: "$products.image",
@@ -299,6 +389,7 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
       school: "$school",
       area: "$area",
       location: "$location",
+      isBoosted: { $gt: ["$priorityScore", 0] }, // Flag for frontend if needed
       vendor: {
         _id: "$vendor._id",
         businessName: "$vendor.businessName",
@@ -312,9 +403,6 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
   });
 
   const products = await VendorPost.aggregate(pipeline);
-
-  // Optional: Get total count for pagination (simplified, separate count query might be needed for perfect pagination)
-  // For now, we return the results.
 
   res.status(200).json({
     success: true,

@@ -25,6 +25,7 @@ import { VendorFloatingButton } from "./components/VendorFloatingButton";
 import Feeds from "./pages/Feeds";
 import CartPage from "./pages/CartPage";
 import SearchProducts from "./pages/SearchProducts";
+import PricingPage from "./pages/PricingPage";
 
 const App = () => {
   const authUser = useAuthStore((state) => state.authUser);
@@ -118,6 +119,7 @@ const App = () => {
           <Route path="/search" element={<SearchProducts />} />
           <Route path="/p/:username" element={<ProfileDispatcher />} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
