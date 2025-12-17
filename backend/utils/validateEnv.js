@@ -1,7 +1,4 @@
-/**
- * Validates required environment variables on startup
- * Prevents the application from running with missing critical configuration
- */
+ 
 const validateEnv = () => {
   const required = [
     "CONNECTION_URI",
@@ -9,6 +6,7 @@ const validateEnv = () => {
     "CLOUDINARY_NAME",
     "CLOUDINARYAPI_KEY",
     "CLOUDINARYAPI_API_SECRET",
+    "PAYSTACK_TEST_SECRET_KEY",
   ];
 
   const missing = [];

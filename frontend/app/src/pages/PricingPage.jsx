@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import { Check, Loader2 } from "lucide-react";
 import { useAuthStore } from "../store/authStore";
 import { useSubscriptionStore } from "../store/subscriptionStore";
@@ -10,6 +11,16 @@ const PricingPage = () => {
   const { initializePayment, initializingPlan } = useSubscriptionStore();
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const reference = params.get("reference");
+
+    if (reference) {
+      toast.success("Payment processing! Your plan will be active shortly.");
+      navigate("/pricing", { replace: true });
+    }
+  }, [navigate]);
 
   const handleSubscribe = (planSlug) => {
     if (!authUser) {
