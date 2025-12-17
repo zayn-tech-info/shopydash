@@ -22,13 +22,13 @@ const PricingPage = () => {
     }
   }, [navigate]);
 
-  const handleSubscribe = (planSlug) => {
+  const handleSubscribe = async (planSlug) => {
     if (!authUser) {
       toast.error("Please login to subscribe");
       navigate("/login");
       return;
     }
-    initializePayment(planSlug);
+    await initializePayment(planSlug);
   };
 
   return (
@@ -114,7 +114,13 @@ const PricingPage = () => {
                     plan.popular
                       ? "bg-primary-3 text-white hover:bg-primary-4 hover:shadow-primary-3/25"
                       : "bg-n-7 text-white hover:bg-n-8"
-                  } ${initializingPlan ? "opacity-75 cursor-not-allowed" : ""}`}
+                  } ${
+                    initializingPlan === plan.slug
+                      ? "opacity-100 cursor-wait"
+                      : initializingPlan
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }`}
                   onClick={() => handleSubscribe(plan.slug)}
                   disabled={!!initializingPlan}
                 >

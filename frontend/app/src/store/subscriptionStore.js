@@ -14,7 +14,6 @@ export const useSubscriptionStore = create((set) => ({
 
       if (res.data.success && res.data.authorization_url) {
         toast.success("Redirecting to payment gateway...");
-        // Redirect to Paystack
         window.location.href = res.data.authorization_url;
       } else {
         toast.error("Failed to initialize payment.");
