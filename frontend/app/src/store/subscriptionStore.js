@@ -3,10 +3,10 @@ import { api } from "../lib/axios";
 import toast from "react-hot-toast";
 
 export const useSubscriptionStore = create((set) => ({
-  isInitializing: false,
+  initializingPlan: null,
 
   initializePayment: async (planSlug) => {
-    set({ isInitializing: true });
+    set({ initializingPlan: planSlug });
     try {
       const res = await api.post("/api/v1/payment/initialize", {
         planSlug,
@@ -25,7 +25,7 @@ export const useSubscriptionStore = create((set) => ({
         error.response?.data?.message || "An error occurred. Please try again."
       );
     } finally {
-      set({ isInitializing: false });
+      set({ initializingPlan: null });
     }
   },
 }));

@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 
 const PricingPage = () => {
   const { authUser } = useAuthStore();
-  const { initializePayment, isInitializing } = useSubscriptionStore();
+  const { initializePayment, initializingPlan } = useSubscriptionStore();
 
   const navigate = useNavigate();
 
@@ -103,11 +103,11 @@ const PricingPage = () => {
                     plan.popular
                       ? "bg-primary-3 text-white hover:bg-primary-4 hover:shadow-primary-3/25"
                       : "bg-n-7 text-white hover:bg-n-8"
-                  } ${isInitializing ? "opacity-75 cursor-not-allowed" : ""}`}
+                  } ${initializingPlan ? "opacity-75 cursor-not-allowed" : ""}`}
                   onClick={() => handleSubscribe(plan.slug)}
-                  disabled={isInitializing}
+                  disabled={!!initializingPlan}
                 >
-                  {isInitializing ? (
+                  {initializingPlan === plan.slug ? (
                     <>
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                       Processing...
