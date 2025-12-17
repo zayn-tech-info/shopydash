@@ -15,6 +15,7 @@ const {
   uploadMiddleware,
   uploadImages,
 } = require("../controllers/vendor/upload.controller");
+const { checkSubscription } = require("../middleware/subscription.middleware");
 
 const vendorPostRouter = express.Router();
 
@@ -25,6 +26,7 @@ vendorPostRouter.get("/fresh", getFreshProducts);
 vendorPostRouter.get("/trending", getTrendingProducts);
 
 vendorPostRouter.use(protectRoute);
+vendorPostRouter.use(checkSubscription);
 vendorPostRouter.get("/my-posts", verifyRole("vendor"), getMyPosts);
 vendorPostRouter.post(
   "/upload",

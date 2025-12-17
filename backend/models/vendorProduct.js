@@ -40,6 +40,10 @@ const productItemSchema = new mongoose.Schema({
     type: String,
     required: [true, "Product image is required"],
   },
+  images: {
+    type: [String],
+    default: [],
+  },
   stock: {
     type: Number,
     default: 1,
@@ -67,12 +71,6 @@ const vendorPostSchema = new mongoose.Schema(
     },
     products: {
       type: [productItemSchema],
-      validate: {
-        validator: function (v) {
-          return v && v.length >= 4;
-        },
-        message: "You must upload at least 4 products per post",
-      },
     },
     school: {
       type: String,

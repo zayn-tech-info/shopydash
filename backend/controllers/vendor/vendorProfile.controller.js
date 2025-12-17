@@ -2,6 +2,8 @@ const asyncErrorHandler = require("../../errors/asyncErrorHandle");
 const customError = require("../../errors/customError");
 const vendorProfileModel = require("../../models/vendorProfile.model");
 const User = require("../../models/auth.model");
+const Subscription = require("../../models/subscription.model");
+const PLANS = require("../../config/subscriptionPlans");
 
 const createVendorProfile = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user && req.user._id;
@@ -74,14 +76,108 @@ const getPublicVendorProfile = asyncErrorHandler(async (req, res, next) => {
     const error = new customError("Vendor profile not found", 404);
     return next(error);
   }
-  res.status(200).json({ success: true, data: { vendorProfile } });
+
+  // Check Subscription for Badges
+  const subscription = await Subscription.findOne({
+    user: vendorProfile.userId._id,
+    status: "active",
+    endDate: { $gt: new Date() },
+  });
+
+  let badges = {
+    isBoosted: false,
+    isVerified: false,
+  };
+
+  if (subscription) {
+    const planConfig = Object.values(PLANS).find(
+      (p) => p.name === subscription.plan
+    );
+    if (planConfig) {
+      if (planConfig.features.boostedBadge) badges.isBoosted = true;
+      if (planConfig.features.verifiedBadge) badges.isVerified = true;
+    }
+  }
+
+  res.status(200).json({
+    success: true,
+    data: {
+      vendorProfile: {
+        ...vendorProfile.toObject(),
+        ...badges,
+      },
+    },
+  });
 });
 
 const getAllVendorsProfile = asyncErrorHandler(async (req, res, next) => {
-  // Use lean() for better performance since we're only reading data
-  const vendors = await User.find({ role: "vendor" })
-    .select("username profilePic businessName whatsAppNumber")
-    .lean();
+  const vendors = await User.aggregate([
+    { $match: { role: "vendor" } },
+    {
+      $project: {
+        username: 1,
+        profilePic: 1,
+        businessName: 1,
+        whatsAppNumber: 1,
+      },
+    },
+    // Lookup active subscription
+    {
+      $lookup: {
+        from: "subscriptions",
+        let: { userId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ["$user", "$$userId"] },
+                  { $eq: ["$status", "active"] },
+                  { $gt: ["$endDate", new Date()] },
+                ],
+              },
+            },
+          },
+        ],
+        as: "subscription",
+      },
+    },
+    {
+      $addFields: {
+        subscription: { $arrayElemAt: ["$subscription", 0] },
+      },
+    },
+    // Determine badges
+    {
+      $addFields: {
+        isBoosted: {
+          $cond: {
+            if: {
+              $or: [
+                { $eq: ["$subscription.plan", "Vendly Boost"] },
+                { $eq: ["$subscription.plan", "Vendly Pro"] },
+                { $eq: ["$subscription.plan", "Vendly Max"] },
+              ],
+            },
+            then: true,
+            else: false,
+          },
+        },
+        isVerified: {
+          $cond: {
+            if: { $eq: ["$subscription.plan", "Vendly Max"] },
+            then: true,
+            else: false,
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        subscription: 0, // Hide subscription details, show only badges
+      },
+    },
+  ]);
 
   if (!vendors || vendors.length === 0) {
     const error = new customError("No vendor found", 404);
