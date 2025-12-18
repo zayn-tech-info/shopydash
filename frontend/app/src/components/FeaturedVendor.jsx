@@ -6,7 +6,7 @@ import { useVendorProfileStore } from "../store/vendorProfileStore";
 import { useEffect } from "react";
 import UserAvatar from "./UserAvatar";
 
-export function FeaturedVendor({ limit = 5 }) {
+export function FeaturedVendor({ limit = 10 }) {
   const { vendors, getAllVendorProfile } = useVendorProfileStore();
 
   useEffect(() => {
@@ -16,7 +16,7 @@ export function FeaturedVendor({ limit = 5 }) {
     getVendors();
   }, [getAllVendorProfile]);
 
-  if (!vendors) return null;
+  if (!vendors || vendors.length < 5) return null;
 
   return (
     <section className="container mx-auto max-w-7xl px-4 md:px-8 mt-12">

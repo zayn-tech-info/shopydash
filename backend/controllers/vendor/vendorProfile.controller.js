@@ -12,7 +12,6 @@ const createVendorProfile = asyncErrorHandler(async (req, res, next) => {
     return next(err);
   }
 
-  // Use lean() and select only _id for faster check
   const existingVendorProfile = await vendorProfileModel
     .findOne({ userId })
     .select("_id")

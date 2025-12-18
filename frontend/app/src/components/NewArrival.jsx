@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../lib/axios";
 import VendorProductItem from "./vendor/VendorProductItem";
 
-export function NewArrival({ limit = 8 }) {
+export function NewArrival({ limit = 10 }) {
   const [arrivals, setArrivals] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -20,7 +20,7 @@ export function NewArrival({ limit = 8 }) {
     fetchFreshProducts();
   }, [limit]);
 
-  if (!loading && arrivals.length === 0) return null;
+  if (!loading && arrivals.length < 5) return null;
 
   return (
     <section className="container mx-auto max-w-7xl px-4 md:px-8 mt-12">

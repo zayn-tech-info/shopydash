@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../lib/axios";
 import VendorProductItem from "./vendor/VendorProductItem";
 
-export function Trending({ limit = 20, title = "Trending Now" }) {
+export function Trending({ limit = 10, title = "Trending Now" }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -20,7 +20,7 @@ export function Trending({ limit = 20, title = "Trending Now" }) {
     fetchTrending();
   }, [limit]);
 
-  if (!loading && items.length === 0) return null;
+  if (!loading && items.length < 5) return null;
 
   return (
     <section className="container mx-auto max-w-7xl px-4 md:px-8">

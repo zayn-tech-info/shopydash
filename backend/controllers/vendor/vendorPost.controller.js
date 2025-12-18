@@ -4,24 +4,17 @@ const VendorPost = require("../../models/vendorProduct");
 const VendorProfile = require("../../models/vendorProfile.model");
 const User = require("../../models/auth.model");
 const { createSafeRegex } = require("../../utils/regex");
+const plans = require("../../config/subscriptionPlans");
 
 const createPost = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user._id;
   const { caption, products, school, location, state, area } = req.body;
 
-  const limitConfig = req.subscription?.config?.limits || {
-    productsPerPost: 4,
-    postPerDay: 3,
-  };
+  const limitConfig = req.subscription?.config?.limits || plans.free.limits;
 
-  const MIN_PRODUCTS = 3;
-
-  if (!products || products.length < MIN_PRODUCTS) {
+  if (!products || products.length < 4) {
     return next(
-      new customError(
-        `You must upload at least ${MIN_PRODUCTS} product per post.`,
-        400
-      )
+      new customError(`You must upload at least 4 products per post.`, 400)
     );
   }
 
@@ -34,33 +27,17 @@ const createPost = asyncErrorHandler(async (req, res, next) => {
     );
   }
 
-  // Check Photo Limits
-  if (limitConfig.maxPhotosPerProduct) {
-    for (const p of products) {
-      if (p.images && p.images.length > limitConfig.maxPhotosPerProduct) {
-        return next(
-          new customError(
-            `Your plan allows max ${limitConfig.maxPhotosPerProduct} photos per product. Upgrade to add more.`,
-            400
-          )
-        );
-      }
-    }
-  }
+  const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000);
 
-  // Check Post Per Day Limit
-  const startOfDay = new Date();
-  startOfDay.setHours(0, 0, 0, 0);
-
-  const postsToday = await VendorPost.countDocuments({
+  const postsLast12Hours = await VendorPost.countDocuments({
     vendorId: userId,
-    createdAt: { $gte: startOfDay },
+    createdAt: { $gte: twelveHoursAgo },
   });
 
-  if (postsToday >= limitConfig.postPerDay) {
+  if (postsLast12Hours >= limitConfig.postsPer12Hours) {
     return next(
       new customError(
-        `You have reached your daily post limit of ${limitConfig.postPerDay}. Upgrade to post more.`,
+        `You have reached your limit of ${limitConfig.postsPer12Hours} posts every 12 hours. Upgrade to post more.`,
         400
       )
     );
@@ -339,9 +316,15 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
       priorityScore: {
         $switch: {
           branches: [
-            { case: { $eq: ["$subscription.plan", "Vendly Max"] }, then: 30 },
-            { case: { $eq: ["$subscription.plan", "Vendly Pro"] }, then: 20 },
-            { case: { $eq: ["$subscription.plan", "Vendly Boost"] }, then: 10 },
+            {
+              case: { $eq: ["$subscription.plan", "Vendora Max"] },
+              then: 30,
+            },
+            { case: { $eq: ["$subscription.plan", "Vendora Pro"] }, then: 20 },
+            {
+              case: { $eq: ["$subscription.plan", "Vendora Boost"] },
+              then: 10,
+            },
           ],
           default: 0,
         },
@@ -389,7 +372,7 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
       school: "$school",
       area: "$area",
       location: "$location",
-      isBoosted: { $gt: ["$priorityScore", 0] }, // Flag for frontend if needed
+      isBoosted: { $gt: ["$priorityScore", 0] },
       vendor: {
         _id: "$vendor._id",
         businessName: "$vendor.businessName",
@@ -416,20 +399,21 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
 });
 
 const getFreshProducts = asyncErrorHandler(async (req, res, next) => {
-  const { limit = 8 } = req.query;
+  const { limit = 10 } = req.query;
   const pageLimit = Math.min(parseInt(limit), 20);
 
-  const AdayAgo = new Date(Date.now() - 48 * 60 * 60 * 1000);
-
   const pipeline = [
+    { $sort: { createdAt: -1 } },
+    { $unwind: "$products" },
     {
-      $match: {
-        createdAt: { $gte: AdayAgo },
+      $group: {
+        _id: "$vendorId",
+        doc: { $first: "$$ROOT" },
       },
     },
-
-    { $unwind: "$products" },
-
+    {
+      $replaceRoot: { newRoot: "$doc" },
+    },
     {
       $lookup: {
         from: "vendorprofiles",
@@ -450,7 +434,6 @@ const getFreshProducts = asyncErrorHandler(async (req, res, next) => {
         "vendorProfile.rating": { $gte: 0 },
       },
     },
-
     {
       $lookup: {
         from: "users",
@@ -465,11 +448,8 @@ const getFreshProducts = asyncErrorHandler(async (req, res, next) => {
         preserveNullAndEmptyArrays: true,
       },
     },
-
     { $sort: { createdAt: -1 } },
-
     { $limit: pageLimit },
-
     {
       $project: {
         _id: "$products._id",
@@ -500,7 +480,7 @@ const getFreshProducts = asyncErrorHandler(async (req, res, next) => {
 });
 
 const getTrendingProducts = asyncErrorHandler(async (req, res, next) => {
-  const { limit = 20 } = req.query;
+  const { limit = 10 } = req.query;
   const pageLimit = Math.min(parseInt(limit), 20);
 
   const pipeline = [
