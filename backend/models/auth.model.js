@@ -200,6 +200,18 @@ const userSchema = mongoose.Schema(
       type: String,
       trim: true,
     },
+    subscriptionPlan: {
+      type: String,
+      enum: ["Vendly Boost", "Vendly Pro", "Vendly Max"],
+      default: null,
+    },
+    subscriptionExpiresAt: {
+      type: Date,
+    },
+    isSubscriptionActive: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

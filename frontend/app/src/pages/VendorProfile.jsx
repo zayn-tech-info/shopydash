@@ -1,3 +1,4 @@
+import SubscriptionBadge from "../components/common/SubscriptionBadge";
 import { toast } from "react-hot-toast";
 import Logo from "../assets/images/vendora_logo.png";
 import { useEffect, useState, useRef, useCallback } from "react";
@@ -44,23 +45,26 @@ export default function VendorProfile() {
     ? authUser?.profilePic || vendorProfile?.userId?.profilePic || Logo
     : vendorProfile?.userId?.profilePic || Logo;
 
-  const handleImageUpload = useCallback(async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  const handleImageUpload = useCallback(
+    async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
 
-    const formData = new FormData();
-    formData.append("avatar", file);
+      const formData = new FormData();
+      formData.append("avatar", file);
 
-    try {
-      await updateProfile(formData);
-      toast.success("Profile picture updated successfully");
-      if (authUser.username) {
-        await getProfile(authUser.username);
+      try {
+        await updateProfile(formData);
+        toast.success("Profile picture updated successfully");
+        if (authUser.username) {
+          await getProfile(authUser.username);
+        }
+      } catch (error) {
+        toast.error("Failed to update profile picture");
       }
-    } catch (error) {
-      toast.error("Failed to update profile picture");
-    }
-  }, [authUser.username, updateProfile, getProfile]);
+    },
+    [authUser.username, updateProfile, getProfile]
+  );
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -131,9 +135,16 @@ export default function VendorProfile() {
             <div className="absolute inset-0 bg-gradient-to-t from-n-8/80 via-n-8/20 to-transparent" />
 
             <div className="absolute bottom-0 left-0 p-6 md:p-8 z-10 w-full">
-              <h1 className="h2 text-white mb-2 drop-shadow-md">
-                {vendorProfile?.userId?.businessName}
-              </h1>
+              <div className="flex items-center gap-2 mb-2">
+                <h1 className="h2 text-white drop-shadow-md">
+                  {vendorProfile?.userId?.businessName}
+                </h1>
+                <SubscriptionBadge
+                  plan={vendorProfile?.userId?.subscriptionPlan}
+                  size="lg"
+                  className="shadow-lg"
+                />
+              </div>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-white/90 body-2">
                 <span className="font-code uppercase tracking-wider text-sm font-bold bg-white/20 backdrop-blur-md px-3 py-1 rounded-lg border border-white/10">
                   {vendorProfile?.businessCategory}
@@ -176,7 +187,6 @@ export default function VendorProfile() {
           </div>
         </div>
 
- 
         {authUser && (
           <div className="lg:hidden mt-8 bg-white rounded-2xl p-6 border border-n-3/20 shadow-sm text-center">
             <div className="font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-1">

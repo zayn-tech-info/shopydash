@@ -166,7 +166,7 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
     VendorPost.find(query)
       .populate(
         "vendorId",
-        "businessName fullName whatsAppNumber phoneNumber username profilePic logo"
+        "businessName fullName whatsAppNumber phoneNumber username profilePic logo subscriptionPlan"
       )
       .sort({ createdAt: -1 })
       .skip((currentPage - 1) * pageLimit)
@@ -398,6 +398,7 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
         logo: "$vendor.logo",
         phoneNumber: "$vendor.phoneNumber",
         whatsAppNumber: "$vendor.whatsAppNumber",
+        subscriptionPlan: "$vendor.subscriptionPlan",
       },
     },
   });
@@ -484,6 +485,7 @@ const getFreshProducts = asyncErrorHandler(async (req, res, next) => {
           businessName: "$vendorUser.businessName",
           username: "$vendorUser.username",
           profilePic: "$vendorUser.profilePic",
+          subscriptionPlan: "$vendorUser.subscriptionPlan",
         },
       },
     },
@@ -560,6 +562,7 @@ const getTrendingProducts = asyncErrorHandler(async (req, res, next) => {
           businessName: "$vendorUser.businessName",
           username: "$vendorUser.username",
           profilePic: "$vendorUser.profilePic",
+          subscriptionPlan: "$vendorUser.subscriptionPlan",
         },
       },
     },

@@ -27,4 +27,16 @@ export const useSubscriptionStore = create((set) => ({
       set({ initializingPlan: null });
     }
   },
+
+  verifyPayment: async (reference) => {
+    try {
+      const res = await api.get(
+        `/api/v1/payment/verify?reference=${reference}`
+      );
+      return res.data;
+    } catch (error) {
+      console.error("Payment Verification Error:", error);
+      throw error;
+    }
+  },
 }));

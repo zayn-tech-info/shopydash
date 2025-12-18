@@ -1,4 +1,5 @@
 import { Edit, Share2, Plus, LogOut } from "lucide-react";
+import SubscriptionBadge from "../common/SubscriptionBadge";
 import UserAvatar from "../UserAvatar";
 import { useVendorProfileStore } from "../../store/vendorProfileStore";
 import { useAuthStore } from "../../store/authStore";
@@ -19,6 +20,9 @@ export default function VendorSidebar({
   const getProfile = useVendorProfileStore((state) => state.getProfile);
   const fileInputRef = useRef(null);
   const isOwner = authUser?._id === vendorProfile?.userId?._id;
+
+  const plan =
+    vendorProfile?.userId?.subscriptionPlan || authUser?.subscriptionPlan;
 
   const businessName =
     vendorProfile?.userId?.businessName ||
@@ -92,7 +96,10 @@ export default function VendorSidebar({
           <Share2 size={16} />
         </button>
 
-        <h2 className="h4 text-n-8 text-center mb-1">{businessName}</h2>
+        <div className="flex items-center justify-center gap-2 mb-1">
+          <h2 className="h5 text-n-8 text-center">{businessName}</h2>
+          <SubscriptionBadge plan={plan} size="sm" />
+        </div>
         <p className="body-2 text-n-4 text-center font-code">@{username}</p>
 
         {isOwner ? (

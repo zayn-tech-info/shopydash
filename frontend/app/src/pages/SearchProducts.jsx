@@ -1,4 +1,6 @@
+import SubscriptionBadge from "../components/common/SubscriptionBadge";
 import React, { useEffect, useState } from "react";
+
 import { Search, MapPin, Filter } from "lucide-react";
 import { useProductStore } from "../store/productStore";
 import LocationSelector from "../components/LocationSelector";
@@ -145,6 +147,10 @@ export function SearchProducts() {
                     <span className="text-xs text-n-5 truncate">
                       {product.vendor.businessName}
                     </span>
+                    <SubscriptionBadge
+                      plan={product.vendor.subscriptionPlan}
+                      size="sm"
+                    />
                   </div>
 
                   <div className="flex items-center text-xs text-n-4 gap-1 truncate">

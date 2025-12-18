@@ -8,7 +8,9 @@ import toast from "react-hot-toast";
 
 const PricingPage = () => {
   const { authUser } = useAuthStore();
-  const { initializePayment, initializingPlan } = useSubscriptionStore();
+  const { initializePayment, initializingPlan, verifyPayment } =
+    useSubscriptionStore();
+  const { checkAuth } = useAuthStore();
 
   const navigate = useNavigate();
 
@@ -16,10 +18,24 @@ const PricingPage = () => {
     const params = new URLSearchParams(window.location.search);
     const reference = params.get("reference");
 
-    if (reference) {
-      toast.success("Payment processing! Your plan will be active shortly.");
-      navigate("/pricing", { replace: true });
-    }
+    const verify = async () => {
+      if (reference) {
+        try {
+          await verifyPayment(reference);
+          await checkAuth();
+          toast.success("Payment successful! Your plan is now active.");
+        } catch (error) {
+          console.error(error);
+          toast.error(
+            "Could not verify payment status. Please contact support."
+          );
+        } finally {
+          navigate("/pricing", { replace: true });
+        }
+      }
+    };
+
+    verify();
   }, [navigate]);
 
   const handleSubscribe = async (planSlug) => {

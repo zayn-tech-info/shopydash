@@ -69,7 +69,7 @@ const getPublicVendorProfile = asyncErrorHandler(async (req, res, next) => {
     })
     .populate(
       "userId",
-      "businessName email phoneNumber whatsAppNumber schoolName logo isVerified profilePic"
+      "businessName email phoneNumber whatsAppNumber schoolName logo isVerified profilePic subscriptionPlan"
     );
 
   if (!vendorProfile) {
@@ -89,7 +89,12 @@ const getPublicVendorProfile = asyncErrorHandler(async (req, res, next) => {
     isVerified: false,
   };
 
+  let vendorProfileObj = vendorProfile.toObject();
+
   if (subscription) {
+    if (vendorProfileObj.userId) {
+      vendorProfileObj.userId.subscriptionPlan = subscription.plan;
+    }
     const planConfig = Object.values(PLANS).find(
       (p) => p.name === subscription.plan
     );
@@ -103,7 +108,7 @@ const getPublicVendorProfile = asyncErrorHandler(async (req, res, next) => {
     success: true,
     data: {
       vendorProfile: {
-        ...vendorProfile.toObject(),
+        ...vendorProfileObj,
         ...badges,
       },
     },
@@ -119,9 +124,10 @@ const getAllVendorsProfile = asyncErrorHandler(async (req, res, next) => {
         profilePic: 1,
         businessName: 1,
         whatsAppNumber: 1,
+        subscriptionPlan: 1,
       },
     },
-    // Lookup active subscription
+
     {
       $lookup: {
         from: "subscriptions",

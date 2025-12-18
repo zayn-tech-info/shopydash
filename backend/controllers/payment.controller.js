@@ -173,7 +173,7 @@ const webhook = async (req, res) => {
       const endDate = new Date();
       endDate.setDate(endDate.getDate() + 30);
 
-      await Subscription.findOneAndUpdate(
+      const subscription = await Subscription.findOneAndUpdate(
         { user: userId },
         {
           plan: plans[planKey].name,
@@ -185,6 +185,12 @@ const webhook = async (req, res) => {
         },
         { upsert: true, new: true }
       );
+
+      await User.findByIdAndUpdate(userId, {
+        subscriptionPlan: plans[planKey].name,
+        isSubscriptionActive: true,
+        subscriptionExpiresAt: endDate,
+      });
     }
 
     res.status(200).send("Webhook received");
@@ -194,7 +200,100 @@ const webhook = async (req, res) => {
   }
 };
 
+const verifyPayment = async (req, res) => {
+  try {
+    const { reference } = req.query;  
+    if (!reference) {
+      return res
+        .status(400)
+        .json({ message: "Transaction reference is required" });
+    }
+
+    const transaction = await Transaction.findOne({ reference });
+    if (!transaction) {
+      return res.status(404).json({ message: "Transaction not found" });
+    }
+
+    // Verify with Paystack
+    const paystackResponse = await paystackRequest(
+      `/transaction/verify/${reference}`,
+      "GET"
+    );
+
+    if (paystackResponse.status && paystackResponse.data.status === "success") {
+      const { metadata, amount, gateway_response, paid_at, plan } =
+        paystackResponse.data;
+
+      // Update Transaction
+      transaction.status = "success";
+      transaction.gatewayResponse = gateway_response;
+      transaction.paidAt = new Date(paid_at);
+      await transaction.save();
+
+      // Determine Plan Key
+      const planNameFromPaystack = metadata?.planName; // We saved this in initialize
+      let planKey = metadata?.planKey;
+
+      // Fallback if metadata is missing/incomplete (shouldn't happen if initialized correctly)
+      if (!planKey && planNameFromPaystack) {
+        planKey = Object.keys(plans).find(
+          (key) => plans[key].name === planNameFromPaystack
+        );
+      }
+
+      const planDetails = plans[planKey];
+
+      if (planDetails) {
+        const startDate = new Date();
+        const endDate = new Date();
+        endDate.setDate(endDate.getDate() + 30);
+
+        // Update Subscription
+        await Subscription.findOneAndUpdate(
+          { user: transaction.user },
+          {
+            plan: planDetails.name,
+            status: "active",
+            startDate: startDate,
+            endDate: endDate,
+            amount: amount / 100,
+            paystackReference: reference,
+          },
+          { upsert: true, new: true }
+        );
+
+        // Update User - THIS IS THE CRITICAL PART REQUESTED
+        await User.findByIdAndUpdate(transaction.user, {
+          subscriptionPlan: planDetails.name,
+          isSubscriptionActive: true,
+          subscriptionExpiresAt: endDate,
+        });
+      }
+
+      return res
+        .status(200)
+        .json({
+          success: true,
+          message: "Payment verified and profile updated",
+        });
+    } else {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "Payment verification failed or pending",
+        });
+    }
+  } catch (error) {
+    console.error("Payment Verification Error:", error);
+    res
+      .status(500)
+      .json({ message: "Could not verify payment", error: error.message });
+  }
+};
+
 module.exports = {
   initializePayment,
   webhook,
+  verifyPayment,
 };

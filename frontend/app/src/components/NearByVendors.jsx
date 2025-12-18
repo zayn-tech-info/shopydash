@@ -1,3 +1,4 @@
+import SubscriptionBadge from "./common/SubscriptionBadge";
 import {
   MapPin,
   Star,
@@ -7,6 +8,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+
 import { toast } from "react-hot-toast";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
@@ -37,6 +39,7 @@ export function NearByVendors({ posts, showHeader = true }) {
           post.vendorId.businessName || post.vendorId.username || "Vendor",
         vendorAvatar: post.vendorId.logo || post.vendorId.profilePic,
         vendorOwnerId: post.vendorId._id,
+        subscriptionPlan: post.vendorId.subscriptionPlan,
         location: post.location,
         postedAt: new Date(post.createdAt).toLocaleDateString(),
         createdAt: post.createdAt,
@@ -124,10 +127,11 @@ export function NearByVendors({ posts, showHeader = true }) {
                   className="w-10 h-10 border border-n-3/10"
                 />
                 <div className="min-w-0">
-                  <div className="flex gap-3">
+                  <div className="flex items-center gap-2 min-w-0">
                     <p className="font-bold text-n-8 truncate">
                       {post.vendorName}
                     </p>
+                    <SubscriptionBadge plan={post.subscriptionPlan} size="sm" />
                   </div>
                   <p className="text-xs text-n-4 flex items-center gap-2 mt-0.5">
                     <span className="inline-flex items-center gap-1">
@@ -205,19 +209,19 @@ export function NearByVendors({ posts, showHeader = true }) {
                           loading="lazy"
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         />
-                        {/* Price badge */}
-                        <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-n-8 font-bold text-xs px-2 py-1 rounded-lg shadow-sm">
-                          ₦{Number(p.price).toLocaleString()}
-                        </div>
-                        {/* Rating */}
-                        <div className="absolute top-2 right-2 flex items-center gap-1 bg-n-8/80 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-1 rounded-lg">
-                          <Star
-                            size={10}
-                            className="fill-primary-3 text-primary-3"
-                          />
-                          <span>
-                            {p.rating?.toFixed ? p.rating.toFixed(1) : p.rating}
-                          </span>
+
+                        <div className="absolute top-2 right-2 flex items-center gap-1">
+                          <div className="flex items-center gap-1 bg-n-8/80 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-1 rounded-lg">
+                            <Star
+                              size={10}
+                              className="fill-primary-3 text-primary-3"
+                            />
+                            <span>
+                              {p.rating?.toFixed
+                                ? p.rating.toFixed(1)
+                                : p.rating}
+                            </span>
+                          </div>
                         </div>
                       </div>
 

@@ -1,4 +1,5 @@
 import { memo } from "react";
+import SubscriptionBadge from "../common/SubscriptionBadge";
 import { useAuthStore } from "../../store/authStore";
 import { useCartStore } from "../../store/cartStore";
 import { ShoppingCart } from "lucide-react";
@@ -75,6 +76,10 @@ function VendorProductItem({ product, vendorId }) {
             <span className="text-xs text-n-5 font-medium truncate">
               {product.vendor.businessName || product.vendor.username}
             </span>
+            <SubscriptionBadge
+              plan={product.vendor.subscriptionPlan}
+              size="sm"
+            />
           </div>
         )}
 

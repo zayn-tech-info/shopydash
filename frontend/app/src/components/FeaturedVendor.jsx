@@ -1,4 +1,5 @@
 import { Star } from "lucide-react";
+import SubscriptionBadge from "./common/SubscriptionBadge";
 import { Link } from "react-router-dom";
 import { VendorsPost } from "../constants";
 import { useVendorProfileStore } from "../store/vendorProfileStore";
@@ -42,9 +43,12 @@ export function FeaturedVendor({ limit = 5 }) {
               />
 
               <div className="min-w-0">
-                <p className="truncate font-bold text-n-8 text-lg">
-                  {vendor.businessName}
-                </p>
+                <div className="flex items-center gap-2">
+                  <p className="truncate font-bold text-n-8 text-lg">
+                    {vendor.businessName}
+                  </p>
+                  <SubscriptionBadge plan={vendor.subscriptionPlan} size="sm" />
+                </div>
                 <div className="flex items-center gap-1 text-primary-3">
                   <Star size={14} className="fill-current" />
                   <span className="text-sm font-bold text-n-8">
