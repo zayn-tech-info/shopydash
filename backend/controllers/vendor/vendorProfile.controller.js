@@ -159,9 +159,9 @@ const getAllVendorsProfile = asyncErrorHandler(async (req, res, next) => {
           $cond: {
             if: {
               $or: [
-                { $eq: ["$subscription.plan", "Vendly Boost"] },
-                { $eq: ["$subscription.plan", "Vendly Pro"] },
-                { $eq: ["$subscription.plan", "Vendly Max"] },
+                { $eq: ["$subscription.plan", "Vendora Boost"] },
+                { $eq: ["$subscription.plan", "Vendora Pro"] },
+                { $eq: ["$subscription.plan", "Vendora Max"] },
               ],
             },
             then: true,
@@ -170,7 +170,7 @@ const getAllVendorsProfile = asyncErrorHandler(async (req, res, next) => {
         },
         isVerified: {
           $cond: {
-            if: { $eq: ["$subscription.plan", "Vendly Max"] },
+            if: { $eq: ["$subscription.plan", "Vendora Max"] },
             then: true,
             else: false,
           },

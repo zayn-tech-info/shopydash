@@ -202,7 +202,7 @@ const userSchema = mongoose.Schema(
     },
     subscriptionPlan: {
       type: String,
-      enum: ["Vendly Boost", "Vendly Pro", "Vendly Max"],
+      enum: ["Vendora Boost", "Vendora Pro", "Vendora Max"],
       default: null,
     },
     subscriptionExpiresAt: {

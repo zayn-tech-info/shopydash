@@ -6,9 +6,9 @@ const SubscriptionBadge = ({ plan, size = "sm", className = "" }) => {
   if (!plan) return null;
 
   const config = {
-    "Vendly Boost": { bg: "bg-blue-600", text: "text-white" },
-    "Vendly Pro": { bg: "bg-orange-500", text: "text-white" },
-    "Vendly Max": { bg: "bg-purple-600", text: "text-white" },
+    "Vendora Boost": { bg: "bg-blue-600", text: "text-white" },
+    "Vendora Pro": { bg: "bg-orange-500", text: "text-white" },
+    "Vendora Max": { bg: "bg-purple-600", text: "text-white" },
   };
 
   const badge = config[plan];

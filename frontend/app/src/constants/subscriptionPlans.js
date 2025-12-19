@@ -1,7 +1,7 @@
 export const SUBSCRIPTION_PLANS = {
   boost: {
-    name: "Vendly Boost",
-    slug: "vendly-boost",
+    name: "Vendora Boost",
+    slug: "vendora-boost",
     price: 750,
     limits: {
       productsPerPost: 6,
@@ -16,15 +16,15 @@ export const SUBSCRIPTION_PLANS = {
     highlight: false,
   },
   pro: {
-    name: "Vendly Pro",
-    slug: "vendly-pro",
+    name: "Vendora Pro",
+    slug: "vendora-pro",
     price: 1500,
     limits: {
       productsPerPost: 8,
       postPerDay: 5,
     },
     features: [
-      "All in Vendly Boost",
+      "All in Vendora Boost",
       "Custom storefront banner & brand colors",
       "Ability to upload more product photos per item limit (10)",
       "Product performance insights (views, saves, clicks)",
@@ -33,15 +33,15 @@ export const SUBSCRIPTION_PLANS = {
     highlight: true,
   },
   max: {
-    name: "Vendly Max",
-    slug: "vendly-max",
+    name: "Vendora Max",
+    slug: "vendora-max",
     price: 3000,
     limits: {
       productsPerPost: 10,
       postPerDay: 20,
     },
     features: [
-      "All in Vendly Pro",
+      "All in Vendora Pro",
       "Higher product upload limit ( 20 )",
       "Advanced analytics Dashboards",
       "Priority Support",
