@@ -88,10 +88,10 @@ const add = asyncErrorHandler(async (req, res, next) => {
         school: productPost.school,
         location: productPost.location,
       });
-
-      await cart.save();
-      res.status(200).json({ cart });
     }
+
+    await cart.save();
+    res.status(200).json({ cart });
   } else {
     const newCart = await Cart.create({
       userId,

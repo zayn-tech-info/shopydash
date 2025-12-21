@@ -262,11 +262,6 @@ userSchema.methods.isPasswordChanged = function (jwtTimeStamp) {
   return jwtTimeStamp < passwordChangedTimeStamp;
 };
 
-userSchema.index({ email: 1 });
-userSchema.index({ username: 1 });
-userSchema.index({ schoolId: 1 });
 userSchema.index({ role: 1 });
-userSchema.index({ phoneNumber: 1 });
-userSchema.index({ businessName: 1 });
 
 module.exports = mongoose.model("User", userSchema);

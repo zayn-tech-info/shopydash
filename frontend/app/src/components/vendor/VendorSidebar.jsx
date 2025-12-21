@@ -22,7 +22,8 @@ export default function VendorSidebar({
   const isOwner = authUser?._id === vendorProfile?.userId?._id;
 
   const plan =
-    vendorProfile?.userId?.subscriptionPlan || authUser?.subscriptionPlan;
+    vendorProfile?.userId?.subscriptionPlan ||
+    (isOwner ? authUser?.subscriptionPlan : null);
 
   const businessName =
     vendorProfile?.userId?.businessName ||

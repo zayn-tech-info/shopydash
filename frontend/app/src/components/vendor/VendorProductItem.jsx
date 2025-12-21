@@ -3,6 +3,7 @@ import SubscriptionBadge from "../common/SubscriptionBadge";
 import { useAuthStore } from "../../store/authStore";
 import { useCartStore } from "../../store/cartStore";
 import { ShoppingCart } from "lucide-react";
+import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 
 function VendorProductItem({ product, vendorId }) {
@@ -23,7 +24,7 @@ function VendorProductItem({ product, vendorId }) {
       }
 
       const postId =
-        product.vendorPostId || product.sectionId || product.postId; //
+        product.vendorPostId || product.sectionId || product.postId; 
 
       if (!postId) {
         toast.error("Unable to add this item: Missing post reference");
@@ -80,6 +81,12 @@ function VendorProductItem({ product, vendorId }) {
               plan={product.vendor.subscriptionPlan}
               size="sm"
             />
+            <Link
+              to={`/p/${product.vendor.username}`}
+              className="ml-auto text-[10px] font-bold text-primary-3 hover:text-primary-4 transition-colors text-nowrap tracking-wider"
+            >
+              View Profile
+            </Link>
           </div>
         )}
 
@@ -88,9 +95,9 @@ function VendorProductItem({ product, vendorId }) {
             String(product?.vendorId?._id || product?.vendorId || vendorId) && (
             <button
               onClick={handleAddToCart}
-              className="w-full h-10 rounded-xl bg-primary-3 text-white font-code text-xs font-bold uppercase tracking-wider hover:bg-primary-4 transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-95"
+              className="w-full h-7 rounded-md bg-primary-3 text-white font-code text-xs font-bold uppercase tracking-wider hover:bg-primary-4 transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-95"
             >
-              <ShoppingCart size={16} />
+              {/* <ShoppingCart size={16} /> */}
               Add to cart
             </button>
           )}

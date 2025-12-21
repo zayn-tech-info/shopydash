@@ -20,7 +20,7 @@ export function NewArrival({ limit = 10 }) {
     fetchFreshProducts();
   }, [limit]);
 
-  if (!loading && arrivals.length < 5) return null;
+  if (!loading && arrivals.length === 5) return null;
 
   return (
     <section className="container mx-auto max-w-7xl px-4 md:px-8 mt-12">
