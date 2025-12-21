@@ -24,7 +24,7 @@ const get = asyncErrorHandler(async (req, res, next) => {
         .findOne({ userId: user._id })
         .populate(
           "userId",
-          "businessName username email phoneNumber whatsAppNumber schoolName profilePic"
+          "businessName username email phoneNumber whatsAppNumber schoolName profilePic subscriptionPlan"
         )
         .lean(),
       VendorPost.find({ vendorId: user._id })

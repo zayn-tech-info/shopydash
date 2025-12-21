@@ -3,7 +3,7 @@ import { toast } from "react-hot-toast";
 import Logo from "../assets/images/vendora_logo.png";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { Edit, Link2, LogOut, Plus } from "lucide-react";
+import { LogOut, Plus } from "lucide-react";
 import { useVendorProfileStore } from "../store/vendorProfileStore";
 import { useAuthStore } from "../store/authStore";
 import { EditVendorProfile } from "../components/vendor/EditVendorProfile";
@@ -11,14 +11,6 @@ import VendorSidebar from "../components/vendor/VendorSidebar";
 import AboutAndProducts from "../components/vendor/AboutAndProducts";
 import { VendorAddress } from "../components/vendor/VendorAddress";
 import { VendorProfileSkeleton } from "../components/skeletons/VendorProfileSkeleton";
-
-const normaliseDate = (date) => {
-  try {
-    return new Date(date).toLocaleDateString();
-  } catch (e) {
-    return "--";
-  }
-};
 
 export default function VendorProfile() {
   const isGettingVendorProfile = useVendorProfileStore(
@@ -44,27 +36,6 @@ export default function VendorProfile() {
   const displayProfileImage = isOwner
     ? authUser?.profilePic || vendorProfile?.userId?.profilePic || Logo
     : vendorProfile?.userId?.profilePic || Logo;
-
-  const handleImageUpload = useCallback(
-    async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const formData = new FormData();
-      formData.append("avatar", file);
-
-      try {
-        await updateProfile(formData);
-        toast.success("Profile picture updated successfully");
-        if (authUser?.username) {
-          await getProfile(authUser.username);
-        }
-      } catch (error) {
-        toast.error("Failed to update profile picture");
-      }
-    },
-    [authUser?.username, updateProfile, getProfile]
-  );
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -119,7 +90,6 @@ export default function VendorProfile() {
   return (
     <main className="py-8 bg-n-1 min-h-[80vh]">
       <div className="container">
-        {/* Cover Image Section */}
         <div className="relative bg-n-2/10 rounded-3xl overflow-hidden mb-8 border border-n-3/20 shadow-sm group">
           <div className="w-full h-32 md:h-48 lg:h-56 bg-n-3 relative">
             {vendorProfile?.coverImage ? (
@@ -139,11 +109,6 @@ export default function VendorProfile() {
                 <h1 className="h2 text-white drop-shadow-md">
                   {vendorProfile?.userId?.businessName}
                 </h1>
-                <SubscriptionBadge
-                  plan={vendorProfile?.userId?.subscriptionPlan}
-                  size="lg"
-                  className="shadow-lg"
-                />
               </div>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-white/90 body-2">
                 <span className="font-code uppercase tracking-wider text-sm font-bold bg-white/20 backdrop-blur-md px-3 py-1 rounded-lg border border-white/10">
@@ -155,7 +120,6 @@ export default function VendorProfile() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Sidebar */}
           <div className="lg:col-span-4 xl:col-span-3">
             <div className="sticky top-24 space-y-6">
               <VendorSidebar
