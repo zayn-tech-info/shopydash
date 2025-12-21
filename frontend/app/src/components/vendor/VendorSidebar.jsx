@@ -45,7 +45,7 @@ export default function VendorSidebar({
     try {
       await updateProfile(formData);
       toast.success("Profile picture updated successfully");
-      if (authUser.username) {
+      if (authUser?.username) {
         await getProfile(authUser.username);
       }
     } catch (error) {
