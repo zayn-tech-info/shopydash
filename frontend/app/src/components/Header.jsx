@@ -23,7 +23,7 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-n-1/90 backdrop-blur shadow-md">
+    <header className="sticky top-0 z-50 bg-n-1 md:bg-n-1/90 md:backdrop-blur-sm shadow-md">
       <div className="container flex items-center justify-between">
         <Link to="/">
           <img src={Logo} alt="Vendora Logo" width={130} height={70} />
