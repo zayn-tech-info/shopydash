@@ -22,11 +22,11 @@ const ProductItem = memo(({ product }) => (
       <img
         src={product.image}
         alt={product.title}
-        className="h-full w-full object-cover transition-transform duration-500 group-hover/item:scale-110"
+        className="h-full w-full object-cover transition-transform duration-500 md:group-hover/item:scale-110"
       />
       <div className="absolute top-3 right-3 z-10">
         <span
-          className={`text-[10px] font-bold px-2.5 py-1 rounded-full backdrop-blur-md shadow-sm border border-white/20 ${
+          className={`text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm border border-white/20 ${
             product.stock > 0
               ? "bg-white/90 text-green-700"
               : "bg-gray-900/90 text-white"
@@ -36,7 +36,7 @@ const ProductItem = memo(({ product }) => (
         </span>
       </div>
       {/* Subtle overlay on hover */}
-      <div className="absolute inset-0 bg-black/5 opacity-0 group-hover/item:opacity-100 transition-opacity duration-300" />
+      <div className="absolute inset-0 bg-black/5 opacity-0 md:group-hover/item:opacity-100 transition-opacity duration-300" />
     </div>
 
     <div className="space-y-1">
@@ -88,7 +88,7 @@ function PostCardComponent({ post, onDelete }) {
         </div>
 
         {/* Actions - Visible on Hover */}
-        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        <div className="flex items-center gap-2 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">
           <button
             onClick={() => navigate("/vendor/add", { state: { post } })}
             className="p-2 text-gray-400 hover:text-primary-3 hover:bg-orange-50 rounded-full transition-colors"

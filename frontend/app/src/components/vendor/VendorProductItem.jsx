@@ -24,7 +24,7 @@ function VendorProductItem({ product, vendorId }) {
       }
 
       const postId =
-        product.vendorPostId || product.sectionId || product.postId; 
+        product.vendorPostId || product.sectionId || product.postId;
 
       if (!postId) {
         toast.error("Unable to add this item: Missing post reference");
@@ -43,14 +43,14 @@ function VendorProductItem({ product, vendorId }) {
   };
 
   return (
-    <div className="bg-white border border-n-3/20 rounded-xl p-3 flex flex-col gap-3 h-full group hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+    <div className="bg-white border border-n-3/20 rounded-xl p-3 flex flex-col gap-3 h-full group md:hover:shadow-lg transition-all duration-300 md:hover:-translate-y-1">
       <div className="w-full aspect-square bg-n-2 rounded-lg overflow-hidden relative">
         <img
           src={img}
           alt={title}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+          className="w-full h-full object-cover md:group-hover:scale-110 transition-transform duration-500"
         />
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+        <div className="absolute inset-0 bg-black/0 md:group-hover:bg-black/10 transition-colors duration-300" />
       </div>
 
       <div className="flex-1 flex flex-col min-w-0">
