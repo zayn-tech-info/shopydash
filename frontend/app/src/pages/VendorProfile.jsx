@@ -56,14 +56,14 @@ export default function VendorProfile() {
       try {
         await updateProfile(formData);
         toast.success("Profile picture updated successfully");
-        if (authUser.username) {
+        if (authUser?.username) {
           await getProfile(authUser.username);
         }
       } catch (error) {
         toast.error("Failed to update profile picture");
       }
     },
-    [authUser.username, updateProfile, getProfile]
+    [authUser?.username, updateProfile, getProfile]
   );
 
   useEffect(() => {

@@ -253,8 +253,8 @@ export const preferredCategories = [
 export const plans = [
   {
     id: "boost",
-    name: "Vendly Boost",
-    slug: "vendly-boost",
+    name: "Vendora Boost",
+    slug: "vendora-boost",
     icon: Zap,
     price: "₦ 750",
     period: "/month",
@@ -271,14 +271,14 @@ export const plans = [
   },
   {
     id: "pro",
-    name: "Vendly Pro",
-    slug: "vendly-pro",
+    name: "Vendora Pro",
+    slug: "vendora-pro",
     icon: Star,
     price: "₦ 1,500",
     period: "/month",
     description: "Professional tools to brand and grow your store.",
     features: [
-      "All in Vendly Boost",
+      "All in Vendora Boost",
       "Product upload limit increased to (8)",
       "Post upload limit increased to (5) per day",
       "Custom storefront banner & brand colors",
@@ -291,14 +291,14 @@ export const plans = [
   },
   {
     id: "max",
-    name: "Vendly Max",
-    slug: "vendly-max",
+    name: "Vendora Max",
+    slug: "vendora-max",
     icon: Crown,
     price: "₦ 3,000",
     period: "/month",
     description: "Maximum visibility and power for serious sellers.",
     features: [
-      "All in Vendly Pro",
+      "All in Vendora Pro",
       "Higher product upload limit (10)",
       "Post upload limit increased to (20) per day",
       "Advanced analytics dashboards",

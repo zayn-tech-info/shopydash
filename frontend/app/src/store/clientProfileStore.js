@@ -28,7 +28,7 @@ const initialProfileData = {
   address: "",
   city: "",
   state: "",
-  lga: "",
+
   area: "",
   country: "",
   preferredCategory: "",
@@ -96,10 +96,7 @@ export const useClientProfileStore = create((set, get) => ({
       const username = currentProfile?.userId?.username;
 
       set({ updating: true, error: null });
-      const res = await api.patch(
-        "/api/v1/clientProfile/",
-        payload
-      );
+      const res = await api.patch("/api/v1/clientProfile/", payload);
       const payloadRes = res?.data?.data ?? res?.data ?? res;
       let profile =
         payloadRes?.clientProfile ??
@@ -143,10 +140,7 @@ export const useClientProfileStore = create((set, get) => ({
   createClientProfile: async (profileData) => {
     set({ loading: true, error: null });
     try {
-      const res = await api.post(
-        "/api/v1/clientProfile/",
-        profileData
-      );
+      const res = await api.post("/api/v1/clientProfile/", profileData);
       const payload = res?.data?.data ?? res?.data ?? res;
       const profile =
         payload?.clientProfile ??

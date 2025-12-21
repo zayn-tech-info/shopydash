@@ -34,9 +34,7 @@ const vendorProfileSchema = new mongoose.Schema(
     state: {
       type: String,
     },
-    lga: {
-      type: String,
-    },
+
     area: {
       type: String,
     },
@@ -83,7 +81,7 @@ const vendorProfileSchema = new mongoose.Schema(
 );
 
 vendorProfileSchema.index({ userId: 1 });
-vendorProfileSchema.index({ storeUsername: 1 });
+
 vendorProfileSchema.index({ businessCategory: 1 });
 vendorProfileSchema.index({ isVerified: 1 });
 

@@ -23,11 +23,7 @@ const clientProfileSchema = new mongoose.Schema({
     trim: true,
     maxlength: 100,
   },
-  lga: {
-    type: String,
-    trim: true,
-    maxlength: 100,
-  },
+
   area: {
     type: String,
     trim: true,

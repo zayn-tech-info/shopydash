@@ -12,7 +12,6 @@ const createVendorProfile = asyncErrorHandler(async (req, res, next) => {
     return next(err);
   }
 
-  // Use lean() and select only _id for faster check
   const existingVendorProfile = await vendorProfileModel
     .findOne({ userId })
     .select("_id")
@@ -160,9 +159,9 @@ const getAllVendorsProfile = asyncErrorHandler(async (req, res, next) => {
           $cond: {
             if: {
               $or: [
-                { $eq: ["$subscription.plan", "Vendly Boost"] },
-                { $eq: ["$subscription.plan", "Vendly Pro"] },
-                { $eq: ["$subscription.plan", "Vendly Max"] },
+                { $eq: ["$subscription.plan", "Vendora Boost"] },
+                { $eq: ["$subscription.plan", "Vendora Pro"] },
+                { $eq: ["$subscription.plan", "Vendora Max"] },
               ],
             },
             then: true,
@@ -171,7 +170,7 @@ const getAllVendorsProfile = asyncErrorHandler(async (req, res, next) => {
         },
         isVerified: {
           $cond: {
-            if: { $eq: ["$subscription.plan", "Vendly Max"] },
+            if: { $eq: ["$subscription.plan", "Vendora Max"] },
             then: true,
             else: false,
           },
@@ -212,7 +211,6 @@ const updateVendorProfile = asyncErrorHandler(async (req, res, next) => {
     address,
     city,
     state,
-    lga,
     area,
     country,
     zipCode,
@@ -230,7 +228,6 @@ const updateVendorProfile = asyncErrorHandler(async (req, res, next) => {
     address,
     city,
     state,
-    lga,
     area,
     country,
     zipCode,

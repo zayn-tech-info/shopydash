@@ -418,28 +418,34 @@ function CustomDropdown({ options, value, onChange, placeholder }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const filteredOptions = options.filter((option) =>
+    option.toLowerCase().includes((value || "").toLowerCase())
+  );
+
   return (
     <div className="relative" ref={dropdownRef}>
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className={`w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-left flex items-center justify-between ${
-          value ? "text-n-8" : "text-n-4/50"
-        } ${
-          isOpen ? "bg-white border-primary-3 ring-4 ring-primary-3/10" : ""
-        }`}
-      >
-        <span className="truncate block mr-4">{value || placeholder}</span>
+      <div className="relative">
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => {
+            onChange(e.target.value);
+            setIsOpen(true);
+          }}
+          onFocus={() => setIsOpen(true)}
+          placeholder={placeholder}
+          className={`w-full h-12 px-4 pr-12 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50`}
+        />
         <ChevronDown
-          className={`w-5 h-5 text-n-4 transition-transform duration-200 ${
+          className={`absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-n-4 transition-transform duration-200 pointer-events-none ${
             isOpen ? "rotate-180" : ""
           }`}
         />
-      </button>
+      </div>
 
-      {isOpen && (
+      {isOpen && filteredOptions.length > 0 && (
         <div className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-n-3/10 max-h-60 overflow-y-auto overflow-x-hidden py-2 animate-in fade-in zoom-in-95 duration-200">
-          {options.map((option, index) => (
+          {filteredOptions.map((option, index) => (
             <button
               key={index}
               type="button"
@@ -455,6 +461,11 @@ function CustomDropdown({ options, value, onChange, placeholder }) {
               )}
             </button>
           ))}
+        </div>
+      )}
+      {isOpen && filteredOptions.length === 0 && (
+        <div className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-n-3/10 py-4 px-4 text-center text-sm text-n-4 animate-in fade-in zoom-in-95 duration-200">
+          No schools found
         </div>
       )}
     </div>

@@ -22,7 +22,8 @@ export default function VendorSidebar({
   const isOwner = authUser?._id === vendorProfile?.userId?._id;
 
   const plan =
-    vendorProfile?.userId?.subscriptionPlan || authUser?.subscriptionPlan;
+    vendorProfile?.userId?.subscriptionPlan ||
+    (isOwner ? authUser?.subscriptionPlan : null);
 
   const businessName =
     vendorProfile?.userId?.businessName ||
@@ -44,7 +45,7 @@ export default function VendorSidebar({
     try {
       await updateProfile(formData);
       toast.success("Profile picture updated successfully");
-      if (authUser.username) {
+      if (authUser?.username) {
         await getProfile(authUser.username);
       }
     } catch (error) {

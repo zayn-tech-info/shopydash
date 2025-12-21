@@ -267,7 +267,6 @@ const updateUser = asyncErrorHandler(async (req, res, next) => {
     "businessName",
     "profilePic",
     "state",
-    "lga",
     "area",
   ];
 
