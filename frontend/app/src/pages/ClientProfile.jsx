@@ -56,8 +56,6 @@ export function ClientProfile() {
     fetchProfile();
   }, [getProfile, params?.username, authUser?.username, clientProfile]);
 
-
-
   if (loading) return <ClientProfileSkeleton />;
   if (error)
     return (
@@ -78,8 +76,7 @@ export function ClientProfile() {
                 openEdit={openEdit}
                 onLogout={async () => {
                   await logout();
-                  await checkAuth();
-                  navigate("/login");
+                  window.location.href = "/login";
                 }}
               />
             </div>
@@ -135,8 +132,7 @@ export function ClientProfile() {
             <button
               onClick={async () => {
                 await logout();
-                await checkAuth();
-                navigate("/login");
+                window.location.href = "/login";
               }}
               className="w-full flex items-center justify-center gap-2 px-4 py-2 mt-3 border border-n-3/20 rounded-xl text-xs font-bold uppercase tracking-wider text-n-5 hover:text-primary-3 hover:border-primary-3 transition-all"
             >

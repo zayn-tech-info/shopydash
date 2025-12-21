@@ -51,6 +51,7 @@ export function NearByVendors({ posts, showHeader = true }) {
           price: p.price,
           rating: 5.0,
           description: p.description,
+          condition: p.condition,
         })),
         vendorUsername: post.vendorId.username,
       };
@@ -65,6 +66,15 @@ export function NearByVendors({ posts, showHeader = true }) {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "");
+
+  const getConditionColors = (condition) => {
+    const c = condition?.toLowerCase();
+    if (c === "new")
+      return "bg-emerald-100 text-emerald-800 border-emerald-200";
+    if (c === "used") return "bg-rose-100 text-rose-800 border-rose-200";
+    if (c === "like new") return "bg-blue-100 text-blue-800 border-blue-200";
+    return "bg-gray-100 text-gray-800 border-gray-200";
+  };
 
   async function handleAddToCart(product, postId) {
     try {
@@ -201,43 +211,83 @@ export function NearByVendors({ posts, showHeader = true }) {
                     key={`${post.id ?? postIndex}-${p.id ?? `p-${pIndex}`}`}
                     className="h-auto"
                   >
-                    <div className="group relative bg-white rounded-xl border border-gray-200 overflow-hidden h-full">
-                      <div className="relative aspect-[4/5] bg-n-2/10 overflow-hidden">
+                    <div className="group relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 h-full overflow-hidden flex flex-col border border-gray-100/50">
+                      {/* Image Container */}
+                      <div className="relative aspect-[4/5] bg-gray-100 overflow-hidden">
                         <img
                           src={p.image}
                           alt={p.name}
                           loading="lazy"
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />
 
-                        <div className="absolute top-2 right-2 flex items-center gap-1">
-                          <div className="flex items-center gap-1 bg-n-8/80 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-1 rounded-lg">
-                            <Star
-                              size={10}
-                              className="fill-primary-3 text-primary-3"
-                            />
-                            <span>
-                              {p.rating?.toFixed
-                                ? p.rating.toFixed(1)
-                                : p.rating}
-                            </span>
+                        {/* Badges Overlay */}
+                        <div className="absolute inset-0 p-3 flex flex-col justify-between pointer-events-none">
+                          <div className="flex justify-between items-start">
+                            {/* Condition */}
+                            {p.condition ? (
+                              <span
+                                className={`shadow-sm text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${getConditionColors(
+                                  p.condition
+                                )}`}
+                              >
+                                {p.condition}
+                              </span>
+                            ) : (
+                              <div />
+                            )}
+
+                            {/* Rating */}
+                            <div className="bg-black/80 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
+                              <Star
+                                size={10}
+                                className="fill-yellow-400 text-yellow-400"
+                              />
+                              <span>
+                                {p.rating?.toFixed
+                                  ? p.rating.toFixed(1)
+                                  : p.rating}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </div>
 
-                      <div className="p-3">
-                        <h4 className="font-bold text-xs text-n-8 truncate mb-2">
+                      {/* Content */}
+                      <div className="p-4 flex flex-col gap-2 flex-grow">
+                        {/* Title */}
+                        <h4
+                          className="font-medium text-base text-gray-900 line-clamp-1"
+                          title={p.name}
+                        >
                           {p.name}
                         </h4>
-                        {authUser?._id !== post.vendorOwnerId && (
-                          <button
-                            type="button"
-                            onClick={() => handleAddToCart(p, post.id)}
-                            className="w-full h-9 flex items-center justify-center gap-2 rounded-lg bg-primary-3 text-white font-code text-[10px] font-bold uppercase tracking-wider hover:bg-primary-4 transition-colors"
-                          >
-                            <ShoppingCart size={14} /> Add to cart
-                          </button>
+
+                        {/* Description */}
+                        {p.description && (
+                          <p className="text-[10px] leading-relaxed text-gray-500 md:text-xs md:max-h-[1.3rem] md:overflow-hidden md:group-hover:max-h-40 transition-[max-height] duration-[1500ms] ease-in-out">
+                            {p.description}
+                          </p>
                         )}
+
+                        {/* Price and Action Row */}
+                        <div className="mt-auto flex items-center justify-between gap-2">
+                          <p className="font-code text-lg font-bold text-gray-900">
+                            <span className="text-primary-3">₦</span>
+                            {p.price?.toLocaleString()}
+                          </p>
+
+                          {authUser?._id !== post.vendorOwnerId && (
+                            <button
+                              type="button"
+                              onClick={() => handleAddToCart(p, post.id)}
+                              className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 text-gray-900 hover:bg-black hover:text-white transition-all duration-300 shadow-sm hover:shadow-md active:scale-95"
+                              title="Add to cart"
+                            >
+                              <ShoppingCart size={16} />
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </SwiperSlide>

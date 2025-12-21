@@ -50,7 +50,7 @@ const update = asyncErrorHandler(async (req, res, next) => {
     address,
     city,
     state,
-    lga,
+
     area,
     country,
     preferredCategory,
@@ -62,7 +62,7 @@ const update = asyncErrorHandler(async (req, res, next) => {
     address,
     city,
     state,
-    lga,
+
     area,
     country,
     preferredCategory,

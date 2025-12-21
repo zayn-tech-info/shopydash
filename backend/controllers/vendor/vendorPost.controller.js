@@ -69,7 +69,7 @@ const createPost = asyncErrorHandler(async (req, res, next) => {
     school: school || vendorProfile.schoolName || user.schoolName,
     location,
     state,
-    lga,
+
     area,
   });
 
@@ -129,10 +129,10 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
   if (!school && !req.query.area) {
     if (req.user) {
       if (req.user.state) query.state = req.user.state;
-      if (req.user.lga) query.lga = req.user.lga;
-    } else if (req.query.state && req.query.lga) {
+      if (req.user.area) query.area = req.user.area;
+    } else if (req.query.state && req.query.area) {
       query.state = req.query.state;
-      query.lga = req.query.lga;
+      query.area = req.query.area;
     }
   }
 
@@ -218,7 +218,7 @@ const remove = asyncErrorHandler(async (req, res, next) => {
 const update = asyncErrorHandler(async (req, res, next) => {
   const { postId } = req.params;
   const userId = req.user._id;
-  const { caption, products, location, state, lga, area } = req.body;
+  const { caption, products, location, state, area } = req.body;
 
   const post = await VendorPost.findById(postId);
 
@@ -241,7 +241,7 @@ const update = asyncErrorHandler(async (req, res, next) => {
   post.caption = caption || post.caption;
   post.location = location || post.location;
   post.state = state || post.state;
-  post.lga = lga || post.lga;
+
   post.area = area || post.area;
   if (products) {
     post.products = products.map((p) => ({ ...p, vendorId: userId }));

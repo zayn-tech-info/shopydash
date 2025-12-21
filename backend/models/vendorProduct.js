@@ -85,10 +85,7 @@ const vendorPostSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    lga: {
-      type: String,
-      trim: true,
-    },
+
     area: {
       type: String,
       trim: true,
