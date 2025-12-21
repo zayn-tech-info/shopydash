@@ -33,7 +33,7 @@ export function FeaturedVendor({ limit = 10 }) {
         {vendors.map((vendor) => (
           <article
             key={vendor._id}
-            className="group rounded-2xl border border-n-3/10 bg-white p-5 hover:shadow-xl hover:shadow-n-3/10 transition-all duration-300 hover:-translate-y-1"
+            className="group rounded-2xl border border-n-3/10 bg-white p-5 md:hover:shadow-xl md:hover:shadow-n-3/10 transition-all duration-300 md:hover:-translate-y-1"
           >
             <div className="flex items-center gap-4">
               <UserAvatar

@@ -19,7 +19,7 @@ export function ShopByDepartemnt() {
             <button
               key={cat.id}
               type="button"
-              className="group rounded-2xl border border-n-3/10 bg-white p-4 hover:shadow-xl hover:shadow-n-3/10 transition-all duration-300 hover:-translate-y-1 text-left"
+              className="group rounded-2xl border border-n-3/10 bg-white p-4 md:hover:shadow-xl md:hover:shadow-n-3/10 transition-all duration-300 md:hover:-translate-y-1 text-left"
             >
               <div className="flex items-center gap-4">
                 <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-n-2/20 text-n-6 group-hover:bg-primary-3 group-hover:text-white transition-colors duration-300">

@@ -36,7 +36,7 @@ export function Testimonial() {
   if (!Array.isArray(testimonials) || testimonials.length === 0) return null;
 
   return (
-    <section className="container mx-auto max-w-7xl px-4 md:px-8 mt-12 mb-12">
+    <section className="container mx-auto max-w-7xl px-4 md:px-8 mt-12 mb-12 relative z-0">
       <div className="flex items-end justify-between gap-4 mb-6">
         <div>
           <h2 className="h4 text-n-8">Client Testimonials</h2>
@@ -50,7 +50,7 @@ export function Testimonial() {
         {testimonials.map((t) => (
           <article
             key={t.id}
-            className="rounded-2xl border border-n-3/10 bg-white p-6 hover:shadow-xl hover:shadow-n-3/10 transition-all duration-300 hover:-translate-y-1"
+            className="rounded-2xl border border-n-3/10 bg-white p-6 md:hover:shadow-xl md:hover:shadow-n-3/10 transition-all duration-300 md:hover:-translate-y-1"
           >
             <div className="flex items-center gap-4 mb-4">
               <img
