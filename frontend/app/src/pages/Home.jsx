@@ -5,7 +5,6 @@ import { NewArrival } from "../components/NewArrival";
 import { Trending } from "../components/Trending";
 import { NearByVendors } from "../components/NearByVendors";
 import { FeaturedVendor } from "../components/FeaturedVendor";
-import { ShopByDepartemnt } from "../components/ShopByDepartemnt";
 import { Testimonial } from "../components/Testimonial";
 import { useProductStore } from "../store/productStore";
 
@@ -27,7 +26,6 @@ export function Home() {
           <Trending />
           <NearByVendors posts={feedPosts} />
           <FeaturedVendor />
-          <ShopByDepartemnt />
           <Testimonial />
         </div>
       </div>
