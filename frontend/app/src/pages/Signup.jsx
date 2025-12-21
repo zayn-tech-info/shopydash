@@ -130,7 +130,7 @@ export function Signup() {
       </div>
 
       <div className="w-full max-w-xl relative z-10">
-        <div className="bg-white/80 backdrop-blur-xl shadow-2xl shadow-n-3/10 rounded-3xl border border-white/50 overflow-hidden">
+        <div className="bg-white/80 md:backdrop-blur-xl shadow-2xl shadow-n-3/10 rounded-3xl border border-white/50 overflow-hidden">
           <div className="px-8 pt-10 text-center">
             <img
               src={logoUrl}

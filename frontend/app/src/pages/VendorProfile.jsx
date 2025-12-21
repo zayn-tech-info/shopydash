@@ -111,7 +111,7 @@ export default function VendorProfile() {
                 </h1>
               </div>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-white/90 body-2">
-                <span className="font-code uppercase tracking-wider text-sm font-bold bg-white/20 backdrop-blur-md px-3 py-1 rounded-lg border border-white/10">
+                <span className="font-code uppercase tracking-wider text-sm font-bold bg-white/20 md:backdrop-blur-md px-3 py-1 rounded-lg border border-white/10">
                   {vendorProfile?.businessCategory}
                 </span>
               </div>

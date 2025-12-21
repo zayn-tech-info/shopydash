@@ -129,7 +129,7 @@ export function HomeContent({
       {/* Search Overlay Background */}
       {isSearchActive && (
         <div
-          className="fixed inset-0 bg-n-8/20 backdrop-blur-sm z-40 transition-all duration-500"
+          className="fixed inset-0 bg-n-8/20 md:backdrop-blur-sm z-40 transition-all duration-500"
           onClick={() => setIsSearchActive(false)}
         />
       )}

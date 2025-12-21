@@ -237,8 +237,7 @@ export function NearByVendors({ posts, showHeader = true }) {
                               <div />
                             )}
 
-                            {/* Rating */}
-                            <div className="bg-black/80 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
+                            <div className="bg-black/80 text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
                               <Star
                                 size={10}
                                 className="fill-yellow-400 text-yellow-400"
@@ -298,7 +297,7 @@ export function NearByVendors({ posts, showHeader = true }) {
               <button
                 className={`swiper-button-prev-${
                   post.id ?? postIndex
-                } absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-primary-3 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center text-white hover:bg-primary-4 transition-all duration-300 [&.swiper-button-disabled]:opacity-0 [&.swiper-button-disabled]:cursor-not-allowed [&.swiper-button-lock]:hidden`}
+                } absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-primary-3 rounded-full shadow-lg flex items-center justify-center text-white hover:bg-primary-4 transition-all duration-300 [&.swiper-button-disabled]:opacity-0 [&.swiper-button-disabled]:cursor-not-allowed [&.swiper-button-lock]:hidden`}
                 aria-label="Previous slide"
               >
                 <ChevronLeft size={20} />
@@ -306,7 +305,7 @@ export function NearByVendors({ posts, showHeader = true }) {
               <button
                 className={`swiper-button-next-${
                   post.id ?? postIndex
-                } absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-primary-3 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center text-white hover:bg-primary-4 transition-all duration-300 [&.swiper-button-disabled]:opacity-0 [&.swiper-button-disabled]:cursor-not-allowed [&.swiper-button-lock]:hidden`}
+                } absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-primary-3 rounded-full shadow-lg flex items-center justify-center text-white hover:bg-primary-4 transition-all duration-300 [&.swiper-button-disabled]:opacity-0 [&.swiper-button-disabled]:cursor-not-allowed [&.swiper-button-lock]:hidden`}
                 aria-label="Next slide"
               >
                 <ChevronRight size={20} />
