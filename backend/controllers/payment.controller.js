@@ -4,6 +4,9 @@ const Transaction = require("../models/transaction.model");
 const Subscription = require("../models/subscription.model");
 const plans = require("../config/subscriptionPlans");
 const User = require("../models/auth.model");
+const VendorProfile = require("../models/vendorProfile.model");
+const Order = require("../models/order.model");
+const VendorPost = require("../models/vendorProduct");
 
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_TEST_SECRET_KEY;
 
@@ -126,6 +129,169 @@ const initializePayment = async (req, res) => {
   }
 };
 
+const createSubaccount = async (req, res) => {
+  try {
+    const {
+      business_name,
+      settlement_bank,
+      account_number,
+      percentage_charge,
+    } = req.body;
+    const userId = req.user.id;
+
+    const vendor = await VendorProfile.findOne({ userId });
+    if (!vendor) {
+      return res.status(404).json({ message: "Vendor profile not found" });
+    }
+
+    const paystackResponse = await paystackRequest("/subaccount", "POST", {
+      business_name,
+      settlement_bank,
+      account_number,
+      percentage_charge: 5,
+    });
+
+    if (!paystackResponse.status) {
+      return res
+        .status(400)
+        .json({ message: "Failed to create subaccount on Paystack" });
+    }
+
+    vendor.bankDetails = {
+      bankName: paystackResponse.data.settlement_bank,
+      bankCode: settlement_bank,
+      accountNumber: account_number,
+      accountName: paystackResponse.data.business_name,
+      subaccountCode: paystackResponse.data.subaccount_code,
+    };
+    await vendor.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Subaccount created successfully",
+      data: vendor.bankDetails,
+    });
+  } catch (error) {
+    console.error("Subaccount Creation Error:", error);
+    res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
+  }
+};
+
+const initializeOrderPayment = async (req, res) => {
+  try {
+    const { cartItems, deliveryAddress } = req.body;
+    const userId = req.user.id;
+
+    if (!cartItems || cartItems.length === 0) {
+      return res.status(400).json({ message: "No items in checkout" });
+    }
+
+    let totalAmountInKobo = 0;
+    const itemsByVendor = {};
+
+    for (const item of cartItems) {
+      const post = await VendorPost.findOne({ "products._id": item.productId });
+      if (!post) continue;
+
+      const product = post.products.id(item.productId);
+      if (!product) continue;
+
+      const vendorId = post.vendorId.toString();
+
+      if (!itemsByVendor[vendorId]) {
+        itemsByVendor[vendorId] = [];
+      }
+
+      itemsByVendor[vendorId].push({
+        product: item.productId,
+        title: product.title,
+        image: product.image,
+        quantity: item.quantity,
+        price: product.price,
+      });
+
+      totalAmountInKobo += product.price * item.quantity * 100;
+    }
+
+    if (totalAmountInKobo === 0 || null || undefined) {
+      return res.status(400).json({
+        message: "Invalid cart total",
+      });
+    }
+
+    const checkoutReference = `CHK_REF_${nanoid(10)}`;
+
+    const orderIds = [];
+
+    for (const [vId, items] of Object.entries(itemsByVendor)) {
+      const vendorTotal = items.reduce(
+        (sum, i) => sum + i.price * i.quantity,
+        0
+      );
+      const platformFee = vendorTotal * 0.05;
+      const vendorAmount = vendorTotal - platformFee;
+
+      const newOrder = await Order.create({
+        buyer: userId,
+        vendor: vId,
+        items: items,
+        totalAmount: vendorTotal,
+        platformFee: platformFee,
+        vendorAmount: vendorAmount,
+        paymentStatus: "pending",
+        deliveryStatus: "pending",
+        payoutStatus: "held",
+        transactionReference: checkoutReference,
+        deliveryAddress: deliveryAddress,
+      });
+      orderIds.push(newOrder._id);
+    }
+
+    const baseUrl =
+      req.headers.origin || process.env.CLIENT_URL || "http://localhost:5173";
+    const callbackUrl = `${baseUrl}/order/confirmation`;
+
+    const paystackResponse = await paystackRequest(
+      "/transaction/initialize",
+      "POST",
+      {
+        email: req.user.email,
+        amount: totalAmountInKobo,
+        reference: checkoutReference,
+        callback_url: callbackUrl,
+        metadata: {
+          type: "cart_purchase",
+          userId,
+          orderIds: orderIds,
+          custom_fields: [
+            { display_name: "Items Count", value: cartItems.length },
+            { display_name: "Order Ref", value: checkoutReference },
+          ],
+        },
+      }
+    );
+
+    if (!paystackResponse.status) {
+      return res.status(400).json({
+        message: "Payment initialization failed",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      authorization_url: paystackResponse.data.authorization_url,
+      reference: checkoutReference,
+    });
+  } catch (error) {
+    console.error("Order Init Error:", error);
+    res
+      .status(500)
+      .json({ message: "Could not initialize order", error: error.message });
+  }
+};
+
 const webhook = async (req, res) => {
   try {
     const secret = PAYSTACK_SECRET_KEY;
@@ -141,56 +307,18 @@ const webhook = async (req, res) => {
     const event = req.body;
 
     if (event.event === "charge.success") {
-      const { reference, metadata, amount, status, gateway_response, paid_at } =
+      const { reference, metadata, amount, gateway_response, paid_at } =
         event.data;
 
-      const userId = metadata ? metadata.userId : null;
-      const planKey = metadata ? metadata.planKey : null;
-
-      if (!userId || !planKey) {
-        return res.status(200).send("Metadata missing, cannot process");
-      }
-
-      const transaction = await Transaction.findOne({ reference });
-      if (transaction) {
-        transaction.status = "success";
-        transaction.gatewayResponse = gateway_response;
-        transaction.paidAt = new Date(paid_at);
-        await transaction.save();
+      if (
+        metadata &&
+        (metadata.type === "product_purchase" ||
+          metadata.type === "cart_purchase")
+      ) {
+        await handleOrderSuccess(event.data);
       } else {
-        await Transaction.create({
-          user: userId,
-          reference: reference,
-          amount: amount / 100,
-          status: "success",
-          plan: plans[planKey].name,
-          gatewayResponse: gateway_response,
-          paidAt: new Date(paid_at),
-        });
+        await handleSubscriptionSuccess(event.data);
       }
-
-      const startDate = new Date();
-      const endDate = new Date();
-      endDate.setDate(endDate.getDate() + 30);
-
-      const subscription = await Subscription.findOneAndUpdate(
-        { user: userId },
-        {
-          plan: plans[planKey].name,
-          status: "active",
-          startDate: startDate,
-          endDate: endDate,
-          amount: amount / 100,
-          paystackReference: reference,
-        },
-        { upsert: true, new: true }
-      );
-
-      await User.findByIdAndUpdate(userId, {
-        subscriptionPlan: plans[planKey].name,
-        isSubscriptionActive: true,
-        subscriptionExpiresAt: endDate,
-      });
     }
 
     res.status(200).send("Webhook received");
@@ -200,41 +328,134 @@ const webhook = async (req, res) => {
   }
 };
 
+const handleSubscriptionSuccess = async (data) => {
+  const { reference, metadata, amount, gateway_response, paid_at } = data;
+  const userId = metadata ? metadata.userId : null;
+  const planKey = metadata ? metadata.planKey : null;
+
+  if (!userId || !planKey) return;
+
+  const transaction = await Transaction.findOne({ reference });
+  if (transaction) {
+    transaction.status = "success";
+    transaction.gatewayResponse = gateway_response;
+    transaction.paidAt = new Date(paid_at);
+    await transaction.save();
+  } else {
+    await Transaction.create({
+      user: userId,
+      reference: reference,
+      amount: amount / 100,
+      status: "success",
+      plan: plans[planKey].name,
+      gatewayResponse: gateway_response,
+      paidAt: new Date(paid_at),
+    });
+  }
+
+  const startDate = new Date();
+  const endDate = new Date();
+  endDate.setDate(endDate.getDate() + 30);
+
+  await Subscription.findOneAndUpdate(
+    { user: userId },
+    {
+      plan: plans[planKey].name,
+      status: "active",
+      startDate: startDate,
+      endDate: endDate,
+      amount: amount / 100,
+      paystackReference: reference,
+    },
+    { upsert: true, new: true }
+  );
+
+  await User.findByIdAndUpdate(userId, {
+    subscriptionPlan: plans[planKey].name,
+    isSubscriptionActive: true,
+    subscriptionExpiresAt: endDate,
+  });
+};
+
+const handleOrderSuccess = async (data) => {
+  const { reference, metadata, amount } = data;
+
+  if (metadata.type === "cart_purchase") {
+    const orderIds = metadata.orderIds;
+    if (orderIds && orderIds.length > 0) {
+      await Order.updateMany(
+        { _id: { $in: orderIds } },
+        { paymentStatus: "paid", payoutStatus: "held" }
+      );
+    }
+    return;
+  }
+};
+
+function nanoid(length) {
+  let result = "";
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return result;
+}
+
 const verifyPayment = async (req, res) => {
   try {
-    const { reference } = req.query;  
+    const { reference } = req.query;
     if (!reference) {
       return res
         .status(400)
         .json({ message: "Transaction reference is required" });
     }
 
-    const transaction = await Transaction.findOne({ reference });
+    let transaction = await Transaction.findOne({ reference });
+    let isOrder = false;
+
     if (!transaction) {
-      return res.status(404).json({ message: "Transaction not found" });
+      const orderExists = await Order.exists({
+        transactionReference: reference,
+      });
+      if (orderExists) {
+        isOrder = true;
+      }
     }
 
-    // Verify with Paystack
+    if (!transaction && !isOrder) {
+      return res
+        .status(404)
+        .json({ message: "Transaction reference not found" });
+    }
+
     const paystackResponse = await paystackRequest(
       `/transaction/verify/${reference}`,
       "GET"
     );
 
     if (paystackResponse.status && paystackResponse.data.status === "success") {
+      if (isOrder) {
+        await Order.updateMany(
+          { transactionReference: reference },
+          { paymentStatus: "paid", payoutStatus: "held" }
+        );
+        return res.status(200).json({
+          success: true,
+          message: "Order verified successfully",
+        });
+      }
+
       const { metadata, amount, gateway_response, paid_at, plan } =
         paystackResponse.data;
 
-      // Update Transaction
       transaction.status = "success";
       transaction.gatewayResponse = gateway_response;
       transaction.paidAt = new Date(paid_at);
       await transaction.save();
 
-      // Determine Plan Key
-      const planNameFromPaystack = metadata?.planName; // We saved this in initialize
+      const planNameFromPaystack = metadata?.planName;
       let planKey = metadata?.planKey;
 
-      // Fallback if metadata is missing/incomplete (shouldn't happen if initialized correctly)
       if (!planKey && planNameFromPaystack) {
         planKey = Object.keys(plans).find(
           (key) => plans[key].name === planNameFromPaystack
@@ -248,7 +469,6 @@ const verifyPayment = async (req, res) => {
         const endDate = new Date();
         endDate.setDate(endDate.getDate() + 30);
 
-        // Update Subscription
         await Subscription.findOneAndUpdate(
           { user: transaction.user },
           {
@@ -262,7 +482,6 @@ const verifyPayment = async (req, res) => {
           { upsert: true, new: true }
         );
 
-        // Update User - THIS IS THE CRITICAL PART REQUESTED
         await User.findByIdAndUpdate(transaction.user, {
           subscriptionPlan: planDetails.name,
           isSubscriptionActive: true,
@@ -270,19 +489,15 @@ const verifyPayment = async (req, res) => {
         });
       }
 
-      return res
-        .status(200)
-        .json({
-          success: true,
-          message: "Payment verified and profile updated",
-        });
+      return res.status(200).json({
+        success: true,
+        message: "Payment verified and profile updated",
+      });
     } else {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Payment verification failed or pending",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Payment verification failed or pending",
+      });
     }
   } catch (error) {
     console.error("Payment Verification Error:", error);
@@ -292,8 +507,47 @@ const verifyPayment = async (req, res) => {
   }
 };
 
+const getBanks = async (req, res) => {
+  try {
+    const response = await paystackRequest("/bank?country=nigeria", "GET");
+    res.status(200).json({ success: true, data: response.data });
+  } catch (error) {
+    console.error("Get Banks Error:", error);
+    res
+      .status(500)
+      .json({ message: "Could not fetch banks", error: error.message });
+  }
+};
+
+const resolveAccountNumber = async (req, res) => {
+  try {
+    const { account_number, bank_code } = req.query;
+    if (!account_number || !bank_code) {
+      return res
+        .status(400)
+        .json({ message: "Account number and bank code required" });
+    }
+
+    const response = await paystackRequest(
+      `/bank/resolve?account_number=${account_number}&bank_code=${bank_code}`,
+      "GET"
+    );
+
+    res.status(200).json({ success: true, data: response.data });
+  } catch (error) {
+    console.error("Resolve Account Error:", error);
+    res
+      .status(400)
+      .json({ message: "Could not resolve account", error: error.message });
+  }
+};
+
 module.exports = {
   initializePayment,
   webhook,
   verifyPayment,
+  createSubaccount,
+  initializeOrderPayment,
+  getBanks,
+  resolveAccountNumber,
 };

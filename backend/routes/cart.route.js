@@ -5,10 +5,12 @@ const {
   get,
   remove,
   updateItemQuantity,
+  clear,
 } = require("../controllers/cart/cart.controller");
 const { protectRoute } = require("../middleware/auth.middleware");
 
 const cartRouter = express.Router();
+cartRouter.delete("/clear", protectRoute, clear);
 
 cartRouter
   .route("/")

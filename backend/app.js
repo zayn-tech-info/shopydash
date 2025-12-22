@@ -17,6 +17,7 @@ const vendorPost = require("./routes/vendorPost.route");
 const cartRouter = require("./routes/cart.route");
 const locationRouter = require("./routes/location.route");
 const paymentRouter = require("./routes/payment.routes");
+const orderRouter = require("./routes/order.route");
 
 connectDB();
 const app = express();
@@ -56,6 +57,7 @@ app.use("/api/v1/post", vendorPost);
 app.use("/api/v1/cart", cartRouter);
 app.use("/api/v1/locations", locationRouter);
 app.use("/api/v1/payment", paymentRouter);
+app.use("/api/v1/orders", orderRouter);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.all(/(.*)/, (req, res, next) => {
@@ -68,3 +70,7 @@ app.all(/(.*)/, (req, res, next) => {
 app.use(globalErrorHandler);
 
 module.exports = app;
+
+
+
+// Fix order page

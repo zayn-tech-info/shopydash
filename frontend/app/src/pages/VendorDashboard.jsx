@@ -4,7 +4,7 @@ import { api } from "../lib/axios";
 import { StatsCards } from "../components/dashboard/StatsCards";
 import { PostList } from "../components/dashboard/PostList";
 import { toast } from "react-hot-toast";
-import { LayoutDashboard } from "lucide-react";
+import { LayoutDashboard, CreditCard } from "lucide-react";
 
 import { useProductStore } from "../store/productStore";
 
@@ -89,6 +89,13 @@ export default function VendorDashboard() {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate("/vendor/settings/bank")}
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-white border hover:bg-gray-50 text-gray-700"
+            >
+              <CreditCard className="w-4 h-4" />
+              <span className="text-sm font-medium">Payment Settings</span>
+            </button>
             <button
               onClick={() => navigate("/profile")}
               className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-white border"
