@@ -9,4 +9,18 @@ router.post("/webhook", paymentController.webhook);
 
 router.get("/verify", protectRoute, paymentController.verifyPayment);
 
+router.post("/subaccount", protectRoute, paymentController.createSubaccount);
+router.post(
+  "/initialize-order",
+  protectRoute,
+  paymentController.initializeOrderPayment
+);
+
+router.get("/banks", protectRoute, paymentController.getBanks);
+router.get(
+  "/resolve-account",
+  protectRoute,
+  paymentController.resolveAccountNumber
+);
+
 module.exports = router;

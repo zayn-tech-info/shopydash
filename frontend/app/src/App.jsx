@@ -26,6 +26,9 @@ import Feeds from "./pages/Feeds";
 import CartPage from "./pages/CartPage";
 import SearchProducts from "./pages/SearchProducts";
 import PricingPage from "./pages/PricingPage";
+import VendorBankSettings from "./pages/VendorBankSettings";
+import OrderConfirmation from "./pages/OrderConfirmation";
+import OrderList from "./pages/OrderList";
 
 const App = () => {
   const authUser = useAuthStore((state) => state.authUser);
@@ -78,7 +81,7 @@ const App = () => {
             }
           />
           <Route
-            path="login"
+            path="/login"
             element={!authUser ? <Login /> : <Navigate to="/" />}
           />
           <Route
@@ -114,11 +117,17 @@ const App = () => {
             }
           />
           <Route path="/dashboard" element={<VendorDashboard />} />
+          <Route
+            path="/vendor/settings/bank"
+            element={<VendorBankSettings />}
+          />
           <Route path="/vendor/add" element={<VendorProductUpload />} />
           <Route path="/feeds" element={<Feeds />} />
           <Route path="/search" element={<SearchProducts />} />
           <Route path="/p/:username" element={<ProfileDispatcher />} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/order/confirmation" element={<OrderConfirmation />} />
+          <Route path="/orders" element={<OrderList />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

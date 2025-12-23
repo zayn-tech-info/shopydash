@@ -182,9 +182,22 @@ const remove = asyncErrorHandler(async (req, res, next) => {
   res.status(204).json({ cart });
 });
 
+const clear = asyncErrorHandler(async (req, res, next) => {
+  const userId = req.user._id;
+  const cart = await Cart.findOne({ userId });
+
+  if (cart) {
+    cart.items = [];
+    await cart.save();
+  }
+
+  res.status(200).json({ message: "Cart cleared" });
+});
+
 module.exports = {
   get,
   add,
   updateItemQuantity,
   remove,
+  clear,
 };

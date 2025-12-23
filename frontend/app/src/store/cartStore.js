@@ -73,7 +73,14 @@ export const useCartStore = create((set, get) => ({
     }
   },
 
-  clearCart: () => set({ cart: [] }),
+  clearCart: async () => {
+    set({ cart: [] });
+    try {
+      await api.delete("/api/v1/cart/clear");
+    } catch (error) {
+      console.error("Failed to clear remote cart", error);
+    }
+  },
 
   getCartCount: () => {
     return get().cart.reduce((total, item) => total + item.quantity, 0);

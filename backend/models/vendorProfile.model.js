@@ -74,13 +74,21 @@ const vendorProfileSchema = new mongoose.Schema(
       facebook: String,
       twitter: String,
     },
+    bankDetails: {
+      bankName: String,
+      bankCode: String,
+      accountNumber: String,
+      accountName: String,
+      subaccountCode: {
+        type: String,
+        select: false,
+      },
+    },
   },
   {
     timestamps: true,
   }
 );
-
-vendorProfileSchema.index({ userId: 1 });
 
 vendorProfileSchema.index({ businessCategory: 1 });
 vendorProfileSchema.index({ isVerified: 1 });
