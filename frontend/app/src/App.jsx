@@ -127,10 +127,7 @@ const App = () => {
           <Route path="/p/:username" element={<ProfileDispatcher />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/order/confirmation" element={<OrderConfirmation />} />
-          <Route
-            path="/orders"
-            element={authUser ? <OrderList /> : <Navigate to="/login" />}
-          />
+          <Route path="/orders" element={<OrderList />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

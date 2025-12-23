@@ -226,6 +226,12 @@ const initializeOrderPayment = async (req, res) => {
     const orderIds = [];
 
     for (const [vId, items] of Object.entries(itemsByVendor)) {
+      const vendorProfile = await VendorProfile.findOne({ userId: vId });
+
+      if (!vendorProfile) {
+        throw new Error(`Vendor profile not found for vendor ID: ${vId}`);
+      }
+
       const vendorTotal = items.reduce(
         (sum, i) => sum + i.price * i.quantity,
         0
@@ -235,7 +241,7 @@ const initializeOrderPayment = async (req, res) => {
 
       const newOrder = await Order.create({
         buyer: userId,
-        vendor: vId,
+        vendor: vendorProfile._id,
         items: items,
         totalAmount: vendorTotal,
         platformFee: platformFee,

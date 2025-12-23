@@ -23,11 +23,8 @@ const markOrderDelivered = async (req, res) => {
       return res.status(400).json({ message: "Order already delivered" });
     }
 
-   
     order.deliveryStatus = "delivered";
-    order.payoutStatus = "released";  
-
- 
+    order.payoutStatus = "released";
 
     await order.save();
 
@@ -47,11 +44,10 @@ const markOrderDelivered = async (req, res) => {
 const getMyOrders = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { role } = req.query; // 'buyer' or 'vendor'
+    const { role } = req.query;
 
     let query = {};
     if (role === "vendor") {
-      // Find vendor profile first
       const vendor = await VendorProfile.findOne({ userId });
       if (!vendor) return res.status(200).json({ data: [] });
       query = { vendor: vendor._id };
@@ -61,7 +57,14 @@ const getMyOrders = async (req, res) => {
 
     const orders = await Order.find(query)
       .populate("items.product", "title image price")
-      .populate("vendor", "storeName") // Assuming storeName exists or mostly just use ID
+      .populate({
+        path: "vendor",
+        select: "storeUsername userId",
+        populate: {
+          path: "userId",
+          select: "businessName fullName email",
+        },
+      })
       .sort({ createdAt: -1 });
 
     res.status(200).json({

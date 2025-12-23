@@ -12,6 +12,7 @@ export const useOrderStore = create((set, get) => ({
     try {
       const res = await api.get("/api/v1/orders");
       set({ orders: res.data.data });
+      console.log(res)
     } catch (error) {
       console.error("Fetch Orders Error:", error);
       toast.error(error.response?.data?.message || "Failed to fetch orders");
@@ -21,19 +22,11 @@ export const useOrderStore = create((set, get) => ({
   },
 
   markOrderDelivered: async (orderId) => {
-    if (
-      !window.confirm(
-        "Confirm you have received this item? This releases funds to the vendor."
-      )
-    )
-      return;
-
     set({ isMarkingDelivered: true });
     try {
       await api.put(`/api/v1/orders/${orderId}/deliver`);
       toast.success("Order confirmed! Funds released.");
 
-      // Refresh orders to show updated status
       await get().fetchOrders();
     } catch (error) {
       console.error("Mark Delivered Error:", error);
