@@ -135,7 +135,7 @@ export default function VendorSidebar({
               Reviews
             </div>
             <div className="text-n-8 font-bold">
-              {vendorProfile?.reviewsCount ?? 0}
+              {vendorProfile?.numReviews ?? 0}
             </div>
           </div>
         </div>

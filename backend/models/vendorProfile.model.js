@@ -59,9 +59,9 @@ const vendorProfileSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    reviews: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Review",
+    numReviews: {
+      type: Number,
+      default: 0,
     },
     products: [
       {

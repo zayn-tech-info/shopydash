@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useOrderStore } from "../store/orderStore";
 import ConfirmationModal from "../components/common/ConfirmationModal";
+import ReviewModal from "../components/common/ReviewModal";
+import { useReviewStore } from "../store/reviewStore";
+import { toast } from "react-hot-toast";
 import {
   Package,
   CheckCircle,
@@ -21,8 +24,11 @@ export default function OrderList() {
     isMarkingDelivered,
   } = useOrderStore();
 
+  const { createReview } = useReviewStore();
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [reviewOrder, setReviewOrder] = useState(null);
 
   useEffect(() => {
     fetchOrders();
@@ -37,7 +43,24 @@ export default function OrderList() {
     if (selectedOrderId) {
       await markOrderDelivered(selectedOrderId);
       setConfirmModalOpen(false);
+
+      const order = orders.find((o) => o._id === selectedOrderId);
+      if (order) {
+        setReviewOrder(order);
+        setIsReviewModalOpen(true);
+      }
+
       setSelectedOrderId(null);
+    }
+  };
+
+  const handleReviewSubmit = async (data) => {
+    try {
+      await createReview(data);
+      toast.success("Review submitted! Thank you.");
+      setIsReviewModalOpen(false);
+    } catch (error) {
+      toast.error(error);
     }
   };
 
@@ -105,7 +128,6 @@ export default function OrderList() {
           </AnimatePresence>
         </div>
       </div>
-
       <ConfirmationModal
         isOpen={confirmModalOpen}
         onClose={() => setConfirmModalOpen(false)}
@@ -115,6 +137,13 @@ export default function OrderList() {
         confirmText="Yes, Release Funds"
         cancelText="Not yet"
         isLoading={isMarkingDelivered}
+      />
+
+      <ReviewModal
+        isOpen={isReviewModalOpen}
+        onClose={() => setIsReviewModalOpen(false)}
+        onSubmit={handleReviewSubmit}
+        order={reviewOrder}
       />
     </div>
   );
