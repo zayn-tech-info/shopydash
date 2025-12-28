@@ -15,6 +15,7 @@ import {
   Gem,
   Zap,
   Star,
+  MessageSquare,
 } from "lucide-react";
 
 import {
@@ -58,6 +59,12 @@ export const navigation = [
     text: "Cart",
     href: "/cart",
     icon: ShoppingCart,
+  },
+  {
+    id: 7,
+    text: "Messages",
+    href: "/messages",
+    icon: MessageSquare,
   },
   {
     id: 4,

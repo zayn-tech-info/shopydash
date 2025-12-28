@@ -5,6 +5,8 @@ import { useVendorProfileStore } from "../../store/vendorProfileStore";
 import { useAuthStore } from "../../store/authStore";
 import { useRef, useState } from "react";
 import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import useChatStore from "../../store/chatStore";
 
 export default function VendorSidebar({
   authUser,
@@ -18,6 +20,8 @@ export default function VendorSidebar({
   );
   const updateProfile = useAuthStore((state) => state.updateProfile);
   const getProfile = useVendorProfileStore((state) => state.getProfile);
+  const { checkAccess, fetchMessages } = useChatStore();
+  const navigate = useNavigate();
   const fileInputRef = useRef(null);
   const isOwner = authUser?._id === vendorProfile?.userId?._id;
 
@@ -115,7 +119,33 @@ export default function VendorSidebar({
           </button>
         ) : (
           <div className="mt-6 w-full">
-            <button className="w-full px-6 py-3 bg-primary-3 hover:bg-primary-4 text-white rounded-xl transition-colors font-code text-xs font-bold uppercase tracking-wider shadow-lg shadow-primary-3/20">
+            <button
+              onClick={async () => {
+                if (!authUser) {
+                  toast.error("Please login to message this vendor");
+                  return;
+                }
+
+                const recipientId = vendorProfile?.userId?._id;
+                if (!recipientId) return;
+
+                const result = await checkAccess(recipientId);
+
+                if (result.allowed) {
+                  await fetchMessages(result.conversation._id);
+                  navigate("/messages");
+                } else if (result.action === "REDIRECT_WHATSAPP") {
+                  const number = result.data.whatsAppNumber;
+                  if (number) {
+                    const formattedNumber = number.replace(/\D/g, ""); // Remove non-digits
+                    window.open(`https://wa.me/${formattedNumber}`, "_blank");
+                  } else {
+                    toast.error("Vendor WhatsApp not available");
+                  }
+                }
+              }}
+              className="w-full px-6 py-3 bg-primary-3 hover:bg-primary-4 text-white rounded-xl transition-colors font-code text-xs font-bold uppercase tracking-wider shadow-lg shadow-primary-3/20"
+            >
               Message
             </button>
           </div>

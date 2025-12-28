@@ -3,17 +3,32 @@ import { navigation } from "../constants";
 import { Link, NavLink } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import { useCartStore } from "../store/cartStore";
+import useChatStore from "../store/chatStore";
 import { ShoppingCart } from "lucide-react";
 import { useEffect } from "react";
 
 export function Header() {
   const { authUser } = useAuthStore();
   const cart = useCartStore((state) => state.cart);
+  const { conversations, fetchConversations } = useChatStore();
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
+
+  useEffect(() => {
+    if (authUser) {
+      fetchConversations();
+    }
+  }, [authUser, fetchConversations]);
+
+  const unreadMessageCount = conversations.reduce((acc, conv) => {
+    // Check various possible locations for the count depending on backend serialization
+    // It is usually in unreadCounts[userId]
+    const count = conv.unreadCounts?.[authUser?._id] || 0;
+    return acc + count;
+  }, 0);
 
   const renderNav = (nav, role) => {
     if (!role) {
-      if (nav === "Dashboard" || nav === "Profile") {
+      if (nav === "Dashboard" || nav === "Profile" || nav === "Messages") {
         return null;
       }
     }
@@ -77,7 +92,18 @@ export function Header() {
                     }
                     end
                   >
-                    {Icon ? <Icon size={16} /> : null}
+                    {Icon ? (
+                      <div className="relative">
+                        <Icon size={16} />
+                        {nav.text === "Messages" && unreadMessageCount > 0 && (
+                          <span className="absolute -top-1.5 -right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">
+                            {unreadMessageCount > 99
+                              ? "99+"
+                              : unreadMessageCount}
+                          </span>
+                        )}
+                      </div>
+                    ) : null}
                     {nav.text}
                   </NavLink>
                 </li>

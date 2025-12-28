@@ -19,6 +19,7 @@ const locationRouter = require("./routes/location.route");
 const paymentRouter = require("./routes/payment.routes");
 const orderRouter = require("./routes/order.route");
 const reviewRouter = require("./routes/review.route");
+const messageRouter = require("./routes/message.route");
 
 connectDB();
 const app = express();
@@ -60,6 +61,7 @@ app.use("/api/v1/locations", locationRouter);
 app.use("/api/v1/payment", paymentRouter);
 app.use("/api/v1/orders", orderRouter);
 app.use("/api/v1/reviews", reviewRouter);
+app.use("/api/v1/messages", messageRouter);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.all(/(.*)/, (req, res, next) => {
