@@ -1,0 +1,103 @@
+/**
+ * Frontend Socket.IO Client Setup with Authentication
+ * File: frontend/app/src/lib/socket.js or similar
+ */
+
+import { io } from 'socket.io-client';
+
+class SocketService {
+  constructor() {
+    this.socket = null;
+    this.connected = false;
+  }
+
+  connect(token) {
+    if (this.socket?.connected) {
+      return this.socket;
+    }
+
+    const serverUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+    this.socket = io(serverUrl, {
+      auth: {
+        token: token, // Pass JWT token for authentication
+      },
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: 5,
+      transports: ['websocket', 'polling'],
+    });
+
+    this.setupEventListeners();
+    return this.socket;
+  }
+
+  setupEventListeners() {
+    this.socket.on('connect', () => {
+      console.log('Socket connected');
+      this.connected = true;
+    });
+
+    this.socket.on('disconnect', (reason) => {
+      console.log('Socket disconnected:', reason);
+      this.connected = false;
+    });
+
+    this.socket.on('connect_error', (error) => {
+      console.error('Socket connection error:', error.message);
+      // Handle authentication errors
+      if (error.message.includes('Authentication')) {
+        // Redirect to login or refresh token
+        console.error('Socket authentication failed');
+      }
+    });
+
+    this.socket.on('error', (data) => {
+      console.error('Socket error:', data.message);
+      // Handle errors in UI
+    });
+  }
+
+  disconnect() {
+    if (this.socket) {
+      this.socket.disconnect();
+      this.socket = null;
+      this.connected = false;
+    }
+  }
+
+  // Helper methods
+  joinConversation(conversationId) {
+    if (this.socket?.connected) {
+      this.socket.emit('join_conversation', { conversationId });
+    }
+  }
+
+  sendMessage(conversationId, content) {
+    if (this.socket?.connected) {
+      this.socket.emit('send_message', { conversationId, content });
+    }
+  }
+
+  onNewMessage(callback) {
+    if (this.socket) {
+      this.socket.on('new_message', callback);
+    }
+  }
+
+  offNewMessage(callback) {
+    if (this.socket) {
+      this.socket.off('new_message', callback);
+    }
+  }
+
+  // Cleanup method
+  cleanup() {
+    if (this.socket) {
+      this.socket.removeAllListeners();
+    }
+  }
+}
+
+export const socketService = new SocketService();
