@@ -1,4 +1,4 @@
-const { logInfo, logWarn } = require("./utils/logger");
+const { logInfo, logWarn } = require("./logger");
  
 const validateEnv = () => {
   const required = [
