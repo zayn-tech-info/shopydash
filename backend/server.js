@@ -7,7 +7,6 @@ const validateEnv = require("./utils/validateEnv");
 const app = require("./app");
 const { logInfo } = require("./utils/logger");
 
-// Validate environment variables before starting the server
 validateEnv();
 
 const PORT = process.env.PORT || 8000;
