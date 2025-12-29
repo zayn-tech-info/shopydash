@@ -1,9 +1,25 @@
 import { X } from "lucide-react";
 import { navigation } from "../constants";
 import { Link, useLocation } from "react-router-dom";
+import { useAuthStore } from "../store/authStore";
+import useChatStore from "../store/chatStore";
+import { useEffect } from "react";
 
 export function AsideBar({ isMenuOpened, handleClick }) {
   const location = useLocation();
+  const { authUser } = useAuthStore();
+  const { conversations, fetchConversations } = useChatStore();
+
+  useEffect(() => {
+    if (authUser) {
+      fetchConversations();
+    }
+  }, [authUser, fetchConversations]);
+
+  const unreadMessageCount = conversations.reduce((acc, conv) => {
+    const count = conv.unreadCounts?.[authUser?._id] || 0;
+    return acc + count;
+  }, 0);
 
   return (
     <div
@@ -34,12 +50,23 @@ export function AsideBar({ isMenuOpened, handleClick }) {
               >
                 <div className="flex items-center gap-7">
                   {Icon ? (
-                    <Icon
-                      className={`w-8 h-8 ${
-                        active ? "text-primary-3" : "text-white"
-                      }`}
-                      aria-hidden="true"
-                    />
+                    <div className="relative">
+                      <Icon
+                        className={`w-8 h-8 ${
+                          active ? "text-primary-3" : "text-white"
+                        }`}
+                        aria-hidden="true"
+                      />
+                      {nav.text === "Messages" && unreadMessageCount > 0 && (
+                        <span
+                          className={`absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white border-2 ${
+                            active ? "border-white" : "border-primary-3"
+                          }`}
+                        >
+                          {unreadMessageCount > 99 ? "99+" : unreadMessageCount}
+                        </span>
+                      )}
+                    </div>
                   ) : null}
                   <span className="font-medium text-3xl">{nav.text}</span>
                 </div>

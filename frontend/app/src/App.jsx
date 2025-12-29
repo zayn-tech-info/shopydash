@@ -3,7 +3,7 @@ import { Home } from "./pages/Home";
 import VendorDashboard from "./pages/VendorDashboard";
 import NotFound from "./pages/NotFound";
 import { Header } from "./components/Header";
-import { useEffect} from "react";
+import { useEffect } from "react";
 import { Footer } from "./components/Footer";
 import { Login } from "./pages/Login";
 import { Signup } from "./pages/Signup";
@@ -23,6 +23,7 @@ import { VendorFloatingButton } from "./components/VendorFloatingButton";
 import Feeds from "./pages/Feeds";
 import CartPage from "./pages/CartPage";
 import SearchProducts from "./pages/SearchProducts";
+import MessagesPage from "./pages/Messages.jsx";
 import PricingPage from "./pages/PricingPage";
 import VendorBankSettings from "./pages/VendorBankSettings";
 import OrderConfirmation from "./pages/OrderConfirmation";
@@ -56,7 +57,13 @@ const App = () => {
   return (
     <div>
       <Header />
-      <div className="relative max-w-7xl mx-auto px-2 sm:px-6 md:px-10 lg:px-8 pb-20">
+      <div
+        className={`relative mx-auto ${
+          location.pathname === "/messages"
+            ? "w-full max-w-full px-0 pb-0 h-screen pt- overflow-hidden bg-n-1"
+            : "max-w-7xl px-2 sm:px-6 md:px-10 lg:px-8 pb-20"
+        }`}
+      >
         <Routes>
           <Route
             path="/"
@@ -126,13 +133,14 @@ const App = () => {
           <Route path="/cart" element={<CartPage />} />
           <Route path="/order/confirmation" element={<OrderConfirmation />} />
           <Route path="/orders" element={<OrderList />} />
+          <Route path="/messages" element={<MessagesPage />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
-      {authUser ? <Footer /> : ""}
-      {authUser ? <BottomNav /> : ""}
-      <VendorFloatingButton />
+      {authUser && location.pathname !== "/messages" ? <Footer /> : ""}
+      {authUser && location.pathname !== "/messages" ? <BottomNav /> : ""}
+      {location.pathname !== "/messages" && <VendorFloatingButton />}
       <Toaster />
     </div>
   );
