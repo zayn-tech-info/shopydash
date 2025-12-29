@@ -7,6 +7,7 @@ const User = require("../models/auth.model");
 const VendorProfile = require("../models/vendorProfile.model");
 const Order = require("../models/order.model");
 const VendorPost = require("../models/vendorProduct");
+const { logError } = require("../utils/logger");
 
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_TEST_SECRET_KEY;
 
@@ -121,10 +122,10 @@ const initializePayment = async (req, res) => {
       reference: paystackResponse.data.reference,
     });
   } catch (error) {
-    console.error("Payment Init Error:", error);
+    logError("Payment Initialization", error);
     res.status(500).json({
       message: "Could not initialize payment",
-      error: error.message,
+      ...(process.env.NODE_ENV === "development" && { error: error.message }),
     });
   }
 };
@@ -172,10 +173,11 @@ const createSubaccount = async (req, res) => {
       data: vendor.bankDetails,
     });
   } catch (error) {
-    console.error("Subaccount Creation Error:", error);
-    res
-      .status(500)
-      .json({ message: "Internal Server Error", error: error.message });
+    logError("Subaccount Creation", error);
+    res.status(500).json({
+      message: "Internal Server Error",
+      ...(process.env.NODE_ENV === "development" && { error: error.message }),
+    });
   }
 };
 
@@ -215,7 +217,7 @@ const initializeOrderPayment = async (req, res) => {
       totalAmountInKobo += product.price * item.quantity * 100;
     }
 
-    if (totalAmountInKobo === 0 || null || undefined) {
+    if (!totalAmountInKobo || totalAmountInKobo === 0) {
       return res.status(400).json({
         message: "Invalid cart total",
       });
@@ -291,10 +293,11 @@ const initializeOrderPayment = async (req, res) => {
       reference: checkoutReference,
     });
   } catch (error) {
-    console.error("Order Init Error:", error);
-    res
-      .status(500)
-      .json({ message: "Could not initialize order", error: error.message });
+    logError("Order Payment Initialization", error);
+    res.status(500).json({
+      message: "Could not initialize order",
+      ...(process.env.NODE_ENV === "development" && { error: error.message }),
+    });
   }
 };
 
@@ -329,7 +332,7 @@ const webhook = async (req, res) => {
 
     res.status(200).send("Webhook received");
   } catch (error) {
-    console.error("Webhook Error:", error);
+    logError("Webhook Processing", error);
     res.status(500).send("Webhook error");
   }
 };
@@ -506,10 +509,11 @@ const verifyPayment = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error("Payment Verification Error:", error);
-    res
-      .status(500)
-      .json({ message: "Could not verify payment", error: error.message });
+    logError("Payment Verification", error);
+    res.status(500).json({
+      message: "Could not verify payment",
+      ...(process.env.NODE_ENV === "development" && { error: error.message }),
+    });
   }
 };
 
@@ -518,10 +522,11 @@ const getBanks = async (req, res) => {
     const response = await paystackRequest("/bank?country=nigeria", "GET");
     res.status(200).json({ success: true, data: response.data });
   } catch (error) {
-    console.error("Get Banks Error:", error);
-    res
-      .status(500)
-      .json({ message: "Could not fetch banks", error: error.message });
+    logError("Get Banks", error);
+    res.status(500).json({
+      message: "Could not fetch banks",
+      ...(process.env.NODE_ENV === "development" && { error: error.message }),
+    });
   }
 };
 
@@ -541,10 +546,11 @@ const resolveAccountNumber = async (req, res) => {
 
     res.status(200).json({ success: true, data: response.data });
   } catch (error) {
-    console.error("Resolve Account Error:", error);
-    res
-      .status(400)
-      .json({ message: "Could not resolve account", error: error.message });
+    logError("Resolve Account Number", error);
+    res.status(400).json({
+      message: "Could not resolve account",
+      ...(process.env.NODE_ENV === "development" && { error: error.message }),
+    });
   }
 };
 

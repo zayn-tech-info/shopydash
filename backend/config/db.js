@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const customError = require("../errors/customError");
+const { logInfo, logError } = require("../utils/logger");
 
 const connectDB = async () => {
   const uri = process.env.CONNECTION_URI;
@@ -12,13 +13,13 @@ const connectDB = async () => {
       socketTimeoutMS: 45000,
       family: 4,
     });
-    console.log("Database connected successfully");
+    logInfo("Database", "Database connected successfully");
   } catch (error) {
     const err = new customError(
       `Database connection error: ${error.message}`,
       500
     );
-    console.error(err.message);
+    logError("Database Connection", err);
     process.exit(1);
   }
 };

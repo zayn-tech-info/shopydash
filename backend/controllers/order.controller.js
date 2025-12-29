@@ -1,6 +1,7 @@
 const Order = require("../models/order.model");
 const VendorProfile = require("../models/vendorProfile.model");
 const { paystackRequest } = require("./payment.controller");
+const { logError } = require("../utils/logger");
 
 const markOrderDelivered = async (req, res) => {
   try {
@@ -34,10 +35,11 @@ const markOrderDelivered = async (req, res) => {
       data: order,
     });
   } catch (error) {
-    console.error("Mark Delivered Error:", error);
-    res
-      .status(500)
-      .json({ message: "Could not update order", error: error.message });
+    logError("Mark Order Delivered", error);
+    res.status(500).json({
+      message: "Could not update order",
+      ...(process.env.NODE_ENV === "development" && { error: error.message }),
+    });
   }
 };
 
@@ -73,10 +75,11 @@ const getMyOrders = async (req, res) => {
       data: orders,
     });
   } catch (error) {
-    console.error("Get Orders Error:", error);
-    res
-      .status(500)
-      .json({ message: "Could not fetch orders", error: error.message });
+    logError("Get My Orders", error);
+    res.status(500).json({
+      message: "Could not fetch orders",
+      ...(process.env.NODE_ENV === "development" && { error: error.message }),
+    });
   }
 };
 

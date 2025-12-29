@@ -112,7 +112,7 @@ const add = asyncErrorHandler(async (req, res, next) => {
     });
 
     res.status(200).json({
-      sucess: true,
+      success: true,
       message: "Product added to cart",
       cart: newCart,
     });
