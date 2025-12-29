@@ -6,11 +6,13 @@ const orderSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      index: true,
     },
     vendor: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "VendorProfile",
       required: true,
+      index: true,
     },
     items: [
       {
@@ -50,11 +52,13 @@ const orderSchema = new mongoose.Schema(
       type: String,
       enum: ["pending", "paid", "refunded"],
       default: "pending",
+      index: true,
     },
     deliveryStatus: {
       type: String,
       enum: ["pending", "delivered", "cancelled"],
       default: "pending",
+      index: true,
     },
     payoutStatus: {
       type: String,
@@ -64,6 +68,7 @@ const orderSchema = new mongoose.Schema(
     transactionReference: {
       type: String,
       required: true,
+      index: true,
     },
     deliveryAddress: {
       address: String,
@@ -76,5 +81,9 @@ const orderSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+orderSchema.index({ buyer: 1, createdAt: -1 });
+orderSchema.index({ vendor: 1, createdAt: -1 });
+orderSchema.index({ transactionReference: 1 }, { unique: true });
 
 module.exports = mongoose.model("Order", orderSchema);

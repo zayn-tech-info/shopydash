@@ -6,11 +6,13 @@ const reviewSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      index: true,
     },
     vendor: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "VendorProfile",
       required: true,
+      index: true,
     },
     order: {
       type: mongoose.Schema.Types.ObjectId,
@@ -36,5 +38,6 @@ const reviewSchema = new mongoose.Schema(
 );
  
 reviewSchema.index({ order: 1 }, { unique: true });
+reviewSchema.index({ vendor: 1, createdAt: -1 });
 
 module.exports = mongoose.model("Review", reviewSchema);

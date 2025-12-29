@@ -8,6 +8,8 @@ const subscriptionSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      unique: true,
+      index: true,
     },
     plan: {
       type: String,
@@ -18,10 +20,12 @@ const subscriptionSchema = mongoose.Schema(
       type: String,
       enum: ["active", "expired", "cancelled"],
       default: "active",
+      index: true,
     },
     amount: {
       type: Number,
       required: true,
+      min: 0,
     },
     startDate: {
       type: Date,
@@ -31,6 +35,7 @@ const subscriptionSchema = mongoose.Schema(
     endDate: {
       type: Date,
       required: true,
+      index: true,
     },
     paystackAuthCode: {
       type: String,
@@ -43,5 +48,7 @@ const subscriptionSchema = mongoose.Schema(
     timestamps: true,
   }
 );
+
+subscriptionSchema.index({ user: 1, status: 1, endDate: 1 });
 
 module.exports = mongoose.model("Subscription", subscriptionSchema);

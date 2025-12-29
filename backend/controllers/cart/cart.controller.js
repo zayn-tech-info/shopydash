@@ -42,6 +42,14 @@ const add = asyncErrorHandler(async (req, res, next) => {
     return next(error);
   }
 
+  if (quantity < 1 || quantity > 100) {
+    const error = new customError(
+      "Quantity must be between 1 and 100",
+      400
+    );
+    return next(error);
+  }
+
   const productPost = await VendorPost.findOne({
     _id: vendorPostId,
     "products._id": productId,
@@ -74,7 +82,15 @@ const add = asyncErrorHandler(async (req, res, next) => {
 
     if (itemIndex > -1) {
       let productItem = cart.items[itemIndex];
-      productItem.quantity += Number(quantity);
+      const newQuantity = productItem.quantity + Number(quantity);
+      
+      if (newQuantity > 100) {
+        return next(
+          new customError("Cannot add more than 100 items of the same product", 400)
+        );
+      }
+      
+      productItem.quantity = newQuantity;
     } else {
       cart.items.push({
         productId,
@@ -112,7 +128,7 @@ const add = asyncErrorHandler(async (req, res, next) => {
     });
 
     res.status(200).json({
-      sucess: true,
+      success: true,
       message: "Product added to cart",
       cart: newCart,
     });
@@ -121,12 +137,16 @@ const add = asyncErrorHandler(async (req, res, next) => {
 
 const updateItemQuantity = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user._id;
-  const user = await User.findById(userId);
 
   const { productId, quantity } = req.body;
 
   if (!productId || quantity === undefined) {
     const error = new customError("Product ID and quantity are required", 400);
+    return next(error);
+  }
+
+  if (quantity < 0 || quantity > 100) {
+    const error = new customError("Quantity must be between 0 and 100", 400);
     return next(error);
   }
 
@@ -157,7 +177,6 @@ const updateItemQuantity = asyncErrorHandler(async (req, res, next) => {
 
 const remove = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user._id;
-  const user = await User.findById(userId);
 
   const { productId } = req.body;
 

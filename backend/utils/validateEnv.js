@@ -1,3 +1,4 @@
+const { logInfo, logWarn } = require("./logger");
  
 const validateEnv = () => {
   const required = [
@@ -26,12 +27,13 @@ const validateEnv = () => {
 
   // Validate JWT_SECRET_KEY strength
   if (process.env.JWT_SECRET_KEY.length < 32) {
-    console.error(
-      "⚠️  Warning: JWT_SECRET_KEY should be at least 32 characters for better security"
+    logWarn(
+      "Environment Validation",
+      "JWT_SECRET_KEY should be at least 32 characters for better security"
     );
   }
 
-  console.log("✅ Environment variables validated successfully");
+  logInfo("Environment Validation", "Environment variables validated successfully");
 };
 
 module.exports = validateEnv;

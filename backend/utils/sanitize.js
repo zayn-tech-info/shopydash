@@ -27,6 +27,18 @@ const sanitizeObject = (obj) => {
     return obj;
   }
 
+  // Handle arrays
+  if (Array.isArray(obj)) {
+    return obj.map((item) => {
+      if (typeof item === "string") {
+        return sanitizeString(item);
+      } else if (typeof item === "object" && item !== null) {
+        return sanitizeObject(item);
+      }
+      return item;
+    });
+  }
+
   const sanitized = {};
 
   for (const [key, value] of Object.entries(obj)) {
@@ -38,9 +50,14 @@ const sanitizeObject = (obj) => {
     if (typeof value === "string") {
       sanitized[key] = sanitizeString(value);
     } else if (Array.isArray(value)) {
-      sanitized[key] = value.map((item) =>
-        typeof item === "string" ? sanitizeString(item) : item
-      );
+      sanitized[key] = value.map((item) => {
+        if (typeof item === "string") {
+          return sanitizeString(item);
+        } else if (typeof item === "object" && item !== null) {
+          return sanitizeObject(item);
+        }
+        return item;
+      });
     } else if (typeof value === "object" && value !== null) {
       sanitized[key] = sanitizeObject(value);
     } else {
