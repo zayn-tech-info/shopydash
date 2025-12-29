@@ -88,7 +88,7 @@ exports.initiateOrGetConversation = asyncErrorHandler(async (req, res, next) => 
   });
 });
 
-exports.sendMessage = catchAsync(async (req, res, next) => {
+exports.sendMessage = asyncErrorHandler(async (req, res, next) => {
   const { conversationId, content, replyTo } = req.body;
   const senderId = req.user.id;
 
@@ -154,7 +154,7 @@ exports.sendMessage = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getConversations = catchAsync(async (req, res, next) => {
+exports.getConversations = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user.id;
 
   const conversations = await Conversation.find({
@@ -173,7 +173,7 @@ exports.getConversations = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getMessages = catchAsync(async (req, res, next) => {
+exports.getMessages = asyncErrorHandler(async (req, res, next) => {
   const { conversationId } = req.params;
   const userId = req.user.id;
 
@@ -207,7 +207,7 @@ exports.getMessages = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getAvailableVendorsForChat = catchAsync(async (req, res, next) => {
+exports.getAvailableVendorsForChat = asyncErrorHandler(async (req, res, next) => {
   const { schoolId, _id: currentUserId } = req.user;
 
   // Find vendors in the same school who are Pro or Max
