@@ -4,6 +4,7 @@ import { useAuthStore } from "../../store/authStore";
 import { Send, MoreVertical, ArrowLeft } from "lucide-react";
 import { format, isToday, isYesterday } from "date-fns";
 import DOMPurify from "isomorphic-dompurify";
+import { toast } from "react-hot-toast";
 
 const ChatWindow = ({ onBack }) => {
   const { activeConversation, messages, sendMessage, isLoading } =
@@ -42,7 +43,7 @@ const ChatWindow = ({ onBack }) => {
     
     // Client-side validation
     if (newMessage.length > 2000) {
-      alert('Message is too long (max 2000 characters)');
+      toast.error('Message is too long (max 2000 characters)');
       return;
     }
     

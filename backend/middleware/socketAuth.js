@@ -19,7 +19,7 @@ const socketAuthMiddleware = async (socket, next) => {
     const token = socket.handshake.auth.token;
     
     if (!token) {
-      return next(new Error('Authentication token required'));
+      return next(new Error('Authentication failed'));
     }
 
     // Verify JWT token
@@ -29,7 +29,7 @@ const socketAuthMiddleware = async (socket, next) => {
     const user = await User.findById(decoded.id).select('-password');
     
     if (!user) {
-      return next(new Error('User not found'));
+      return next(new Error('Authentication failed'));
     }
 
     // Attach user info to socket

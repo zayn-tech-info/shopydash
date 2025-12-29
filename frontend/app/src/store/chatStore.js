@@ -295,7 +295,7 @@ const useChatStore = create((set, get) => ({
       }
     } catch (error) {
       console.error(error);
-      const errorMsg = error.response?.data?.message || "Failed to send message";
+      const errorMsg = error.response?.data?.message || error.message || "Failed to send message";
       toast.error(errorMsg);
     }
   },
