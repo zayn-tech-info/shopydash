@@ -3,9 +3,22 @@ import { io } from "socket.io-client";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { useAuthStore } from "./authStore";
+import DOMPurify from 'isomorphic-dompurify';
 
 const ENDPOINT = import.meta.env.VITE_URL || "http://localhost:8000"; // Adjust as needed
 // Note: In Vite, we often use a proxy or relative URL if configured, but socket.io needs the host usually.
+
+// Helper to get token from cookies
+const getTokenFromCookies = () => {
+  const cookies = document.cookie.split(';');
+  for (let cookie of cookies) {
+    const [name, value] = cookie.trim().split('=');
+    if (name === 'token') {
+      return value;
+    }
+  }
+  return null;
+};
 
 const useChatStore = create((set, get) => ({
   socket: null,
@@ -19,8 +32,22 @@ const useChatStore = create((set, get) => ({
     const existingSocket = get().socket;
     if (existingSocket) return;
 
+    // Get token from cookies for authentication
+    const token = getTokenFromCookies();
+    if (!token) {
+      console.error('No authentication token found for socket connection');
+      return;
+    }
+
     const socket = io(ENDPOINT, {
       withCredentials: true,
+      auth: {
+        token: token, // Pass JWT token for authentication
+      },
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: 5,
     });
 
     socket.on("connect", () => {
@@ -28,27 +55,49 @@ const useChatStore = create((set, get) => ({
       socket.emit("join_user_room", userId);
     });
 
+    socket.on('connect_error', (error) => {
+      console.error('Socket connection error:', error.message);
+      if (error.message.includes('Authentication')) {
+        console.error('Socket authentication failed. Please re-login.');
+        toast.error('Connection failed. Please re-login.');
+      }
+    });
+
+    socket.on('error', (data) => {
+      console.error('Socket error:', data.message);
+      toast.error(data.message || 'Socket error occurred');
+    });
+
     socket.on("receive_message", (message) => {
       const { activeConversation, messages, conversations } = get();
+
+      // Sanitize message content before displaying
+      const sanitizedMessage = {
+        ...message,
+        content: DOMPurify.sanitize(message.content, {
+          ALLOWED_TAGS: [],
+          KEEP_CONTENT: true,
+        }),
+      };
 
       // If the message belongs to the active conversation, append it
       if (
         activeConversation &&
-        message.conversationId === activeConversation._id
+        sanitizedMessage.conversationId === activeConversation._id
       ) {
         // Prevent duplicates
-        const exists = messages.find((m) => m._id === message._id);
+        const exists = messages.find((m) => m._id === sanitizedMessage._id);
         if (!exists) {
-          set({ messages: [...messages, message] });
+          set({ messages: [...messages, sanitizedMessage] });
         }
       }
 
       // Update the conversation list preview
       const updatedConversations = conversations.map((c) => {
-        if (c._id === message.conversationId) {
+        if (c._id === sanitizedMessage.conversationId) {
           return {
             ...c,
-            lastMessage: message,
+            lastMessage: sanitizedMessage,
             // Increment unread if not active
             unreadCounts:
               activeConversation && c._id === activeConversation._id
@@ -205,12 +254,23 @@ const useChatStore = create((set, get) => ({
     const { activeConversation, socket, messages } = get();
     if (!activeConversation) return;
 
+    // Client-side validation
+    if (!content || !content.trim()) {
+      toast.error("Message cannot be empty");
+      return;
+    }
+
+    if (content.length > 2000) {
+      toast.error("Message is too long (max 2000 characters)");
+      return;
+    }
+
     try {
       const res = await axios.post(
         `${ENDPOINT}/api/v1/messages`,
         {
           conversationId: activeConversation._id,
-          content,
+          content: content.trim(),
           replyTo,
         },
         { withCredentials: true }
@@ -218,15 +278,25 @@ const useChatStore = create((set, get) => ({
 
       const newMessage = res.data.data.message;
 
+      // Sanitize before adding to state
+      const sanitizedMessage = {
+        ...newMessage,
+        content: DOMPurify.sanitize(newMessage.content, {
+          ALLOWED_TAGS: [],
+          KEEP_CONTENT: true,
+        }),
+      };
+
       // Optimistic / Direct update
       // Check if already added by socket (race condition)
       const currentMessages = get().messages;
-      if (!currentMessages.find((m) => m._id === newMessage._id)) {
-        set({ messages: [...currentMessages, newMessage] });
+      if (!currentMessages.find((m) => m._id === sanitizedMessage._id)) {
+        set({ messages: [...currentMessages, sanitizedMessage] });
       }
     } catch (error) {
       console.error(error);
-      toast.error("Failed to send message");
+      const errorMsg = error.response?.data?.message || "Failed to send message";
+      toast.error(errorMsg);
     }
   },
 

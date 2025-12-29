@@ -26,5 +26,7 @@ const conversationSchema = new mongoose.Schema(
 
 // Index for faster queries when fetching user's conversations
 conversationSchema.index({ participants: 1 });
+// CRITICAL: Additional indexes for query performance
+conversationSchema.index({ updatedAt: -1 }); // For sorting by recent activity
 
 module.exports = mongoose.model("Conversation", conversationSchema);

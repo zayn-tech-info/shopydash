@@ -2,9 +2,14 @@ const dotenv = require("dotenv");
 dotenv.config({ path: ".env" });
 const http = require("http");
 const { Server } = require("socket.io");
+const DOMPurify = require('isomorphic-dompurify');
 
 const validateEnv = require("./utils/validateEnv");
 const app = require("./app");
+const socketAuthMiddleware = require('./middleware/socketAuth');
+const Message = require("./models/message.model");
+const Conversation = require("./models/conversation.model");
+const { logError, logInfo } = require("./utils/logger");
 
 // Validate environment variables before starting the server
 validateEnv();
@@ -27,22 +32,163 @@ const io = new Server(server, {
 // Make io accessible to our routers/controllers
 app.set("io", io);
 
+// Socket.IO Authentication Middleware
+io.use(socketAuthMiddleware);
+
+// Rate limiter for socket events
+class SocketRateLimiter {
+  constructor() {
+    this.limits = new Map();
+  }
+
+  check(userId, limit = 30, windowMs = 60000) {
+    const now = Date.now();
+    const userLimit = this.limits.get(userId) || { count: 0, resetTime: now + windowMs };
+
+    if (now > userLimit.resetTime) {
+      userLimit.count = 0;
+      userLimit.resetTime = now + windowMs;
+    }
+
+    if (userLimit.count >= limit) {
+      return false;
+    }
+
+    userLimit.count++;
+    this.limits.set(userId, userLimit);
+    return true;
+  }
+
+  cleanup() {
+    const now = Date.now();
+    for (const [userId, limit] of this.limits.entries()) {
+      if (now > limit.resetTime) {
+        this.limits.delete(userId);
+      }
+    }
+  }
+}
+
+const messageRateLimiter = new SocketRateLimiter();
+
+// Cleanup rate limiter every 5 minutes
+setInterval(() => messageRateLimiter.cleanup(), 5 * 60 * 1000);
+
 io.on("connection", (socket) => {
-  console.log("New client connected", socket.id);
+  logInfo("Socket", `User connected: ${socket.userId}`);
 
   // User joins their own room for notifications
+  socket.join(`user:${socket.userId}`);
+
+  // Join user's own room (backward compatibility)
   socket.on("join_user_room", (userId) => {
-    if (userId) {
+    if (userId && userId === socket.userId) {
       socket.join(userId);
-      console.log(`User ${userId} joined their personal room`);
+      logInfo("Socket", `User ${userId} joined their personal room`);
     }
   });
 
-  // User joins a specific conversation room
-  socket.on("join_chat", (conversationId) => {
-    if (conversationId) {
+  // User joins a specific conversation room with authorization
+  socket.on("join_chat", async (conversationId) => {
+    try {
+      if (!conversationId) return;
+
+      // Verify user is participant
+      const conversation = await Conversation.findById(conversationId);
+      if (!conversation) {
+        socket.emit("error", { message: "Conversation not found" });
+        return;
+      }
+
+      const isParticipant = conversation.participants.some(
+        p => p.toString() === socket.userId
+      );
+
+      if (!isParticipant) {
+        socket.emit("error", { message: "Unauthorized" });
+        return;
+      }
+
       socket.join(conversationId);
-      console.log(`User joined chat room ${conversationId}`);
+      logInfo("Socket", `User ${socket.userId} joined chat room ${conversationId}`);
+    } catch (error) {
+      logError("Socket", `Error joining chat: ${error.message}`);
+      socket.emit("error", { message: "Failed to join chat" });
+    }
+  });
+
+  // Send message with rate limiting and sanitization
+  socket.on("send_message", async (data) => {
+    try {
+      const { conversationId, content } = data;
+      const userId = socket.userId;
+
+      // Rate limiting
+      if (!messageRateLimiter.check(userId, 30, 60000)) {
+        socket.emit("error", { message: "Rate limit exceeded. Please slow down." });
+        return;
+      }
+
+      // Validate inputs
+      if (!conversationId || !content) {
+        socket.emit("error", { message: "Invalid message data" });
+        return;
+      }
+
+      // Verify user is participant
+      const conversation = await Conversation.findById(conversationId);
+      if (!conversation) {
+        socket.emit("error", { message: "Conversation not found" });
+        return;
+      }
+
+      const isParticipant = conversation.participants.some(
+        p => p.toString() === userId
+      );
+
+      if (!isParticipant) {
+        socket.emit("error", { message: "Unauthorized" });
+        return;
+      }
+
+      // Sanitize content
+      const sanitizedContent = DOMPurify.sanitize(content, {
+        ALLOWED_TAGS: [],
+        KEEP_CONTENT: true
+      });
+
+      if (sanitizedContent.length > 2000) {
+        socket.emit("error", { message: "Message too long" });
+        return;
+      }
+
+      if (sanitizedContent.trim().length === 0) {
+        socket.emit("error", { message: "Message cannot be empty" });
+        return;
+      }
+
+      // Create message
+      const message = await Message.create({
+        conversationId,
+        sender: userId,
+        content: sanitizedContent,
+      });
+
+      await message.populate('sender', 'fullName profilePic');
+
+      // Update conversation
+      await Conversation.findByIdAndUpdate(conversationId, {
+        lastMessage: message._id,
+        updatedAt: new Date(),
+      });
+
+      // Emit to conversation room
+      io.to(conversationId).emit("receive_message", message);
+
+      logInfo("Socket", `Message sent in conversation ${conversationId}`);
+    } catch (error) {
+      logError("Socket", `Error sending message: ${error.message}`);
+      socket.emit("error", { message: "Failed to send message" });
     }
   });
 
@@ -55,7 +201,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("Client disconnected");
+    logInfo("Socket", `User disconnected: ${socket.userId}`);
   });
 });
 
