@@ -39,6 +39,8 @@ export default function VendorSidebar({
     ? authUser?.profilePic
     : vendorProfile?.userId?.profilePic;
 
+
+
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -107,6 +109,7 @@ export default function VendorSidebar({
         </div>
         <p className="body-2 text-n-4 text-center font-code">@{username}</p>
 
+
         {isOwner ? (
           <button
             onClick={openEdit}
@@ -137,7 +140,7 @@ export default function VendorSidebar({
                 } else if (result.action === "REDIRECT_WHATSAPP") {
                   const number = result.data.whatsAppNumber;
                   if (number) {
-                    const formattedNumber = number.replace(/\D/g, ""); 
+                    const formattedNumber = number.replace(/\D/g, "");
                     window.open(`https://wa.me/${formattedNumber}`, "_blank");
                   } else {
                     toast.error("Vendor WhatsApp not available");

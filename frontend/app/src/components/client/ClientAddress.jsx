@@ -5,16 +5,9 @@ export function ClientAddress({ clientProfile, authUser, className }) {
         className={`mt-6 bg-white rounded-lg border border-gray-100 p-5 text-sm space-y-4 ${className}`}
       >
         <div>
-          <div className="font-medium text-sm">Address</div>
-          <div className="mt-1 text-primary-4 text-base">
-            {clientProfile?.address || "-"}
-          </div>
-        </div>
-
-        <div>
           <div className="font-medium text-sm">School Area</div>
           <div className="mt-1 text-primary-4 text-base">
-            {clientProfile?.area || clientProfile?.city || "-"}
+            {clientProfile?.userId?.schoolArea || "-"}
           </div>
         </div>
 

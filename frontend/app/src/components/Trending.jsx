@@ -36,7 +36,7 @@ export function Trending({ limit = 10, title = "Trending Now" }) {
         </div>
       </header>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 md:gap-6">
         {items.map((item) => (
           <div key={item._id} className="h-full">
             <VendorProductItem product={item} vendorId={item.vendorId} />

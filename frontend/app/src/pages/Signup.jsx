@@ -30,6 +30,10 @@ export function Signup() {
     profilePic,
     bio,
     logo,
+    city,
+    state,
+    country,
+    schoolArea,
     setRole,
     toggleShowPassword,
     setField,
@@ -57,12 +61,21 @@ export function Signup() {
       whatsAppNumber: whatsAppNumber?.trim() ?? "",
       schoolEmail: schoolEmail?.trim() ?? "",
       schoolId: schoolId?.trim() ?? "",
+      city: city?.trim() ?? "",
+      state: state?.trim() ?? "",
+      country: country?.trim() ?? "",
+      schoolArea: schoolArea?.trim() ?? "",
     };
 
     if (!trimmed.fullName) return toast.error("Full name is required"), false;
     if (!trimmed.email) return toast.error("Email is required"), false;
     if (!trimmed.password) return toast.error("Password is required"), false;
     if (!trimmed.username) return toast.error("Username is required"), false;
+    if (!trimmed.city) return toast.error("City is required"), false;
+    if (!trimmed.state) return toast.error("State is required"), false;
+    if (!trimmed.country) return toast.error("Country is required"), false;
+    if (!trimmed.schoolArea)
+      return toast.error("School Area is required"), false;
     if (!trimmed.whatsAppNumber)
       return toast.error("WhatsApp number is required"), false;
 
@@ -94,6 +107,10 @@ export function Signup() {
       profilePic: profilePic || undefined,
       bio: bio || undefined,
       logo: logo || undefined,
+      city,
+      state,
+      country,
+      schoolArea,
     };
 
     const ok = validateForm();
@@ -207,6 +224,10 @@ export function Signup() {
                 toggleShowPassword={toggleShowPassword}
                 isSigningUp={isSigningUp}
                 error={error}
+                city={city}
+                state={state}
+                country={country}
+                schoolArea={schoolArea}
               />
             </div>
           )}

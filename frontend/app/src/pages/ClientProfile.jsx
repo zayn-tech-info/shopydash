@@ -96,9 +96,9 @@ export function ClientProfile() {
                     <span className="w-1 h-1 rounded-full bg-n-3"></span>
                     <span>
                       {[
-                        clientProfile?.city,
-                        clientProfile?.state,
-                        clientProfile?.country,
+                        clientProfile?.userId?.city,
+                        clientProfile?.userId?.state,
+                        clientProfile?.userId?.country,
                       ]
                         .filter(Boolean)
                         .join(", ")}

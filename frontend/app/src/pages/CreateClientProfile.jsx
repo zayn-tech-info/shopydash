@@ -6,7 +6,6 @@ import { useAuthStore } from "../store/authStore";
 import { InputField } from "../components/InputField";
 import { schools, preferredCategories } from "../constants";
 import { ChevronDown, Check } from "lucide-react";
-import LocationSelector from "../components/LocationSelector";
 
 export default function CreateClientProfile() {
   const navigate = useNavigate();
@@ -81,50 +80,72 @@ export default function CreateClientProfile() {
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="col-span-1 md:col-span-2">
+                <label className="block text-sm font-medium text-n-6 mb-3 uppercase tracking-wide">
+                  What items are you interested in buying?
+                </label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {preferredCategories.map((category) => (
+                    <label
+                      key={category}
+                      className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
+                        (clientProfileData.preferredCategory || []).includes(
+                          category
+                        )
+                          ? "border-primary-3 bg-primary-3/5"
+                          : "border-n-3 hover:border-n-4 bg-white"
+                      }`}
+                    >
+                      <div className="relative flex items-center justify-center">
+                        <input
+                          type="checkbox"
+                          className="peer sr-only"
+                          checked={(
+                            clientProfileData.preferredCategory || []
+                          ).includes(category)}
+                          onChange={(e) => {
+                            const current =
+                              clientProfileData.preferredCategory || [];
+                            const newValue = e.target.checked
+                              ? [...current, category]
+                              : current.filter((c) => c !== category);
+                            setInputField("preferredCategory", newValue);
+                          }}
+                        />
+                        <div className="w-5 h-5 border-2 border-n-4 rounded-md peer-checked:bg-primary-3 peer-checked:border-primary-3 transition-colors"></div>
+                        <Check className="w-3.5 h-3.5 text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 transition-opacity" />
+                      </div>
+                      <span className="text-sm font-medium text-n-7">
+                        {category}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
-                  Preferred Category
+                  Gender
                 </label>
                 <CustomDropdown
-                  options={preferredCategories}
-                  value={clientProfileData.preferredCategory}
-                  onChange={(value) =>
-                    setInputField("preferredCategory", value)
-                  }
-                  placeholder="Select a category"
+                  options={["Male", "Female", "Other", "Prefer not to say"]}
+                  value={clientProfileData.gender}
+                  onChange={(value) => setInputField("gender", value)}
+                  placeholder="Select gender"
                 />
               </div>
-            </div>
-          </section>
 
-          <section className="space-y-6">
-            <h2 className="text-xl font-bold text-n-8 border-b border-n-3 pb-2">
-              Location
-            </h2>
-            <InputField
-              label="Address"
-              value={clientProfileData.address}
-              onChange={handleInputChange("address")}
-              placeholder="Street address"
-            />
-
-            <LocationSelector
-              selectedState={clientProfileData.state}
-              setSelectedState={(val) => setInputField("state", val)}
-              selectedArea={clientProfileData.area}
-              setSelectedArea={(val) => {
-                setInputField("area", val);
-                setInputField("city", val);
-              }}
-              schoolName={authUser?.schoolName}
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <InputField
-                placeholder="Country"
-                value={clientProfileData.country}
-                onChange={handleInputChange("country")}
-              />
+              <div className="col-span-1 md:col-span-2">
+                <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
+                  Bio
+                </label>
+                <textarea
+                  value={clientProfileData.bio || ""}
+                  onChange={handleInputChange("bio")}
+                  className="w-full min-h-[100px] px-4 py-3 bg-white border border-n-3 rounded-xl text-n-8 placeholder:text-n-4 focus:outline-none focus:border-primary-3 focus:ring-2 focus:ring-primary-3/20 transition-all duration-200 resize-y"
+                  placeholder="Tell us a little about yourself..."
+                />
+              </div>
             </div>
           </section>
 

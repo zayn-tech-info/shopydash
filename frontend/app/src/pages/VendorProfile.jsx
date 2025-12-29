@@ -3,7 +3,7 @@ import { toast } from "react-hot-toast";
 import Logo from "../assets/images/vendora_logo.png";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { LogOut, Plus } from "lucide-react";
+import { LogOut, Plus, MapPin } from "lucide-react";
 import { useVendorProfileStore } from "../store/vendorProfileStore";
 import { useAuthStore } from "../store/authStore";
 import { EditVendorProfile } from "../components/vendor/EditVendorProfile";
@@ -36,6 +36,14 @@ export default function VendorProfile() {
   const displayProfileImage = isOwner
     ? authUser?.profilePic || vendorProfile?.userId?.profilePic || Logo
     : vendorProfile?.userId?.profilePic || Logo;
+
+  const vendorLocation = [
+    vendorProfile?.userId?.city,
+    vendorProfile?.userId?.state,
+    vendorProfile?.userId?.country,
+  ]
+    .filter(Boolean)
+    .join(", ");
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -112,8 +120,16 @@ export default function VendorProfile() {
               </div>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-white/90 body-2">
                 <span className="font-code uppercase tracking-wider text-sm font-bold bg-white/20 md:backdrop-blur-md px-3 py-1 rounded-lg border border-white/10">
-                  {vendorProfile?.businessCategory}
+                  {Array.isArray(vendorProfile?.businessCategory)
+                    ? vendorProfile?.businessCategory.join(", ")
+                    : vendorProfile?.businessCategory}
                 </span>
+                {vendorLocation && (
+                  <span className="flex items-center gap-1.5 font-bold text-sm bg-n-8/40 backdrop-blur-md px-3 py-1 rounded-lg border border-white/10 text-white">
+                    <MapPin size={14} className="text-white" />
+                    {vendorLocation}
+                  </span>
+                )}
               </div>
             </div>
           </div>

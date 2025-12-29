@@ -31,8 +31,9 @@ const initialProfileData = {
 
   area: "",
   country: "",
-  preferredCategory: "",
+  preferredCategory: [],
   wishList: [],
+  bio: "",
 };
 
 export const useClientProfileStore = create((set, get) => ({
