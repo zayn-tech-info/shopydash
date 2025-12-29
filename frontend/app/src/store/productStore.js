@@ -34,7 +34,7 @@ export const useProductStore = create((set, get) => ({
     } catch (error) {
       set({ isFetchingFeedPosts: false });
       console.error(error);
-      // toast.error(error.response?.data?.message || "Failed to fetch feed");
+      
     }
   },
 
@@ -64,7 +64,7 @@ export const useProductStore = create((set, get) => ({
       });
 
       set({ isUploading: false });
-      return res.data.data; // Returns array of image URLs
+      return res.data.data; 
     } catch (error) {
       set({ isUploading: false });
       toast.error(error.response?.data?.message || "Failed to upload images");

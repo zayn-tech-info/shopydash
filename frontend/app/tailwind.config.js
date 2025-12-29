@@ -1,4 +1,4 @@
-/** @type {import('tailwindcss').Config} */
+
 import { fontFamily } from "tailwindcss/defaultTheme";
 import plugin from "tailwindcss/plugin";
 
@@ -8,11 +8,11 @@ export default {
     extend: {
       colors: {
         primary: {
-          1: "#FFA8B8", // Lightest
-          2: "#FF8050", // Light
-          3: "#F7561B", // Main
-          4: "#C53500", // Dark
-          5: "#8F2700", // Darkest
+          1: "#FFA8B8", 
+          2: "#FF8050", 
+          3: "#F7561B", 
+          4: "#C53500", 
+          5: "#8F2700", 
         },
         stroke: {
           1: "#26242C",

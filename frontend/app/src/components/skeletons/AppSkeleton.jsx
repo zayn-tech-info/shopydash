@@ -4,7 +4,7 @@ import { Skeleton } from "@mui/material";
 export function AppSkeleton() {
   return (
     <div>
-      {/* Header Skeleton */}
+      {}
       <div className="h-16 border-b border-n-3/10 flex items-center px-4 md:px-8 justify-between bg-white/80 backdrop-blur-md sticky top-0 z-50">
         <div className="flex items-center gap-2">
           <Skeleton variant="circular" width={32} height={32} />

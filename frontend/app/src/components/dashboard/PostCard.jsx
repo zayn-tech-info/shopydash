@@ -35,7 +35,7 @@ const ProductItem = memo(({ product }) => (
           {product.stock > 0 ? "In Stock" : "Sold Out"}
         </span>
       </div>
-      {/* Subtle overlay on hover */}
+      {}
       <div className="absolute inset-0 bg-black/5 opacity-0 md:group-hover/item:opacity-100 transition-opacity duration-300" />
     </div>
 
@@ -72,7 +72,7 @@ function PostCardComponent({ post, onDelete }) {
 
   return (
     <div className="group bg-white rounded-3xl p-5 sm:p-6 shadow-sm hover:shadow-xl border border-gray-100 transition-all duration-300">
-      {/* Header */}
+      {}
       <div className="flex justify-between items-start mb-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-wider">
@@ -87,7 +87,7 @@ function PostCardComponent({ post, onDelete }) {
           )}
         </div>
 
-        {/* Actions - Visible on Hover */}
+        {}
         <div className="flex items-center gap-2 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">
           <button
             onClick={() => navigate("/vendor/add", { state: { post } })}
@@ -106,14 +106,14 @@ function PostCardComponent({ post, onDelete }) {
         </div>
       </div>
 
-      {/* Caption */}
+      {}
       {post.caption && (
         <p className="text-gray-600 mb-6 text-sm sm:text-base leading-relaxed font-light">
           {post.caption}
         </p>
       )}
 
-      {/* Products Display */}
+      {}
       <div className="relative group/swiper -mx-2 px-2">
         <Swiper
           modules={[Pagination, Navigation]}
@@ -138,7 +138,7 @@ function PostCardComponent({ post, onDelete }) {
           ))}
         </Swiper>
 
-        {/* Navigation Buttons */}
+        {}
         <button
           className={`swiper-button-prev-${post._id} absolute left-2 top-[40%] -translate-y-1/2 z-20 w-10 h-10 bg-primary-3 text-n-1 border border-gray-100 rounded-full shadow-lg flex items-center justify-center hover:bg-primary-2 hover:text-white hover:border-primary-4 transition-all duration-300 [&.swiper-button-disabled]:opacity-0 [&.swiper-button-disabled]:cursor-not-allowed [&.swiper-button-lock]:hidden`}
           aria-label="Previous slide"

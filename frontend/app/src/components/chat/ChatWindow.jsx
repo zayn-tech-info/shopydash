@@ -41,7 +41,7 @@ const ChatWindow = ({ onBack }) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
     
-    // Client-side validation
+    
     if (newMessage.length > 2000) {
       toast.error('Message is too long (max 2000 characters)');
       return;
@@ -53,7 +53,7 @@ const ChatWindow = ({ onBack }) => {
 
   return (
     <div className="flex flex-col w-full h-full bg-[#efeae2]">
-      {/* Header */}
+      {}
       <div className="px-4 py-3 bg-[#f0f2f5] border-b border-gray-300 flex items-center justify-between">
         <div className="flex items-center">
           <button onClick={onBack} className="md:hidden mr-2 text-gray-600">
@@ -72,7 +72,7 @@ const ChatWindow = ({ onBack }) => {
             <h3 className="font-semibold text-gray-800">
               {otherUser.businessName || otherUser.fullName}
             </h3>
-            {/* <span className="text-xs text-gray-500">Online</span> */}
+            {}
           </div>
         </div>
 
@@ -81,12 +81,12 @@ const ChatWindow = ({ onBack }) => {
         </div>
       </div>
 
-      {/* Messages Area */}
+      {}
       <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-repeat">
-        {/* Background pattern is a classic WhatsApp doodle pattern hosted on GitHub */}
+        {}
 
         {messages.map((msg, idx) => {
-          const isMe = msg.sender._id === user._id || msg.sender === user._id; // Handle populated vs unpopulated
+          const isMe = msg.sender._id === user._id || msg.sender === user._id; 
 
           const currentDate = new Date(msg.createdAt);
           const previousMessage = messages[idx - 1];
@@ -147,7 +147,7 @@ const ChatWindow = ({ onBack }) => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Area */}
+      {}
       <div className="p-3 bg-[#f0f2f5] flex items-center space-x-2">
         <form onSubmit={handleSend} className="flex-1 flex items-center">
           <input

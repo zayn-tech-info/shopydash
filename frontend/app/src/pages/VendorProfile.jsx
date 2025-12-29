@@ -135,13 +135,13 @@ export default function VendorProfile() {
             </div>
           </div>
 
-          {/* Main Content */}
+          {}
           <div className="lg:col-span-8 xl:col-span-9 space-y-8">
             <div className="bg-white rounded-2xl p-8 border border-n-3/20 shadow-sm min-h-[400px]">
               <AboutAndProducts vendor={vendorProfile} />
             </div>
 
-            {/* Contact Info Section */}
+            {}
             <div className="bg-white rounded-2xl p-8 border border-n-3/20 shadow-sm">
               <VendorAddress
                 vendorProfile={vendorProfile}

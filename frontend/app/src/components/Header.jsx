@@ -20,8 +20,8 @@ export function Header() {
   }, [authUser, fetchConversations]);
 
   const unreadMessageCount = conversations.reduce((acc, conv) => {
-    // Check various possible locations for the count depending on backend serialization
-    // It is usually in unreadCounts[userId]
+    
+    
     const count = conv.unreadCounts?.[authUser?._id] || 0;
     return acc + count;
   }, 0);
@@ -109,26 +109,7 @@ export function Header() {
                 </li>
               );
             })}
-            {/*             <li>
-              <NavLink
-                to={
-                  authUser && authUser.role === "vendor"
-                    ? "/vendor/profile"
-                    : "/profile"
-                }
-                className={({ isActive }) =>
-                  `flex items-center gap-2 transition-colors ${
-                    isActive
-                      ? "text-primary-3 font-medium"
-                      : "text-n-6 hover:text-primary-3"
-                  }`
-                }
-                end
-              >
-                {<User size={16} />}
-                Profile
-              </NavLink>
-            </li> */}
+            {}
           </ul>
 
           <Link to="/cart" className="relative group mr-5">

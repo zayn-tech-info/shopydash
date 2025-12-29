@@ -39,7 +39,7 @@ export const ProductItem = ({
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-all hover:shadow-md">
-      {/* Header */}
+      {}
       <div className="bg-gray-50/50 px-6 py-4 border-b border-gray-100 flex justify-between items-center">
         <div className="flex items-center gap-3">
           <span className="flex items-center justify-center w-8 h-8 rounded-full bg-orange-100 text-orange-600 font-bold text-sm">
@@ -61,7 +61,7 @@ export const ProductItem = ({
 
       <div className="p-6">
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Left Column: Image Upload */}
+          {}
           <div className="w-full lg:w-1/3 flex-shrink-0">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Product Image
@@ -109,7 +109,7 @@ export const ProductItem = ({
             </div>
           </div>
 
-          {/* Right Column: Form Fields */}
+          {}
           <div className="flex-1 space-y-5">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">

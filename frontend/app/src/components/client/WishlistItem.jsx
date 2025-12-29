@@ -1,6 +1,6 @@
 
 export default function WishlistItem({ item }) {
-  // item may be either populated product object or just an id
+  
   const title = item?.title || item?.name || `Item: ${item?._id || item}`;
   const price = item?.price ? `₦${item.price}` : null;
   const img =

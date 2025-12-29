@@ -17,9 +17,7 @@ const hasPremiumMessaging = (vendorUser) => {
   return plan?.features?.messaging || false;
 };
 
-/**
- * Helper: Verify user has access to conversation
- */
+
 const verifyConversationAccess = async (conversationId, userId) => {
   const conversation = await Conversation.findById(conversationId);
   
@@ -27,7 +25,7 @@ const verifyConversationAccess = async (conversationId, userId) => {
     throw new customError("Conversation not found", 404);
   }
   
-  // Check if user is a participant
+  
   const isParticipant = conversation.participants.some(
     p => p.toString() === userId.toString()
   );
@@ -115,21 +113,21 @@ exports.sendMessage = asyncErrorHandler(async (req, res, next) => {
   const { conversationId, content, replyTo } = req.body;
   const senderId = req.user.id;
 
-  // Validate inputs
+  
   if (!conversationId || !content) {
     return next(new customError("Conversation ID and content are required", 400));
   }
 
-  // Verify user has access to conversation
+  
   const conversation = await verifyConversationAccess(conversationId, senderId);
 
-  // Sanitize message content to prevent XSS
+  
   const sanitizedContent = DOMPurify.sanitize(content, {
-    ALLOWED_TAGS: [], // Strip all HTML tags
-    KEEP_CONTENT: true // Keep the text content
+    ALLOWED_TAGS: [], 
+    KEEP_CONTENT: true 
   });
 
-  // Validate message length
+  
   if (sanitizedContent.length > 2000) {
     return next(new customError("Message too long (max 2000 characters)", 400));
   }
@@ -138,7 +136,7 @@ exports.sendMessage = asyncErrorHandler(async (req, res, next) => {
     return next(new customError("Message cannot be empty", 400));
   }
 
-  // Create message
+  
   const message = await Message.create({
     conversationId,
     sender: senderId,
@@ -146,9 +144,9 @@ exports.sendMessage = asyncErrorHandler(async (req, res, next) => {
     replyTo: replyTo || null,
   });
 
-  // Update conversation
+  
   conversation.lastMessage = message._id;
-  // Increment unread count for the OTHER participant(s)
+  
   conversation.participants.forEach((pId) => {
     if (pId.toString() !== senderId) {
       const currentCount = conversation.unreadCounts.get(pId.toString()) || 0;
@@ -164,13 +162,13 @@ exports.sendMessage = asyncErrorHandler(async (req, res, next) => {
     await message.populate("replyTo");
   }
 
-  // Emit real-time event
+  
   const io = req.app.get("io");
   if (io) {
-    // Emit to the conversation room (for open chat windows)
+    
     io.to(conversationId).emit("receive_message", message);
 
-    // Emit to the recipient's personal room (for notifications/list updates)
+    
     conversation.participants.forEach((pId) => {
       if (pId.toString() !== senderId) {
         io.to(pId.toString()).emit("conversation_updated", {
@@ -193,14 +191,14 @@ exports.sendMessage = asyncErrorHandler(async (req, res, next) => {
 exports.getConversations = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user.id;
 
-  // Only fetch conversations where user is a participant
+  
   const conversations = await Conversation.find({
     participants: userId,
   })
     .populate("participants", "fullName profilePic role businessName")
     .populate("lastMessage")
     .sort({ updatedAt: -1 })
-    .lean(); // Use lean() for better performance on read-only queries
+    .lean(); 
 
   res.status(200).json({
     status: "success",
@@ -215,24 +213,24 @@ exports.getMessages = asyncErrorHandler(async (req, res, next) => {
   const { conversationId } = req.params;
   const userId = req.user.id;
 
-  // Optional: pagination
+  
   const page = req.query.page * 1 || 1;
-  const limit = Math.min(req.query.limit * 1 || 50, 100); // Max 100 messages per page
+  const limit = Math.min(req.query.limit * 1 || 50, 100); 
   const skip = (page - 1) * limit;
 
-  // Verify user has access to conversation
+  
   await verifyConversationAccess(conversationId, userId);
 
   const messages = await Message.find({ conversationId })
     .populate("sender", "fullName profilePic")
     .populate("replyTo")
-    .sort({ createdAt: -1 }) // Newest first for infinite scroll
+    .sort({ createdAt: -1 }) 
     .skip(skip)
     .limit(limit)
-    .lean(); // Use lean() for better performance on read-only queries
+    .lean(); 
 
-  // Mark as read for the current user
-  // We can do this asynchronously
+  
+  
   const conversation = await Conversation.findById(conversationId);
   if (conversation) {
     conversation.unreadCounts.set(userId, 0);
@@ -240,14 +238,14 @@ exports.getMessages = asyncErrorHandler(async (req, res, next) => {
     await conversation.save();
   }
 
-  // Get total count for pagination
+  
   const total = await Message.countDocuments({ conversationId });
 
   res.status(200).json({
     status: "success",
     results: messages.length,
     data: {
-      messages: messages.reverse(), // Send back in chronological order for rendering if needed, or keep reverse for flex-col-reverse
+      messages: messages.reverse(), 
     },
     pagination: {
       page,
@@ -261,14 +259,14 @@ exports.getMessages = asyncErrorHandler(async (req, res, next) => {
 exports.getAvailableVendorsForChat = asyncErrorHandler(async (req, res, next) => {
   const { schoolId, _id: currentUserId } = req.user;
 
-  // Find vendors in the same school who are Pro or Max
+  
   const vendors = await User.find({
     role: "vendor",
     schoolId: schoolId,
     subscriptionPlan: {
       $in: ["Vendora Pro", "Vendora Max"],
     },
-    _id: { $ne: currentUserId }, // Exclude self
+    _id: { $ne: currentUserId }, 
   }).select("fullName businessName profilePic subscriptionPlan schoolName");
 
   res.status(200).json({

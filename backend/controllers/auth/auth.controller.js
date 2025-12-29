@@ -183,10 +183,10 @@ const login = asyncErrorHandler(async (req, res, next) => {
   if (validator.isEmail(trimmed)) {
     query = { email: trimmed };
   } else if (/^\d+$/.test(trimmed)) {
-    // Could be schoolId (numeric string)
+    
     query = { schoolId: trimmed };
   } else {
-    // Treat as username
+    
     query = { username: trimmed };
   }
 

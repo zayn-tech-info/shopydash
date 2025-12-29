@@ -137,7 +137,7 @@ export default function VendorSidebar({
                 } else if (result.action === "REDIRECT_WHATSAPP") {
                   const number = result.data.whatsAppNumber;
                   if (number) {
-                    const formattedNumber = number.replace(/\D/g, ""); // Remove non-digits
+                    const formattedNumber = number.replace(/\D/g, ""); 
                     window.open(`https://wa.me/${formattedNumber}`, "_blank");
                   } else {
                     toast.error("Vendor WhatsApp not available");

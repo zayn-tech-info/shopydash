@@ -24,17 +24,17 @@ export function SearchProducts() {
     });
   };
 
-  // Initial fetch or debounce could be added here
+  
   useEffect(() => {
-    // Optionally fetch all or clear
+    
     return () => {
-      // cleanup if needed
+      
     };
   }, []);
 
   return (
     <div className="min-h-screen bg-n-1 pb-20">
-      {/* Sticky Header */}
+      {}
       <div className="sticky top-[73px] z-40 bg-white/90 backdrop-blur-md border-b border-n-3/10 px-4 py-4 md:px-8">
         <form onSubmit={handleSearch} className="max-w-5xl mx-auto space-y-4">
           <div className="flex gap-2">
@@ -70,7 +70,7 @@ export function SearchProducts() {
             </button>
           </div>
 
-          {/* Collapsible Filters */}
+          {}
           {(showFilters || schoolName || selectedArea) && (
             <div className="pt-2 animate-in slide-in-from-top-2 fade-in duration-200">
               <div className="p-4 bg-white rounded-2xl border border-n-3/10 shadow-sm">
@@ -98,7 +98,7 @@ export function SearchProducts() {
         </form>
       </div>
 
-      {/* Results Grid */}
+      {}
       <main className="container mx-auto max-w-7xl px-4 md:px-8 py-8">
         {isSearching ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">

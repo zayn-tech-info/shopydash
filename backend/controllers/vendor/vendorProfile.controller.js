@@ -76,7 +76,7 @@ const getPublicVendorProfile = asyncErrorHandler(async (req, res, next) => {
     return next(error);
   }
 
-  // Check Subscription for Badges
+  
   const subscription = await Subscription.findOne({
     user: vendorProfile.userId._id,
     status: "active",
@@ -152,7 +152,7 @@ const getAllVendorsProfile = asyncErrorHandler(async (req, res, next) => {
         subscription: { $arrayElemAt: ["$subscription", 0] },
       },
     },
-    // Determine badges
+    
     {
       $addFields: {
         isBoosted: {
@@ -179,7 +179,7 @@ const getAllVendorsProfile = asyncErrorHandler(async (req, res, next) => {
     },
     {
       $project: {
-        subscription: 0, // Hide subscription details, show only badges
+        subscription: 0, 
       },
     },
   ]);

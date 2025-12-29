@@ -11,7 +11,7 @@ const Message = require("./models/message.model");
 const Conversation = require("./models/conversation.model");
 const { logError, logInfo } = require("./utils/logger");
 
-// Validate environment variables before starting the server
+
 validateEnv();
 
 const PORT = process.env.PORT || 8000;
@@ -29,13 +29,13 @@ const io = new Server(server, {
   },
 });
 
-// Make io accessible to our routers/controllers
+
 app.set("io", io);
 
-// Socket.IO Authentication Middleware
+
 io.use(socketAuthMiddleware);
 
-// Rate limiter for socket events
+
 class SocketRateLimiter {
   constructor() {
     this.limits = new Map();
@@ -71,16 +71,16 @@ class SocketRateLimiter {
 
 const messageRateLimiter = new SocketRateLimiter();
 
-// Cleanup rate limiter every 5 minutes
+
 setInterval(() => messageRateLimiter.cleanup(), 5 * 60 * 1000);
 
 io.on("connection", (socket) => {
   logInfo("Socket", `User connected: ${socket.userId}`);
 
-  // User joins their own room for notifications
+  
   socket.join(`user:${socket.userId}`);
 
-  // Join user's own room (backward compatibility)
+  
   socket.on("join_user_room", (userId) => {
     if (userId && userId === socket.userId) {
       socket.join(userId);
@@ -88,12 +88,12 @@ io.on("connection", (socket) => {
     }
   });
 
-  // User joins a specific conversation room with authorization
+  
   socket.on("join_chat", async (conversationId) => {
     try {
       if (!conversationId) return;
 
-      // Verify user is participant
+      
       const conversation = await Conversation.findById(conversationId);
       if (!conversation) {
         socket.emit("error", { message: "Conversation not found" });
@@ -117,25 +117,25 @@ io.on("connection", (socket) => {
     }
   });
 
-  // Send message with rate limiting and sanitization
+  
   socket.on("send_message", async (data) => {
     try {
       const { conversationId, content } = data;
       const userId = socket.userId;
 
-      // Rate limiting
+      
       if (!messageRateLimiter.check(userId, 30, 60000)) {
         socket.emit("error", { message: "Rate limit exceeded. Please slow down." });
         return;
       }
 
-      // Validate inputs
+      
       if (!conversationId || !content) {
         socket.emit("error", { message: "Invalid message data" });
         return;
       }
 
-      // Verify user is participant
+      
       const conversation = await Conversation.findById(conversationId);
       if (!conversation) {
         socket.emit("error", { message: "Conversation not found" });
@@ -151,7 +151,7 @@ io.on("connection", (socket) => {
         return;
       }
 
-      // Sanitize content
+      
       const sanitizedContent = DOMPurify.sanitize(content, {
         ALLOWED_TAGS: [],
         KEEP_CONTENT: true
@@ -167,7 +167,7 @@ io.on("connection", (socket) => {
         return;
       }
 
-      // Create message
+      
       const message = await Message.create({
         conversationId,
         sender: userId,
@@ -176,13 +176,13 @@ io.on("connection", (socket) => {
 
       await message.populate('sender', 'fullName profilePic');
 
-      // Update conversation
+      
       await Conversation.findByIdAndUpdate(conversationId, {
         lastMessage: message._id,
         updatedAt: new Date(),
       });
 
-      // Emit to conversation room
+      
       io.to(conversationId).emit("receive_message", message);
 
       logInfo("Socket", `Message sent in conversation ${conversationId}`);

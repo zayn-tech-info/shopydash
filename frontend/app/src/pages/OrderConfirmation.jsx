@@ -14,7 +14,7 @@ export default function OrderConfirmation() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const reference = searchParams.get("reference") || searchParams.get("trxref");
-  const [status, setStatus] = useState("verifying"); // verifying, success, failed
+  const [status, setStatus] = useState("verifying"); 
   const { clearCart } = useCartStore();
 
   useEffect(() => {

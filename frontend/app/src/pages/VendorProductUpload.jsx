@@ -134,7 +134,7 @@ const VendorProductUpload = () => {
 
       const postData = {
         caption,
-        location: selectedArea, // Simplified location
+        location: selectedArea, 
         school: schoolName,
         area: selectedArea,
         products: processedProducts,

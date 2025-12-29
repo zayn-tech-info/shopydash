@@ -226,7 +226,7 @@ export default function LocationSelector({
                       )}
                     </button>
                   ))}
-                  {/* Allow selecting what the user typed if it's not in suggestions */}
+                  {}
                   {selectedArea && !areaSuggestions.includes(selectedArea) && (
                     <button
                       type="button"

@@ -6,28 +6,28 @@ export function ClientProfileSkeleton() {
     <main className="py-12 bg-n-1 min-h-[80vh]">
       <div className="container">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Left Sidebar - Profile Info Skeleton */}
+          {}
           <div className="lg:col-span-4 xl:col-span-3">
             <div className="sticky top-24 space-y-6">
               <aside className="bg-white rounded-2xl p-6 border border-n-3/20 shadow-sm w-full">
                 <div className="flex flex-col items-center">
-                  {/* Avatar */}
+                  {}
                   <Skeleton
                     variant="circular"
                     width={128}
                     height={128}
                     className="mb-4"
                   />
-                  {/* Name */}
+                  {}
                   <Skeleton
                     variant="text"
                     width="60%"
                     height={32}
                     className="mb-1"
                   />
-                  {/* Username */}
+                  {}
                   <Skeleton variant="text" width="40%" height={24} />
-                  {/* Button */}
+                  {}
                   <Skeleton
                     variant="rectangular"
                     width="100%"
@@ -54,7 +54,7 @@ export function ClientProfileSkeleton() {
           </div>
 
           <div className="lg:col-span-8 xl:col-span-9 space-y-8">
-            {/* Header Info */}
+            {}
             <div className="bg-white rounded-2xl p-8 border border-n-3/20 shadow-sm">
               <Skeleton
                 variant="text"
@@ -69,7 +69,7 @@ export function ClientProfileSkeleton() {
               </div>
             </div>
 
-            {/* Content Section */}
+            {}
             <div className="bg-white rounded-2xl p-8 border border-n-3/20 shadow-sm min-h-[400px]">
               <Skeleton
                 variant="text"
@@ -85,7 +85,7 @@ export function ClientProfileSkeleton() {
               />
             </div>
 
-            {/* Contact Info Section */}
+            {}
             <div className="bg-white rounded-2xl p-8 border border-n-3/20 shadow-sm">
               <Skeleton
                 variant="text"

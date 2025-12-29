@@ -14,7 +14,7 @@ export function Home() {
 
   useEffect(() => {
     getFeedPosts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, []);
 
   return (

@@ -283,7 +283,7 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
     });
   }
 
-  // Stage 4: Lookup Subscription for Global Priority sorting
+  
   pipeline.push({
     $lookup: {
       from: "subscriptions",
@@ -332,14 +332,14 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
     },
   });
 
-  // Stage 5: Sort by Priority then Creation Date
+  
   pipeline.push({ $sort: { priorityScore: -1, createdAt: -1 } });
 
-  // Stage 6: Pagination (Skip and Limit)
+  
   pipeline.push({ $skip: skip });
   pipeline.push({ $limit: pageLimit });
 
-  // Stage 7: Lookup Vendor Details
+  
   pipeline.push({
     $lookup: {
       from: "users",
@@ -349,7 +349,7 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
     },
   });
 
-  // Stage 8: Unwind Vendor array
+  
   pipeline.push({
     $unwind: {
       path: "$vendor",
@@ -357,7 +357,7 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
     },
   });
 
-  // Stage 9: Project the final structure
+  
   pipeline.push({
     $project: {
       _id: "$products._id",

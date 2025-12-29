@@ -5,7 +5,7 @@ export function VendorProfileSkeleton() {
   return (
     <main className="py-8 bg-n-1 min-h-[80vh]">
       <div className="container">
-        {/* Cover Image Skeleton */}
+        {}
         <div className="relative bg-n-2/10 rounded-3xl overflow-hidden mb-8 border border-n-3/20 shadow-sm">
           <Skeleton
             variant="rectangular"
@@ -16,7 +16,7 @@ export function VendorProfileSkeleton() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Sidebar Skeleton */}
+          {}
           <div className="lg:col-span-4 xl:col-span-3">
             <div className="sticky top-24 space-y-6">
               <div className="bg-white rounded-2xl p-6 border border-n-3/20 shadow-sm w-full">
@@ -45,7 +45,7 @@ export function VendorProfileSkeleton() {
             </div>
           </div>
 
-          {/* Main Content Skeleton */}
+          {}
           <div className="lg:col-span-8 xl:col-span-9 space-y-8">
             <div className="bg-white rounded-2xl p-8 border border-n-3/20 shadow-sm min-h-[400px]">
               <Skeleton
@@ -62,7 +62,7 @@ export function VendorProfileSkeleton() {
               />
             </div>
 
-            {/* Contact Info Section */}
+            {}
             <div className="bg-white rounded-2xl p-8 border border-n-3/20 shadow-sm">
               <Skeleton
                 variant="text"

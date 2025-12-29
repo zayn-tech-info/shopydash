@@ -185,7 +185,7 @@ export function NearByVendors({ posts, showHeader = true }) {
               </div>
             )}
 
-            {/* Product grid section */}
+            {}
             <div className="p-6 bg-n-1 relative group/swiper">
               <Swiper
                 modules={[Navigation]}
@@ -212,7 +212,7 @@ export function NearByVendors({ posts, showHeader = true }) {
                     className="h-auto"
                   >
                     <div className="group relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 h-full overflow-hidden flex flex-col border border-gray-100/50">
-                      {/* Image Container */}
+                      {}
                       <div className="relative aspect-[4/5] bg-gray-100 overflow-hidden">
                         <img
                           src={p.image}
@@ -221,10 +221,10 @@ export function NearByVendors({ posts, showHeader = true }) {
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />
 
-                        {/* Badges Overlay */}
+                        {}
                         <div className="absolute inset-0 p-3 flex flex-col justify-between pointer-events-none">
                           <div className="flex justify-between items-start">
-                            {/* Condition */}
+                            {}
                             {p.condition ? (
                               <span
                                 className={`shadow-sm text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${getConditionColors(
@@ -252,9 +252,9 @@ export function NearByVendors({ posts, showHeader = true }) {
                         </div>
                       </div>
 
-                      {/* Content */}
+                      {}
                       <div className="p-4 flex flex-col gap-2 flex-grow">
-                        {/* Title */}
+                        {}
                         <h4
                           className="font-medium text-base text-gray-900 line-clamp-1"
                           title={p.name}
@@ -262,14 +262,14 @@ export function NearByVendors({ posts, showHeader = true }) {
                           {p.name}
                         </h4>
 
-                        {/* Description */}
+                        {}
                         {p.description && (
                           <p className="text-[10px] leading-relaxed text-gray-500 md:text-xs md:max-h-[1.3rem] md:overflow-hidden md:group-hover:max-h-40 transition-[max-height] duration-[1500ms] ease-in-out">
                             {p.description}
                           </p>
                         )}
 
-                        {/* Price and Action Row */}
+                        {}
                         <div className="mt-auto flex items-center justify-between gap-2">
                           <p className="font-code text-lg font-bold text-gray-900">
                             <span className="text-primary-3">₦</span>
@@ -293,7 +293,7 @@ export function NearByVendors({ posts, showHeader = true }) {
                 ))}
               </Swiper>
 
-              {/* Custom Navigation Buttons */}
+              {}
               <button
                 className={`swiper-button-prev-${
                   post.id ?? postIndex

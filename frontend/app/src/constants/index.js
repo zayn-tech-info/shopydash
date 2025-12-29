@@ -130,7 +130,7 @@ export const VendorsPost = [
         id: "p-1",
         name: "Handmade Tote Bag",
         image:
-          // "https://images.unsplash.com/photo-1547949003-9792a18a2601?q=80&w=800&auto=format&fit=crop",
+          
           aongaHighStreetPrintRetroImg,
         price: 22.5,
         rating: 4.7,
@@ -139,7 +139,7 @@ export const VendorsPost = [
         id: "p-1b",
         name: "Beaded Bracelet",
         image:
-          // "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=800&auto=format&fit=crop",
+          
           armorCardSlotIphoneCaseImg,
         price: 7.5,
         rating: 4.4,
@@ -148,7 +148,7 @@ export const VendorsPost = [
         id: "p-1c",
         name: "Macrame Keychain",
         image:
-          // "https://images.unsplash.com/photo-1601597111158-2fceff292cdc?q=80&w=800&auto=format&fit=crop",
+          
           appleCollectionImg,
         price: 4.0,
         rating: 4.2,
@@ -157,7 +157,7 @@ export const VendorsPost = [
         id: "p-1d",
         name: "Woven Pouch",
         image:
-          // "https://images.unsplash.com/photo-1610436070184-217dc72f66f6?q=80&w=800&auto=format&fit=crop",
+          
           beanBagsBigWImg,
         price: 9.0,
         rating: 4.5,
@@ -176,7 +176,7 @@ export const VendorsPost = [
         id: "p-2",
         name: "Strawberries",
         image:
-          // "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?q=80&w=800&auto=format&fit=crop",
+          
           betterHomesGardensBazaarImg,
         price: 5.0,
         rating: 4.5,
@@ -185,7 +185,7 @@ export const VendorsPost = [
         id: "p-2b",
         name: "Spinach",
         image:
-          // "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=800&auto=format&fit=crop",
+          
           caseCompatibleSamsungGalaxyImg,
         price: 3.2,
         rating: 4.3,
@@ -194,7 +194,7 @@ export const VendorsPost = [
         id: "p-2c",
         name: "Tomatoes",
         image:
-          // "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?q=80&w=800&auto=format&fit=crop",
+          
           cottonHeadNeckArabScarfImg,
         price: 4.1,
         rating: 4.6,
@@ -203,7 +203,7 @@ export const VendorsPost = [
         id: "p-2b",
         name: "Spinach",
         image:
-          // "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=800&auto=format&fit=crop",
+          
           caseCompatibleSamsungGalaxyImg,
         price: 3.2,
         rating: 4.3,
@@ -212,7 +212,7 @@ export const VendorsPost = [
         id: "p-2c",
         name: "Tomatoes",
         image:
-          // "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?q=80&w=800&auto=format&fit=crop",
+          
           cottonHeadNeckArabScarfImg,
         price: 4.1,
         rating: 4.6,

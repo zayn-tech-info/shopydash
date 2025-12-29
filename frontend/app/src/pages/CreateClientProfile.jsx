@@ -58,7 +58,7 @@ export default function CreateClientProfile() {
 
   return (
     <main className="min-h-screen py-12 bg-n-1 relative overflow-hidden">
-      {/* Background decoration */}
+      {}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute -top-[20%] -right-[10%] w-[70%] h-[70%] rounded-full bg-primary-3/5 blur-[120px]" />
         <div className="absolute top-[40%] -left-[10%] w-[60%] h-[60%] rounded-full bg-primary-2/5 blur-[100px]" />

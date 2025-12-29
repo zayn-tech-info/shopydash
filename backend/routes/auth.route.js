@@ -14,14 +14,14 @@ const createRateLimiter = require("../middleware/rateLimiter.middleware");
 
 const route = express.Router();
 
-// Rate limit auth endpoints to prevent brute force attacks
+
 const authLimiter = createRateLimiter(
   10,
   15 * 60 * 1000,
   "Too many authentication attempts, please try again later"
 );
 
-// General rate limiter for other routes
+
 const generalLimiter = createRateLimiter(
   100,
   15 * 60 * 1000,

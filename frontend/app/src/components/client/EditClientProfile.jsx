@@ -89,7 +89,7 @@ export function EditClientProfile({ clientProfileData, onClose }) {
                   className="w-full px-4 py-3 bg-n-2 border border-n-3 rounded-xl text-n-5 cursor-not-allowed"
                 />
               </div>
-              {/* WhatsApp might not be in User model for clients, checking... */}
+              {}
             </div>
             <InputField
               label="Address"

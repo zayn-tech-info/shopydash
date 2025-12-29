@@ -51,23 +51,23 @@ export default function VendorBankSettings() {
 
   const fetchVendorProfile = async () => {
     try {
-      // We need to get the vendor profile to check if bank details exist
-      // Assuming a generic endpoint or parsing from user if available.
-      // For now, let's try to get me and see if vendor details are attached or fetch specific
-      const res = await api.get(`/api/v1/vendorProfile/${authUser._id}`); // Adjust route if needed
-      // Actually usually /vendorProfile/me or similar.
-      // If no direct route, we might rely on what we have.
-      // Let's assume the user doesn't have it yet if they are here, OR just show empty forms.
-      // Better: Check if `createSubaccount` returns existing? No.
+      
+      
+      
+      const res = await api.get(`/api/v1/vendorProfile/${authUser._id}`); 
+      
+      
+      
+      
 
-      // Let's rely on user inputs for now or if backend sends it.
+      
 
-      // OPTIONAL: Pre-fill if we can fetch it.
+      
       if (authUser && authUser.vendorProfile) {
-        // If nested...
+        
       }
     } catch (error) {
-      // ignore
+      
     }
   };
 
@@ -111,14 +111,14 @@ export default function VendorBankSettings() {
 
     setSaving(true);
     try {
-      // createSubaccount expects: business_name, settlement_bank, account_number, percentage_charge
+      
       const selectedBank = banks.find((b) => b.code === formData.bankCode);
 
       const payload = {
-        business_name: formData.accountName, // Or store name? Usually account name for matching
+        business_name: formData.accountName, 
         settlement_bank: formData.bankCode,
         account_number: formData.accountNumber,
-        percentage_charge: 5, // Default
+        percentage_charge: 5, 
       };
 
       const res = await api.post("/api/v1/payment/subaccount", payload);
@@ -164,7 +164,7 @@ export default function VendorBankSettings() {
           </div>
 
           <form onSubmit={handleSubmit} className="p-6 sm:p-10 space-y-8">
-            {/* Bank Selection */}
+            {}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Select Bank
@@ -200,7 +200,7 @@ export default function VendorBankSettings() {
               </div>
             </div>
 
-            {/* Account Number */}
+            {}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Account Number
@@ -228,7 +228,7 @@ export default function VendorBankSettings() {
               </div>
             </div>
 
-            {/* Verify Button */}
+            {}
             {!isVerified && (
               <div className="flex justify-end">
                 <button
@@ -253,7 +253,7 @@ export default function VendorBankSettings() {
               </div>
             )}
 
-            {/* Account Name Display */}
+            {}
             {isVerified && (
               <div className="rounded-xl bg-green-50 p-4 border border-green-100 flex items-start gap-3 animate-in fade-in slide-in-from-top-4 duration-300">
                 <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
@@ -271,7 +271,7 @@ export default function VendorBankSettings() {
               </div>
             )}
 
-            {/* Submit Button */}
+            {}
             <div className="pt-4">
               <button
                 type="submit"

@@ -25,7 +25,7 @@ const validateEnv = () => {
     process.exit(1);
   }
 
-  // Validate JWT_SECRET_KEY strength
+  
   if (process.env.JWT_SECRET_KEY.length < 32) {
     logWarn(
       "Environment Validation",

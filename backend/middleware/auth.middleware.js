@@ -30,7 +30,7 @@ const protectRoute = asyncErrorHandler(async (req, res, next) => {
     process.env.JWT_SECRET_KEY
   );
 
-  // Don't use lean() here as we need the user methods like isPasswordChanged
+  
   const user = await User.findById(decodeToken.id);
 
   if (!user) {

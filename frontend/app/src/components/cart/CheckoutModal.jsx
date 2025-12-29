@@ -16,7 +16,7 @@ const CheckoutModal = ({
 
   if (!isOpen) return null;
 
-  // Flatten items for API and calculate Grand Total
+  
   const allItems = Object.values(groupedItems).flatMap((g) => g.items);
   const grandTotal = Object.values(groupedItems).reduce(
     (acc, g) => acc + g.total,

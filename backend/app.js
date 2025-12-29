@@ -38,17 +38,17 @@ app.use(
   })
 );
 
-// Add security headers
+
 app.use(securityHeaders);
 
 app.use(cookieParser());
 
 app.use(express.json());
 
-// CSRF protection for state-changing requests
+
 app.use(csrfProtection);
 
-// Sanitize all inputs to prevent NoSQL injection
+
 app.use(sanitizeInputs);
 
 app.use("/api/v1/auth", authRouter);

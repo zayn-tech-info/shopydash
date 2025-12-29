@@ -26,13 +26,13 @@ export function HomeContent({
   const [isSearchActive, setIsSearchActive] = useState(false);
   const dropdownRef = useRef(null);
 
-  // School Selection State
+  
   const [selectedSchool, setSelectedSchool] = useState("");
   const [schools, setSchools] = useState([]);
   const [loadingSchools, setLoadingSchools] = useState(false);
   const [showSchoolDropdown, setShowSchoolDropdown] = useState(false);
 
-  // Location/Area Selection State
+  
   const [selectedLocation, setSelectedLocation] = useState("");
   const [areaSuggestions, setAreaSuggestions] = useState([]);
   const [loadingAreas, setLoadingAreas] = useState(false);
@@ -40,7 +40,7 @@ export function HomeContent({
   const locationDropdownRef = useRef(null);
   const schoolDropdownRef = useRef(null);
 
-  // Fetch Schools
+  
   useEffect(() => {
     const fetchSchools = async () => {
       try {
@@ -59,7 +59,7 @@ export function HomeContent({
     fetchSchools();
   }, []);
 
-  // Fetch Areas
+  
   useEffect(() => {
     const fetchAreas = async () => {
       if (!selectedSchool) {
@@ -89,7 +89,7 @@ export function HomeContent({
     return () => clearTimeout(delayDebounceFn);
   }, [selectedLocation, selectedSchool]);
 
-  // Handle Click Outside
+  
   useEffect(() => {
     function handleClickOutside(event) {
       if (
@@ -114,7 +114,7 @@ export function HomeContent({
     if (onSubmit) {
       onSubmit(value);
     } else {
-      // Navigate to feeds with query params if no external onSubmit is provided
+      
       const params = new URLSearchParams();
       if (value) params.append("search", value);
       if (selectedSchool) params.append("school", selectedSchool);
@@ -126,7 +126,7 @@ export function HomeContent({
 
   return (
     <>
-      {/* Search Overlay Background */}
+      {}
       {isSearchActive && (
         <div
           className="fixed inset-0 bg-n-8/20 md:backdrop-blur-sm z-40 transition-all duration-500"
@@ -190,7 +190,7 @@ export function HomeContent({
                       isSearchActive ? "p-3" : ""
                     }`}
                   >
-                    {/* Input Wrapper */}
+                    {}
                     <div className="relative group">
                       <Search
                         className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-300 ${
@@ -215,7 +215,7 @@ export function HomeContent({
                         }`}
                       />
 
-                      {/* Right Actions */}
+                      {}
                       <div className="absolute right-2 top-1/2 -translate-y-1/2">
                         {isSearchActive ? (
                           <button
@@ -236,7 +236,7 @@ export function HomeContent({
                       </div>
                     </div>
 
-                    {/* Expanded Filters */}
+                    {}
                     <div
                       className={`grid grid-cols-1 md:grid-cols-2 gap-4 transition-all duration-500 ease-in-out overflow-hidden ${
                         isSearchActive
@@ -244,7 +244,7 @@ export function HomeContent({
                           : "max-h-0 opacity-0 mt-0"
                       }`}
                     >
-                      {/* School Filter */}
+                      {}
                       <div
                         className="space-y-2 relative"
                         ref={schoolDropdownRef}
@@ -319,7 +319,7 @@ export function HomeContent({
                         </div>
                       </div>
 
-                      {/* Location Filter */}
+                      {}
                       <div
                         className="space-y-2 relative"
                         ref={locationDropdownRef}

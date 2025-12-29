@@ -35,7 +35,7 @@ export function Login() {
 
   return (
     <div className="min-h-screen bg-n-1 flex items-center justify-center px-4 py-12 relative overflow-hidden">
-      {/* Background Elements */}
+      {}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute -top-[20%] -left-[10%] w-[70%] h-[70%] rounded-full bg-primary-3/5 blur-[120px]" />
         <div className="absolute top-[40%] -right-[10%] w-[60%] h-[60%] rounded-full bg-primary-2/5 blur-[100px]" />

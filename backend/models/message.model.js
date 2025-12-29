@@ -54,9 +54,9 @@ const messageSchema = new mongoose.Schema(
   }
 );
 
-// CRITICAL: Add compound indexes for query performance
-messageSchema.index({ conversationId: 1, createdAt: -1 }); // For fetching messages in order
-messageSchema.index({ sender: 1, createdAt: -1 }); // For user's sent messages
-messageSchema.index({ conversationId: 1, isRead: 1 }); // For unread message counts
+
+messageSchema.index({ conversationId: 1, createdAt: -1 }); 
+messageSchema.index({ sender: 1, createdAt: -1 }); 
+messageSchema.index({ conversationId: 1, isRead: 1 }); 
 
 module.exports = mongoose.model("Message", messageSchema);

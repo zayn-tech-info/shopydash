@@ -90,7 +90,7 @@ export function SignupForm({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {isClient ? (
             <>
-              {/* Client Order: Full Name, Username, Email, Phone, School, ID, WhatsApp, Password */}
+              {}
               <div className="md:col-span-2">
                 <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
                   Full name

@@ -1,6 +1,4 @@
-/**
- * Frontend Socket.IO Client Setup with Authentication
- */
+
 
 import { io } from 'socket.io-client';
 
@@ -19,7 +17,7 @@ class SocketService {
 
     this.socket = io(serverUrl, {
       auth: {
-        token: token, // Pass JWT token for authentication
+        token: token, 
       },
       reconnection: true,
       reconnectionDelay: 1000,
@@ -46,7 +44,7 @@ class SocketService {
 
     this.socket.on('connect_error', (error) => {
       console.error('Socket connection error:', error.message);
-      // Handle authentication errors
+      
       if (error.message.includes('Authentication')) {
         console.error('Socket authentication failed');
       }
@@ -65,7 +63,7 @@ class SocketService {
     }
   }
 
-  // Helper methods
+  
   joinConversation(conversationId) {
     if (this.socket?.connected) {
       this.socket.emit('join_conversation', { conversationId });
@@ -90,7 +88,7 @@ class SocketService {
     }
   }
 
-  // Cleanup method
+  
   cleanup() {
     if (this.socket) {
       this.socket.removeAllListeners();

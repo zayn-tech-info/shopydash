@@ -97,7 +97,7 @@ function VendorProductItem({ product, vendorId }) {
               onClick={handleAddToCart}
               className="w-full h-7 rounded-md bg-primary-3 text-white font-code text-xs font-bold uppercase tracking-wider hover:bg-primary-4 transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-95"
             >
-              {/* <ShoppingCart size={16} /> */}
+              {}
               Add to cart
             </button>
           )}

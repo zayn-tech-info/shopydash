@@ -51,7 +51,7 @@ export const openWhatsApp = (vendor, items, total, authUser, userProfile) => {
     userProfile
   );
 
-  // Basic phone number cleaning (remove spacing, ensure it works with wa.me)
+  
   const cleanPhone = vendor.whatsAppNumber.replace(/[^\d+]/g, "");
   const encodedMessage = encodeURIComponent(message);
 

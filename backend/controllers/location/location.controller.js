@@ -291,15 +291,15 @@ const addSchoolArea = asyncErrorHandler(async (req, res, next) => {
     });
   }
 
-  // Normalize
-  // Title Case logic: "under g" -> "Under G"
+  
+  
   const normalizedArea = areaName
     .toLowerCase()
     .split(" ")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 
-  // Check existence
+  
   const existing = await SchoolArea.findOne({
     schoolName,
     name: normalizedArea,

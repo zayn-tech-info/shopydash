@@ -69,7 +69,7 @@ export function BottomNav() {
                     px: 1.5,
                     border: "none",
                   },
-                  // label tweaks
+                  
                   "& .MuiBottomNavigationAction-label": {
                     fontSize: 12,
                     fontWeight: 500,

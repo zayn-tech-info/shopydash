@@ -1,8 +1,8 @@
-// Logo
+
 import downloadLogo from "../assets/images/Download logo.png";
 import img1 from "../assets/images/img1.png";
 
-// Phone Cases & Electronics
+
 import armorCardSlotIphoneCase from "../assets/images/Temu-Armor Card Slot iPhone Case.jpg";
 import caseCompatibleSamsungGalaxy from "../assets/images/Temu-Case Compatible with Samsung Galaxy.jpg";
 import gadgetSetWithStand from "../assets/images/Temu-Gadget Set With Stand.jpeg";
@@ -13,7 +13,7 @@ import magSafeWirelessChargingCaseBlack from "../assets/images/Temu-MagSafe Wire
 import samsungGalaxyA15 from "../assets/images/Temu-Samsung galaxy A15.jpg";
 import samsungGalaxyS24Ultra from "../assets/images/Temu-Samsung Galaxy S24 Ultra.jpg";
 
-// Clothing & Fashion
+
 import faithOverFearHoodie from "../assets/images/Temu-Faith Over Fear Hoodie.jpg";
 import fashionHoodedJacketMen from "../assets/images/Temu-Fashion Hooded Jacket Men.jpg";
 import inkachWomenFashionCasualSkirt from "../assets/images/Temu-Inkach Women Fashion Casual Skirt With.jpg";
@@ -29,20 +29,20 @@ import washedVintageOversized from "../assets/images/Temu-Washed Vintage oversiz
 import westLouisSummerCotton from "../assets/images/Temu-West Louis™ Summer Cotton.jpg";
 import dopeShirtHoodie from "../assets/images/Tume-dope-shirt-hoddie.jpg";
 
-// Accessories
+
 import cottonHeadNeckArabScarf from "../assets/images/Temu- cotton Head Neck Arab Scarf.jpg";
 import cottonKeffiyehTacticalDesert from "../assets/images/Temu-Cotton Keffiyeh Tactical Desert.jpg";
 import earrings from "../assets/images/Temu-earrings.jpg";
 import mensHorseBuckleBritish from "../assets/images/Temu-Men's Horse Buckle British.jpg";
 
-// Footwear
+
 import mensShoes from "../assets/images/Temu-Men's Shoes.jpg";
 import neatSlidesAvailable from "../assets/images/Temu-Neat slides available.jpg";
 import officeMenDressShoesFloralPattern from "../assets/images/Temu-Office Men Dress Shoes Floral Pattern.jpg";
 import pointedSuedeOxfordShoes from "../assets/images/Temu-Pointed suede oxford shoes.jpg";
 import sneakers from "../assets/images/Temu-Sneakers.jpg";
 
-// Home & Decor
+
 import aongaHighStreetPrintRetro from "../assets/images/Temu-Aonga High Street Print Retro.jpg";
 import beanBagsBigW from "../assets/images/Temu-Bean Bags _ BIG W.jpg";
 import betterHomesGardensBazaar from "../assets/images/Temu-Better Homes & Gardens Bazaar.jpg";
@@ -59,15 +59,15 @@ import solidVelvetPillow from "../assets/images/Temu-Solid Velvet Pillow.jpg";
 import standingClock from "../assets/images/Temu-Standing-clock.jpg";
 import threlacoSmallPillarCandles from "../assets/images/Temu-Threlaco 6 Pcs Small Pillar Candles.jpg";
 
-// Other
+
 import appleCollection from "../assets/images/Temu-appple collection.jpg";
 import temuSam from "../assets/images/Temu- Sam.jpg";
 
-// Logo exports
+
 export const downloadLogoImg = downloadLogo;
 export const img1Img = img1;
 
-// Phone Cases & Electronics exports
+
 export const armorCardSlotIphoneCaseImg = armorCardSlotIphoneCase;
 export const caseCompatibleSamsungGalaxyImg = caseCompatibleSamsungGalaxy;
 export const gadgetSetWithStandImg = gadgetSetWithStand;
@@ -79,7 +79,7 @@ export const magSafeWirelessChargingCaseBlackImg =
 export const samsungGalaxyA15Img = samsungGalaxyA15;
 export const samsungGalaxyS24UltraImg = samsungGalaxyS24Ultra;
 
-// Clothing & Fashion exports
+
 export const faithOverFearHoodieImg = faithOverFearHoodie;
 export const fashionHoodedJacketMenImg = fashionHoodedJacketMen;
 export const inkachWomenFashionCasualSkirtImg = inkachWomenFashionCasualSkirt;
@@ -95,13 +95,13 @@ export const washedVintageOversizedImg = washedVintageOversized;
 export const westLouisSummerCottonImg = westLouisSummerCotton;
 export const dopeShirtHoodieImg = dopeShirtHoodie;
 
-// Accessories exports
+
 export const cottonHeadNeckArabScarfImg = cottonHeadNeckArabScarf;
 export const cottonKeffiyehTacticalDesertImg = cottonKeffiyehTacticalDesert;
 export const earringsImg = earrings;
 export const mensHorseBuckleBritishImg = mensHorseBuckleBritish;
 
-// Footwear exports
+
 export const mensShoesImg = mensShoes;
 export const neatSlidesAvailableImg = neatSlidesAvailable;
 export const officeMenDressShoesFloralPatternImg =
@@ -109,7 +109,7 @@ export const officeMenDressShoesFloralPatternImg =
 export const pointedSuedeOxfordShoesImg = pointedSuedeOxfordShoes;
 export const sneakersImg = sneakers;
 
-// Home & Decor exports
+
 export const aongaHighStreetPrintRetroImg = aongaHighStreetPrintRetro;
 export const beanBagsBigWImg = beanBagsBigW;
 export const betterHomesGardensBazaarImg = betterHomesGardensBazaar;
@@ -126,6 +126,6 @@ export const solidVelvetPillowImg = solidVelvetPillow;
 export const standingClockImg = standingClock;
 export const threlacoSmallPillarCandlesImg = threlacoSmallPillarCandles;
 
-// Other exports
+
 export const appleCollectionImg = appleCollection;
 export const temuSamImg = temuSam;

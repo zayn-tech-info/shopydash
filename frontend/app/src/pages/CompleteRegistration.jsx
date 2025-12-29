@@ -195,7 +195,7 @@ export default function CompleteRegistration() {
               />
             </div>
 
-            {/* Password */}
+            {}
             <div className="mb-5">
               <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
                 Password

@@ -19,12 +19,12 @@ export default function Feeds() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Initialize from URL params
+  
   const [searchQuery, setSearchQuery] = useState(
     searchParams.get("search") || ""
   );
 
-  // School Selection State
+  
   const [selectedSchool, setSelectedSchool] = useState(
     searchParams.get("school") || ""
   );
@@ -32,7 +32,7 @@ export default function Feeds() {
   const [loadingSchools, setLoadingSchools] = useState(false);
   const [showSchoolDropdown, setShowSchoolDropdown] = useState(false);
 
-  // Location/Area Selection State
+  
   const [selectedLocation, setSelectedLocation] = useState(
     searchParams.get("area") || ""
   );
@@ -45,7 +45,7 @@ export default function Feeds() {
   const schoolDropdownRef = useRef(null);
   const locationDropdownRef = useRef(null);
 
-  // Fetch Schools
+  
   useEffect(() => {
     const fetchSchools = async () => {
       try {
@@ -64,7 +64,7 @@ export default function Feeds() {
     fetchSchools();
   }, []);
 
-  // Fetch Areas when School changes or user types in location
+  
   useEffect(() => {
     const fetchAreas = async () => {
       if (!selectedSchool) {
@@ -94,7 +94,7 @@ export default function Feeds() {
     return () => clearTimeout(delayDebounceFn);
   }, [selectedLocation, selectedSchool]);
 
-  // Handle Click Outside for Dropdowns
+  
   useEffect(() => {
     function handleClickOutside(event) {
       if (
@@ -114,7 +114,7 @@ export default function Feeds() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Fetch Feed Posts
+  
   const fetchPosts = useCallback(async () => {
     setLoading(true);
     try {
@@ -126,14 +126,14 @@ export default function Feeds() {
       const res = await api.get("/api/v1/post/feed", { params });
       setPosts(res.data.data.posts);
     } catch (error) {
-      // Error silently handled
+      
       console.error(error);
     } finally {
       setLoading(false);
     }
   }, [selectedSchool, selectedLocation, searchQuery]);
 
-  // Debounce fetchPosts when searchQuery changes
+  
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       fetchPosts();
@@ -142,16 +142,16 @@ export default function Feeds() {
     return () => clearTimeout(delayDebounceFn);
   }, [fetchPosts, searchQuery]);
 
-  // Handle immediate fetch for filters
+  
   useEffect(() => {
     if (!searchQuery) fetchPosts();
   }, [selectedSchool, selectedLocation]);
 
-  const filteredPosts = posts; // Direct assignment since filtering is now backend-side
+  const filteredPosts = posts; 
 
   return (
     <div className="relative min-h-screen">
-      {/* Search Overlay Background */}
+      {}
       {isSearchActive && (
         <div
           className="fixed inset-0 bg-black/20 md:backdrop-blur-sm z-40 transition-all duration-300"
@@ -159,7 +159,7 @@ export default function Feeds() {
         />
       )}
 
-      {/* Search Bar Section */}
+      {}
       <div
         className={`sticky top-20 z-50 transition-all duration-300 ${
           isSearchActive ? "py-6" : "py-4"
@@ -197,7 +197,7 @@ export default function Feeds() {
                 )}
               </div>
 
-              {/* Expanded Filters */}
+              {}
               <div
                 className={`grid grid-cols-1 md:grid-cols-2 gap-4 px-4 transition-all duration-300 overflow-hidden ${
                   isSearchActive
@@ -205,7 +205,7 @@ export default function Feeds() {
                     : "max-h-0 opacity-0"
                 }`}
               >
-                {/* School Filter */}
+                {}
                 <div className="space-y-2 relative" ref={schoolDropdownRef}>
                   <label className="text-xs font-bold text-n-4 uppercase tracking-wider flex items-center gap-2">
                     <School size={14} /> School
@@ -277,7 +277,7 @@ export default function Feeds() {
                   </div>
                 </div>
 
-                {/* Location Filter */}
+                {}
                 <div className="space-y-2 relative" ref={locationDropdownRef}>
                   <label className="text-xs font-bold text-n-4 uppercase tracking-wider flex items-center gap-2">
                     <MapPin size={14} /> Location
@@ -347,7 +347,7 @@ export default function Feeds() {
         </div>
       </div>
 
-      {/* Content */}
+      {}
       <div className="pb-20">
         {loading ? (
           <FeedSkeleton />
