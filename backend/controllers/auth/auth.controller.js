@@ -99,7 +99,7 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
   user.whatsAppNumber = whatsAppNumber;
   user.password = password;
   user.businessName = role === "vendor" ? businessName : undefined;
-  user.schoolId = schoolId ? Number(schoolId) : undefined;
+  user.schoolId = schoolId || undefined;
   user.state = state;
   user.area = area;
   user.country = country;
@@ -178,14 +178,15 @@ const login = asyncErrorHandler(async (req, res, next) => {
   }
 
   const trimmed = String(identifier).trim();
-  const maybeNumber = Number(trimmed);
   let query = null;
 
-  if (trimmed !== "" && !Number.isNaN(maybeNumber) && /^\d+$/.test(trimmed)) {
-    query = { schoolId: maybeNumber };
-  } else if (validator.isEmail(trimmed)) {
+  if (validator.isEmail(trimmed)) {
     query = { email: trimmed };
+  } else if (/^\d+$/.test(trimmed)) {
+    // Could be schoolId (numeric string)
+    query = { schoolId: trimmed };
   } else {
+    // Treat as username
     query = { username: trimmed };
   }
 

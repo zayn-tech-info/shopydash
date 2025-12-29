@@ -45,12 +45,12 @@ const globalErrorHandler = (error, req, res, next) => {
   error.status = error.status || "error";
 
   if (process.env.NODE_ENV === "production") {
-    if (error.name === "castError") error = castErrorHandler(error);
+    if (error.name === "CastError") error = castErrorHandler(error);
     if (error.code === 11000) error = duplicateKeyErrorHandler(error);
     if (error.name === "ValidationError") error = validationErrorHandler(error);
     prodErrors(res, error);
   } else if (process.env.NODE_ENV === "development") {
-    if (error.name === "ValidationError") validationErrorHandler(error);
+    if (error.name === "ValidationError") error = validationErrorHandler(error);
     devErrors(res, error);
   }
 };

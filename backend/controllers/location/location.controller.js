@@ -302,7 +302,7 @@ const addSchoolArea = asyncErrorHandler(async (req, res, next) => {
   // Check existence
   const existing = await SchoolArea.findOne({
     schoolName,
-    name: { $regex: new RegExp(`^${normalizedArea}$`, "i") },
+    name: normalizedArea,
   });
 
   if (existing) {

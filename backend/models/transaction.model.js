@@ -6,15 +6,18 @@ const transactionSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      index: true,
     },
     reference: {
       type: String,
       required: true,
       unique: true,
+      index: true,
     },
     amount: {
       type: Number,
       required: true,
+      min: 0,
     },
     currency: {
       type: String,
@@ -24,6 +27,7 @@ const transactionSchema = mongoose.Schema(
       type: String,
       enum: ["pending", "success", "failed", "abandoned"],
       default: "pending",
+      index: true,
     },
     plan: {
       type: String,
@@ -40,5 +44,7 @@ const transactionSchema = mongoose.Schema(
     timestamps: true,
   }
 );
+
+transactionSchema.index({ user: 1, createdAt: -1 });
 
 module.exports = mongoose.model("Transaction", transactionSchema);
