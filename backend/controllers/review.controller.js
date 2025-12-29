@@ -53,8 +53,11 @@ const createReview = async (req, res, next) => {
       comment,
     });
 
-
     const vendor = await VendorProfile.findById(vendorId);
+    
+    if (!vendor) {
+      return next(new customError("Vendor profile not found", 404));
+    }
 
     const currentNumReviews = vendor.numReviews || 0;
     const currentRating = vendor.rating || 0;
