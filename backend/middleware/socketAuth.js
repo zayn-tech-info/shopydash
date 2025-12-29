@@ -1,11 +1,10 @@
 /**
  * Socket.IO Authentication Middleware
- * Add this to backend/server.js to authenticate socket connections
  */
 
 const jwt = require("jsonwebtoken");
-const User = require("./models/auth.model");
-const { logError } = require("./utils/logger");
+const User = require("../models/auth.model");
+const { logError } = require("../utils/logger");
 
 /**
  * Middleware to authenticate Socket.IO connections using JWT
@@ -20,7 +19,7 @@ const socketAuthMiddleware = async (socket, next) => {
     const token = socket.handshake.auth.token;
     
     if (!token) {
-      return next(new Error('Authentication token required'));
+      return next(new Error('Authentication failed'));
     }
 
     // Verify JWT token
@@ -30,7 +29,7 @@ const socketAuthMiddleware = async (socket, next) => {
     const user = await User.findById(decoded.id).select('-password');
     
     if (!user) {
-      return next(new Error('User not found'));
+      return next(new Error('Authentication failed'));
     }
 
     // Attach user info to socket

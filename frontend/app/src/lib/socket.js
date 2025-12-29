@@ -1,6 +1,5 @@
 /**
  * Frontend Socket.IO Client Setup with Authentication
- * File: frontend/app/src/lib/socket.js or similar
  */
 
 import { io } from 'socket.io-client';
@@ -16,7 +15,7 @@ class SocketService {
       return this.socket;
     }
 
-    const serverUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    const serverUrl = import.meta.env.VITE_URL || 'http://localhost:8000';
 
     this.socket = io(serverUrl, {
       auth: {
@@ -27,6 +26,7 @@ class SocketService {
       reconnectionDelayMax: 5000,
       reconnectionAttempts: 5,
       transports: ['websocket', 'polling'],
+      withCredentials: true,
     });
 
     this.setupEventListeners();
@@ -48,14 +48,12 @@ class SocketService {
       console.error('Socket connection error:', error.message);
       // Handle authentication errors
       if (error.message.includes('Authentication')) {
-        // Redirect to login or refresh token
         console.error('Socket authentication failed');
       }
     });
 
     this.socket.on('error', (data) => {
       console.error('Socket error:', data.message);
-      // Handle errors in UI
     });
   }
 

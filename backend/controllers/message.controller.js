@@ -5,6 +5,7 @@ const VendorProfile = require("../models/vendorProfile.model");
 const customError = require("../errors/customError");
 const asyncErrorHandler = require("../errors/asyncErrorHandle");
 const plans = require("../config/subscriptionPlans");
+const DOMPurify = require('isomorphic-dompurify');
 
 
 const hasPremiumMessaging = (vendorUser) => {
@@ -14,6 +15,28 @@ const hasPremiumMessaging = (vendorUser) => {
     (p) => p.name === vendorUser.subscriptionPlan
   );
   return plan?.features?.messaging || false;
+};
+
+/**
+ * Helper: Verify user has access to conversation
+ */
+const verifyConversationAccess = async (conversationId, userId) => {
+  const conversation = await Conversation.findById(conversationId);
+  
+  if (!conversation) {
+    throw new customError("Conversation not found", 404);
+  }
+  
+  // Check if user is a participant
+  const isParticipant = conversation.participants.some(
+    p => p.toString() === userId.toString()
+  );
+  
+  if (!isParticipant) {
+    throw new customError("Unauthorized access to conversation", 403);
+  }
+  
+  return conversation;
 };
 
 exports.checkMessagingAccess = asyncErrorHandler(async (req, res, next) => {
@@ -92,16 +115,34 @@ exports.sendMessage = asyncErrorHandler(async (req, res, next) => {
   const { conversationId, content, replyTo } = req.body;
   const senderId = req.user.id;
 
-  const conversation = await Conversation.findById(conversationId);
-  if (!conversation) {
-    return next(new customError("Conversation not found", 404));
+  // Validate inputs
+  if (!conversationId || !content) {
+    return next(new customError("Conversation ID and content are required", 400));
+  }
+
+  // Verify user has access to conversation
+  const conversation = await verifyConversationAccess(conversationId, senderId);
+
+  // Sanitize message content to prevent XSS
+  const sanitizedContent = DOMPurify.sanitize(content, {
+    ALLOWED_TAGS: [], // Strip all HTML tags
+    KEEP_CONTENT: true // Keep the text content
+  });
+
+  // Validate message length
+  if (sanitizedContent.length > 2000) {
+    return next(new customError("Message too long (max 2000 characters)", 400));
+  }
+
+  if (sanitizedContent.trim().length === 0) {
+    return next(new customError("Message cannot be empty", 400));
   }
 
   // Create message
   const message = await Message.create({
     conversationId,
     sender: senderId,
-    content,
+    content: sanitizedContent,
     replyTo: replyTo || null,
   });
 
@@ -122,11 +163,6 @@ exports.sendMessage = asyncErrorHandler(async (req, res, next) => {
   if (replyTo) {
     await message.populate("replyTo");
   }
-
-  // NOTE: Socket.io emission will happen in the route/server layer or we can import io here if we structure it right.
-  // For now, we return the data, and the frontend will handle the "optimistic" UI,
-  // but ideally we want real-time.
-  // We will handle socket emission in the route wrapper or a separate service.
 
   // Emit real-time event
   const io = req.app.get("io");
@@ -157,12 +193,14 @@ exports.sendMessage = asyncErrorHandler(async (req, res, next) => {
 exports.getConversations = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user.id;
 
+  // Only fetch conversations where user is a participant
   const conversations = await Conversation.find({
     participants: userId,
   })
     .populate("participants", "fullName profilePic role businessName")
     .populate("lastMessage")
-    .sort({ updatedAt: -1 });
+    .sort({ updatedAt: -1 })
+    .lean(); // Use lean() for better performance on read-only queries
 
   res.status(200).json({
     status: "success",
@@ -179,15 +217,19 @@ exports.getMessages = asyncErrorHandler(async (req, res, next) => {
 
   // Optional: pagination
   const page = req.query.page * 1 || 1;
-  const limit = req.query.limit * 1 || 50;
+  const limit = Math.min(req.query.limit * 1 || 50, 100); // Max 100 messages per page
   const skip = (page - 1) * limit;
+
+  // Verify user has access to conversation
+  await verifyConversationAccess(conversationId, userId);
 
   const messages = await Message.find({ conversationId })
     .populate("sender", "fullName profilePic")
     .populate("replyTo")
     .sort({ createdAt: -1 }) // Newest first for infinite scroll
     .skip(skip)
-    .limit(limit);
+    .limit(limit)
+    .lean(); // Use lean() for better performance on read-only queries
 
   // Mark as read for the current user
   // We can do this asynchronously
@@ -198,11 +240,20 @@ exports.getMessages = asyncErrorHandler(async (req, res, next) => {
     await conversation.save();
   }
 
+  // Get total count for pagination
+  const total = await Message.countDocuments({ conversationId });
+
   res.status(200).json({
     status: "success",
     results: messages.length,
     data: {
       messages: messages.reverse(), // Send back in chronological order for rendering if needed, or keep reverse for flex-col-reverse
+    },
+    pagination: {
+      page,
+      limit,
+      total,
+      pages: Math.ceil(total / limit),
     },
   });
 });

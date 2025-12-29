@@ -3,6 +3,8 @@ import useChatStore from "../../store/chatStore";
 import { useAuthStore } from "../../store/authStore";
 import { Send, MoreVertical, ArrowLeft } from "lucide-react";
 import { format, isToday, isYesterday } from "date-fns";
+import DOMPurify from "isomorphic-dompurify";
+import { toast } from "react-hot-toast";
 
 const ChatWindow = ({ onBack }) => {
   const { activeConversation, messages, sendMessage, isLoading } =
@@ -38,6 +40,13 @@ const ChatWindow = ({ onBack }) => {
   const handleSend = async (e) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
+    
+    // Client-side validation
+    if (newMessage.length > 2000) {
+      toast.error('Message is too long (max 2000 characters)');
+      return;
+    }
+    
     await sendMessage(newMessage);
     setNewMessage("");
   };
@@ -117,7 +126,12 @@ const ChatWindow = ({ onBack }) => {
                               }
                           `}
                 >
-                  <div className="break-words">{msg.content}</div>
+                  <div className="break-words">
+                    {DOMPurify.sanitize(msg.content, {
+                      ALLOWED_TAGS: [],
+                      KEEP_CONTENT: true,
+                    })}
+                  </div>
                   <div
                     className={`text-[10px] ${
                       isMe ? "text-white/80" : "text-gray-500"

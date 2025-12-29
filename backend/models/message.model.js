@@ -12,10 +12,13 @@ const messageSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      index: true,
     },
     content: {
       type: String,
       required: true,
+      maxLength: [2000, "Message cannot exceed 2000 characters"],
+      trim: true,
     },
     attachments: [
       {
@@ -31,6 +34,7 @@ const messageSchema = new mongoose.Schema(
     isRead: {
       type: Boolean,
       default: false,
+      index: true,
     },
     readBy: [
       {
@@ -49,5 +53,10 @@ const messageSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+// CRITICAL: Add compound indexes for query performance
+messageSchema.index({ conversationId: 1, createdAt: -1 }); // For fetching messages in order
+messageSchema.index({ sender: 1, createdAt: -1 }); // For user's sent messages
+messageSchema.index({ conversationId: 1, isRead: 1 }); // For unread message counts
 
 module.exports = mongoose.model("Message", messageSchema);
