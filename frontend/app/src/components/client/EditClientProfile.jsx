@@ -12,6 +12,20 @@ export function EditClientProfile({ clientProfileData, onClose }) {
     (s) => s.updateClientProfile
   );
 
+  const [formData, setFormData] = useState({
+    fullName: clientProfileData?.userId?.fullName || "",
+    phoneNumber: clientProfileData?.userId?.phoneNumber || "",
+  });
+
+  useEffect(() => {
+    if (clientProfileData?.userId) {
+      setFormData({
+        fullName: clientProfileData.userId.fullName || "",
+        phoneNumber: clientProfileData.userId.phoneNumber || "",
+      });
+    }
+  }, [clientProfileData]);
+
   if (!clientProfileData) return null;
 
   const handleChange = (field) => (e) => setInputField(field, e.target.value);
@@ -19,7 +33,12 @@ export function EditClientProfile({ clientProfileData, onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await updateClientProfile(clientProfileData);
+      const payload = {
+        ...clientProfileData,
+        fullName: formData.fullName,
+        phoneNumber: formData.phoneNumber,
+      };
+      await updateClientProfile(payload);
       toast.success("Profile updated");
       if (typeof onClose === "function") onClose();
     } catch (err) {
@@ -53,109 +72,23 @@ export function EditClientProfile({ clientProfileData, onClose }) {
 
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
-                  Full Name (Read-only)
-                </label>
-                <input
-                  type="text"
-                  value={clientProfileData?.userId?.fullName || ""}
-                  disabled
-                  className="w-full px-4 py-3 bg-n-2 border border-n-3 rounded-xl text-n-5 cursor-not-allowed"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
-                  Username (Read-only)
-                </label>
-                <input
-                  type="text"
-                  value={clientProfileData?.userId?.username || ""}
-                  disabled
-                  className="w-full px-4 py-3 bg-n-2 border border-n-3 rounded-xl text-n-5 cursor-not-allowed"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
-                  Phone (Read-only)
-                </label>
-                <input
-                  type="text"
-                  value={clientProfileData?.userId?.phoneNumber || ""}
-                  disabled
-                  className="w-full px-4 py-3 bg-n-2 border border-n-3 rounded-xl text-n-5 cursor-not-allowed"
-                />
-              </div>
-              {}
-            </div>
-            <InputField
-              label="Address"
-              value={clientProfileData.address}
-              onChange={handleChange("address")}
-            />
-
-            <div>
-              <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
-                School (Read-only)
-              </label>
-              <input
-                type="text"
-                value={clientProfileData?.userId?.schoolName || ""}
-                disabled
-                className="w-full px-4 py-3 bg-n-2 border border-n-3 rounded-xl text-n-5 cursor-not-allowed"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <InputField
-                label="City"
-                value={clientProfileData.city}
-                onChange={handleChange("city")}
+                label="Full Name"
+                value={formData.fullName}
+                onChange={(e) =>
+                  setFormData({ ...formData, fullName: e.target.value })
+                }
               />
               <InputField
-                label="State"
-                value={clientProfileData.state}
-                onChange={handleChange("state")}
-              />
-              <InputField
-                label="Country"
-                value={clientProfileData.country}
-                onChange={handleChange("country")}
+                label="Phone Number"
+                value={formData.phoneNumber}
+                onChange={(e) =>
+                  setFormData({ ...formData, phoneNumber: e.target.value })
+                }
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center pt-2">
-              <label className="flex items-center gap-3 p-4 rounded-xl border border-n-3 cursor-pointer hover:border-n-4 transition-colors">
-                <input
-                  type="checkbox"
-                  className="w-5 h-5 text-primary-3 rounded border-gray-300 focus:ring-primary-3"
-                  checked={!!clientProfileData.active}
-                  onChange={(e) => setInputField("active", e.target.checked)}
-                />
-                <span className="font-medium text-n-7">Active Profile</span>
-              </label>
-              <div className="grid grid-cols-2 gap-4">
-                <InputField
-                  label="Map Lat"
-                  value={clientProfileData.mapLocationLat || ""}
-                  onChange={(e) =>
-                    setInputField("mapLocationLat", e.target.value)
-                  }
-                  placeholder="Lat"
-                />
-                <InputField
-                  label="Map Lng"
-                  value={clientProfileData.mapLocationLng || ""}
-                  onChange={(e) =>
-                    setInputField("mapLocationLng", e.target.value)
-                  }
-                  placeholder="Lng"
-                />
-              </div>
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center pt-2"></div>
 
             <div className="flex items-center justify-end gap-4 pt-6 border-t border-n-3">
               <button

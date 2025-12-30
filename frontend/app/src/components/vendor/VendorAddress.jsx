@@ -4,19 +4,10 @@ export function VendorAddress({ vendorProfile, authUser, className }) {
       <div className="bg-n-1 rounded-xl border border-n-3/10 p-5 space-y-4">
         <div>
           <div className="font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-1">
-            Address
-          </div>
-          <div className="text-n-8 font-medium text-sm">
-            {vendorProfile?.address || "-"}
-          </div>
-        </div>
-
-        <div>
-          <div className="font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-1">
             School Area
           </div>
           <div className="text-n-8 font-medium text-sm">
-            {vendorProfile?.area || vendorProfile?.city || "-"}
+            {vendorProfile?.userId?.schoolArea || "-"}
           </div>
         </div>
 

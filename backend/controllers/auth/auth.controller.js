@@ -58,7 +58,9 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
     schoolId,
     password,
     state,
+    city,
     country,
+    schoolArea,
     area,
   } = req.body;
 
@@ -100,7 +102,10 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
   user.password = password;
   user.businessName = role === "vendor" ? businessName : undefined;
   user.schoolId = schoolId || undefined;
+  user.schoolId = schoolId || undefined;
   user.state = state;
+  user.city = city;
+  user.schoolArea = schoolArea;
   user.area = area;
   user.country = country;
   user.profileComplete = true;
@@ -124,6 +129,10 @@ const signup = asyncErrorHandler(async (req, res, next) => {
     password,
     businessName,
     role,
+    city,
+    state,
+    country,
+    schoolArea,
   } = req.body;
 
   if (role === "client") {
@@ -133,7 +142,12 @@ const signup = asyncErrorHandler(async (req, res, next) => {
       !email ||
       !phoneNumber ||
       !schoolName ||
-      !password
+      !schoolName ||
+      !password ||
+      !city ||
+      !state ||
+      !country ||
+      !schoolArea
     ) {
       const err = new customError("All fields are required", 400);
       return next(err);
@@ -146,7 +160,11 @@ const signup = asyncErrorHandler(async (req, res, next) => {
       !phoneNumber ||
       !schoolName ||
       !password ||
-      !businessName
+      !businessName ||
+      !city ||
+      !state ||
+      !country ||
+      !schoolArea
     ) {
       const err = new customError("All fields are required", 400);
       return next(err);
@@ -183,10 +201,8 @@ const login = asyncErrorHandler(async (req, res, next) => {
   if (validator.isEmail(trimmed)) {
     query = { email: trimmed };
   } else if (/^\d+$/.test(trimmed)) {
-    
     query = { schoolId: trimmed };
   } else {
-    
     query = { username: trimmed };
   }
 
@@ -268,7 +284,11 @@ const updateUser = asyncErrorHandler(async (req, res, next) => {
     "businessName",
     "profilePic",
     "state",
+    "city",
+    "country",
+    "schoolArea",
     "area",
+    "username",
   ];
 
   let filteredBody = filterField(req.body, ...allowedFields);
@@ -322,6 +342,42 @@ const updateUser = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
+const changePassword = asyncErrorHandler(async (req, res, next) => {
+  const { currentPassword, newPassword, confirmPassword } = req.body;
+  const userId = req.user._id;
+
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    const error = new customError("All fields are required", 400);
+    return next(error);
+  }
+
+  if (newPassword !== confirmPassword) {
+    const error = new customError(
+      "New password and confirm password do not match",
+      400
+    );
+    return next(error);
+  }
+
+  const user = await User.findById(userId).select("+password");
+
+  if (!user) {
+    const error = new customError("User not found", 404);
+    return next(error);
+  }
+
+  const isPasswordMatch = await user.comparePassword(currentPassword);
+  if (!isPasswordMatch) {
+    const error = new customError("Current incorrect password", 401);
+    return next(error);
+  }
+
+  user.password = newPassword;
+  await user.save();
+
+  sendToken(user, "Password changed successfully", res, 200);
+});
+
 module.exports = {
   signup,
   login,
@@ -330,4 +386,5 @@ module.exports = {
   googleAuth,
   completeRegistration,
   updateUser,
+  changePassword,
 };

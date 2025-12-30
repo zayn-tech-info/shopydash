@@ -3,7 +3,7 @@ import { toast } from "react-hot-toast";
 import Logo from "../assets/images/vendora_logo.png";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { LogOut, Plus } from "lucide-react";
+import { LogOut, Plus, MapPin, Settings } from "lucide-react";
 import { useVendorProfileStore } from "../store/vendorProfileStore";
 import { useAuthStore } from "../store/authStore";
 import { EditVendorProfile } from "../components/vendor/EditVendorProfile";
@@ -36,6 +36,14 @@ export default function VendorProfile() {
   const displayProfileImage = isOwner
     ? authUser?.profilePic || vendorProfile?.userId?.profilePic || Logo
     : vendorProfile?.userId?.profilePic || Logo;
+
+  const vendorLocation = [
+    vendorProfile?.userId?.city,
+    vendorProfile?.userId?.state,
+    vendorProfile?.userId?.country,
+  ]
+    .filter(Boolean)
+    .join(", ");
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -104,6 +112,27 @@ export default function VendorProfile() {
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-n-8/80 via-n-8/20 to-transparent" />
 
+            {authUser &&
+              vendorProfile &&
+              authUser._id === vendorProfile.userId?._id && (
+                <button
+                  onClick={() => navigate("/settings")}
+                  className="absolute top-4 right-4 p-2 bg-black/30 hover:bg-black/50 backdrop-blur-md rounded-full text-white transition-all z-20"
+                  title="Settings"
+                >
+                  <Settings size={20} />
+                </button>
+              )}
+
+            {vendorLocation && (
+              <div className="absolute bottom-6 right-6 md:bottom-8 md:right-8 z-20">
+                <span className="flex items-center gap-1.5 font-bold text-sm bg-black/30 backdrop-blur-md px-3 py-1 rounded-lg border border-white/10 text-white">
+                  <MapPin size={14} className="text-white" />
+                  {vendorLocation}
+                </span>
+              </div>
+            )}
+
             <div className="absolute bottom-0 left-0 p-6 md:p-8 z-10 w-full">
               <div className="flex items-center gap-2 mb-2">
                 <h1 className="h2 text-white drop-shadow-md">
@@ -112,7 +141,9 @@ export default function VendorProfile() {
               </div>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-white/90 body-2">
                 <span className="font-code uppercase tracking-wider text-sm font-bold bg-white/20 md:backdrop-blur-md px-3 py-1 rounded-lg border border-white/10">
-                  {vendorProfile?.businessCategory}
+                  {Array.isArray(vendorProfile?.businessCategory)
+                    ? vendorProfile?.businessCategory.join(", ")
+                    : vendorProfile?.businessCategory}
                 </span>
               </div>
             </div>

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Eye, EyeOff, Check, ChevronDown } from "lucide-react";
 import { useGoogleLogin } from "@react-oauth/google";
-import { schools } from "../constants";
+import LocationSelector from "./LocationSelector";
 
 import { useAuthStore } from "../store/authStore";
 import { toast } from "react-hot-toast";
@@ -24,6 +24,10 @@ export function SignupForm({
   toggleShowPassword,
   isSigningUp,
   error,
+  city,
+  state,
+  country,
+  schoolArea,
 }) {
   const { googleAuthenticate } = useAuthStore();
 
@@ -148,18 +152,55 @@ export function SignupForm({
                 />
               </div>
 
-              <div className="md:col-span-2">
+              <div className="md:col-span-1">
                 <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
-                  School Name
+                  City
                 </label>
-                <div className="relative">
-                  <CustomDropdown
-                    options={schools}
-                    value={schoolName}
-                    onChange={(value) => setField("schoolName", value)}
-                    placeholder="Select your school"
-                  />
-                </div>
+                <input
+                  type="text"
+                  value={city}
+                  onChange={(e) => setField("city", e.target.value)}
+                  placeholder="e.g. Lagos"
+                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
+                  required
+                />
+              </div>
+
+              <div className="md:col-span-1">
+                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
+                  State
+                </label>
+                <input
+                  type="text"
+                  value={state}
+                  onChange={(e) => setField("state", e.target.value)}
+                  placeholder="e.g. Lagos"
+                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
+                  required
+                />
+              </div>
+
+              <div className="md:col-span-1">
+                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
+                  Country
+                </label>
+                <input
+                  type="text"
+                  value={country}
+                  onChange={(e) => setField("country", e.target.value)}
+                  placeholder="e.g. Nigeria"
+                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
+                  required
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <LocationSelector
+                  schoolName={schoolName}
+                  setSchoolName={(val) => setField("schoolName", val)}
+                  selectedArea={schoolArea}
+                  setSelectedArea={(val) => setField("schoolArea", val)}
+                />
               </div>
 
               <div className="md:col-span-2">
@@ -327,18 +368,55 @@ export function SignupForm({
                 />
               </div>
 
-              <div className="md:col-span-2">
+              <div className="md:col-span-1">
                 <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
-                  School Name
+                  City
                 </label>
-                <div className="relative">
-                  <CustomDropdown
-                    options={schools}
-                    value={schoolName}
-                    onChange={(value) => setField("schoolName", value)}
-                    placeholder="Select your school"
-                  />
-                </div>
+                <input
+                  type="text"
+                  value={city}
+                  onChange={(e) => setField("city", e.target.value)}
+                  placeholder="e.g. Lagos"
+                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
+                  required
+                />
+              </div>
+
+              <div className="md:col-span-1">
+                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
+                  State
+                </label>
+                <input
+                  type="text"
+                  value={state}
+                  onChange={(e) => setField("state", e.target.value)}
+                  placeholder="e.g. Lagos"
+                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
+                  required
+                />
+              </div>
+
+              <div className="md:col-span-1">
+                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
+                  Country
+                </label>
+                <input
+                  type="text"
+                  value={country}
+                  onChange={(e) => setField("country", e.target.value)}
+                  placeholder="e.g. Nigeria"
+                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
+                  required
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <LocationSelector
+                  schoolName={schoolName}
+                  setSchoolName={(val) => setField("schoolName", val)}
+                  selectedArea={schoolArea}
+                  setSelectedArea={(val) => setField("schoolArea", val)}
+                />
               </div>
 
               <div className="md:col-span-2">

@@ -37,8 +37,17 @@ const clientProfileSchema = new mongoose.Schema({
   },
 
   preferredCategory: {
+    type: [String],
+    default: [],
+  },
+
+  gender: {
     type: String,
-    trim: true,
+    enum: ["Male", "Female", "Other", "Prefer not to say"],
+  },
+  bio: {
+    type: String,
+    maxlength: 500,
   },
 
   wishlist: [

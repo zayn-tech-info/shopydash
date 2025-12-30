@@ -3,7 +3,7 @@ import { api } from "../lib/axios";
 
 const initialProfileData = {
   storeDescription: "",
-  businessCategory: "",
+  businessCategory: [],
   coverImage: "",
   address: "",
   city: "",
@@ -17,6 +17,8 @@ const initialProfileData = {
   instagram: "",
   facebook: "",
   twitter: "",
+  sellingDuration: "",
+  offersDelivery: false,
 };
 
 export const useVendorProfileStore = create((set, get) => ({

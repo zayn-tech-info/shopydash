@@ -150,4 +150,21 @@ export const useAuthStore = create((set) => ({
       throw serverMessage;
     }
   },
+
+  changePassword: async (data) => {
+    set({ isUpdatingProfile: true, error: null });
+    try {
+      const res = await api.post("/api/v1/auth/change-password", data);
+      set({ isUpdatingProfile: false, error: null });
+      return res.data;
+    } catch (err) {
+      const serverMessage =
+        err?.response?.data?.message ||
+        (typeof err?.response?.data === "string" ? err.response.data : null) ||
+        err?.message ||
+        "Failed to change password";
+      set({ error: serverMessage, isUpdatingProfile: false });
+      throw serverMessage;
+    }
+  },
 }));

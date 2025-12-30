@@ -6,7 +6,6 @@ import { useAuthStore } from "../store/authStore";
 import { InputField } from "../components/InputField";
 import { preferredCategories } from "../constants";
 import { ChevronDown, Check } from "lucide-react";
-import LocationSelector from "../components/LocationSelector";
 
 export default function CreateVendorProfile() {
   const navigate = useNavigate();
@@ -95,39 +94,85 @@ export default function CreateVendorProfile() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
-                Category
+              <label className="block text-sm font-medium text-n-6 mb-3 uppercase tracking-wide">
+                What kind of items do you sell?
               </label>
-              <CustomDropdown
-                options={preferredCategories}
-                value={profileData.businessCategory}
-                onChange={(value) => setProfileField("businessCategory", value)}
-                placeholder="Select category"
-              />
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {preferredCategories.map((category) => (
+                  <label
+                    key={category}
+                    className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
+                      (profileData.businessCategory || []).includes(category)
+                        ? "border-primary-3 bg-primary-3/5"
+                        : "border-n-3 hover:border-n-4 bg-white"
+                    }`}
+                  >
+                    <div className="relative flex items-center justify-center">
+                      <input
+                        type="checkbox"
+                        className="peer sr-only"
+                        checked={(profileData.businessCategory || []).includes(
+                          category
+                        )}
+                        onChange={(e) => {
+                          const current = profileData.businessCategory || [];
+                          const newValue = e.target.checked
+                            ? [...current, category]
+                            : current.filter((c) => c !== category);
+                          setProfileField("businessCategory", newValue);
+                        }}
+                      />
+                      <div className="w-5 h-5 border-2 border-n-4 rounded-md peer-checked:bg-primary-3 peer-checked:border-primary-3 transition-colors"></div>
+                      <Check className="w-3.5 h-3.5 text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 transition-opacity" />
+                    </div>
+                    <span className="text-sm font-medium text-n-7">
+                      {category}
+                    </span>
+                  </label>
+                ))}
+              </div>
             </div>
-          </section>
 
-          <section className="space-y-6">
-            <h2 className="text-xl font-bold text-n-8 border-b border-n-3 pb-2">
-              Location
-            </h2>
-            <InputField
-              label="Address"
-              value={profileData.address}
-              onChange={handleInputChange("address")}
-              placeholder="Street address"
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
+                  How long have you been selling?
+                </label>
+                <CustomDropdown
+                  options={[
+                    "Less than 1 year",
+                    "1-3 years",
+                    "3-5 years",
+                    "More than 5 years",
+                  ]}
+                  value={profileData.sellingDuration}
+                  onChange={(value) =>
+                    setProfileField("sellingDuration", value)
+                  }
+                  placeholder="Select duration"
+                />
+              </div>
 
-            <LocationSelector
-              selectedState={profileData.state}
-              setSelectedState={(val) => setProfileField("state", val)}
-              selectedArea={profileData.area}
-              setSelectedArea={(val) => {
-                setProfileField("area", val);
-                setProfileField("city", val);
-              }}
-              schoolName={authUser?.schoolName}
-            />
+              <div className="flex items-center h-full pt-6">
+                <label className="flex items-center gap-3 cursor-pointer group">
+                  <div className="relative">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={profileData.offersDelivery || false}
+                      onChange={(e) =>
+                        setProfileField("offersDelivery", e.target.checked)
+                      }
+                    />
+                    <div className="w-6 h-6 border-2 border-n-4 peer-checked:bg-primary-3 peer-checked:border-primary-3 rounded-md transition-all"></div>
+                    <Check className="w-4 h-4 text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 transition-opacity" />
+                  </div>
+                  <span className="font-medium text-n-6 group-hover:text-n-8 transition-colors">
+                    Do you offer delivery services?
+                  </span>
+                </label>
+              </div>
+            </div>
           </section>
 
           <section className="space-y-6">

@@ -21,6 +21,10 @@ export const useSignupStore = create((set) => ({
   profilePic: "",
   bio: "",
   logo: "",
+  city: "",
+  state: "",
+  country: "",
+  schoolArea: "",
 
   setRole: (role) => set({ role }),
 
@@ -42,6 +46,10 @@ export const useSignupStore = create((set) => ({
       profilePic: "",
       bio: "",
       logo: "",
+      city: "",
+      state: "",
+      country: "",
+      schoolArea: "",
     }),
 
   signup: async (data) => {

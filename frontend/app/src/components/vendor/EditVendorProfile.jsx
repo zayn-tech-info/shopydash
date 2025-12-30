@@ -16,7 +16,15 @@ export function EditVendorProfile({ initialData, onClose }) {
   );
 
   useEffect(() => {
-    if (initialData) setFormData(initialData);
+    if (initialData) {
+      setFormData({
+        ...initialData,
+        businessName:
+          initialData.userId?.businessName || initialData.businessName || "",
+        phoneNumber:
+          initialData.userId?.phoneNumber || initialData.phoneNumber || "",
+      });
+    }
   }, [initialData]);
 
   if (!formData) return null;
@@ -30,10 +38,6 @@ export function EditVendorProfile({ initialData, onClose }) {
       const payload = {
         storeDescription: formData.storeDescription,
         businessCategory: formData.businessCategory,
-        address: formData.address,
-        city: formData.city,
-        state: formData.state,
-        country: formData.country,
         coverImage: formData.coverImage,
         gallery: formData.gallery
           ? formData.gallery
@@ -42,10 +46,8 @@ export function EditVendorProfile({ initialData, onClose }) {
               .filter(Boolean)
           : [],
         active: !!formData.active,
-        mapLocation:
-          formData.mapLocationLat || formData.mapLocationLng
-            ? { lat: formData.mapLocationLat, lng: formData.mapLocationLng }
-            : null,
+        businessName: formData.businessName,
+        phoneNumber: formData.phoneNumber,
       };
 
       await updateVendorProfile(payload);
@@ -82,30 +84,17 @@ export function EditVendorProfile({ initialData, onClose }) {
 
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
-                  Business Name (Read-only)
-                </label>
-                <input
-                  type="text"
-                  value={formData?.userId?.businessName || ""}
-                  disabled
-                  className="w-full px-4 py-3 bg-n-2 border border-n-3 rounded-xl text-n-5 cursor-not-allowed"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
-                  Store Username (Read-only)
-                </label>
-                <input
-                  type="text"
-                  value={formData?.userId?.storeUsername || ""}
-                  disabled
-                  className="w-full px-4 py-3 bg-n-2 border border-n-3 rounded-xl text-n-5 cursor-not-allowed"
-                />
-              </div>
+              <InputField
+                label="Business Name"
+                value={formData.businessName || ""}
+                onChange={handleChange("businessName")}
+              />
+              <InputField
+                label="Phone Number"
+                value={formData.phoneNumber || ""}
+                onChange={handleChange("phoneNumber")}
+              />
             </div>
-
             <div>
               <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
                 Description
@@ -119,133 +108,21 @@ export function EditVendorProfile({ initialData, onClose }) {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
-                  Category
-                </label>
-                <CustomDropdown
-                  options={preferredCategories}
-                  value={formData.businessCategory}
-                  onChange={(value) =>
-                    setFormData((f) => ({ ...f, businessCategory: value }))
-                  }
-                  placeholder="Select category"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
-                  Email (Read-only)
-                </label>
-                <input
-                  type="text"
-                  value={formData?.userId?.email || ""}
-                  disabled
-                  className="w-full px-4 py-3 bg-n-2 border border-n-3 rounded-xl text-n-5 cursor-not-allowed"
-                />
-              </div>
-            </div>
-
             <div>
               <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
-                School (Read-only)
+                Category
               </label>
-              <input
-                type="text"
-                value={formData?.userId?.schoolName || ""}
-                disabled
-                className="w-full px-4 py-3 bg-n-2 border border-n-3 rounded-xl text-n-5 cursor-not-allowed"
+              <CustomDropdown
+                options={preferredCategories}
+                value={formData.businessCategory}
+                onChange={(value) =>
+                  setFormData((f) => ({ ...f, businessCategory: value }))
+                }
+                placeholder="Select category"
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
-                  Phone (Read-only)
-                </label>
-                <input
-                  type="text"
-                  value={formData?.userId?.phoneNumber || ""}
-                  disabled
-                  className="w-full px-4 py-3 bg-n-2 border border-n-3 rounded-xl text-n-5 cursor-not-allowed"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-n-6 mb-1.5 uppercase tracking-wide">
-                  WhatsApp (Read-only)
-                </label>
-                <input
-                  type="text"
-                  value={formData?.userId?.whatsAppNumber || ""}
-                  disabled
-                  className="w-full px-4 py-3 bg-n-2 border border-n-3 rounded-xl text-n-5 cursor-not-allowed"
-                />
-              </div>
-            </div>
-
-            <InputField
-              label="Address"
-              value={formData.address}
-              onChange={handleChange("address")}
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <InputField
-                label="City"
-                value={formData.city}
-                onChange={handleChange("city")}
-              />
-              <InputField
-                label="State"
-                value={formData.state}
-                onChange={handleChange("state")}
-              />
-              <InputField
-                label="Country"
-                value={formData.country}
-                onChange={handleChange("country")}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center pt-2">
-              <label className="flex items-center gap-3 p-4 rounded-xl border border-n-3 cursor-pointer hover:border-n-4 transition-colors">
-                <input
-                  type="checkbox"
-                  className="w-5 h-5 text-primary-3 rounded border-gray-300 focus:ring-primary-3"
-                  checked={!!formData.active}
-                  onChange={(e) =>
-                    setFormData((f) => ({ ...f, active: e.target.checked }))
-                  }
-                />
-                <span className="font-medium text-n-7">Active Profile</span>
-              </label>
-              <div className="grid grid-cols-2 gap-4">
-                <InputField
-                  label="Map Lat"
-                  value={formData.mapLocationLat || ""}
-                  onChange={(e) =>
-                    setFormData((f) => ({
-                      ...f,
-                      mapLocationLat: e.target.value,
-                    }))
-                  }
-                  placeholder="Lat"
-                />
-                <InputField
-                  label="Map Lng"
-                  value={formData.mapLocationLng || ""}
-                  onChange={(e) =>
-                    setFormData((f) => ({
-                      ...f,
-                      mapLocationLng: e.target.value,
-                    }))
-                  }
-                  placeholder="Lng"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-end gap-4 pt-6 border-t border-n-3">
+            <div className="flex items-center justify-end gap-4 pt-6">
               <button
                 type="button"
                 onClick={() => typeof onClose === "function" && onClose()}

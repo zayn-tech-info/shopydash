@@ -16,6 +16,7 @@ import {
   Zap,
   Star,
   MessageSquare,
+  Settings,
 } from "lucide-react";
 
 import {
@@ -129,36 +130,28 @@ export const VendorsPost = [
       {
         id: "p-1",
         name: "Handmade Tote Bag",
-        image:
-          
-          aongaHighStreetPrintRetroImg,
+        image: aongaHighStreetPrintRetroImg,
         price: 22.5,
         rating: 4.7,
       },
       {
         id: "p-1b",
         name: "Beaded Bracelet",
-        image:
-          
-          armorCardSlotIphoneCaseImg,
+        image: armorCardSlotIphoneCaseImg,
         price: 7.5,
         rating: 4.4,
       },
       {
         id: "p-1c",
         name: "Macrame Keychain",
-        image:
-          
-          appleCollectionImg,
+        image: appleCollectionImg,
         price: 4.0,
         rating: 4.2,
       },
       {
         id: "p-1d",
         name: "Woven Pouch",
-        image:
-          
-          beanBagsBigWImg,
+        image: beanBagsBigWImg,
         price: 9.0,
         rating: 4.5,
       },
@@ -175,45 +168,35 @@ export const VendorsPost = [
       {
         id: "p-2",
         name: "Strawberries",
-        image:
-          
-          betterHomesGardensBazaarImg,
+        image: betterHomesGardensBazaarImg,
         price: 5.0,
         rating: 4.5,
       },
       {
         id: "p-2b",
         name: "Spinach",
-        image:
-          
-          caseCompatibleSamsungGalaxyImg,
+        image: caseCompatibleSamsungGalaxyImg,
         price: 3.2,
         rating: 4.3,
       },
       {
         id: "p-2c",
         name: "Tomatoes",
-        image:
-          
-          cottonHeadNeckArabScarfImg,
+        image: cottonHeadNeckArabScarfImg,
         price: 4.1,
         rating: 4.6,
       },
       {
         id: "p-2b",
         name: "Spinach",
-        image:
-          
-          caseCompatibleSamsungGalaxyImg,
+        image: caseCompatibleSamsungGalaxyImg,
         price: 3.2,
         rating: 4.3,
       },
       {
         id: "p-2c",
         name: "Tomatoes",
-        image:
-          
-          cottonHeadNeckArabScarfImg,
+        image: cottonHeadNeckArabScarfImg,
         price: 4.1,
         rating: 4.6,
       },
@@ -240,20 +223,17 @@ export const schools = [
 ];
 
 export const preferredCategories = [
-  "Food & Snacks",
-  "Clothing & Fashion",
-  "Shoes & Bags",
-  "Electronics & Gadgets",
-  "Phone Accessories",
-  "Beauty & Personal Care",
-  "Health & Wellness",
+  "Clothes",
+  "Perfumes",
+  "Wristwatches",
+  "Gadgets / Appliances",
+  "Footwears",
+  "Bags",
   "Groceries",
-  "Home & Kitchen",
-  "Stationery & School Supplies",
-  "Services (Haircut, Laundry, Repairs)",
-  "Sports & Fitness",
-  "Art & Crafts",
-  "Books & Study Materials",
+  "Beauty / Skincare",
+  "Accessories",
+  "Textbooks / Stationaries",
+  "Services",
   "Others",
 ];
 

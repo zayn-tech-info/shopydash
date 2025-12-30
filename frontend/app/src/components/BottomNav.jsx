@@ -17,6 +17,8 @@ export function BottomNav() {
   if (!authUser) return null;
 
   const renderNav = (nav, role) => {
+    if (nav === "Settings") return null;
+    if (nav === "Messages") return null;
     if (nav === "Dashboard" && role !== "vendor") {
       return null;
     }
@@ -69,7 +71,7 @@ export function BottomNav() {
                     px: 1.5,
                     border: "none",
                   },
-                  
+
                   "& .MuiBottomNavigationAction-label": {
                     fontSize: 12,
                     fontWeight: 500,

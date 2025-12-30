@@ -68,7 +68,7 @@ const getPublicVendorProfile = asyncErrorHandler(async (req, res, next) => {
     })
     .populate(
       "userId",
-      "businessName email phoneNumber whatsAppNumber schoolName logo isVerified profilePic subscriptionPlan"
+      "businessName email phoneNumber whatsAppNumber schoolName logo isVerified profilePic subscriptionPlan city state country schoolArea area"
     );
 
   if (!vendorProfile) {
@@ -76,7 +76,6 @@ const getPublicVendorProfile = asyncErrorHandler(async (req, res, next) => {
     return next(error);
   }
 
-  
   const subscription = await Subscription.findOne({
     user: vendorProfile.userId._id,
     status: "active",
@@ -152,7 +151,7 @@ const getAllVendorsProfile = asyncErrorHandler(async (req, res, next) => {
         subscription: { $arrayElemAt: ["$subscription", 0] },
       },
     },
-    
+
     {
       $addFields: {
         isBoosted: {
@@ -179,7 +178,7 @@ const getAllVendorsProfile = asyncErrorHandler(async (req, res, next) => {
     },
     {
       $project: {
-        subscription: 0, 
+        subscription: 0,
       },
     },
   ]);
@@ -206,31 +205,36 @@ const updateVendorProfile = asyncErrorHandler(async (req, res, next) => {
   }
 
   const {
+    businessName,
+    phoneNumber,
     storeDescription,
     businessCategory,
-    address,
-    city,
-    state,
-    area,
-    country,
-    zipCode,
     accountNumber,
     paymentMethods,
     instagram,
     facebook,
     twitter,
     storeUsername,
+    sellingDuration,
+    offersDelivery,
   } = req.body;
+
+  if (businessName || phoneNumber) {
+    const userUpdates = {};
+    if (businessName) userUpdates.businessName = businessName;
+    if (phoneNumber) userUpdates.phoneNumber = phoneNumber;
+
+    await User.findByIdAndUpdate(userId, userUpdates, {
+      new: true,
+      runValidators: true,
+    });
+  }
 
   const updates = {
     storeDescription,
     businessCategory,
-    address,
-    city,
-    state,
-    area,
-    country,
-    zipCode,
+    sellingDuration,
+    offersDelivery,
     accountNumber,
     paymentMethods,
     socialLinks: {

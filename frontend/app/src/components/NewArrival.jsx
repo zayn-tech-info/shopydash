@@ -28,7 +28,7 @@ export function NewArrival({ limit = 10 }) {
         <div>
           <h2 className="h4 text-n-8">New Arrivals</h2>
           <p className="body-2 text-n-4 mt-1">
-            Fresh on Campus — newly listed items from vendors near you.
+            Fresh on Campus! Newly listed items from vendors near you.
           </p>
         </div>
         <button className="hidden md:flex items-center gap-2 font-code text-xs font-bold uppercase tracking-wider text-primary-3 hover:text-primary-4 transition-colors">

@@ -45,28 +45,25 @@ const create = asyncErrorHandler(async (req, res, next) => {
 const update = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user && req.user._id;
 
-  const {
-    gender,
-    address,
-    city,
-    state,
+  const { fullName, phoneNumber, gender, preferredCategory, wishList, bio } =
+    req.body;
 
-    area,
-    country,
-    preferredCategory,
-    wishList,
-  } = req.body;
+  if (fullName || phoneNumber) {
+    const userUpdates = {};
+    if (fullName) userUpdates.fullName = fullName;
+    if (phoneNumber) userUpdates.phoneNumber = phoneNumber;
+
+    await User.findByIdAndUpdate(userId, userUpdates, {
+      new: true,
+      runValidators: true,
+    });
+  }
 
   const updates = {
     gender,
-    address,
-    city,
-    state,
-
-    area,
-    country,
     preferredCategory,
     wishList,
+    bio,
   };
 
   const updated = await clientProfileSchema.findOneAndUpdate(

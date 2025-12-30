@@ -5,7 +5,7 @@ import { useAuthStore } from "../store/authStore";
 import { useNavigate, useParams } from "react-router-dom";
 import { useClientProfileStore } from "../store/clientProfileStore";
 import { EditClientProfile } from "../components/client/EditClientProfile";
-import { LogOut } from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
 import { ClientAddress } from "../components/client/ClientAddress";
 import { ClientProfileSkeleton } from "../components/skeletons/ClientProfileSkeleton";
 
@@ -86,9 +86,11 @@ export function ClientProfile() {
             <div className="bg-white rounded-2xl p-8 border border-n-3/20 shadow-sm">
               <div className="flex items-start justify-between">
                 <div>
-                  <h1 className="h3 text-n-8 mb-2">
-                    {clientProfile?.userId?.fullName}
-                  </h1>
+                  <div className="flex items-center gap-3 mb-2">
+                    <h1 className="h3 text-n-8">
+                      {clientProfile?.userId?.fullName}
+                    </h1>
+                  </div>
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-n-4 body-2">
                     <span className="font-code text-primary-3">
                       @{clientProfile?.userId?.username || "-"}
@@ -96,15 +98,26 @@ export function ClientProfile() {
                     <span className="w-1 h-1 rounded-full bg-n-3"></span>
                     <span>
                       {[
-                        clientProfile?.city,
-                        clientProfile?.state,
-                        clientProfile?.country,
+                        clientProfile?.userId?.city,
+                        clientProfile?.userId?.state,
+                        clientProfile?.userId?.country,
                       ]
                         .filter(Boolean)
                         .join(", ")}
                     </span>
                   </div>
                 </div>
+                {authUser &&
+                  clientProfile &&
+                  authUser._id === clientProfile.userId?._id && (
+                    <button
+                      onClick={() => navigate("/settings")}
+                      className="p-1.5 text-n-4 hover:text-primary-3 hover:bg-n-2 rounded-full transition-colors flex-shrink-0"
+                      title="Settings"
+                    >
+                      <Settings size={20} />
+                    </button>
+                  )}
               </div>
             </div>
 

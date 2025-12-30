@@ -20,15 +20,18 @@ export function Header() {
   }, [authUser, fetchConversations]);
 
   const unreadMessageCount = conversations.reduce((acc, conv) => {
-    
-    
     const count = conv.unreadCounts?.[authUser?._id] || 0;
     return acc + count;
   }, 0);
 
   const renderNav = (nav, role) => {
+    if (nav === "Pricing" && role === "client") {
+      return null;
+    }
+    if (nav === "Messages") return null;
+
     if (!role) {
-      if (nav === "Dashboard" || nav === "Profile" || nav === "Messages") {
+      if (nav === "Dashboard" || nav === "Profile") {
         return null;
       }
     }

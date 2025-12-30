@@ -28,6 +28,7 @@ import PricingPage from "./pages/PricingPage";
 import VendorBankSettings from "./pages/VendorBankSettings";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import OrderList from "./pages/OrderList";
+import SettingsPage from "./pages/SettingsPage";
 
 const App = () => {
   const authUser = useAuthStore((state) => state.authUser);
@@ -134,7 +135,20 @@ const App = () => {
           <Route path="/order/confirmation" element={<OrderConfirmation />} />
           <Route path="/orders" element={<OrderList />} />
           <Route path="/messages" element={<MessagesPage />} />
-          <Route path="/pricing" element={<PricingPage />} />
+          <Route
+            path="/settings"
+            element={authUser ? <SettingsPage /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/pricing"
+            element={
+              authUser?.role === "client" ? (
+                <Navigate to="/" />
+              ) : (
+                <PricingPage />
+              )
+            }
+          />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>

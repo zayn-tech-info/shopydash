@@ -19,7 +19,15 @@ const vendorProfileSchema = new mongoose.Schema(
       type: String,
     },
     businessCategory: {
+      type: [String],
+      default: [],
+    },
+    sellingDuration: {
       type: String,
+    },
+    offersDelivery: {
+      type: Boolean,
+      default: false,
     },
 
     coverImage: {
