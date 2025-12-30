@@ -18,6 +18,7 @@ export function BottomNav() {
 
   const renderNav = (nav, role) => {
     if (nav === "Settings") return null;
+    if (nav === "Messages") return null;
     if (nav === "Dashboard" && role !== "vendor") {
       return null;
     }

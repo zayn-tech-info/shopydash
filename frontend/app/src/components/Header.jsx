@@ -28,8 +28,10 @@ export function Header() {
     if (nav === "Pricing" && role === "client") {
       return null;
     }
+    if (nav === "Messages") return null;
+
     if (!role) {
-      if (nav === "Dashboard" || nav === "Profile" || nav === "Messages") {
+      if (nav === "Dashboard" || nav === "Profile") {
         return null;
       }
     }
