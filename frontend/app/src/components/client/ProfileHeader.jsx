@@ -1,9 +1,10 @@
-import { Edit, LogOut, Plus } from "lucide-react";
+import { Edit, LogOut, Plus, Settings } from "lucide-react";
 import UserAvatar from "../UserAvatar";
 import { useClientProfileStore } from "../../store/clientProfileStore";
 import { useAuthStore } from "../../store/authStore";
 import { useRef } from "react";
 import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 export default function ProfileHeader({
   clientProfile,
@@ -15,24 +16,7 @@ export default function ProfileHeader({
   const updateProfile = useAuthStore((state) => state.updateProfile);
   const fileInputRef = useRef(null);
 
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
 
-    const formData = new FormData();
-    formData.append("avatar", file);
-
-    try {
-      await updateProfile(formData);
-      toast.success("Profile picture updated successfully");
-      if (authUser.username) {
-        await getProfile(authUser.username);
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to update profile picture");
-    }
-  };
 
   const isOwner =
     authUser && clientProfile && authUser._id === clientProfile.userId?._id;
@@ -58,24 +42,6 @@ export default function ProfileHeader({
               className="w-full h-full transition-transform duration-500 group-hover:scale-105"
             />
           </div>
-          {isOwner && (
-            <>
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="absolute bottom-0 right-0 p-2.5 bg-primary-3 text-white rounded-full border-4 border-white z-20"
-                title="Change profile picture"
-              >
-                <Plus size={18} />
-              </button>
-              <input
-                type="file"
-                ref={fileInputRef}
-                className="hidden"
-                onChange={handleImageUpload}
-                accept="image/*"
-              />
-            </>
-          )}
         </div>
 
         <h2 className="h4 text-n-8 text-center mb-1">{clientName}</h2>

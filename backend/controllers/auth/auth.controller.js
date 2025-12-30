@@ -288,6 +288,7 @@ const updateUser = asyncErrorHandler(async (req, res, next) => {
     "country",
     "schoolArea",
     "area",
+    "username",
   ];
 
   let filteredBody = filterField(req.body, ...allowedFields);
@@ -341,6 +342,42 @@ const updateUser = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
+const changePassword = asyncErrorHandler(async (req, res, next) => {
+  const { currentPassword, newPassword, confirmPassword } = req.body;
+  const userId = req.user._id;
+
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    const error = new customError("All fields are required", 400);
+    return next(error);
+  }
+
+  if (newPassword !== confirmPassword) {
+    const error = new customError(
+      "New password and confirm password do not match",
+      400
+    );
+    return next(error);
+  }
+
+  const user = await User.findById(userId).select("+password");
+
+  if (!user) {
+    const error = new customError("User not found", 404);
+    return next(error);
+  }
+
+  const isPasswordMatch = await user.comparePassword(currentPassword);
+  if (!isPasswordMatch) {
+    const error = new customError("Current incorrect password", 401);
+    return next(error);
+  }
+
+  user.password = newPassword;
+  await user.save();
+
+  sendToken(user, "Password changed successfully", res, 200);
+});
+
 module.exports = {
   signup,
   login,
@@ -349,4 +386,5 @@ module.exports = {
   googleAuth,
   completeRegistration,
   updateUser,
+  changePassword,
 };

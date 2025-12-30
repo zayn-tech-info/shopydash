@@ -1,4 +1,4 @@
-import { Edit, Share2, Plus, LogOut } from "lucide-react";
+import { Edit, Share2, Plus, LogOut, Settings } from "lucide-react";
 import SubscriptionBadge from "../common/SubscriptionBadge";
 import UserAvatar from "../UserAvatar";
 import { useVendorProfileStore } from "../../store/vendorProfileStore";
@@ -39,8 +39,6 @@ export default function VendorSidebar({
     ? authUser?.profilePic
     : vendorProfile?.userId?.profilePic;
 
-
-
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -74,25 +72,6 @@ export default function VendorSidebar({
               <div className="absolute inset-0 bg-primary-3/10 pointer-events-none rounded-full" />
             )}
           </div>
-
-          {isOwner && (
-            <>
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="absolute bottom-0 right-0 p-2.5 bg-primary-3 text-white rounded-full border-4 border-white z-20"
-                title="Change profile picture"
-              >
-                <Plus size={18} />
-              </button>
-              <input
-                type="file"
-                ref={fileInputRef}
-                className="hidden"
-                onChange={handleImageUpload}
-                accept="image/*"
-              />
-            </>
-          )}
         </div>
 
         <button
@@ -108,7 +87,6 @@ export default function VendorSidebar({
           <SubscriptionBadge plan={plan} size="sm" />
         </div>
         <p className="body-2 text-n-4 text-center font-code">@{username}</p>
-
 
         {isOwner ? (
           <button

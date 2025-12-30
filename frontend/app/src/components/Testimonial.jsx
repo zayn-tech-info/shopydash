@@ -1,4 +1,4 @@
-import { Quote } from "lucide-react";
+/* import { Quote } from "lucide-react";
 
 const testimonials = [
   {
@@ -82,3 +82,4 @@ export function Testimonial() {
     </section>
   );
 }
+ */

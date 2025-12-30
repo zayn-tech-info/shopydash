@@ -16,6 +16,7 @@ import {
   Zap,
   Star,
   MessageSquare,
+  Settings,
 } from "lucide-react";
 
 import {

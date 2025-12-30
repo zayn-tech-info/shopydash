@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function OrderList() {
+export default function OrderList({ isEmbedded = false }) {
   const {
     orders,
     isLoading,
@@ -66,7 +66,11 @@ export default function OrderList() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div
+        className={`${
+          isEmbedded ? "h-full py-12" : "min-h-screen"
+        } flex items-center justify-center bg-gray-50`}
+      >
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
@@ -79,7 +83,11 @@ export default function OrderList() {
 
   if (orders.length === 0) {
     return (
-      <div className="min-h-[80vh] flex flex-col items-center justify-center p-4 text-center bg-gray-50">
+      <div
+        className={`${
+          isEmbedded ? "h-full" : "min-h-[80vh]"
+        } flex flex-col items-center justify-center p-4 text-center bg-gray-50`}
+      >
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -103,8 +111,12 @@ export default function OrderList() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
+    <div
+      className={`${
+        isEmbedded ? "" : "min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8"
+      }`}
+    >
+      <div className={`${isEmbedded ? "" : "max-w-4xl mx-auto"}`}>
         <header className="mb-10">
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
             <Package className="text-primary-3" size={32} />
