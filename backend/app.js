@@ -31,7 +31,7 @@ const mode = process.env.NODE_ENV || "development";
 const frontendOrigin =
   mode === "development"
     ? "http://localhost:5173"
-    : "https://shopydash-app-rho.vercel.app";
+    : "https://shopydash-v1.vercel.app";
 
 app.use(
   cors({
