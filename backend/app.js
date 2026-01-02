@@ -38,16 +38,13 @@ app.use(
   })
 );
 
-
 app.use(securityHeaders);
 
 app.use(cookieParser());
 
 app.use(express.json());
 
-
 app.use(csrfProtection);
-
 
 app.use(sanitizeInputs);
 
@@ -63,6 +60,10 @@ app.use("/api/v1/orders", orderRouter);
 app.use("/api/v1/reviews", reviewRouter);
 app.use("/api/v1/messages", messageRouter);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
+});
 
 app.all(/(.*)/, (req, res, next) => {
   const err = new customError(

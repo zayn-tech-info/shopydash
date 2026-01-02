@@ -1,16 +1,17 @@
 const dotenv = require("dotenv");
 dotenv.config({ path: ".env" });
 const http = require("http");
+const cron = require("node-cron");
+const https = require("https");
 const { Server } = require("socket.io");
-const DOMPurify = require('isomorphic-dompurify');
+const DOMPurify = require("isomorphic-dompurify");
 
 const validateEnv = require("./utils/validateEnv");
 const app = require("./app");
-const socketAuthMiddleware = require('./middleware/socketAuth');
+const socketAuthMiddleware = require("./middleware/socketAuth");
 const Message = require("./models/message.model");
 const Conversation = require("./models/conversation.model");
 const { logError, logInfo } = require("./utils/logger");
-
 
 validateEnv();
 
@@ -29,12 +30,9 @@ const io = new Server(server, {
   },
 });
 
-
 app.set("io", io);
 
-
 io.use(socketAuthMiddleware);
-
 
 class SocketRateLimiter {
   constructor() {
@@ -43,7 +41,10 @@ class SocketRateLimiter {
 
   check(userId, limit = 30, windowMs = 60000) {
     const now = Date.now();
-    const userLimit = this.limits.get(userId) || { count: 0, resetTime: now + windowMs };
+    const userLimit = this.limits.get(userId) || {
+      count: 0,
+      resetTime: now + windowMs,
+    };
 
     if (now > userLimit.resetTime) {
       userLimit.count = 0;
@@ -71,16 +72,13 @@ class SocketRateLimiter {
 
 const messageRateLimiter = new SocketRateLimiter();
 
-
 setInterval(() => messageRateLimiter.cleanup(), 5 * 60 * 1000);
 
 io.on("connection", (socket) => {
   logInfo("Socket", `User connected: ${socket.userId}`);
 
-  
   socket.join(`user:${socket.userId}`);
 
-  
   socket.on("join_user_room", (userId) => {
     if (userId && userId === socket.userId) {
       socket.join(userId);
@@ -88,12 +86,10 @@ io.on("connection", (socket) => {
     }
   });
 
-  
   socket.on("join_chat", async (conversationId) => {
     try {
       if (!conversationId) return;
 
-      
       const conversation = await Conversation.findById(conversationId);
       if (!conversation) {
         socket.emit("error", { message: "Conversation not found" });
@@ -101,7 +97,7 @@ io.on("connection", (socket) => {
       }
 
       const isParticipant = conversation.participants.some(
-        p => p.toString() === socket.userId
+        (p) => p.toString() === socket.userId
       );
 
       if (!isParticipant) {
@@ -110,32 +106,33 @@ io.on("connection", (socket) => {
       }
 
       socket.join(conversationId);
-      logInfo("Socket", `User ${socket.userId} joined chat room ${conversationId}`);
+      logInfo(
+        "Socket",
+        `User ${socket.userId} joined chat room ${conversationId}`
+      );
     } catch (error) {
       logError("Socket", `Error joining chat: ${error.message}`);
       socket.emit("error", { message: "Failed to join chat" });
     }
   });
 
-  
   socket.on("send_message", async (data) => {
     try {
       const { conversationId, content } = data;
       const userId = socket.userId;
 
-      
       if (!messageRateLimiter.check(userId, 30, 60000)) {
-        socket.emit("error", { message: "Rate limit exceeded. Please slow down." });
+        socket.emit("error", {
+          message: "Rate limit exceeded. Please slow down.",
+        });
         return;
       }
 
-      
       if (!conversationId || !content) {
         socket.emit("error", { message: "Invalid message data" });
         return;
       }
 
-      
       const conversation = await Conversation.findById(conversationId);
       if (!conversation) {
         socket.emit("error", { message: "Conversation not found" });
@@ -143,7 +140,7 @@ io.on("connection", (socket) => {
       }
 
       const isParticipant = conversation.participants.some(
-        p => p.toString() === userId
+        (p) => p.toString() === userId
       );
 
       if (!isParticipant) {
@@ -151,10 +148,9 @@ io.on("connection", (socket) => {
         return;
       }
 
-      
       const sanitizedContent = DOMPurify.sanitize(content, {
         ALLOWED_TAGS: [],
-        KEEP_CONTENT: true
+        KEEP_CONTENT: true,
       });
 
       if (sanitizedContent.length > 2000) {
@@ -167,22 +163,19 @@ io.on("connection", (socket) => {
         return;
       }
 
-      
       const message = await Message.create({
         conversationId,
         sender: userId,
         content: sanitizedContent,
       });
 
-      await message.populate('sender', 'fullName profilePic');
+      await message.populate("sender", "fullName profilePic");
 
-      
       await Conversation.findByIdAndUpdate(conversationId, {
         lastMessage: message._id,
         updatedAt: new Date(),
       });
 
-      
       io.to(conversationId).emit("receive_message", message);
 
       logInfo("Socket", `Message sent in conversation ${conversationId}`);
@@ -203,6 +196,25 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     logInfo("Socket", `User disconnected: ${socket.userId}`);
   });
+});
+
+// Cron job to ping the server every 5 minutes to avoid Render spin-down
+cron.schedule("*/5 * * * *", () => {
+  const backendUrl = process.env.BACKEND_URL;
+  if (!backendUrl) {
+    console.log("BACKEND_URL not set, skipping self-ping.");
+    return;
+  }
+
+  const protocol = backendUrl.startsWith("https") ? https : http;
+
+  protocol
+    .get(`${backendUrl}/health`, (res) => {
+      // console.log(`Self-ping status: ${res.statusCode}`);
+    })
+    .on("error", (err) => {
+      console.error(`Self-ping failed: ${err.message}`);
+    });
 });
 
 server.listen(PORT, () => {

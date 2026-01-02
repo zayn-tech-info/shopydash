@@ -44,3 +44,6 @@ Thumbs.db
 .vercel
 .turbo
 .pnpm-store/
+
+# Database utilities
+rename.db.js

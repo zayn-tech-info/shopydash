@@ -22,6 +22,7 @@ async function renameDatabase(oldName, newName) {
 
     await client.db(oldName).dropDatabase();
     console.log("Database renamed successfully!");
+    console.log(require('crypto').randomBytes(32).toString('hex'))
   } catch (err) {
     console.error(err);
   } finally {
@@ -29,4 +30,4 @@ async function renameDatabase(oldName, newName) {
   }
 }
 
-renameDatabase("test", "vendora");
+renameDatabase("test", "shopydash");
