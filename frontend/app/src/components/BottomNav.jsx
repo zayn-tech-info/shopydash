@@ -15,8 +15,10 @@ export function BottomNav() {
   }, [location.pathname]);
 
   const renderNav = (nav, role) => {
+    if (nav === "Pricing" && role !== "vendor") return null;
+
     if (!authUser) {
-      if (nav === "Home" || nav === "Pricing") return;
+      if (nav === "Home") return;
       return null;
     }
 
