@@ -62,24 +62,32 @@ export const VendorFloatingButton = () => {
           </button>
         )}
 
-        {isVendor && location.pathname !== "/vendor/add" && (
-          <div className="w-8 h-[1px] bg-white/20" />
-        )}
+        {isVendor &&
+          location.pathname !== "/vendor/add" &&
+          (authUser.role !== "vendor" ||
+            ["Shopydash Pro", "Shopydash Max"].includes(
+              authUser?.subscriptionPlan
+            )) && <div className="w-8 h-[1px] bg-white/20" />}
 
-        <button
-          onClick={handleMessageClick}
-          className={`flex items-center justify-center text-white hover:bg-white/10 transition-colors relative ${
-            isVendor ? "w-12 h-12 rounded-full" : "w-14 h-14"
-          }`}
-          title="Messages"
-        >
-          <MessageSquare size={isVendor ? 24 : 28} strokeWidth={2.5} />
-          {unreadMessageCount > 0 && (
-            <span className="absolute top-2 right-2 md:top-3 md:right-3 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white border border-[#F7561B]">
-              {unreadMessageCount > 99 ? "99+" : unreadMessageCount}
-            </span>
-          )}
-        </button>
+        {(authUser.role !== "vendor" ||
+          ["Shopydash Pro", "Shopydash Max"].includes(
+            authUser?.subscriptionPlan
+          )) && (
+          <button
+            onClick={handleMessageClick}
+            className={`flex items-center justify-center text-white hover:bg-white/10 transition-colors relative ${
+              isVendor ? "w-12 h-12 rounded-full" : "w-14 h-14"
+            }`}
+            title="Messages"
+          >
+            <MessageSquare size={isVendor ? 24 : 28} strokeWidth={2.5} />
+            {unreadMessageCount > 0 && (
+              <span className="absolute top-2 right-2 md:top-3 md:right-3 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white border border-[#F7561B]">
+                {unreadMessageCount > 99 ? "99+" : unreadMessageCount}
+              </span>
+            )}
+          </button>
+        )}
       </div>
     </div>
   );

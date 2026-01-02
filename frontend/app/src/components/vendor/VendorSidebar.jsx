@@ -99,37 +99,39 @@ export default function VendorSidebar({
             <span>Edit profile</span>
           </button>
         ) : (
-          <div className="mt-6 w-full">
-            <button
-              onClick={async () => {
-                if (!authUser) {
-                  toast.error("Please login to message this vendor");
-                  return;
-                }
-
-                const recipientId = vendorProfile?.userId?._id;
-                if (!recipientId) return;
-
-                const result = await checkAccess(recipientId);
-
-                if (result.allowed) {
-                  await fetchMessages(result.conversation._id);
-                  navigate("/messages");
-                } else if (result.action === "REDIRECT_WHATSAPP") {
-                  const number = result.data.whatsAppNumber;
-                  if (number) {
-                    const formattedNumber = number.replace(/\D/g, "");
-                    window.open(`https://wa.me/${formattedNumber}`, "_blank");
-                  } else {
-                    toast.error("Vendor WhatsApp not available");
+          ["Shopydash Pro", "Shopydash Max"].includes(plan) && (
+            <div className="mt-6 w-full">
+              <button
+                onClick={async () => {
+                  if (!authUser) {
+                    toast.error("Please login to message this vendor");
+                    return;
                   }
-                }
-              }}
-              className="w-full px-6 py-3 bg-primary-3 hover:bg-primary-4 text-white rounded-xl transition-colors font-code text-xs font-bold uppercase tracking-wider shadow-lg shadow-primary-3/20"
-            >
-              Message
-            </button>
-          </div>
+
+                  const recipientId = vendorProfile?.userId?._id;
+                  if (!recipientId) return;
+
+                  const result = await checkAccess(recipientId);
+
+                  if (result.allowed) {
+                    await fetchMessages(result.conversation._id);
+                    navigate("/messages");
+                  } else if (result.action === "REDIRECT_WHATSAPP") {
+                    const number = result.data.whatsAppNumber;
+                    if (number) {
+                      const formattedNumber = number.replace(/\D/g, "");
+                      window.open(`https://wa.me/${formattedNumber}`, "_blank");
+                    } else {
+                      toast.error("Vendor WhatsApp not available");
+                    }
+                  }
+                }}
+                className="w-full px-6 py-3 bg-primary-3 hover:bg-primary-4 text-white rounded-xl transition-colors font-code text-xs font-bold uppercase tracking-wider shadow-lg shadow-primary-3/20"
+              >
+                Message
+              </button>
+            </div>
+          )
         )}
 
         <div className="mt-6 w-full grid grid-cols-2 gap-4 text-center">

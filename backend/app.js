@@ -28,14 +28,20 @@ app.set("trust proxy", 1);
 
 const mode = process.env.NODE_ENV || "development";
 
-const frontendOrigin =
-  mode === "development"
-    ? "http://localhost:5173"
-    : "https://shopydash-v1.vercel.app";
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://shopydash-v1.vercel.app",
+];
 
 app.use(
   cors({
-    origin: frontendOrigin,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
