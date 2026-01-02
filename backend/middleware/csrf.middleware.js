@@ -1,33 +1,22 @@
 const customError = require("../errors/customError");
 
-
-
-
 const csrfProtection = (req, res, next) => {
-  
   if (["GET", "HEAD", "OPTIONS"].includes(req.method)) {
     return next();
   }
 
-  
-  const mode = process.env.NODE_ENV || "development";
   const allowedOrigins = [
-    mode === "development"
-      ? "http://localhost:5173"
-      : "https://shopydash-app-rho.vercel.app",
+    "http://localhost:5173",
+    "https://shopydash-v1.vercel.app",
   ];
 
   const origin = req.get("origin") || req.get("referer");
 
-  
-  
-  
   const hasCustomHeader =
     req.get("X-Requested-With") === "XMLHttpRequest" ||
     req.get("Content-Type")?.includes("application/json");
 
   if (!hasCustomHeader && origin) {
-    
     const isValidOrigin = allowedOrigins.some((allowed) =>
       origin?.startsWith(allowed)
     );
