@@ -317,12 +317,12 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
         $switch: {
           branches: [
             {
-              case: { $eq: ["$subscription.plan", "Vendora Max"] },
+              case: { $eq: ["$subscription.plan", "Shopydash Max"] },
               then: 30,
             },
-            { case: { $eq: ["$subscription.plan", "Vendora Pro"] }, then: 20 },
+            { case: { $eq: ["$subscription.plan", "Shopydash Pro"] }, then: 20 },
             {
-              case: { $eq: ["$subscription.plan", "Vendora Boost"] },
+              case: { $eq: ["$subscription.plan", "Shopydash Boost"] },
               then: 10,
             },
           ],

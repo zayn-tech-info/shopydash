@@ -264,7 +264,7 @@ exports.getAvailableVendorsForChat = asyncErrorHandler(async (req, res, next) =>
     role: "vendor",
     schoolId: schoolId,
     subscriptionPlan: {
-      $in: ["Vendora Pro", "Vendora Max"],
+      $in: ["Shopydash Pro", "Shopydash Max"],
     },
     _id: { $ne: currentUserId }, 
   }).select("fullName businessName profilePic subscriptionPlan schoolName");

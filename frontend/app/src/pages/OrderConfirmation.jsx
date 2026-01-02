@@ -78,7 +78,7 @@ export default function OrderConfirmation() {
             Return to Cart
           </Link>
           <a
-            href="mailto:support@vendora.com"
+            href="mailto:support@shopydash.com"
             className="px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
           >
             Contact Support

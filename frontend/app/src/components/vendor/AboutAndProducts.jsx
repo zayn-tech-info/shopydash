@@ -5,6 +5,7 @@ import { Star, User } from "lucide-react";
 
 function AboutAndProducts({ vendor }) {
   const [tab, setTab] = useState("products");
+  const [visibleCount, setVisibleCount] = useState(20);
   const { reviews, getVendorReviews, isLoading } = useReviewStore();
   const products = vendor?.products || [];
 
@@ -94,13 +95,23 @@ function AboutAndProducts({ vendor }) {
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                {products.map((p) => (
+                {products.slice(0, visibleCount).map((p) => (
                   <VendorProductItem
                     key={p._id || p}
                     product={p}
                     vendorId={vendor?.userId?._id}
                   />
                 ))}
+              </div>
+            )}
+            {products.length > visibleCount && (
+              <div className="flex justify-center mt-8">
+                <button
+                  onClick={() => setVisibleCount((prev) => prev + 10)}
+                  className="px-6 py-2 rounded-full border border-n-3/10 text-n-6 font-bold text-sm hover:border-primary-3 hover:text-primary-3 transition-colors"
+                >
+                  View More
+                </button>
               </div>
             )}
           </div>

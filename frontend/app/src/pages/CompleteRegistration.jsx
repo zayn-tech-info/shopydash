@@ -126,7 +126,7 @@ export default function CompleteRegistration() {
                   type="text"
                   value={businessName}
                   onChange={(e) => setBusinessName(e.target.value)}
-                  placeholder="e.g. Vendora Shop"
+                  placeholder="e.g. Shopydash Shop"
                   className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
                   required={!isClient}
                 />

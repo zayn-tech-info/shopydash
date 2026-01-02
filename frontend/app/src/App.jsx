@@ -25,7 +25,6 @@ import CartPage from "./pages/CartPage";
 import SearchProducts from "./pages/SearchProducts";
 import MessagesPage from "./pages/Messages.jsx";
 import PricingPage from "./pages/PricingPage";
-import VendorBankSettings from "./pages/VendorBankSettings";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import OrderList from "./pages/OrderList";
 import SettingsPage from "./pages/SettingsPage";
@@ -62,7 +61,7 @@ const App = () => {
         className={`relative mx-auto ${
           location.pathname === "/messages"
             ? "w-full max-w-full px-0 pb-0 h-screen pt- overflow-hidden bg-n-1"
-            : "max-w-7xl px-2 sm:px-6 md:px-10 lg:px-8 pb-20"
+            : "max-w-7xl px-2 sm:px-6 md:px-10 lg:px-8 pb-40"
         }`}
       >
         <Routes>
@@ -123,10 +122,10 @@ const App = () => {
             }
           />
           <Route path="/dashboard" element={<VendorDashboard />} />
-          <Route
+          {/* <Route
             path="/vendor/settings/bank"
             element={<VendorBankSettings />}
-          />
+          /> */}
           <Route path="/vendor/add" element={<VendorProductUpload />} />
           <Route path="/feeds" element={<Feeds />} />
           <Route path="/search" element={<SearchProducts />} />

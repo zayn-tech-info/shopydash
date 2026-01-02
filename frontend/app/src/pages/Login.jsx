@@ -1,6 +1,6 @@
 import { useAuthStore } from "../store/authStore";
 import { useGoogleLogin } from "@react-oauth/google";
-import logoUrl from "../assets/images/vendora_logo.png";
+import logoUrl from "../assets/images/shopydash_logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { LoginForm } from "../components/LoginForm";
@@ -47,7 +47,7 @@ export function Login() {
             <Link to="/" className="inline-block">
               <img
                 src={logoUrl}
-                alt="Vendora"
+                alt="Shopydash"
                 className="mx-auto h-12 w-auto object-contain mb-4 hover:scale-105 transition-transform"
               />
             </Link>

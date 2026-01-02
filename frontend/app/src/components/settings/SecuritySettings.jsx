@@ -57,7 +57,7 @@ export function SecuritySettings() {
           <h4 className="font-bold text-n-8 mb-1">Secure Your Account</h4>
           <p className="text-sm text-n-5">
             Use a strong password with at least 8 characters, including numbers
-            and symbols, to keep your Vendora account safe.
+            and symbols, to keep your Shopydash account safe.
           </p>
         </div>
       </div>

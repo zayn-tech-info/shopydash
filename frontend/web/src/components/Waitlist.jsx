@@ -21,7 +21,7 @@ export function Waitlist() {
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
             <h2 className="text-4xl font-bold text-white mb-4">
-              Join the Vendora Waitlist
+              Join the Shopydash Waitlist
             </h2>
             <p className="text-xl text-orange-50">
               Be among the first students to access the campus marketplace.
@@ -51,7 +51,7 @@ export function Waitlist() {
                 You're on the list!
               </h3>
               <p className="text-gray-600">
-                We'll notify you as soon as Vendora launches at your campus.
+                We'll notify you as soon as Shopydash launches at your campus.
               </p>
             </div>
           ) : (

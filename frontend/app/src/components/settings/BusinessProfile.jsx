@@ -71,7 +71,7 @@ export function BusinessProfile({ user }) {
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-n-8">Business Profile</h2>
         <p className="text-n-4 mt-1">
-          Manage how your store appears to customers on Vendora.
+          Manage how your store appears to customers on Shopydash.
         </p>
       </div>
 

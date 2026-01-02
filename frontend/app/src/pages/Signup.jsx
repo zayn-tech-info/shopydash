@@ -1,5 +1,5 @@
 import { useState } from "react";
-import logoUrl from "../assets/images/vendora_logo.png";
+import logoUrl from "../assets/images/shopydash_logo.png";
 import { useSignupStore } from "../store/signupStore";
 import { useVendorProfileStore } from "../store/vendorProfileStore";
 import { useAuthStore } from "../store/authStore";
@@ -125,7 +125,11 @@ export function Signup() {
       resetField();
 
       const { reloadApp } = await import("../utils/navigation");
-      reloadApp("/", true);
+      if (role === "vendor") {
+        reloadApp("/pricing", true);
+      } else {
+        reloadApp("/", true);
+      }
     } catch (err) {
       const msg =
         typeof err === "string" ? err : err?.message ?? "Signup failed";
@@ -151,8 +155,8 @@ export function Signup() {
           <div className="px-8 pt-10 text-center">
             <img
               src={logoUrl}
-              alt="Vendora"
-              className="mx-auto h-12 w-auto object-contain mb-4"
+              alt="Shopydash"
+              className="mx-auto w-auto object-contain mb-4"
             />
             <h1 className="h4 text-n-8 mb-2">Create your account</h1>
             <p className="body-2 text-n-4">

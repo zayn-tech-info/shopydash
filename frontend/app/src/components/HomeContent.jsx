@@ -153,7 +153,7 @@ export function HomeContent({
               ) : (
                 <>
                   <h1 className="h4 text-n-8">
-                    Welcome to <span className="text-primary-3">Vendora</span>
+                    Welcome to <span className="text-primary-3">Shopydash</span>
                   </h1>
                   <p className="body-2 text-n-4 mt-1">
                     <Link

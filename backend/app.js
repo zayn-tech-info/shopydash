@@ -24,12 +24,14 @@ const messageRouter = require("./routes/message.route");
 connectDB();
 const app = express();
 
+app.set("trust proxy", 1);
+
 const mode = process.env.NODE_ENV || "development";
 
 const frontendOrigin =
   mode === "development"
     ? "http://localhost:5173"
-    : "https://vendora-app-rho.vercel.app";
+    : "https://shopydash-app-rho.vercel.app";
 
 app.use(
   cors({

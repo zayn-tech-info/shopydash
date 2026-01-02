@@ -6,11 +6,14 @@ import { SecuritySettings } from "../components/settings/SecuritySettings";
 import { AccountInfo } from "../components/settings/AccountInfo";
 import { BusinessProfile } from "../components/settings/BusinessProfile";
 import { NotificationSettings } from "../components/settings/NotificationSettings";
+import { PayoutSettings } from "../components/settings/PayoutSettings";
 import { OrdersSettings } from "../components/settings/OrdersSettings";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export default function SettingsPage() {
-  const [activeTab, setActiveTab] = useState("profile");
+  const [searchParams] = useSearchParams();
+  const initialTab = searchParams.get("tab") || "profile";
+  const [activeTab, setActiveTab] = useState(initialTab);
   const { authUser, logout } = useAuthStore();
   const navigate = useNavigate();
 
@@ -37,6 +40,8 @@ export default function SettingsPage() {
         return <NotificationSettings />;
       case "orders":
         return <OrdersSettings />;
+      case "payout":
+        return <PayoutSettings user={authUser} />;
       default:
         return <ProfileSettings user={authUser} />;
     }

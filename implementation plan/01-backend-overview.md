@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document provides a high-level overview of the Vendora backend application architecture.
+This document provides a high-level overview of the Shopydash backend application architecture.
 
 ---
 
@@ -37,13 +37,13 @@ backend/
 
 ## Application Setup
 
-### [app.js](file:///c:/projects/Vendora/backend/app.js)
+### [app.js](file:///c:/projects/Shopydash/backend/app.js)
 
 **Configuration**:
 
 - **CORS**: Configured for frontend origin
   - Development: `http://localhost:5173`
-  - Production: `https://vendora-app-rho.vercel.app`
+  - Production: `https://shopydash-app-rho.vercel.app`
 - **Middleware Stack**:
   - `cors()` - with credentials support
   - `cookieParser()` - for JWT cookie handling

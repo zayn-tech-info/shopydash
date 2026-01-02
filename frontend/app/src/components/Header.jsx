@@ -1,4 +1,4 @@
-import Logo from "../assets/images/vendora_logo.png";
+import Logo from "../assets/images/shopydash_logo.png";
 import { navigation } from "../constants";
 import { Link, NavLink } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
@@ -44,7 +44,7 @@ export function Header() {
     <header className="sticky top-0 z-50 bg-n-1 md:bg-n-1/90 md:backdrop-blur-sm shadow-md">
       <div className="container flex items-center justify-between">
         <Link to="/">
-          <img src={Logo} alt="Vendora Logo" width={130} height={70} />
+          <img src={Logo} className="py-2" alt="Shopydash Logo" width={90} height={40} />
         </Link>
 
         <div className="flex items-center gap-4">

@@ -1,4 +1,4 @@
-# Vendora Backend - Implementation Documentation
+# Shopydash Backend - Implementation Documentation
 
 ## Overview
 
@@ -27,7 +27,7 @@ backend/
 
 ### 2. Models (Database Schemas)
 
-#### ✅ [auth.model.js](file:///c:/projects/Vendora/backend/models/auth.model.js)
+#### ✅ [auth.model.js](file:///c:/projects/Shopydash/backend/models/auth.model.js)
 
 **Purpose**: Core user authentication and account management
 
@@ -55,7 +55,7 @@ backend/
 
 ---
 
-#### ✅ [clientProfile.model.js](file:///c:/projects/Vendora/backend/models/clientProfile.model.js)
+#### ✅ [clientProfile.model.js](file:///c:/projects/Shopydash/backend/models/clientProfile.model.js)
 
 **Purpose**: Extended profile information for client users
 
@@ -70,7 +70,7 @@ backend/
 
 ---
 
-#### ✅ [vendorProfile.model.js](file:///c:/projects/Vendora/backend/models/vendorProfile.model.js)
+#### ✅ [vendorProfile.model.js](file:///c:/projects/Shopydash/backend/models/vendorProfile.model.js)
 
 **Purpose**: Extended profile information for vendor users
 
@@ -86,7 +86,7 @@ backend/
 
 ---
 
-#### ⚠️ [vendorProduct.js](file:///c:/projects/Vendora/backend/models/vendorProduct.js)
+#### ⚠️ [vendorProduct.js](file:///c:/projects/Shopydash/backend/models/vendorProduct.js)
 
 **Purpose**: Product listing management for vendors
 
@@ -126,7 +126,7 @@ backend/
 
 ### 3. Controllers (Business Logic)
 
-#### ✅ [auth.controller.js](file:///c:/projects/Vendora/backend/controllers/auth.controller.js)
+#### ✅ [auth.controller.js](file:///c:/projects/Shopydash/backend/controllers/auth.controller.js)
 
 **Purpose**: Handle authentication and user management
 
@@ -151,7 +151,7 @@ backend/
 
 ---
 
-#### ✅ [vendorProfile.controller.js](file:///c:/projects/Vendora/backend/controllers/vendorProfile.controller.js)
+#### ✅ [vendorProfile.controller.js](file:///c:/projects/Shopydash/backend/controllers/vendorProfile.controller.js)
 
 **Purpose**: Manage vendor profile operations
 
@@ -173,7 +173,7 @@ backend/
 
 ---
 
-#### ✅ [clientProfile.controller.js](file:///c:/projects/Vendora/backend/controllers/clientProfile.controller.js)
+#### ✅ [clientProfile.controller.js](file:///c:/projects/Shopydash/backend/controllers/clientProfile.controller.js)
 
 **Purpose**: Manage client profile operations
 
@@ -195,7 +195,7 @@ backend/
 
 ### 4. Routes (API Endpoints)
 
-#### ✅ [auth.route.js](file:///c:/projects/Vendora/backend/routes/auth.route.js)
+#### ✅ [auth.route.js](file:///c:/projects/Shopydash/backend/routes/auth.route.js)
 
 ```
 POST   /api/v1/auth/signup
@@ -229,7 +229,7 @@ PATCH  /api/v1/clientProfile/ (protected, client only)
 
 ### 5. Middleware
 
-#### ✅ [auth.middleware.js](file:///c:/projects/Vendora/backend/middleware/auth.middleware.js)
+#### ✅ [auth.middleware.js](file:///c:/projects/Shopydash/backend/middleware/auth.middleware.js)
 
 **Purpose**: Protect routes and verify user roles
 
@@ -251,7 +251,7 @@ PATCH  /api/v1/clientProfile/ (protected, client only)
 
 ### 6. Error Handling
 
-#### ✅ [globalError.controller.js](file:///c:/projects/Vendora/backend/errors/globalError.controller.js)
+#### ✅ [globalError.controller.js](file:///c:/projects/Shopydash/backend/errors/globalError.controller.js)
 
 **Purpose**: Centralized error handling middleware
 
@@ -267,11 +267,11 @@ PATCH  /api/v1/clientProfile/ (protected, client only)
 
 **Status**: ✅ **Production-ready**
 
-#### ✅ [customError.js](file:///c:/projects/Vendora/backend/errors/customError.js)
+#### ✅ [customError.js](file:///c:/projects/Shopydash/backend/errors/customError.js)
 
 **Purpose**: Custom error class with status codes
 
-#### ✅ [asyncErrorHandle.js](file:///c:/projects/Vendora/backend/errors/asyncErrorHandle.js)
+#### ✅ [asyncErrorHandle.js](file:///c:/projects/Shopydash/backend/errors/asyncErrorHandle.js)
 
 **Purpose**: Wrapper to catch async errors and pass to global error handler
 
@@ -279,7 +279,7 @@ PATCH  /api/v1/clientProfile/ (protected, client only)
 
 ### 7. Utilities
 
-#### ✅ [sendToken.js](file:///c:/projects/Vendora/backend/utils/sendToken.js)
+#### ✅ [sendToken.js](file:///c:/projects/Shopydash/backend/utils/sendToken.js)
 
 **Purpose**: Consistent JWT cookie management and response formatting
 
@@ -297,7 +297,7 @@ PATCH  /api/v1/clientProfile/ (protected, client only)
 
 ### 8. Application Setup
 
-#### ✅ [app.js](file:///c:/projects/Vendora/backend/app.js)
+#### ✅ [app.js](file:///c:/projects/Shopydash/backend/app.js)
 
 **Configuration**:
 

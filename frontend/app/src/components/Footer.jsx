@@ -9,7 +9,7 @@ export function Footer() {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Store className="w-6 h-6 text-orange-500" />
-                <span className="text-xl font-bold">Vendora</span>
+                <span className="text-xl font-bold">Shopydash</span>
               </div>
               <p className="text-gray-400">
                 The campus marketplace connecting students. Starting at LAUTECH.
@@ -72,7 +72,7 @@ export function Footer() {
           </div>
 
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
-            <p>&copy; 2025 Vendora. All rights reserved.</p>
+            <p>&copy; 2025 Shopydash. All rights reserved.</p>
           </div>
         </div>
       </footer>

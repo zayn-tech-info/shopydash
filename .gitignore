@@ -1,4 +1,4 @@
-# Root gitignore for Vendora monorepo (frontend + backend)
+# Root gitignore for Shopydash monorepo (frontend + backend)
 
 # OS
 .DS_Store

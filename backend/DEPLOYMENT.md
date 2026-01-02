@@ -59,7 +59,7 @@
   ```javascript
   module.exports = {
     apps: [{
-      name: 'vendora-backend',
+      name: 'shopydash-backend',
       script: './server.js',
       instances: 2,
       exec_mode: 'cluster',
@@ -165,10 +165,10 @@
 ## Rollback Plan
 
 ### If Deployment Fails
-1. [ ] Stop new application: `pm2 stop vendora-backend`
+1. [ ] Stop new application: `pm2 stop shopydash-backend`
 2. [ ] Restore previous version from git
 3. [ ] Restore previous `.env` if changed
-4. [ ] Restart application: `pm2 restart vendora-backend`
+4. [ ] Restart application: `pm2 restart shopydash-backend`
 5. [ ] Verify old version working
 6. [ ] Investigate and fix issues
 7. [ ] Document what went wrong
@@ -184,10 +184,10 @@
 
 ```bash
 # View logs
-pm2 logs vendora-backend
+pm2 logs shopydash-backend
 
 # Restart application
-pm2 restart vendora-backend
+pm2 restart shopydash-backend
 
 # Monitor resources
 pm2 monit
@@ -196,7 +196,7 @@ pm2 monit
 pm2 status
 
 # View specific number of log lines
-pm2 logs vendora-backend --lines 100
+pm2 logs shopydash-backend --lines 100
 
 # Database backup
 mongodump --uri="mongodb://..." --out=/backup/path

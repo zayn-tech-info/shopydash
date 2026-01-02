@@ -12,7 +12,7 @@ export function Hero() {
               Your Campus Marketplace for Buying and Selling
             </h1>
             <p className="body-1 text-n-4 text-sm max-w-3xl md:max-w-none mx-auto md:mx-0 text-pretty mb-8">
-              Vendora connects student vendors and buyers in one social
+              Shopydash connects student vendors and buyers in one social
               marketplace. Buy and sell textbooks, gadgets, food, fashion, and
               more, all within your campus community. Already helping students
               at LAUTECH and expanding to more universities.
@@ -42,7 +42,7 @@ export function Hero() {
           <div className="order-first md:order-none">
             <img
               src={HeroImg}
-              alt="Students buying and selling on Vendora"
+              alt="Students buying and selling on Shopydash"
               className="w-full h-auto max-w-[560px] mx-auto object-contain"
               loading="eager"
               decoding="async"

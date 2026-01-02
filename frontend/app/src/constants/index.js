@@ -240,8 +240,8 @@ export const preferredCategories = [
 export const plans = [
   {
     id: "boost",
-    name: "Vendora Boost",
-    slug: "vendora-boost",
+    name: "Shopydash Boost",
+    slug: "shopydash-boost",
     icon: Zap,
     price: "₦ 750",
     period: "/month",
@@ -258,14 +258,14 @@ export const plans = [
   },
   {
     id: "pro",
-    name: "Vendora Pro",
-    slug: "vendora-pro",
+    name: "Shopydash Pro",
+    slug: "shopydash-pro",
     icon: Star,
     price: "₦ 1,500",
     period: "/month",
     description: "Professional tools to brand and grow your store.",
     features: [
-      "All in Vendora Boost",
+      "All in Shopydash Boost",
       "Product upload limit increased to (8)",
       "Post upload limit increased to (5) per day",
       "Custom storefront banner & brand colors",
@@ -278,14 +278,14 @@ export const plans = [
   },
   {
     id: "max",
-    name: "Vendora Max",
-    slug: "vendora-max",
+    name: "Shopydash Max",
+    slug: "shopydash-max",
     icon: Crown,
     price: "₦ 3,000",
     period: "/month",
     description: "Maximum visibility and power for serious sellers.",
     features: [
-      "All in Vendora Pro",
+      "All in Shopydash Pro",
       "Higher product upload limit (10)",
       "Post upload limit increased to (20) per day",
       "Advanced analytics dashboards",

@@ -127,7 +127,7 @@ export function LoginForm() {
             type="submit"
             className="w-full h-12 bg-primary-3 hover:bg-primary-4 text-white rounded-xl font-code text-sm font-bold uppercase tracking-wider transition-all shadow-lg shadow-primary-3/20 hover:shadow-primary-3/40 hover:-translate-y-0.5"
           >
-            Continue to Vendora
+            Continue to Shopydash
           </button>
         </div>
 

@@ -1,7 +1,7 @@
 # Security Best Practices & Considerations
 
 ## Overview
-This document outlines the security measures implemented in the Vendora backend and important considerations for deployment.
+This document outlines the security measures implemented in the Shopydash backend and important considerations for deployment.
 
 ## Authentication & Authorization
 

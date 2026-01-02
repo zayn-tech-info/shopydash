@@ -24,6 +24,11 @@ export function SettingsSidebar({ activeTab, setActiveTab, role, onLogout }) {
       label: "Business Profile",
       icon: Store,
     });
+    menuItems.splice(4, 0, {
+      id: "payout",
+      label: "Payout Settings",
+      icon: CreditCard,
+    });
   }
 
   return (

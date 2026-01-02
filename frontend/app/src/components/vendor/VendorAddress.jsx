@@ -1,39 +1,25 @@
-export function VendorAddress({ vendorProfile, authUser, className }) {
+import { MapPin } from "lucide-react";
+
+export function VendorAddress({ vendorProfile }) {
+  if (!vendorProfile || !vendorProfile.userId) return null;
+
+  const { city, state, country, schoolArea, area } = vendorProfile.userId;
+
+  const addressParts = [schoolArea, area, city, state, country].filter(Boolean);
+
+  if (addressParts.length === 0) return null;
+
   return (
-    <div className={className}>
-      <div className="bg-n-1 rounded-xl border border-n-3/10 p-5 space-y-4">
-        <div>
-          <div className="font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-1">
-            School Area
-          </div>
-          <div className="text-n-8 font-medium text-sm">
-            {vendorProfile?.userId?.schoolArea || "-"}
-          </div>
-        </div>
-
-        <div>
-          <div className="font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-1">
-            Phone
-          </div>
-          <div className="text-n-8 font-medium text-sm">
-            {vendorProfile?.userId?.phoneNumber || authUser?.phoneNumber || "-"}
-          </div>
-        </div>
-
-        <div>
-          <div className="font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-1">
-            Email
-          </div>
-          <div className="text-n-8 font-medium text-sm break-all">
-            {vendorProfile?.userId?.email || authUser?.email || "-"}
-          </div>
+    <div className="flex flex-col gap-4">
+      <h3 className="h5 text-n-8">Location</h3>
+      <div className="flex items-start gap-4 p-4 bg-n-2/30 rounded-xl border border-n-3/20">
+        <div className="p-2 bg-white rounded-lg shadow-sm border border-n-3/20">
+          <MapPin className="text-primary-3" size={24} />
         </div>
         <div>
-          <div className="font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-1">
-            School
-          </div>
-          <div className="text-n-8 font-medium text-sm">
-            {vendorProfile?.userId?.schoolName || authUser?.schoolName || "-"}
+          <div className="text-n-8 font-medium">{addressParts.join(", ")}</div>
+          <div className="text-sm text-n-4 mt-1">
+            Vendor's primary operating location
           </div>
         </div>
       </div>

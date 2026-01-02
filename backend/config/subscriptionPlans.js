@@ -17,8 +17,8 @@ module.exports = {
     },
   },
   boost: {
-    name: "Vendora Boost",
-    slug: "vendora-boost",
+    name: "Shopydash Boost",
+    slug: "shopydash-boost",
     price: 750,
     limits: {
       productsPerPost: 6,
@@ -36,8 +36,8 @@ module.exports = {
     },
   },
   pro: {
-    name: "Vendora Pro",
-    slug: "vendora-pro",
+    name: "Shopydash Pro",
+    slug: "shopydash-pro",
     price: 1500,
     limits: {
       productsPerPost: 10,
@@ -55,8 +55,8 @@ module.exports = {
     },
   },
   max: {
-    name: "Vendora Max",
-    slug: "vendora-max",
+    name: "Shopydash Max",
+    slug: "shopydash-max",
     price: 3000,
     limits: {
       productsPerPost: 20,

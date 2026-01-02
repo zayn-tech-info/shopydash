@@ -1,7 +1,7 @@
 export const SUBSCRIPTION_PLANS = {
   boost: {
-    name: "Vendora Boost",
-    slug: "vendora-boost",
+    name: "Shopydash Boost",
+    slug: "shopydash-boost",
     price: 750,
     limits: {
       productsPerPost: 6,
@@ -16,15 +16,15 @@ export const SUBSCRIPTION_PLANS = {
     highlight: false,
   },
   pro: {
-    name: "Vendora Pro",
-    slug: "vendora-pro",
+    name: "Shopydash Pro",
+    slug: "shopydash-pro",
     price: 1500,
     limits: {
       productsPerPost: 8,
       postPerDay: 5,
     },
     features: [
-      "All in Vendora Boost",
+      "All in Shopydash Boost",
       "Custom storefront banner & brand colors",
       "Ability to upload more product photos per item limit (10)",
       "Product performance insights (views, saves, clicks)",
@@ -33,15 +33,15 @@ export const SUBSCRIPTION_PLANS = {
     highlight: true,
   },
   max: {
-    name: "Vendora Max",
-    slug: "vendora-max",
+    name: "Shopydash Max",
+    slug: "shopydash-max",
     price: 3000,
     limits: {
       productsPerPost: 10,
       postPerDay: 20,
     },
     features: [
-      "All in Vendora Pro",
+      "All in Shopydash Pro",
       "Higher product upload limit ( 20 )",
       "Advanced analytics Dashboards",
       "Priority Support",

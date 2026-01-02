@@ -49,14 +49,12 @@ export default function VendorDashboard() {
         const me = await fetchMe();
         if (!mounted) return;
 
-        
         if (me && me.role !== "vendor") {
           toast.error("You must be a vendor to access this page");
           navigate("/");
           return;
         }
 
-        
         if (me && !me.hasProfile) {
           toast("Please complete your vendor profile first", { icon: "📝" });
           navigate("/create-vendor-profile");
@@ -64,9 +62,7 @@ export default function VendorDashboard() {
         }
 
         await getMyPosts();
-      } catch (err) {
-        
-      }
+      } catch (err) {}
     })();
     return () => (mounted = false);
   }, [fetchMe, getMyPosts, navigate]);
@@ -89,13 +85,6 @@ export default function VendorDashboard() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate("/vendor/settings/bank")}
-              className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-white border hover:bg-gray-50 text-gray-700"
-            >
-              <CreditCard className="w-4 h-4" />
-              <span className="text-sm font-medium">Payment Settings</span>
-            </button>
             <button
               onClick={() => navigate("/profile")}
               className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-white border"

@@ -16,7 +16,7 @@ export function AccountInfo({ user }) {
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-n-8">Account Information</h2>
         <p className="text-n-4 mt-1">
-          View details about your Vendora account status.
+          View details about your Shopydash account status.
         </p>
       </div>
 

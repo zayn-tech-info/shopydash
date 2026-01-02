@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useProductStore } from "../store/productStore";
 import { useAuthStore } from "../store/authStore";
-import { Plus, Loader } from "lucide-react";
+import { Plus, Loader, CreditCard } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { PostDetails } from "../components/vendor/PostDetails";
 import { ProductItem } from "../components/vendor/ProductItem";
@@ -134,7 +134,7 @@ const VendorProductUpload = () => {
 
       const postData = {
         caption,
-        location: selectedArea, 
+        location: selectedArea,
         school: schoolName,
         area: selectedArea,
         products: processedProducts,
@@ -165,59 +165,84 @@ const VendorProductUpload = () => {
               : "Share your latest products with the community."}{" "}
             You must add at least 4 products.
           </p>
+
+          {!authUser?.vendorProfile?.bankDetails?.subaccountCode && (
+            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-4">
+              <div className="p-2 bg-red-100 rounded-lg">
+                <CreditCard className="w-6 h-6 text-red-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-bold text-red-900">
+                  Bank Details Required
+                </h3>
+                <p className="text-sm text-red-700 mt-1 mb-3">
+                  You need to set up your payout details before you can upload
+                  products. This ensures you get paid for your sales.
+                </p>
+                <button
+                  onClick={() => navigate("/settings?tab=payout")}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-bold hover:bg-red-700 transition-colors"
+                >
+                  Set Account Details
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-8">
-          <PostDetails
-            caption={caption}
-            setCaption={setCaption}
-            schoolName={schoolName}
-            setSchoolName={setSchoolName}
-            selectedArea={selectedArea}
-            setSelectedArea={setSelectedArea}
-          />
+        {authUser?.vendorProfile?.bankDetails?.subaccountCode ? (
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <PostDetails
+              caption={caption}
+              setCaption={setCaption}
+              schoolName={schoolName}
+              setSchoolName={setSchoolName}
+              selectedArea={selectedArea}
+              setSelectedArea={setSelectedArea}
+            />
 
-          <div className="space-y-6">
-            {products.map((product, index) => (
-              <ProductItem
-                key={product.id}
-                product={product}
-                index={index}
-                totalProducts={products.length}
-                updateProduct={updateProduct}
-                removeProduct={removeProduct}
-              />
-            ))}
-          </div>
+            <div className="space-y-6">
+              {products.map((product, index) => (
+                <ProductItem
+                  key={product.id}
+                  product={product}
+                  index={index}
+                  totalProducts={products.length}
+                  updateProduct={updateProduct}
+                  removeProduct={removeProduct}
+                />
+              ))}
+            </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-between pt-4">
-            <button
-              type="button"
-              onClick={addProduct}
-              className="flex items-center justify-center gap-2 px-6 py-3 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 hover:border-orange-500 hover:text-orange-600 transition-colors font-medium"
-            >
-              <Plus size={20} />
-              Add Another Product
-            </button>
+            <div className="flex flex-col sm:flex-row gap-4 justify-between pt-4">
+              <button
+                type="button"
+                onClick={addProduct}
+                className="flex items-center justify-center gap-2 px-6 py-3 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 hover:border-orange-500 hover:text-orange-600 transition-colors font-medium"
+              >
+                <Plus size={20} />
+                Add Another Product
+              </button>
 
-            <button
-              type="submit"
-              disabled={isCreatingPost || isUploading}
-              className="flex items-center justify-center gap-2 px-8 py-3 bg-orange-600 text-white rounded-xl hover:bg-orange-700 transition-colors font-bold disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-orange-200"
-            >
-              {isCreatingPost || isUploading ? (
-                <>
-                  <Loader className="animate-spin" size={20} />
-                  Processing...
-                </>
-              ) : editingPost ? (
-                "Update Post"
-              ) : (
-                "Post Products"
-              )}
-            </button>
-          </div>
-        </form>
+              <button
+                type="submit"
+                disabled={isCreatingPost || isUploading}
+                className="flex items-center justify-center gap-2 px-8 py-3 bg-orange-600 text-white rounded-xl hover:bg-orange-700 transition-colors font-bold disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-orange-200"
+              >
+                {isCreatingPost || isUploading ? (
+                  <>
+                    <Loader className="animate-spin" size={20} />
+                    Processing...
+                  </>
+                ) : editingPost ? (
+                  "Update Post"
+                ) : (
+                  "Post Products"
+                )}
+              </button>
+            </div>
+          </form>
+        ) : null}
       </div>
     </div>
   );

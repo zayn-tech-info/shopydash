@@ -1,6 +1,6 @@
 import SubscriptionBadge from "../components/common/SubscriptionBadge";
 import { toast } from "react-hot-toast";
-import Logo from "../assets/images/vendora_logo.png";
+import Logo from "../assets/images/shopydash_logo.png";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { LogOut, Plus, MapPin, Settings } from "lucide-react";

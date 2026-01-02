@@ -1,7 +1,7 @@
 const { MongoClient } = require("mongodb");
 
 async function renameDatabase(oldName, newName) {
-  const client = new MongoClient("mongodb+srv://zayn_vendora_db:UcEIDMua33vVgbYb@cluster0.lymnjws.mongodb.net/?appName=Cluster0");
+  const client = new MongoClient("mongodb+srv://zayn_shopydash_db:UcEIDMua33vVgbYb@cluster0.lymnjws.mongodb.net/?appName=Cluster0");
 
   try {
     await client.connect();

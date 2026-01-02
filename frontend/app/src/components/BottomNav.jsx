@@ -14,12 +14,12 @@ export function BottomNav() {
     return location.pathname === "/" ? "/" : location.pathname;
   }, [location.pathname]);
 
-  if (!authUser) return null;
-
   const renderNav = (nav, role) => {
+    if (!authUser) {
+      if (nav === "Home" || nav === "Pricing") return;
+      return null;
+    }
 
-
-    
     if (nav === "Settings") return null;
     if (nav === "Messages") return null;
     if (nav === "Dashboard" && role !== "vendor") {

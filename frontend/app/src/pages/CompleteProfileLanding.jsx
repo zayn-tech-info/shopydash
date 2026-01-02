@@ -53,7 +53,7 @@ export  function CompleteProfileLanding() {
         </h1>
 
         <p className="text-n-4 mb-8">
-          To get the most out of Vendora, please complete your profile
+          To get the most out of Shopydash, please complete your profile
           information. It only takes a minute!
         </p>
 

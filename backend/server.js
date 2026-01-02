@@ -23,7 +23,7 @@ const io = new Server(server, {
   cors: {
     origin:
       process.env.NODE_ENV === "production"
-        ? "https://vendora-app-rho.vercel.app"
+        ? "https://shopydash-app-rho.vercel.app"
         : "http://localhost:5173",
     methods: ["GET", "POST"],
     credentials: true,
