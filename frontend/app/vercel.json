@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/landing",
-      "destination": "https://shopydash.com/"
+      "destination": "https://vendora-chi.vercel.app/"
     },
     {
       "source": "/landing/(.*)",
-      "destination": "https://shopydash.com/$1"
+      "destination": "https://vendora-chi.vercel.app/$1"
     },
     { "source": "/(.*)", "destination": "/" }
   ]
