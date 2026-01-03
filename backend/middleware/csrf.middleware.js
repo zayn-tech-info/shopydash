@@ -7,7 +7,7 @@ const csrfProtection = (req, res, next) => {
 
   const allowedOrigins = [
     "http://localhost:5173",
-    "https://shopydash-v1.vercel.app",
+    "https://shopydash.com",
   ];
 
   const origin = req.get("origin") || req.get("referer");
