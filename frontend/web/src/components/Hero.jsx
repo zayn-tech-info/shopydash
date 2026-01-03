@@ -29,17 +29,22 @@ export function Hero() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-8">
-              <Button className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-full shadow-orange-200 shadow-xl font-bold text-lg transition-all transform hover:-translate-y-1">
+              <a
+                href="https://app.shopydash.com/signup"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-full shadow-orange-200 shadow-xl font-bold text-lg transition-all transform hover:-translate-y-1 text-center"
+              >
                 Start Selling
-              </Button>
-              <button
-                onClick={() =>
-                  window.open("https://app.shopydash.com", "_blank")
-                }
-                className="w-full sm:w-auto px-8 py-4 bg-white text-gray-900 border-2 border-gray-100 hover:border-orange-100 hover:bg-orange-50 rounded-full font-bold text-lg transition-all shadow-sm hover:shadow-md"
+              </a>
+              <a
+                href="https://app.shopydash.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto px-8 py-4 bg-white text-gray-900 border-2 border-gray-100 hover:border-orange-100 hover:bg-orange-50 rounded-full font-bold text-lg transition-all shadow-sm hover:shadow-md text-center"
               >
                 Start Shopping
-              </button>
+              </a>
             </div>
 
             <div className="flex items-center justify-center lg:justify-start">

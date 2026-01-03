@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Check, Star, Crown, Zap } from "lucide-react";
 
- 
 const plans = [
   {
     id: 1,
@@ -35,7 +34,7 @@ const plans = [
     ],
     cta: "Go Pro",
     icon: Star,
-    slug: "pro_monthly", 
+    slug: "pro_monthly",
     popular: true,
   },
   {
@@ -152,18 +151,18 @@ export function Pricing() {
                   ))}
                 </ul>
 
-                <button
-                  className={`w-full py-4 px-6 rounded-xl font-bold text-base transition-all duration-300 shadow-md transform active:scale-95 flex items-center justify-center ${
+                <a
+                  href="https://app.shopydash.com/pricing"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`w-full py-4 px-6 rounded-xl font-bold text-base transition-all duration-300 shadow-md transform active:scale-95 flex items-center justify-center cursor-pointer ${
                     plan.popular
                       ? "bg-orange-500 text-white hover:bg-orange-600"
                       : "bg-gray-800 text-white hover:bg-gray-900"
                   }`}
-                  onClick={() =>
-                    window.open("https://shopydash.com/login", "_blank")
-                  }
                 >
                   {plan.cta}
-                </button>
+                </a>
               </div>
             </div>
           ))}

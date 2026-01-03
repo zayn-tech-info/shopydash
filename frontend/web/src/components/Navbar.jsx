@@ -4,6 +4,7 @@ import { navigation } from "../constant";
 import { Button } from "./Button";
 import { useState } from "react";
 import { enablePageScroll, disablePageScroll } from "scroll-lock";
+import { Link } from "react-router-dom";
 
 export function Navbar() {
   const [isMenuOpened, setIsMenuOpened] = useState(false);
@@ -51,12 +52,22 @@ export function Navbar() {
             </ul>
           </nav>
           <div className="md:flex items-center gap-4 hidden">
-            <button className="px-4 py-2 text-n-6 font-medium hover:text-n-4 uppercase text-sm">
-              Sign In
-            </button>
-            <Button className="uppercase font-medium text-sm">
+            <a
+              href="https://app.shopydash.com/signup"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-5 py-2 text-n-6 hover:text-primary-3 transition-colors duration-300 font-medium uppercase text-sm"
+            >
+              Sign Up
+            </a>
+            <a
+              href="https://app.shopydash.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-5 py-2 bg-primary-3 text-white rounded-lg hover:bg-primary-2 transition-colors duration-300 uppercase font-medium text-sm"
+            >
               Get started
-            </Button>
+            </a>
           </div>
           <Menu
             onClick={toggleNavigation}
