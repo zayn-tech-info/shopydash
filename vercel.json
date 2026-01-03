@@ -4,10 +4,46 @@
       "src": "frontend/web/package.json",
       "use": "@vercel/static-build",
       "config": { "distDir": "dist" }
+    },
+    {
+      "src": "frontend/app/package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist" }
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "app.shopydash.com"
+        }
+      ],
+      "destination": "/frontend/app/$1"
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "shopydash.com"
+        }
+      ],
+      "destination": "/frontend/web/$1"
     }
   ],
   "routes": [
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/index.html" }
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/frontend/app/.*",
+      "dest": "/frontend/app/index.html"
+    },
+    {
+      "src": "/frontend/web/.*",
+      "dest": "/frontend/web/index.html"
+    }
   ]
 }
