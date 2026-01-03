@@ -151,7 +151,13 @@ const App = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
-      {authUser && location.pathname !== "/messages" ? <Footer /> : ""}
+      {location.pathname !== "/messages" &&
+      location.pathname !== "/login" &&
+      location.pathname !== "/signup" ? (
+        <Footer />
+      ) : (
+        ""
+      )}
       {authUser && location.pathname !== "/messages" ? <BottomNav /> : ""}
       {location.pathname !== "/messages" && <VendorFloatingButton />}
       <Toaster />
