@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/landing",
-      "destination": "https://REPLACE_WITH_YOUR_WEB_DEPLOYMENT_URL/"
+      "destination": "https://shopydash.com/"
     },
     {
       "source": "/landing/(.*)",
-      "destination": "https://REPLACE_WITH_YOUR_WEB_DEPLOYMENT_URL/$1"
+      "destination": "https://shopydash.com/$1"
     },
     { "source": "/(.*)", "destination": "/" }
   ]
