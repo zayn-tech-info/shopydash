@@ -264,9 +264,25 @@ const updateVendorProfile = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
+const getVendorProfileByUserId = asyncErrorHandler(async (req, res, next) => {
+  const userId = req.params.userId;
+  const vendorProfile = await vendorProfileModel.findOne({ userId });
+
+  if (!vendorProfile) {
+    const error = new customError("Vendor profile not found", 404);
+    return next(error);
+  }
+
+  res.status(200).json({
+    success: true,
+    data: vendorProfile,
+  });
+});
+
 module.exports = {
   createVendorProfile,
   getPublicVendorProfile,
   updateVendorProfile,
   getAllVendorsProfile,
+  getVendorProfileByUserId,
 };

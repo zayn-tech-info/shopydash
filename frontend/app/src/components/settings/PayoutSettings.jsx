@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import SearchableDropdown from "../common/SearchableDropdown";
 import { api } from "../../lib/axios";
 import { toast } from "react-hot-toast";
 import {
@@ -165,36 +166,23 @@ export function PayoutSettings({ user }) {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label className="block text-sm font-medium text-n-6 mb-2">
-            Select Bank
-          </label>
-          <div className="relative">
-            <select
-              value={formData.bankCode}
-              onChange={(e) => {
-                setFormData({
-                  ...formData,
-                  bankCode: e.target.value,
-                  accountName: "",
-                });
-                setIsVerified(false);
-              }}
-              className="w-full px-4 py-3 bg-white border border-n-3 rounded-xl text-n-8 focus:outline-none focus:border-primary-3 focus:ring-2 focus:ring-primary-3/20 transition-all appearance-none disabled:bg-n-2"
-            >
-              <option value="">Choose your bank</option>
-              {banks.map((bank) => (
-                <option key={bank.id} value={bank.code}>
-                  {bank.name}
-                </option>
-              ))}
-            </select>
-            <Building
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-n-4 pointer-events-none"
-              size={18}
-            />
-          </div>
-        </div>
+        <SearchableDropdown
+          label="Select Bank"
+          value={formData.bankCode}
+          onChange={(val) => {
+            setFormData({
+              ...formData,
+              bankCode: val,
+              accountName: "",
+            });
+            setIsVerified(false);
+          }}
+          options={banks}
+          loading={loadingBanks}
+          placeholder="Search and select your bank..."
+          displayKey="name"
+          valueKey="code"
+        />
 
         <div>
           <label className="block text-sm font-medium text-n-6 mb-2">

@@ -1,5 +1,6 @@
 const asyncErrorHandler = require("../../errors/asyncErrorHandle");
 const User = require("../../models/auth.model");
+const VendorProfile = require("../../models/vendorProfile.model");
 const sendToken = require("../../utils/sendToken");
 const validator = require("validator");
 const customError = require("../../errors/customError");
@@ -226,7 +227,24 @@ const login = asyncErrorHandler(async (req, res, next) => {
 
   const hasProfile = await checkUserHasProfile(user);
 
-  sendToken(user, "Logged in successfully", res, 200, hasProfile);
+  let additionalData = {};
+  if (user.role === "vendor") {
+    const vendorProfile = await VendorProfile.findOne({
+      userId: user._id,
+    }).select("+bankDetails.subaccountCode");
+    if (vendorProfile) {
+      additionalData.vendorProfile = vendorProfile;
+    }
+  }
+
+  sendToken(
+    user,
+    "Logged in successfully",
+    res,
+    200,
+    hasProfile,
+    additionalData
+  );
 });
 
 const logout = (req, res, next) => {
@@ -252,8 +270,19 @@ const checkAuth = asyncErrorHandler(async (req, res, next) => {
   }
 
   const hasProfile = await checkUserHasProfile(req.user);
+  const userData = req.user.toObject();
+  userData.hasProfile = hasProfile;
 
-  res.status(200).json({ ...req.user.toObject(), hasProfile });
+  if (req.user.role === "vendor") {
+    const vendorProfile = await VendorProfile.findOne({
+      userId: req.user._id,
+    }).select("+bankDetails.subaccountCode");
+    if (vendorProfile) {
+      userData.vendorProfile = vendorProfile;
+    }
+  }
+
+  res.status(200).json(userData);
 });
 
 const filterField = (obj, ...allowedFields) => {

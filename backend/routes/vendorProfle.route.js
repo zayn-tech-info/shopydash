@@ -5,6 +5,7 @@ const {
   getPublicVendorProfile,
   updateVendorProfile,
   getAllVendorsProfile,
+  getVendorProfileByUserId,
 } = require("../controllers/vendor/vendorProfile.controller");
 const { protectRoute, verifyRole } = require("../middleware/auth.middleware");
 
@@ -20,6 +21,9 @@ route.post(
 route.get("/store/:storeUsername", getPublicVendorProfile);
 
 route.get("/allvendors", getAllVendorsProfile);
+
+route.get("/:userId", getVendorProfileByUserId);
+
 route.patch(
   "/updateVendorProfile",
   protectRoute,

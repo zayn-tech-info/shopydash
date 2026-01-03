@@ -1,4 +1,5 @@
 import { Edit, Share2, Plus, LogOut, Settings } from "lucide-react";
+import ConfirmationModal from "../common/ConfirmationModal";
 import SubscriptionBadge from "../common/SubscriptionBadge";
 import UserAvatar from "../UserAvatar";
 import { useVendorProfileStore } from "../../store/vendorProfileStore";
@@ -58,6 +59,39 @@ export default function VendorSidebar({
     }
   };
 
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [whatsappNumber, setWhatsappNumber] = useState("");
+
+  const handleMessage = async () => {
+    if (!authUser) {
+      toast.error("Please login to message this vendor");
+      return;
+    }
+
+    const recipientId = vendorProfile?.userId?._id;
+    if (!recipientId) return;
+
+    const result = await checkAccess(recipientId);
+
+    if (result.allowed) {
+      await fetchMessages(result.conversation._id);
+      navigate("/messages");
+    } else if (result.action === "REDIRECT_WHATSAPP") {
+      setWhatsappNumber(result.data.whatsAppNumber);
+      setShowPremiumModal(true);
+    }
+  };
+
+  const handleContinueToWhatsapp = () => {
+    if (whatsappNumber) {
+      const formattedNumber = whatsappNumber.replace(/\D/g, "");
+      window.open(`https://wa.me/${formattedNumber}`, "_blank");
+    } else {
+      toast.error("Vendor WhatsApp not available");
+    }
+    setShowPremiumModal(false);
+  };
+
   return (
     <aside className="bg-white rounded-2xl p-6 border border-n-3/20 shadow-sm w-full relative">
       <div className="flex flex-col items-center">
@@ -99,39 +133,14 @@ export default function VendorSidebar({
             <span>Edit profile</span>
           </button>
         ) : (
-          ["Shopydash Pro", "Shopydash Max"].includes(plan) && (
-            <div className="mt-6 w-full">
-              <button
-                onClick={async () => {
-                  if (!authUser) {
-                    toast.error("Please login to message this vendor");
-                    return;
-                  }
-
-                  const recipientId = vendorProfile?.userId?._id;
-                  if (!recipientId) return;
-
-                  const result = await checkAccess(recipientId);
-
-                  if (result.allowed) {
-                    await fetchMessages(result.conversation._id);
-                    navigate("/messages");
-                  } else if (result.action === "REDIRECT_WHATSAPP") {
-                    const number = result.data.whatsAppNumber;
-                    if (number) {
-                      const formattedNumber = number.replace(/\D/g, "");
-                      window.open(`https://wa.me/${formattedNumber}`, "_blank");
-                    } else {
-                      toast.error("Vendor WhatsApp not available");
-                    }
-                  }
-                }}
-                className="w-full px-6 py-3 bg-primary-3 hover:bg-primary-4 text-white rounded-xl transition-colors font-code text-xs font-bold uppercase tracking-wider shadow-lg shadow-primary-3/20"
-              >
-                Message
-              </button>
-            </div>
-          )
+          <div className="mt-6 w-full">
+            <button
+              onClick={handleMessage}
+              className="w-full px-6 py-3 bg-primary-3 hover:bg-primary-4 text-white rounded-xl transition-colors font-code text-xs font-bold uppercase tracking-wider shadow-lg shadow-primary-3/20"
+            >
+              Message
+            </button>
+          </div>
         )}
 
         <div className="mt-6 w-full grid grid-cols-2 gap-4 text-center">
@@ -183,6 +192,16 @@ export default function VendorSidebar({
           </div>
         )}
       </div>
+
+      <ConfirmationModal
+        isOpen={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+        onConfirm={handleContinueToWhatsapp}
+        title="Premium Vendor Only"
+        message="This vendor is not on our Premium plan"
+        confirmText="Continue to WhatsApp"
+        cancelText="Cancel"
+      />
     </aside>
   );
 }

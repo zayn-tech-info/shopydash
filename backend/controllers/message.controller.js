@@ -5,8 +5,7 @@ const VendorProfile = require("../models/vendorProfile.model");
 const customError = require("../errors/customError");
 const asyncErrorHandler = require("../errors/asyncErrorHandle");
 const plans = require("../config/subscriptionPlans");
-const DOMPurify = require('isomorphic-dompurify');
-
+const DOMPurify = require("isomorphic-dompurify");
 
 const hasPremiumMessaging = (vendorUser) => {
   if (!vendorUser.subscriptionPlan) return false;
@@ -17,23 +16,21 @@ const hasPremiumMessaging = (vendorUser) => {
   return plan?.features?.messaging || false;
 };
 
-
 const verifyConversationAccess = async (conversationId, userId) => {
   const conversation = await Conversation.findById(conversationId);
-  
+
   if (!conversation) {
     throw new customError("Conversation not found", 404);
   }
-  
-  
+
   const isParticipant = conversation.participants.some(
-    p => p.toString() === userId.toString()
+    (p) => p.toString() === userId.toString()
   );
-  
+
   if (!isParticipant) {
     throw new customError("Unauthorized access to conversation", 403);
   }
-  
+
   return conversation;
 };
 
@@ -54,7 +51,7 @@ exports.checkMessagingAccess = asyncErrorHandler(async (req, res, next) => {
     if (!isPremium) {
       return res.status(200).json({
         status: "success",
-        action: "Redirect WhatsApp",
+        action: "REDIRECT_WHATSAPP",
         message: "This vendor uses WhatsApp for communication.",
         data: {
           whatsAppNumber: recipient.whatsAppNumber,
@@ -62,7 +59,6 @@ exports.checkMessagingAccess = asyncErrorHandler(async (req, res, next) => {
       });
     }
   }
-
 
   if (req.user.role === "vendor") {
     const isSenderPremium = hasPremiumMessaging(req.user);
@@ -77,57 +73,56 @@ exports.checkMessagingAccess = asyncErrorHandler(async (req, res, next) => {
   next();
 });
 
-exports.initiateOrGetConversation = asyncErrorHandler(async (req, res, next) => {
-  const { recipientId } = req.body;
-  const senderId = req.user.id;
+exports.initiateOrGetConversation = asyncErrorHandler(
+  async (req, res, next) => {
+    const { recipientId } = req.body;
+    const senderId = req.user.id;
 
-  let conversation = await Conversation.findOne({
-    participants: { $all: [senderId, recipientId] },
-  });
+    let conversation = await Conversation.findOne({
+      participants: { $all: [senderId, recipientId] },
+    });
 
-  if (!conversation) {
-    conversation = await Conversation.create({
-      participants: [senderId, recipientId],
-      unreadCounts: {
-        [senderId]: 0,
-        [recipientId]: 0,
+    if (!conversation) {
+      conversation = await Conversation.create({
+        participants: [senderId, recipientId],
+        unreadCounts: {
+          [senderId]: 0,
+          [recipientId]: 0,
+        },
+      });
+    }
+
+    await conversation.populate(
+      "participants",
+      "fullName profilePic role businessName"
+    );
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        conversation,
       },
     });
   }
-
-  
-  await conversation.populate(
-    "participants",
-    "fullName profilePic role businessName"
-  );
-
-  res.status(200).json({
-    status: "success",
-    data: {
-      conversation,
-    },
-  });
-});
+);
 
 exports.sendMessage = asyncErrorHandler(async (req, res, next) => {
   const { conversationId, content, replyTo } = req.body;
   const senderId = req.user.id;
 
-  
   if (!conversationId || !content) {
-    return next(new customError("Conversation ID and content are required", 400));
+    return next(
+      new customError("Conversation ID and content are required", 400)
+    );
   }
 
-  
   const conversation = await verifyConversationAccess(conversationId, senderId);
 
-  
   const sanitizedContent = DOMPurify.sanitize(content, {
-    ALLOWED_TAGS: [], 
-    KEEP_CONTENT: true 
+    ALLOWED_TAGS: [],
+    KEEP_CONTENT: true,
   });
 
-  
   if (sanitizedContent.length > 2000) {
     return next(new customError("Message too long (max 2000 characters)", 400));
   }
@@ -136,7 +131,6 @@ exports.sendMessage = asyncErrorHandler(async (req, res, next) => {
     return next(new customError("Message cannot be empty", 400));
   }
 
-  
   const message = await Message.create({
     conversationId,
     sender: senderId,
@@ -144,9 +138,8 @@ exports.sendMessage = asyncErrorHandler(async (req, res, next) => {
     replyTo: replyTo || null,
   });
 
-  
   conversation.lastMessage = message._id;
-  
+
   conversation.participants.forEach((pId) => {
     if (pId.toString() !== senderId) {
       const currentCount = conversation.unreadCounts.get(pId.toString()) || 0;
@@ -162,13 +155,10 @@ exports.sendMessage = asyncErrorHandler(async (req, res, next) => {
     await message.populate("replyTo");
   }
 
-  
   const io = req.app.get("io");
   if (io) {
-    
     io.to(conversationId).emit("receive_message", message);
 
-    
     conversation.participants.forEach((pId) => {
       if (pId.toString() !== senderId) {
         io.to(pId.toString()).emit("conversation_updated", {
@@ -191,14 +181,13 @@ exports.sendMessage = asyncErrorHandler(async (req, res, next) => {
 exports.getConversations = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user.id;
 
-  
   const conversations = await Conversation.find({
     participants: userId,
   })
     .populate("participants", "fullName profilePic role businessName")
     .populate("lastMessage")
     .sort({ updatedAt: -1 })
-    .lean(); 
+    .lean();
 
   res.status(200).json({
     status: "success",
@@ -213,24 +202,20 @@ exports.getMessages = asyncErrorHandler(async (req, res, next) => {
   const { conversationId } = req.params;
   const userId = req.user.id;
 
-  
   const page = req.query.page * 1 || 1;
-  const limit = Math.min(req.query.limit * 1 || 50, 100); 
+  const limit = Math.min(req.query.limit * 1 || 50, 100);
   const skip = (page - 1) * limit;
 
-  
   await verifyConversationAccess(conversationId, userId);
 
   const messages = await Message.find({ conversationId })
     .populate("sender", "fullName profilePic")
     .populate("replyTo")
-    .sort({ createdAt: -1 }) 
+    .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit)
-    .lean(); 
+    .lean();
 
-  
-  
   const conversation = await Conversation.findById(conversationId);
   if (conversation) {
     conversation.unreadCounts.set(userId, 0);
@@ -238,14 +223,13 @@ exports.getMessages = asyncErrorHandler(async (req, res, next) => {
     await conversation.save();
   }
 
-  
   const total = await Message.countDocuments({ conversationId });
 
   res.status(200).json({
     status: "success",
     results: messages.length,
     data: {
-      messages: messages.reverse(), 
+      messages: messages.reverse(),
     },
     pagination: {
       page,
@@ -256,24 +240,25 @@ exports.getMessages = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
-exports.getAvailableVendorsForChat = asyncErrorHandler(async (req, res, next) => {
-  const { schoolId, _id: currentUserId } = req.user;
+exports.getAvailableVendorsForChat = asyncErrorHandler(
+  async (req, res, next) => {
+    const { schoolId, _id: currentUserId } = req.user;
 
-  
-  const vendors = await User.find({
-    role: "vendor",
-    schoolId: schoolId,
-    subscriptionPlan: {
-      $in: ["Shopydash Pro", "Shopydash Max"],
-    },
-    _id: { $ne: currentUserId }, 
-  }).select("fullName businessName profilePic subscriptionPlan schoolName");
+    const vendors = await User.find({
+      role: "vendor",
+      schoolId: schoolId,
+      subscriptionPlan: {
+        $in: ["Shopydash Pro", "Shopydash Max"],
+      },
+      _id: { $ne: currentUserId },
+    }).select("fullName businessName profilePic subscriptionPlan schoolName");
 
-  res.status(200).json({
-    status: "success",
-    results: vendors.length,
-    data: {
-      vendors,
-    },
-  });
-});
+    res.status(200).json({
+      status: "success",
+      results: vendors.length,
+      data: {
+        vendors,
+      },
+    });
+  }
+);

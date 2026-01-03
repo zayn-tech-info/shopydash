@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import { X, AlertTriangle } from "lucide-react";
 
 export default function ConfirmationModal({
@@ -12,10 +13,10 @@ export default function ConfirmationModal({
 }) {
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="bg-white rounded-2xl w-full max-w-md shadow-xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in duration-200">
-        {}
+        {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-gray-50/50">
           <h3 className="font-semibold text-gray-900 flex items-center gap-2">
             <AlertTriangle className="w-5 h-5 text-orange-500" />
@@ -50,6 +51,7 @@ export default function ConfirmationModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

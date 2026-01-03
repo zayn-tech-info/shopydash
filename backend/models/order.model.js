@@ -68,7 +68,6 @@ const orderSchema = new mongoose.Schema(
     transactionReference: {
       type: String,
       required: true,
-      index: true,
     },
     deliveryAddress: {
       address: String,

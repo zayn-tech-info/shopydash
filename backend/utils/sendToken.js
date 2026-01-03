@@ -1,4 +1,11 @@
-const sendToken = (user, message, res, statusCode, hasProfile = undefined) => {
+const sendToken = (
+  user,
+  message,
+  res,
+  statusCode,
+  hasProfile = undefined,
+  additionalData = {}
+) => {
   const token =
     typeof user.generateToken === "function" ? user.generateToken() : null;
 
@@ -7,7 +14,7 @@ const sendToken = (user, message, res, statusCode, hasProfile = undefined) => {
   res.cookie("token", token, {
     httpOnly: true,
     secure: isProduction,
-    maxAge: 7 * 24 * 60 * 60 * 1000, 
+    maxAge: 7 * 24 * 60 * 60 * 1000,
     sameSite: isProduction ? "none" : "lax",
   });
 
@@ -15,6 +22,8 @@ const sendToken = (user, message, res, statusCode, hasProfile = undefined) => {
   if (hasProfile !== undefined) {
     userData.hasProfile = hasProfile;
   }
+
+  Object.assign(userData, additionalData);
 
   res.status(statusCode).json({
     success: true,
