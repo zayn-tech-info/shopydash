@@ -11,7 +11,7 @@ export const navigation = [
   },
   {
     id: 3,
-    href: "#waitlist",
-    text: "Join Waitlist",
+    href: "#pricing",
+    text: "Pricing",
   },
 ];

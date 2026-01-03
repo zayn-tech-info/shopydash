@@ -6,6 +6,7 @@ import {
   Shield,
   Zap,
   MessageCircle,
+  Search,
 } from "lucide-react";
 
 export function Features() {
@@ -37,14 +38,15 @@ export function Features() {
 
             <div className="bg-white p-8 rounded-lg">
               <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
-                <Users className="w-6 h-6 text-orange-500" />
+                <Search className="w-6 h-6 text-orange-500" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">
-                Campus Discovery
+                Smart Product Search
               </h3>
               <p className="text-gray-600">
-                Browse student vendors like social media. Follow your favorite
-                campus sellers and discover new products daily.
+                Easily find exactly what you need with our powerful search and
+                filter tools. Browse by category, price, or location to discover
+                items around campus.
               </p>
             </div>
 
@@ -57,7 +59,7 @@ export function Features() {
               </h3>
               <p className="text-gray-600">
                 Buy textbooks, gadgets, food, fashion, and more from verified
-                students with secure checkout.
+                students with secure checkout options.
               </p>
             </div>
 
@@ -66,11 +68,11 @@ export function Features() {
                 <TrendingUp className="w-6 h-6 text-orange-500" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">
-                Sales Dashboard
+                Seamless Payouts
               </h3>
               <p className="text-gray-600">
-                Track your sales, understand what students want, and grow your
-                campus business with insights.
+                Track your sales and withdraw your earnings directly to your
+                bank account via our secure Paystack integration.
               </p>
             </div>
 
@@ -89,14 +91,14 @@ export function Features() {
 
             <div className="bg-white p-8 rounded-lg">
               <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
-                <Zap className="w-6 h-6 text-orange-500" />
+                <MessageCircle className="w-6 h-6 text-orange-500" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">
-                Quick Setup
+                Instant Messaging
               </h3>
               <p className="text-gray-600">
-                Start selling in minutes with your university email. No
-                complicated setup just sign up and list your products.
+                Chat directly with vendors to ask questions, negotiate prices,
+                and arrange safe meetups on campus.
               </p>
             </div>
           </div>

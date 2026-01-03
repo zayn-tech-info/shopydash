@@ -1,7 +1,5 @@
-import {
-  Store,
-  MessageCircle,
-} from "lucide-react";
+import { Store, MessageCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export function Footer() {
   return (
@@ -38,7 +36,7 @@ export function Footer() {
                   <a href="#pricing">Pricing</a>
                 </li>
                 <li>
-                  <a href="#security">Security</a>
+                  <Link to="/privacy-policy">Privacy Policy</Link>
                 </li>
               </ul>
             </div>

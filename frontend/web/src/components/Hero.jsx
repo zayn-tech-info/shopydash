@@ -39,11 +39,26 @@ export function Hero() {
           </div>
 
           {/* Right: Image */}
-          <div className="order-first md:order-none">
+          <div className="order-first md:order-none relative z-10">
+            {/* Decorative Patterns */}
+            {/* Decorative Patterns */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-[image:radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-orange-100/50 via-transparent to-transparent -z-20" />
+
+            {/* Dot Pattern */}
+            <div className="absolute -top-10 -right-10 w-32 h-32 opacity-20 bg-[radial-gradient(#f97316_2px,transparent_2px)] [background-size:16px_16px] -z-10" />
+            <div className="absolute -bottom-10 -left-10 w-40 h-40 opacity-20 bg-[radial-gradient(#f97316_2px,transparent_2px)] [background-size:16px_16px] -z-10" />
+
+            {/* Circles */}
+            <div className="absolute top-0 right-0 w-24 h-24 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob -z-10" />
+            <div className="absolute -bottom-8 left-20 w-32 h-32 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000 -z-10" />
+
+            {/* Ring */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] border-2 border-dashed border-orange-200 rounded-full -z-10 animate-[spin_10s_linear_infinite]" />
+
             <img
               src={HeroImg}
               alt="Students buying and selling on Shopydash"
-              className="w-full h-auto max-w-[560px] mx-auto object-contain"
+              className="w-full h-auto max-w-[200px] md:max-w-[300px] mx-auto object-contain rounded-3xl relative z-10 drop-shadow-2xl"
               loading="eager"
               decoding="async"
             />

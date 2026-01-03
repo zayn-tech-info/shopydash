@@ -28,9 +28,13 @@ export function Navbar() {
   return (
     <div>
       <header className="border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <img className="w-28 h-16" src={Logo} alt="" />
+            <img
+              className="w-auto h-16 object-contain"
+              src={Logo}
+              alt="Shopydash Logo"
+            />
           </div>
           <nav className="hidden md:flex items-center">
             <ul className="flex items-center gap-8">
