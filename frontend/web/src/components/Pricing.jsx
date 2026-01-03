@@ -64,17 +64,20 @@ export function Pricing() {
   return (
     <div
       id="pricing"
-      className="bg-orange-50/50 py-24 font-sans border-t border-gray-100"
+      className="bg-orange-50/30 py-24 font-sans relative overflow-hidden"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-orange-500 font-bold tracking-widest uppercase text-sm mb-3">
-            Premium Plans
-          </h2>
-          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 tracking-tight">
+      {/* Background Decoration */}
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-orange-100/40 rounded-full blur-3xl opacity-60 -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="text-center mb-20">
+          <span className="bg-orange-100 text-orange-600 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-6 inline-block">
+            Flexible Pricing
+          </span>
+          <h2 className="text-4xl md:text-5xl font-bold text-n-8 mb-6 tracking-tight font-sora">
             Supercharge Your Sales
-          </h1>
-          <p className="max-w-2xl mx-auto text-xl text-gray-500 leading-relaxed">
+          </h2>
+          <p className="max-w-2xl mx-auto text-xl text-n-4 leading-relaxed">
             Choose the perfect plan to grow your business, reach more students,
             and build a professional brand on Vendors.
           </p>
@@ -84,10 +87,10 @@ export function Pricing() {
           {plans.map((plan) => (
             <div
               key={plan.id}
-              className={`relative flex flex-col items-stretch h-full bg-white rounded-3xl transition-all duration-300 hover:shadow-xl group ${
+              className={`relative flex flex-col items-stretch h-full bg-white rounded-3xl transition-all duration-300 group ${
                 plan.popular
-                  ? "shadow-xl ring-2 ring-orange-500 scale-105 z-10"
-                  : "shadow-lg border border-gray-100"
+                  ? "shadow-2xl ring-2 ring-orange-500 scale-105 z-10"
+                  : "shadow-lg border border-n-2/30 hover:shadow-xl hover:-translate-y-1"
               }`}
             >
               {plan.popular && (
@@ -99,52 +102,56 @@ export function Pricing() {
               )}
 
               <div className="p-8 flex-1 flex flex-col">
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center justify-between mb-8">
                   <div
                     className={`p-3 rounded-2xl ${
                       plan.popular
                         ? "bg-orange-50 text-orange-600"
-                        : "bg-gray-50 text-gray-600"
+                        : "bg-n-2/20 text-n-6"
                     }`}
                   >
                     <plan.icon size={28} strokeWidth={2} />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900">
+                  <h3 className="text-xl font-bold text-n-8 font-sora">
                     {plan.name}
                   </h3>
                 </div>
 
-                <div className="mb-6">
-                  <p className="text-gray-500 text-sm leading-relaxed min-h-[48px]">
-                    {plan.description}
-                  </p>
-                </div>
-
                 <div className="mb-8 flex items-baseline">
-                  <span className="text-4xl font-extrabold text-gray-900 tracking-tight">
+                  <span className="text-5xl font-bold text-n-8 tracking-tight font-sora">
                     {plan.price}
                   </span>
                   {plan.price !== "Free" && (
-                    <span className="text-gray-500 ml-1 font-medium">
+                    <span className="text-n-4 ml-2 font-medium">
                       {plan.period}
                     </span>
                   )}
                   {plan.price === "Free" && (
-                    <span className="text-gray-500 ml-1 font-medium text-sm sr-only">
-                      {plan.period}
-                    </span>
+                    <span className="sr-only">Free</span>
                   )}
                 </div>
 
-                <ul className="flex-1 space-y-4 mb-8">
+                <div className="mb-8 border-t border-dashed border-gray-100 pt-6">
+                  <p className="text-n-4 text-sm leading-relaxed">
+                    {plan.description}
+                  </p>
+                </div>
+
+                <ul className="flex-1 space-y-4 mb-10">
                   {plan.features.map((feature, idx) => (
                     <li key={idx} className="flex items-start">
-                      <div className="flex-shrink-0 mt-1">
-                        <div className="flex items-center justify-center w-5 h-5 rounded-full bg-green-100 text-green-600">
+                      <div className="flex-shrink-0 mt-0.5">
+                        <div
+                          className={`flex items-center justify-center w-5 h-5 rounded-full ${
+                            plan.popular
+                              ? "bg-orange-100 text-orange-600"
+                              : "bg-green-100 text-green-600"
+                          }`}
+                        >
                           <Check size={12} strokeWidth={4} />
                         </div>
                       </div>
-                      <p className="ml-3 text-sm text-gray-600 font-medium leading-5">
+                      <p className="ml-3 text-sm text-n-5 font-medium leading-5">
                         {feature}
                       </p>
                     </li>
@@ -155,10 +162,10 @@ export function Pricing() {
                   href="https://app.shopydash.com/pricing"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`w-full py-4 px-6 rounded-xl font-bold text-base transition-all duration-300 shadow-md transform active:scale-95 flex items-center justify-center cursor-pointer ${
+                  className={`w-full py-4 px-6 rounded-xl font-bold text-base transition-all duration-300 shadow-lg transform active:scale-95 flex items-center justify-center cursor-pointer ${
                     plan.popular
-                      ? "bg-orange-500 text-white hover:bg-orange-600"
-                      : "bg-gray-800 text-white hover:bg-gray-900"
+                      ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 shadow-orange-200"
+                      : "bg-n-8 text-white hover:bg-black"
                   }`}
                 >
                   {plan.cta}

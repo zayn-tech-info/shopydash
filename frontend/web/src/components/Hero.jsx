@@ -15,14 +15,14 @@ export function Hero() {
         <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-12 lg:gap-20">
           {/* Left: Text Content */}
           <div className="text-center lg:text-left z-10">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight leading-tight mb-4">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-n-8 tracking-tight leading-tight mb-4 font-sora">
               Your Campus Marketplace for{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-amber-500">
                 Buying & Selling
               </span>
             </h1>
 
-            <p className="text-lg md:text-xl text-gray-500 leading-relaxed mb-8 max-w-2xl mx-auto lg:mx-0">
+            <p className="text-lg md:text-xl text-n-4 leading-relaxed mb-8 max-w-2xl mx-auto lg:mx-0">
               Shopydash connects student vendors and buyers in one premium
               social marketplace. Trade textbooks, gadgets, fashion, and more
               securely within your campus community.

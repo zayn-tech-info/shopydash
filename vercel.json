@@ -42,6 +42,10 @@
       "dest": "/frontend/app/index.html"
     },
     {
+      "src": "/frontend/web/sitemap.xml",
+      "dest": "/frontend/web/sitemap.xml"
+    },
+    {
       "src": "/frontend/web/.*",
       "dest": "/frontend/web/index.html"
     }
