@@ -9,6 +9,8 @@ import { useAuthStore } from "../store/authStore";
 export function BottomNav() {
   const authUser = useAuthStore((state) => state.authUser);
 
+  if (!authUser) return null;
+
   const location = useLocation();
   const current = useMemo(() => {
     return location.pathname === "/" ? "/" : location.pathname;

@@ -68,8 +68,21 @@ function AboutAndProducts({ vendor }) {
                 <h4 className="font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
                   Category
                 </h4>
-                <div className="text-n-8 font-medium">
-                  {vendor?.businessCategory || "-"}
+                <div className="flex flex-wrap gap-2">
+                  {Array.isArray(vendor?.businessCategory) ? (
+                    vendor.businessCategory.map((cat, index) => (
+                      <span
+                        key={index}
+                        className="px-3 py-1 bg-n-2 rounded-full text-xs font-medium text-n-6 border border-n-3/10"
+                      >
+                        {cat}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-n-8 font-medium">
+                      {vendor?.businessCategory || "-"}
+                    </span>
+                  )}
                 </div>
               </div>
 

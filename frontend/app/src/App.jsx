@@ -159,7 +159,9 @@ const App = () => {
         ""
       )}
       {authUser && location.pathname !== "/messages" ? <BottomNav /> : ""}
-      {location.pathname !== "/messages" && <VendorFloatingButton />}
+      {authUser && location.pathname !== "/messages" && (
+        <VendorFloatingButton />
+      )}
       <Toaster />
     </div>
   );
