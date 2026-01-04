@@ -100,6 +100,10 @@ export const useVendorProfileStore = create((set, get) => ({
       set({ vendors });
       return vendors;
     } catch (err) {
+      if (err.response && err.response.status === 404) {
+        set({ vendors: [], isGettingVendorProfile: false });
+        return [];
+      }
       const serverMessage =
         err?.response?.data?.message ??
         err?.response?.data ??

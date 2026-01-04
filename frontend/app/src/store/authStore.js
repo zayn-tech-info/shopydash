@@ -100,6 +100,10 @@ export const useAuthStore = create((set) => ({
       const payload = res?.data?.data ?? res?.data ?? res;
       set({ authUser: payload, isCheckingAuth: false, error: null });
     } catch (err) {
+      if (err.response && err.response.status === 401) {
+        set({ authUser: null, isCheckingAuth: false });
+        return null;
+      }
       const serverMessage =
         err?.response?.data?.message ||
         (typeof err?.response?.data === "string" ? err.response.data : null) ||

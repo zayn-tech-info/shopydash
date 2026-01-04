@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { LogOut } from "lucide-react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { LogOut, UserX, Home } from "lucide-react";
 import { api } from "../lib/axios";
 import { useVendorProfileStore } from "../store/vendorProfileStore";
 import { useClientProfileStore } from "../store/clientProfileStore";
@@ -85,17 +85,32 @@ export default function ProfileDispatcher() {
       );
     }
     return (
-      <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
-        <div className="text-primary-3 body-1">{error}</div>
-        {authUser && (
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-4 py-2 border border-n-3/20 rounded-xl text-xs font-bold uppercase tracking-wider text-n-5 hover:text-primary-3 hover:border-primary-3 transition-all"
+      <div className="flex flex-col items-center justify-center min-h-[70vh] px-4 text-center">
+        <div className="w-24 h-24 rounded-full bg-n-3/10 flex items-center justify-center mb-6">
+          <UserX className="w-10 h-10 text-n-5" strokeWidth={1.5} />
+        </div>
+        <h2 className="h4 font-bold text-n-7 mb-2">User Not Found</h2>
+        <p className="body-2 text-n-5 max-w-xs mb-8">
+          The user profile you are looking for is unavailable or does not exist.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Link
+            to="/"
+            className="flex items-center justify-center gap-2 px-6 py-2.5 bg-primary-3 hover:bg-primary-2 rounded-xl text-n-1 font-bold transition-colors"
           >
-            <LogOut size={14} />
-            Logout
-          </button>
-        )}
+            <Home size={18} />
+            <span>Go Home</span>
+          </Link>
+          {authUser && (
+            <button
+              onClick={handleLogout}
+              className="flex items-center justify-center gap-2 px-6 py-2.5 border border-n-3/20 hover:border-n-3/40 rounded-xl text-n-7 font-bold transition-colors"
+            >
+              <LogOut size={18} />
+              <span>Logout</span>
+            </button>
+          )}
+        </div>
       </div>
     );
   }

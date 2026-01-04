@@ -11,7 +11,11 @@ export function FeaturedVendor({ limit = 10 }) {
 
   useEffect(() => {
     async function getVendors() {
-      await getAllVendorProfile();
+      try {
+        await getAllVendorProfile();
+      } catch (error) {
+        console.error("Failed to fetch featured vendors:", error);
+      }
     }
     getVendors();
   }, [getAllVendorProfile]);
