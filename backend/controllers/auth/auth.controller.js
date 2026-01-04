@@ -245,15 +245,21 @@ const login = asyncErrorHandler(async (req, res, next) => {
 });
 
 const logout = (req, res, next) => {
-  const isProduction =
-    process.env.NODE_ENV === "production" || process.env.RENDER === "true";
+  const isProduction = process.env.NODE_ENV === "production";
 
-  res.cookie("token", "", {
+  const cookieOptions = {
     httpOnly: true,
     secure: isProduction,
     maxAge: 0,
     sameSite: isProduction ? "none" : "lax",
-  });
+  };
+
+  // Set domain for production to allow cookie clearing across subdomains
+  if (isProduction) {
+    cookieOptions.domain = ".shopydash.com";
+  }
+
+  res.cookie("token", "", cookieOptions);
 
   res.status(200).json({
     success: true,
