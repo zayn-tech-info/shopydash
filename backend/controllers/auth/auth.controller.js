@@ -249,9 +249,9 @@ const logout = (req, res, next) => {
 
   const cookieOptions = {
     httpOnly: true,
-    secure: isProduction,
+    secure: true,
     maxAge: 0,
-    sameSite: isProduction ? "none" : "lax",
+    sameSite: "none",
   };
 
   // Set domain for production to allow cookie clearing across subdomains
