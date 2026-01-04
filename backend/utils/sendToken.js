@@ -12,13 +12,12 @@ const sendToken = (
   const isProduction = process.env.NODE_ENV === "production";
 
   const cookieOptions = {
-    httpOnly: true,
-    secure: true,
+    httpOnly: isProduction,
+    secure: isProduction,
     maxAge: 7 * 24 * 60 * 60 * 1000,
-    sameSite: "none",
+    sameSite: isProduction ? "lax" : "none",
   };
 
-  // Set domain for production to allow cookie sharing across subdomains
   if (isProduction && process.env.COOKIE_DOMAIN) {
     cookieOptions.domain = process.env.COOKIE_DOMAIN;
   }
