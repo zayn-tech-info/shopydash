@@ -113,11 +113,7 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
 
   await user.save();
 
-  res.status(200).json({
-    success: true,
-    message: "Registration completed successfully",
-    data: { user: user.toObject(), hasProfile: false },
-  });
+  sendToken(user, "Registration completed successfully", res, 200, false);
 });
 
 const signup = asyncErrorHandler(async (req, res, next) => {
@@ -181,7 +177,8 @@ const signup = asyncErrorHandler(async (req, res, next) => {
 
   const user = await User.create({ ...req.body, profileComplete: true });
 
-  sendToken(user, "User created successfully", res, 201);
+  const hasProfile = await checkUserHasProfile(user);
+  sendToken(user, "User created successfully", res, 201, hasProfile);
 });
 
 const login = asyncErrorHandler(async (req, res, next) => {
