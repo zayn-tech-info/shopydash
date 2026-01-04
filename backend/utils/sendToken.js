@@ -12,10 +12,10 @@ const sendToken = (
   const isProduction = process.env.NODE_ENV === "production";
 
   const cookieOptions = {
-    httpOnly: isProduction,
-    secure: isProduction,
+    httpOnly: true,
+    secure: true,
     maxAge: 7 * 24 * 60 * 60 * 1000,
-    sameSite: isProduction ? "lax" : "none",
+    sameSite: "none",
   };
 
   if (isProduction && process.env.COOKIE_DOMAIN) {

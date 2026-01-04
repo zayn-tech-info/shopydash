@@ -248,10 +248,10 @@ const logout = (req, res, next) => {
   const isProduction = process.env.NODE_ENV === "production";
 
   const cookieOptions = {
-    httpOnly: isProduction,
-    secure: isProduction,
+    httpOnly: true,
+    secure: true,
     maxAge: 0,
-    sameSite: isProduction ? "lax" : "none",
+    sameSite: "none",
   };
 
   if (isProduction && process.env.COOKIE_DOMAIN) {
