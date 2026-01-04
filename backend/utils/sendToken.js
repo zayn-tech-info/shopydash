@@ -9,7 +9,8 @@ const sendToken = (
   const token =
     typeof user.generateToken === "function" ? user.generateToken() : null;
 
-  const isProduction = process.env.NODE_ENV === "production";
+  const isProduction =
+    process.env.NODE_ENV === "production" || process.env.RENDER === "true";
 
   res.cookie("token", token, {
     httpOnly: true,
