@@ -30,7 +30,9 @@ const SubscriptionBadge = ({ plan, size = "sm", className = "" }) => {
     <div
       className={`rounded-full flex items-center justify-center shadow-sm ${
         badge.bg
-      } ${badge.text} ${sizeClasses[size] || sizeClasses.sm} ${className}`}
+      } ${badge.text} ${
+        sizeClasses[size] || sizeClasses.sm
+      } shrink-0 ${className}`}
       title={plan}
       aria-label={`${plan} Badge`}
     >

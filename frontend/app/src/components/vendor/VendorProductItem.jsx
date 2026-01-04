@@ -51,6 +51,14 @@ function VendorProductItem({ product, vendorId }) {
           className="w-full h-full object-cover md:group-hover:scale-110 transition-transform duration-500"
         />
         <div className="absolute inset-0 bg-black/0 md:group-hover:bg-black/10 transition-colors duration-300" />
+        {product?.vendor && (
+          <Link
+            to={`/p/${product.vendor.username}`}
+            className="absolute top-0 right-0 z-10 bg-primary-3 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl rounded-tr-lg shadow-sm hover:bg-primary-4 transition-colors"
+          >
+            View Profile
+          </Link>
+        )}
       </div>
 
       <div className="flex-1 flex flex-col min-w-0">
@@ -69,7 +77,7 @@ function VendorProductItem({ product, vendorId }) {
                 product.vendor.profilePic || "/assets/avatar-placeholder.svg"
               }
               alt={product.vendor.businessName}
-              className="w-6 h-6 rounded-full object-cover border border-n-3"
+              className="w-6 h-6 rounded-full object-cover border border-n-3 shrink-0"
               onError={(e) => {
                 e.target.src = "/assets/avatar-placeholder.svg";
               }}
@@ -81,12 +89,6 @@ function VendorProductItem({ product, vendorId }) {
               plan={product.vendor.subscriptionPlan}
               size="sm"
             />
-            <Link
-              to={`/p/${product.vendor.username}`}
-              className="ml-auto text-[10px] font-bold text-primary-3 hover:text-primary-4 transition-colors text-nowrap tracking-wider"
-            >
-              View Profile
-            </Link>
           </div>
         )}
 
