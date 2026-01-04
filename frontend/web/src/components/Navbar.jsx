@@ -119,7 +119,7 @@ export function Navbar() {
                   href="https://app.shopydash.com/signup"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-4 text-center text-lg font-medium border border-n-8 rounded-xl"
+                  className="w-full py-4 text-center text-lg  text-black font-medium border border-n-8 rounded-xl"
                 >
                   Sign Up
                 </a>
