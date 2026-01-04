@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { GraduationCap, Store, Eye, EyeOff } from "lucide-react";
@@ -10,14 +10,21 @@ export default function CompleteRegistration() {
   const { authUser, completeRegistration } = useAuthStore();
   const [loading, setLoading] = useState(false);
 
-  const [role, setRole] = useState("client");
+  const [role, setRole] = useState(
+    () => localStorage.getItem("signupRole") || "client"
+  );
+
+  // Removed premature cleanup to support StrictMode double-invocations
   const [username, setUsername] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [schoolName, setSchoolName] = useState("");
   const [whatsAppNumber, setWhatsAppNumber] = useState("");
   const [businessName, setBusinessName] = useState("");
-  const [schoolId, setSchoolId] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [country, setCountry] = useState("");
 
+  const [schoolId, setSchoolId] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [selectedArea, setSelectedArea] = useState("");
@@ -33,9 +40,14 @@ export default function CompleteRegistration() {
       !schoolName ||
       !whatsAppNumber ||
       !password ||
-      !selectedArea
+      !selectedArea ||
+      !city ||
+      !state ||
+      !country
     ) {
-      return toast.error("Please fill in all required fields");
+      return toast.error(
+        "Please fill in all required fields (City, State, Country included)"
+      );
     }
 
     if (!isClient && !businessName) {
@@ -58,9 +70,12 @@ export default function CompleteRegistration() {
         schoolId: schoolId ? Number(schoolId) : undefined,
         password,
         area: selectedArea,
-        state: "Nigeria",
+        city,
+        state,
+        country,
       });
 
+      localStorage.removeItem("signupRole");
       toast.success("Registration completed successfully!");
       const { reloadApp } = await import("../utils/navigation");
       reloadApp("/", true);
@@ -159,6 +174,48 @@ export default function CompleteRegistration() {
                 className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
                 required
               />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5">
+              <div>
+                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
+                  City
+                </label>
+                <input
+                  type="text"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="e.g. Lagos"
+                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
+                  State
+                </label>
+                <input
+                  type="text"
+                  value={state}
+                  onChange={(e) => setState(e.target.value)}
+                  placeholder="e.g. Lagos"
+                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
+                  Country
+                </label>
+                <input
+                  type="text"
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                  placeholder="e.g. Nigeria"
+                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
+                  required
+                />
+              </div>
             </div>
 
             <LocationSelector

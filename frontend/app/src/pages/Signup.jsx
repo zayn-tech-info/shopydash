@@ -139,6 +139,7 @@ export function Signup() {
 
   const switchTo = (nextRole) => {
     setRole(nextRole);
+    localStorage.setItem("signupRole", nextRole);
     resetField();
   };
 
