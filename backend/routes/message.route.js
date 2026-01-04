@@ -34,13 +34,14 @@ router.use(protectRoute);
 
 router.post(
   "/check-access",
+  protectRoute,
   conversationRateLimiter,
   messageController.checkMessagingAccess,
   messageController.initiateOrGetConversation
 );
 
 
-router.get("/", conversationRateLimiter, messageController.getConversations);
+router.get("/", protectRoute, conversationRateLimiter, messageController.getConversations);
 
 
 router.get("/available-vendors", conversationRateLimiter, messageController.getAvailableVendorsForChat);
@@ -49,6 +50,6 @@ router.get("/available-vendors", conversationRateLimiter, messageController.getA
 router.get("/:conversationId", conversationRateLimiter, messageController.getMessages);
 
 
-router.post("/", messageRateLimiter, messageController.sendMessage);
+router.post("/", protectRoute, messageRateLimiter, messageController.sendMessage);
 
 module.exports = router;
