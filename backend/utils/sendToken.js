@@ -11,12 +11,19 @@ const sendToken = (
 
   const isProduction = process.env.NODE_ENV === "production";
 
-  res.cookie("token", token, {
+  const cookieOptions = {
     httpOnly: true,
     secure: isProduction,
     maxAge: 7 * 24 * 60 * 60 * 1000,
     sameSite: isProduction ? "none" : "lax",
-  });
+  };
+
+  // Set domain for production to allow cookie sharing across subdomains
+  if (isProduction && process.env.COOKIE_DOMAIN) {
+    cookieOptions.domain = process.env.COOKIE_DOMAIN;
+  }
+
+  res.cookie("token", token, cookieOptions);
 
   const userData = user.toObject ? user.toObject() : { ...user };
   if (hasProfile !== undefined) {
