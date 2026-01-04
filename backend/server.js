@@ -21,7 +21,13 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173", "https://shopydash-v1.vercel.app"],
+    origin: [
+      "http://localhost:5173",
+      "https://shopydash-v1.vercel.app",
+      "https://app.shopydash.com",
+      "https://shopydash.com",
+      "https://www.shopydash.com",
+    ],
     methods: ["GET", "POST"],
     credentials: true,
   },

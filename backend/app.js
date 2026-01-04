@@ -31,6 +31,9 @@ const mode = process.env.NODE_ENV || "development";
 const allowedOrigins = [
   "http://localhost:5173",
   "https://app.shopydash.com",
+  "https://shopydash.com",
+  "https://www.shopydash.com",
+  "https://shopydash-v1.vercel.app",
 ];
 
 app.use(
