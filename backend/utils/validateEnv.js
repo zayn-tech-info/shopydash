@@ -33,6 +33,14 @@ const validateEnv = () => {
     );
   }
 
+  // Validate COOKIE_DOMAIN in production
+  if (process.env.NODE_ENV === "production" && !process.env.COOKIE_DOMAIN) {
+    logWarn(
+      "Environment Validation",
+      "COOKIE_DOMAIN is not set. Authentication cookies may not work across subdomains in production."
+    );
+  }
+
   logInfo("Environment Validation", "Environment variables validated successfully");
 };
 

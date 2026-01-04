@@ -255,8 +255,8 @@ const logout = (req, res, next) => {
   };
 
   // Set domain for production to allow cookie clearing across subdomains
-  if (isProduction) {
-    cookieOptions.domain = ".shopydash.com";
+  if (isProduction && process.env.COOKIE_DOMAIN) {
+    cookieOptions.domain = process.env.COOKIE_DOMAIN;
   }
 
   res.cookie("token", "", cookieOptions);

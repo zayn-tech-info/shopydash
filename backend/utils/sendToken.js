@@ -19,8 +19,8 @@ const sendToken = (
   };
 
   // Set domain for production to allow cookie sharing across subdomains
-  if (isProduction) {
-    cookieOptions.domain = ".shopydash.com";
+  if (isProduction && process.env.COOKIE_DOMAIN) {
+    cookieOptions.domain = process.env.COOKIE_DOMAIN;
   }
 
   res.cookie("token", token, cookieOptions);
