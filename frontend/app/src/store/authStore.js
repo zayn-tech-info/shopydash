@@ -26,6 +26,10 @@ export const useAuthStore = create((set) => ({
       const res = await api.post("/api/v1/auth/login", data);
       const payload = res?.data?.data ?? res?.data ?? res;
 
+      if (res.data.token) {
+        localStorage.setItem("token", res.data.token);
+      }
+
       set({ authUser: payload, isLogginIn: false, error: null });
       return payload;
     } catch (err) {
@@ -45,6 +49,10 @@ export const useAuthStore = create((set) => ({
     try {
       const res = await api.post("/api/v1/auth/google", { token });
       const payload = res?.data?.data ?? res?.data ?? res;
+
+      if (res.data.token) {
+        localStorage.setItem("token", res.data.token);
+      }
 
       const userData = payload.user || payload;
       const hasProfile =
@@ -77,6 +85,10 @@ export const useAuthStore = create((set) => ({
       const res = await api.post("/api/v1/auth/complete-registration", data);
       const payload = res?.data?.data ?? res?.data ?? res;
 
+      if (res.data.token) {
+        localStorage.setItem("token", res.data.token);
+      }
+
       const userData = payload.user || payload;
       const hasProfile =
         payload.hasProfile !== undefined ? payload.hasProfile : false;
@@ -102,6 +114,9 @@ export const useAuthStore = create((set) => ({
     } catch (err) {
       if (err.response && err.response.status === 401) {
         set({ authUser: null, isCheckingAuth: false });
+        // Don't remove token here yet, maybe session expired but let user try to login again or refresh?
+        // actually if 401, token is invalid.
+        localStorage.removeItem("token");
         return null;
       }
       const serverMessage =
@@ -117,6 +132,7 @@ export const useAuthStore = create((set) => ({
   logout: async () => {
     try {
       await api.post("/api/v1/auth/logout");
+      localStorage.removeItem("token");
     } catch (err) {
       const serverMessage =
         err?.response?.data?.message ||

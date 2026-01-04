@@ -193,13 +193,6 @@ const useChatStore = create((set, get) => ({
       
       const { conversations: currentConvs } = get();
       
-      
-      
-      
-      
-      
-
-      
       const userId = useAuthStore.getState().authUser?._id;
 
       if (userId) {
