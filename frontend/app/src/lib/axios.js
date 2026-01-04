@@ -6,7 +6,7 @@ export const api = axios.create({
     mode === "development"
       ? "http://localhost:8000"
       : "https://vendora-7457.onrender.com",
-  withCredentials: true, 
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
