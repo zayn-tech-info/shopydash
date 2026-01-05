@@ -56,6 +56,11 @@ export const useSignupStore = create((set) => ({
     set({ isSigningUp: true, error: null });
     try {
       const res = await api.post("/api/v1/auth/signup", data);
+
+      if (res.data.token) {
+        localStorage.setItem("token", res.data.token);
+      }
+
       const payload = res?.data?.data ?? res?.data ?? res;
       set({ userData: payload, isSigningUp: false, error: null });
     } catch (err) {
