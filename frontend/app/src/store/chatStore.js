@@ -31,6 +31,12 @@ const useChatStore = create((set, get) => ({
     if (existingSocket) return;
 
     const token = getToken();
+    console.log(
+      "Attempting socket connection to:",
+      ENDPOINT,
+      "with token:",
+      token ? "Found" : "Missing"
+    );
     if (!token) {
       console.error("No authentication token found for socket connection");
       return;
