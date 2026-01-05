@@ -5,7 +5,7 @@ import { toast } from "react-hot-toast";
 import { useAuthStore } from "./authStore";
 import DOMPurify from "isomorphic-dompurify";
 
-const ENDPOINT = import.meta.env.RENDER_URL || "http://localhost:8000";
+const ENDPOINT = import.meta.env.RENDER_URL
 
 const getTokenFromCookies = () => {
   const cookies = document.cookie.split(";");
