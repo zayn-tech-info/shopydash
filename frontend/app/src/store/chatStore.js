@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { io } from "socket.io-client";
-import axios from "axios";
+import { api as axios } from "../lib/axios";
 import { toast } from "react-hot-toast";
 import { useAuthStore } from "./authStore";
 import DOMPurify from "isomorphic-dompurify";
