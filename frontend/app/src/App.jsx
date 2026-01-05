@@ -55,12 +55,18 @@ const App = () => {
   }
 
   return (
-    <div>
+    <div
+      className={
+        location.pathname === "/messages"
+          ? "flex flex-col h-[100dvh] overflow-hidden"
+          : ""
+      }
+    >
       <Header />
       <div
         className={`relative mx-auto ${
           location.pathname === "/messages"
-            ? "w-full max-w-full px-0 pb-0 h-screen pt- overflow-hidden bg-n-1"
+            ? "w-full max-w-full px-0 pb-0 flex-1 overflow-hidden bg-n-1"
             : "max-w-7xl px-2 sm:px-6 md:px-10 lg:px-8 pb-40"
         }`}
       >
