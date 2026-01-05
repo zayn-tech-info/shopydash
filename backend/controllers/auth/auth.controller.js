@@ -285,7 +285,8 @@ const checkAuth = asyncErrorHandler(async (req, res, next) => {
     }
   }
 
-  res.status(200).json(userData);
+  const token = req.user.generateToken();
+  res.status(200).json({ ...userData, token });
 });
 
 const filterField = (obj, ...allowedFields) => {

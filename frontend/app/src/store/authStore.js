@@ -110,6 +110,9 @@ export const useAuthStore = create((set) => ({
     try {
       const res = await api.get("/api/v1/auth/check");
       const payload = res?.data?.data ?? res?.data ?? res;
+      if (payload.token) {
+        localStorage.setItem("token", payload.token);
+      }
       set({ authUser: payload, isCheckingAuth: false, error: null });
     } catch (err) {
       if (err.response && err.response.status === 401) {
