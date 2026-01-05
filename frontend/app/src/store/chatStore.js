@@ -7,7 +7,7 @@ import DOMPurify from "isomorphic-dompurify";
 
 const ENDPOINT = "https://vendora-7457.onrender.com";
 
-const getTokenFromCookies = () => {
+const getToken = () => {
   const cookies = document.cookie.split(";");
   for (let cookie of cookies) {
     const [name, value] = cookie.trim().split("=");
@@ -15,7 +15,7 @@ const getTokenFromCookies = () => {
       return value;
     }
   }
-  return null;
+  return localStorage.getItem("token");
 };
 
 const useChatStore = create((set, get) => ({
@@ -30,7 +30,7 @@ const useChatStore = create((set, get) => ({
     const existingSocket = get().socket;
     if (existingSocket) return;
 
-    const token = getTokenFromCookies();
+    const token = getToken();
     if (!token) {
       console.error("No authentication token found for socket connection");
       return;
