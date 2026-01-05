@@ -213,7 +213,6 @@ export function SignupForm({
                   onChange={(e) => setField("schoolId", e.target.value)}
                   placeholder="e.g. 20221234"
                   className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
-                  required
                 />
               </div>
 
@@ -429,7 +428,6 @@ export function SignupForm({
                   onChange={(e) => setField("schoolId", e.target.value)}
                   placeholder="e.g. 20221334"
                   className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
-                  required
                 />
               </div>
 

@@ -77,12 +77,6 @@ const userSchema = mongoose.Schema(
     schoolId: {
       type: String,
       trim: true,
-      required: [
-        function () {
-          return !this.isGoogleAuth;
-        },
-        "Please provide your school ID number",
-      ],
       unique: [
         true,
         "This School ID is already registered. Please verify your ID or contact support.",
