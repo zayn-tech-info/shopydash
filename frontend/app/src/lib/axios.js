@@ -2,10 +2,10 @@ import axios from "axios";
 
 const mode = import.meta.env.MODE;
 export const api = axios.create({
-  /*      mode === "development"
+  baseURL:
+    mode === "development"
       ? "http://localhost:8000"
-      :  */
-  baseURL: "https://vendora-7457.onrender.com",
+      : "https://vendora-7457.onrender.com",
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
