@@ -7,7 +7,7 @@ const validateEnv = () => {
     "CLOUDINARY_NAME",
     "CLOUDINARYAPI_KEY",
     "CLOUDINARYAPI_API_SECRET",
-    "PAYSTACK_TEST_SECRET_KEY",
+    "PAYSTACK_LIVE_SECRET_KEY",
   ];
 
   const missing = [];
