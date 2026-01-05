@@ -15,7 +15,7 @@ const VendorProductUpload = () => {
 
   useEffect(() => {
     if (authUser && !authUser.hasProfile) {
-      toast("Please complete your vendor profile first");
+      toast.error("Please complete your vendor profile first");
       navigate("/create-vendor-profile");
     }
   }, [authUser, navigate]);
@@ -23,21 +23,43 @@ const VendorProductUpload = () => {
   const { createPost, updatePost, uploadImages, isCreatingPost, isUploading } =
     useProductStore();
 
-  const [caption, setCaption] = useState(editingPost?.caption || "");
-  const [schoolName, setSchoolName] = useState(editingPost?.school || "");
-  const [selectedArea, setSelectedArea] = useState(editingPost?.area || "");
-  const [products, setProducts] = useState(
-    editingPost?.products.map((p) => ({
-      id: p._id || Date.now() + Math.random(),
-      title: p.title,
-      price: p.price,
-      description: p.description,
-      category: p.category,
-      condition: p.condition,
-      stock: p.stock,
-      imageFile: null,
-      previewUrl: p.image,
-    })) || [
+  const getInitialState = (key, defaultValue) => {
+    if (editingPost) return defaultValue;
+    const saved = localStorage.getItem("vendor_post_draft_" + key);
+    return saved ? JSON.parse(saved) : defaultValue;
+  };
+
+  const [caption, setCaption] = useState(() =>
+    getInitialState("caption", editingPost?.caption || "")
+  );
+  const [schoolName, setSchoolName] = useState(() =>
+    getInitialState("school", editingPost?.school || "")
+  );
+  const [selectedArea, setSelectedArea] = useState(() =>
+    getInitialState("area", editingPost?.area || "")
+  );
+
+  const [products, setProducts] = useState(() => {
+    if (editingPost) {
+      return (
+        editingPost?.products.map((p) => ({
+          id: p._id || Date.now() + Math.random(),
+          title: p.title,
+          price: p.price,
+          description: p.description,
+          category: p.category,
+          condition: p.condition,
+          stock: p.stock,
+          imageFile: null,
+          previewUrl: p.image,
+        })) || []
+      );
+    }
+    const savedProducts = localStorage.getItem("vendor_post_draft_products");
+    if (savedProducts) {
+      return JSON.parse(savedProducts);
+    }
+    return [
       {
         id: 1,
         title: "",
@@ -49,8 +71,44 @@ const VendorProductUpload = () => {
         imageFile: null,
         previewUrl: null,
       },
-    ]
-  );
+    ];
+  });
+
+  // Save to localStorage whenever state changes
+  useEffect(() => {
+    if (!editingPost) {
+      localStorage.setItem(
+        "vendor_post_draft_caption",
+        JSON.stringify(caption)
+      );
+      localStorage.setItem(
+        "vendor_post_draft_school",
+        JSON.stringify(schoolName)
+      );
+      localStorage.setItem(
+        "vendor_post_draft_area",
+        JSON.stringify(selectedArea)
+      );
+
+      // products need to be sanitized (remove imageFile) before saving
+      const sanitizedProducts = products.map((p) => ({
+        ...p,
+        imageFile: null,
+        previewUrl: null, // Don't persist blob URLs as they expire
+      }));
+      localStorage.setItem(
+        "vendor_post_draft_products",
+        JSON.stringify(sanitizedProducts)
+      );
+    }
+  }, [caption, schoolName, selectedArea, products, editingPost]);
+
+  const clearDraft = () => {
+    localStorage.removeItem("vendor_post_draft_caption");
+    localStorage.removeItem("vendor_post_draft_school");
+    localStorage.removeItem("vendor_post_draft_area");
+    localStorage.removeItem("vendor_post_draft_products");
+  };
 
   const addProduct = () => {
     setProducts([
@@ -144,11 +202,13 @@ const VendorProductUpload = () => {
         await updatePost(editingPost._id, postData);
       } else {
         await createPost(postData);
+        clearDraft(); 
       }
 
       navigate("/dashboard");
     } catch (error) {
       console.error("Submission failed", error);
+      toast.error("Failed to submit post. Please try again.");
     }
   };
 

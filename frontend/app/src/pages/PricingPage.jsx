@@ -18,25 +18,33 @@ const PricingPage = () => {
     const params = new URLSearchParams(window.location.search);
     const reference = params.get("reference");
 
-    const verify = async () => {
-      if (reference) {
+    if (reference) {
+ 
+      window.history.replaceState({}, document.title, window.location.pathname);
+
+      const verify = async () => {
         try {
           await verifyPayment(reference);
           await checkAuth();
           toast.success("Payment successful! Your plan is now active.");
+
+          const updatedUser = useAuthStore.getState().authUser;
+          if (updatedUser?.username) {
+            navigate(`/p/${updatedUser.username}`);
+          } else {
+            navigate("/dashboard");
+          }
         } catch (error) {
           console.error(error);
           toast.error(
             "Could not verify payment status. Please contact support."
           );
-        } finally {
-          navigate("/pricing", { replace: true });
         }
-      }
-    };
+      };
 
-    verify();
-  }, [navigate]);
+      verify();
+    }
+  }, [navigate, verifyPayment, checkAuth]);
 
   const handleSubscribe = async (planSlug) => {
     if (!authUser) {

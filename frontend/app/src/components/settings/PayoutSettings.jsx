@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import SearchableDropdown from "../common/SearchableDropdown";
 import { api } from "../../lib/axios";
 import { toast } from "react-hot-toast";
+import { useAuthStore } from "../../store/authStore";
 import {
   CreditCard,
   Building,
@@ -14,6 +15,7 @@ import {
 export function PayoutSettings({ user }) {
   const [banks, setBanks] = useState([]);
   const [loadingBanks, setLoadingBanks] = useState(true);
+  const { checkAuth } = useAuthStore();
 
   const [formData, setFormData] = useState({
     bankCode: "",
@@ -125,6 +127,7 @@ export function PayoutSettings({ user }) {
 
       if (res.data.success) {
         toast.success("Bank details saved successfully!");
+        await checkAuth();
       }
     } catch (error) {
       console.error("Save Bank Error:", error);
