@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { Check, Loader2 } from "lucide-react";
+import { Check, Loader2, X } from "lucide-react";
 import { useAuthStore } from "../store/authStore";
 import { useSubscriptionStore } from "../store/subscriptionStore";
 import { plans } from "../constants/index";
@@ -19,7 +19,6 @@ const PricingPage = () => {
     const reference = params.get("reference");
 
     if (reference) {
- 
       window.history.replaceState({}, document.title, window.location.pathname);
 
       const verify = async () => {
@@ -56,7 +55,14 @@ const PricingPage = () => {
   };
 
   return (
-    <div className="bg-n-1/50 min-h-screen py-16 px-4 sm:px-6 lg:px-8 font-sans">
+    <div className="bg-n-1/50 min-h-screen py-16 px-4 sm:px-6 lg:px-8 font-sans relative">
+      <button
+        onClick={() => navigate("/")}
+        className="absolute top-6 right-6 p-2 rounded-full bg-n-2/50 hover:bg-n-3/50 text-n-6 transition-colors"
+        title="Go to Home"
+      >
+        <X size={24} />
+      </button>
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-primary-3 font-bold tracking-widest uppercase text-sm mb-3">
