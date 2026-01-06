@@ -59,6 +59,12 @@ app.use(csrfProtection);
 
 app.use(sanitizeInputs);
 
+// Debug: Log all requests
+app.use((req, res, next) => {
+  console.log(`Incoming request: ${req.method} ${req.url}`);
+  next();
+});
+
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/vendorProfile", vendorProfile);
 app.use("/api/v1/clientProfile", clientProfileRouter);

@@ -1,25 +1,20 @@
-
 const sanitizeString = (input) => {
   if (input === null || input === undefined) {
     return null;
   }
 
-  
   const str = String(input);
-  
-  
+
   const sanitized = str.replace(/[${}]/g, "");
-  
+
   return sanitized;
 };
-
 
 const sanitizeObject = (obj) => {
   if (!obj || typeof obj !== "object") {
     return obj;
   }
 
-  
   if (Array.isArray(obj)) {
     return obj.map((item) => {
       if (typeof item === "string") {
@@ -34,7 +29,6 @@ const sanitizeObject = (obj) => {
   const sanitized = {};
 
   for (const [key, value] of Object.entries(obj)) {
-    
     if (key.startsWith("$")) {
       continue;
     }
@@ -60,18 +54,15 @@ const sanitizeObject = (obj) => {
   return sanitized;
 };
 
-
 const sanitizeSearchQuery = (query) => {
   if (!query || typeof query !== "string") {
     return "";
   }
 
-  
-  
   return query
     .replace(/[^\w\s\-.,]/gi, "")
     .trim()
-    .slice(0, 200); 
+    .slice(0, 200);
 };
 
 module.exports = {

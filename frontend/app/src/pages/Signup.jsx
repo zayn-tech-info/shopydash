@@ -120,16 +120,10 @@ export function Signup() {
 
     try {
       const result = await signup(payload);
-      await checkAuth();
-      toast.success("Account created successfully!");
-      resetField();
 
-      const { reloadApp } = await import("../utils/navigation");
-      if (role === "vendor") {
-        reloadApp("/pricing", true);
-      } else {
-        reloadApp("/", true);
-      }
+      toast.success("Account created successfully! Please login.");
+      resetField();
+      navigate("/login");
     } catch (err) {
       const msg =
         typeof err === "string" ? err : err?.message ?? "Signup failed";

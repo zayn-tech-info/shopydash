@@ -1,8 +1,17 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { Eye, EyeOff, Check, ChevronDown } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Check,
+  ChevronDown,
+  BadgeCheck,
+  Loader,
+} from "lucide-react";
 import { useGoogleLogin } from "@react-oauth/google";
 import LocationSelector from "./LocationSelector";
+import { VerificationModal } from "../components/VerificationModal";
+import { api } from "../lib/axios";
 
 import { useAuthStore } from "../store/authStore";
 import { toast } from "react-hot-toast";
@@ -30,6 +39,30 @@ export function SignupForm({
   schoolArea,
 }) {
   const { googleAuthenticate } = useAuthStore();
+  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [isSendingCode, setIsSendingCode] = useState(false);
+
+  const handleVerifyClick = async () => {
+    if (!email) {
+      toast.error("Please enter email first");
+      return;
+    }
+    setIsSendingCode(true);
+    try {
+      await api.post("/api/v1/auth/send-otp", { email });
+      setIsVerificationModalOpen(true);
+      toast.success("Verification code sent!");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to send code");
+    } finally {
+      setIsSendingCode(false);
+    }
+  };
+
+  const onVerified = () => {
+    setIsEmailVerified(true);
+  };
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
@@ -55,6 +88,12 @@ export function SignupForm({
 
   return (
     <div className="w-full">
+      <VerificationModal
+        isOpen={isVerificationModalOpen}
+        onClose={() => setIsVerificationModalOpen(false)}
+        email={email}
+        onVerified={onVerified}
+      />
       <form onSubmit={onSubmit} noValidate className="px-8 pt-6 pb-8">
         <button
           type="button"
@@ -123,19 +162,43 @@ export function SignupForm({
                 />
               </div>
 
-              <div className="md:col-span-2">
-                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
-                  Email
-                </label>
+              <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
+                Email
+              </label>
+              <div className="relative">
                 <input
                   type="text"
                   value={email}
-                  onChange={(e) => setField("email", e.target.value)}
+                  onChange={(e) => {
+                    setField("email", e.target.value);
+                    setIsEmailVerified(false);
+                  }}
                   placeholder="e.g. john@uni.edu"
-                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
+                  className={`w-full h-12 px-4 rounded-xl bg-n-2/10 border ${
+                    isEmailVerified ? "border-green-500" : "border-transparent"
+                  } focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50`}
                   autoComplete="email"
                   required
                 />
+                <div className="absolute top-1/2 right-2 -translate-y-1/2">
+                  {isEmailVerified ? (
+                    <span className="flex items-center gap-1 text-green-600 bg-green-100 px-3 py-1 rounded-lg text-xs font-bold uppercase">
+                      <BadgeCheck className="w-4 h-4" /> Verified
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleVerifyClick}
+                      disabled={isSendingCode || !email}
+                      className="bg-n-8 text-white px-3 py-1.5 rounded-lg text-xs font-bold uppercase hover:bg-n-7 transition-colors disabled:opacity-50 flex items-center gap-2"
+                    >
+                      {isSendingCode && (
+                        <Loader className="w-3 h-3 animate-spin" />
+                      )}
+                      Verify
+                    </button>
+                  )}
+                </div>
               </div>
 
               <div className="md:col-span-2">
@@ -309,15 +372,43 @@ export function SignupForm({
                 <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
                   Email
                 </label>
-                <input
-                  type="text"
-                  value={email}
-                  onChange={(e) => setField("email", e.target.value)}
-                  placeholder="e.g. vendor@shop.com"
-                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
-                  autoComplete="email"
-                  required
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={email}
+                    onChange={(e) => {
+                      setField("email", e.target.value);
+                      setIsEmailVerified(false);
+                    }}
+                    placeholder="e.g. vendor@shop.com"
+                    className={`w-full h-12 px-4 rounded-xl bg-n-2/10 border ${
+                      isEmailVerified
+                        ? "border-green-500"
+                        : "border-transparent"
+                    } focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50`}
+                    autoComplete="email"
+                    required
+                  />
+                  <div className="absolute top-1/2 right-2 -translate-y-1/2">
+                    {isEmailVerified ? (
+                      <span className="flex items-center gap-1 text-green-600 bg-green-100 px-3 py-1 rounded-lg text-xs font-bold uppercase">
+                        <BadgeCheck className="w-4 h-4" /> Verified
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={handleVerifyClick}
+                        disabled={isSendingCode || !email}
+                        className="bg-n-8 text-white px-3 py-1.5 rounded-lg text-xs font-bold uppercase hover:bg-n-7 transition-colors disabled:opacity-50 flex items-center gap-2"
+                      >
+                        {isSendingCode && (
+                          <Loader className="w-3 h-3 animate-spin" />
+                        )}
+                        Verify
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
 
               <div className="md:col-span-2">
@@ -449,10 +540,12 @@ export function SignupForm({
 
         <button
           type="submit"
-          disabled={isSigningUp}
+          disabled={isSigningUp || !isEmailVerified}
           className={[
             "mt-8 w-full h-12 bg-primary-3 hover:bg-primary-4 text-white rounded-xl font-code text-sm font-bold uppercase tracking-wider transition-all shadow-lg shadow-primary-3/20 hover:shadow-primary-3/40 hover:-translate-y-0.5",
-            isSigningUp ? "opacity-70 cursor-not-allowed" : "cursor-pointer",
+            isSigningUp || !isEmailVerified
+              ? "opacity-70 cursor-not-allowed"
+              : "cursor-pointer",
           ].join(" ")}
         >
           {isSigningUp

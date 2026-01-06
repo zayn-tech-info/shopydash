@@ -8,12 +8,17 @@ const {
   completeRegistration,
   updateUser,
   changePassword,
+  verifyEmail,
+  resendVerificationCode,
+  sendOtp,
+  validateOtp,
 } = require("../controllers/auth/auth.controller");
 const { protectRoute } = require("../middleware/auth.middleware");
 const { changeAvatar } = require("../controllers/vendor/upload.controller");
 const createRateLimiter = require("../middleware/rateLimiter.middleware");
 
 const route = express.Router();
+console.log("Auth routes loading...");
 
 const authLimiter = createRateLimiter(
   10,
@@ -41,5 +46,9 @@ route.post(
 
 route.patch("/update", protectRoute, generalLimiter, changeAvatar, updateUser);
 route.post("/change-password", protectRoute, authLimiter, changePassword);
+route.post("/verify-email", authLimiter, verifyEmail);
+route.post("/resend-code", authLimiter, resendVerificationCode);
+route.post("/send-otp", authLimiter, sendOtp);
+route.post("/validate-otp", authLimiter, validateOtp);
 
 module.exports = route;
