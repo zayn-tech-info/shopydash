@@ -1,5 +1,6 @@
 import { memo } from "react";
 import SubscriptionBadge from "../common/SubscriptionBadge";
+import UserAvatar from "../UserAvatar";
 import { useAuthStore } from "../../store/authStore";
 import { useCartStore } from "../../store/cartStore";
 import { ShoppingCart } from "lucide-react";
@@ -72,15 +73,10 @@ function VendorProductItem({ product, vendorId }) {
 
         {product?.vendor && (
           <div className="flex items-center gap-2 mb-3">
-            <img
-              src={
-                product.vendor.profilePic || "/assets/avatar-placeholder.svg"
-              }
+            <UserAvatar
+              profilePic={product.vendor.profilePic || product.vendor.logo}
               alt={product.vendor.businessName}
-              className="w-6 h-6 rounded-full object-cover border border-n-3 shrink-0"
-              onError={(e) => {
-                e.target.src = "/assets/avatar-placeholder.svg";
-              }}
+              className="w-6 h-6 border border-n-3 shrink-0"
             />
             <span className="text-xs text-n-5 font-medium truncate">
               {product.vendor.businessName || product.vendor.username}

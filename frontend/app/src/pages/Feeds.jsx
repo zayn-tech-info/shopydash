@@ -11,28 +11,42 @@ import {
   Loader,
 } from "lucide-react";
 import { FeedSkeleton } from "../components/skeletons/FeedSkeleton";
-
 import { useSearchParams } from "react-router-dom";
+import { useAuthStore } from "../store/authStore";
 
 export default function Feeds() {
   const [searchParams] = useSearchParams();
+  const { authUser } = useAuthStore();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  
   const [searchQuery, setSearchQuery] = useState(
     searchParams.get("search") || ""
   );
 
-  
   const [selectedSchool, setSelectedSchool] = useState(
-    searchParams.get("school") || ""
+    searchParams.get("school") || authUser?.schoolName || ""
   );
+
+  const schoolInitialized = useRef(
+    !!(searchParams.get("school") || authUser?.schoolName)
+  );
+
+  useEffect(() => {
+    if (
+      !schoolInitialized.current &&
+      authUser?.schoolName &&
+      !searchParams.get("school")
+    ) {
+      setSelectedSchool(authUser.schoolName);
+      schoolInitialized.current = true;
+    }
+  }, [authUser, searchParams]);
+
   const [schools, setSchools] = useState([]);
   const [loadingSchools, setLoadingSchools] = useState(false);
   const [showSchoolDropdown, setShowSchoolDropdown] = useState(false);
 
-  
   const [selectedLocation, setSelectedLocation] = useState(
     searchParams.get("area") || ""
   );
@@ -45,7 +59,6 @@ export default function Feeds() {
   const schoolDropdownRef = useRef(null);
   const locationDropdownRef = useRef(null);
 
-  
   useEffect(() => {
     const fetchSchools = async () => {
       try {
@@ -64,7 +77,6 @@ export default function Feeds() {
     fetchSchools();
   }, []);
 
-  
   useEffect(() => {
     const fetchAreas = async () => {
       if (!selectedSchool) {
@@ -94,7 +106,6 @@ export default function Feeds() {
     return () => clearTimeout(delayDebounceFn);
   }, [selectedLocation, selectedSchool]);
 
-  
   useEffect(() => {
     function handleClickOutside(event) {
       if (
@@ -114,7 +125,6 @@ export default function Feeds() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  
   const fetchPosts = useCallback(async () => {
     setLoading(true);
     try {
@@ -126,14 +136,12 @@ export default function Feeds() {
       const res = await api.get("/api/v1/post/feed", { params });
       setPosts(res.data.data.posts);
     } catch (error) {
-      
       console.error(error);
     } finally {
       setLoading(false);
     }
   }, [selectedSchool, selectedLocation, searchQuery]);
 
-  
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       fetchPosts();
@@ -142,12 +150,11 @@ export default function Feeds() {
     return () => clearTimeout(delayDebounceFn);
   }, [fetchPosts, searchQuery]);
 
-  
   useEffect(() => {
     if (!searchQuery) fetchPosts();
   }, [selectedSchool, selectedLocation]);
 
-  const filteredPosts = posts; 
+  const filteredPosts = posts;
 
   return (
     <div className="relative min-h-screen">
@@ -172,19 +179,33 @@ export default function Feeds() {
             }`}
           >
             <div className="p-2">
-              <div className="flex items-center gap-2 bg-n-2/30 rounded-xl px-4 py-2">
+              <div
+                className="flex items-center gap-2 bg-n-2/30 rounded-xl px-4 py-2 cursor-pointer"
+                onClick={() => !isSearchActive && setIsSearchActive(true)}
+              >
                 <Search className="text-n-4" size={20} />
                 <input
                   type="text"
                   placeholder="Search vendors, products..."
-                  className="flex-1 bg-transparent border-none outline-none text-n-8 placeholder:text-n-4 h-10"
+                  className="flex-1 bg-transparent border-none outline-none text-n-8 placeholder:text-n-4 h-10 min-w-0"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => setIsSearchActive(true)}
                 />
+
+                {!isSearchActive && (
+                  <div className="flex items-center gap-1.5 px-2 py-1.5 bg-white rounded-lg border border-n-3/10 shadow-sm">
+                    <School size={12} className="text-primary-3" />
+                    <span className="text-xs font-bold text-n-6 whitespace-nowrap max-w-[80px] sm:max-w-xs truncate">
+                      {selectedSchool || "All Schools"}
+                    </span>
+                  </div>
+                )}
+
                 {isSearchActive && (
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setIsSearchActive(false);
                       setSearchQuery("");
                       setSelectedSchool("");
@@ -249,12 +270,33 @@ export default function Feeds() {
                             <Check className="w-4 h-4 text-primary-3" />
                           )}
                         </button>
+                        
+                        {authUser?.schoolName && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedSchool(authUser.schoolName);
+                              setShowSchoolDropdown(false);
+                            }}
+                            className="w-full px-4 py-2 text-left text-sm text-n-6 hover:bg-primary-3/5 hover:text-primary-3 transition-colors flex items-center justify-between border-b border-n-3/10"
+                          >
+                            <span className="font-medium">
+                              My School ({authUser.schoolName})
+                            </span>
+                            {selectedSchool === authUser.schoolName && (
+                              <Check className="w-4 h-4 text-primary-3" />
+                            )}
+                          </button>
+                        )}
+
                         {schools
-                          .filter((s) =>
-                            s
+                          .filter((s) => {
+                            const matchesSearch = s
                               .toLowerCase()
-                              .includes(selectedSchool.toLowerCase())
-                          )
+                              .includes(selectedSchool.toLowerCase());
+                            const isNotMySchool = s !== authUser?.schoolName;
+                            return matchesSearch && isNotMySchool;
+                          })
                           .map((school, index) => (
                             <button
                               key={index}

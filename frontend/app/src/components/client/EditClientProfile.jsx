@@ -15,6 +15,10 @@ export function EditClientProfile({ clientProfileData, onClose }) {
   const [formData, setFormData] = useState({
     fullName: clientProfileData?.userId?.fullName || "",
     phoneNumber: clientProfileData?.userId?.phoneNumber || "",
+    schoolArea:
+      clientProfileData?.userId?.schoolArea ||
+      clientProfileData?.userId?.area ||
+      "",
   });
 
   useEffect(() => {
@@ -22,6 +26,10 @@ export function EditClientProfile({ clientProfileData, onClose }) {
       setFormData({
         fullName: clientProfileData.userId.fullName || "",
         phoneNumber: clientProfileData.userId.phoneNumber || "",
+        schoolArea:
+          clientProfileData.userId.schoolArea ||
+          clientProfileData.userId.area ||
+          "",
       });
     }
   }, [clientProfileData]);
@@ -37,6 +45,7 @@ export function EditClientProfile({ clientProfileData, onClose }) {
         ...clientProfileData,
         fullName: formData.fullName,
         phoneNumber: formData.phoneNumber,
+        schoolArea: formData.schoolArea,
       };
       await updateClientProfile(payload);
       toast.success("Profile updated");
@@ -84,6 +93,13 @@ export function EditClientProfile({ clientProfileData, onClose }) {
                 value={formData.phoneNumber}
                 onChange={(e) =>
                   setFormData({ ...formData, phoneNumber: e.target.value })
+                }
+              />
+              <InputField
+                label="School Area"
+                value={formData.schoolArea}
+                onChange={(e) =>
+                  setFormData({ ...formData, schoolArea: e.target.value })
                 }
               />
             </div>
