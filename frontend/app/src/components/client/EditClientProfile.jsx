@@ -17,7 +17,6 @@ export function EditClientProfile({ clientProfileData, onClose }) {
     phoneNumber: clientProfileData?.userId?.phoneNumber || "",
     schoolArea:
       clientProfileData?.userId?.schoolArea ||
-      clientProfileData?.userId?.area ||
       "",
   });
 
@@ -27,9 +26,7 @@ export function EditClientProfile({ clientProfileData, onClose }) {
         fullName: clientProfileData.userId.fullName || "",
         phoneNumber: clientProfileData.userId.phoneNumber || "",
         schoolArea:
-          clientProfileData.userId.schoolArea ||
-          clientProfileData.userId.area ||
-          "",
+          clientProfileData.userId.schoolArea || "",
       });
     }
   }, [clientProfileData]);
