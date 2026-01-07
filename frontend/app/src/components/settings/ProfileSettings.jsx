@@ -5,6 +5,8 @@ import { Camera, MapPin, School } from "lucide-react";
 import { schools } from "../../constants";
 import { InputField } from "../InputField";
 
+import UserAvatar from "../UserAvatar";
+
 export function ProfileSettings({ user }) {
   const { updateProfile, isUpdatingProfile } = useAuthStore();
   const [formData, setFormData] = useState({
@@ -68,14 +70,12 @@ export function ProfileSettings({ user }) {
 
       <form onSubmit={handleSubmit} className="space-y-8">
         <div className="flex items-center gap-6">
-          <div className="relative group">
-            <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-n-3 bg-n-2">
-              <img
-                src={previewImage || "/default-avatar.png"}
-                alt="Profile"
-                className="w-full h-full object-cover"
-              />
-            </div>
+          <div className="relative group w-24 h-24">
+            <UserAvatar
+              profilePic={previewImage}
+              alt="Profile"
+              className="w-full h-full border-2 border-n-3"
+            />
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
