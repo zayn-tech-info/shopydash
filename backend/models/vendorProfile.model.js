@@ -59,6 +59,11 @@ const vendorProfileSchema = new mongoose.Schema(
       type: String,
       default: "active",
     },
+    kycStatus: {
+      type: String,
+      enum: ["pending", "verified", "failed", "none"],
+      default: "none",
+    },
     rating: {
       type: Number,
       default: 0,

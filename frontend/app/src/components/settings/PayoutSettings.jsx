@@ -27,6 +27,8 @@ export function PayoutSettings({ user }) {
   const [isVerified, setIsVerified] = useState(false);
   const [saving, setSaving] = useState(false);
   const [loadingProfile, setLoadingProfile] = useState(true);
+  const [consent, setConsent] = useState(false);
+  const [kycStatus, setKycStatus] = useState("none");
 
   useEffect(() => {
     fetchBanks();
@@ -66,6 +68,9 @@ export function PayoutSettings({ user }) {
           if (profile.bankDetails.accountName) {
             setIsVerified(true);
           }
+        }
+        if (profile.kycStatus) {
+          setKycStatus(profile.kycStatus);
         }
       }
     } catch (error) {
@@ -114,6 +119,10 @@ export function PayoutSettings({ user }) {
       return toast.error("Please verify your account details first");
     }
 
+    if (!consent) {
+      return toast.error("You must agree to the terms to proceed");
+    }
+
     setSaving(true);
     try {
       const payload = {
@@ -141,7 +150,10 @@ export function PayoutSettings({ user }) {
 
   if (loadingBanks || loadingProfile) {
     return (
-      <div className="p-8 text-center text-n-4">Loading payout settings...</div>
+      <div className="flex flex-col items-center justify-center p-12 text-n-4">
+        <Loader className="w-8 h-8 animate-spin mb-4 text-primary-3" />
+        <p>Loading KYC & Payout settings...</p>
+      </div>
     );
   }
 
@@ -155,6 +167,45 @@ export function PayoutSettings({ user }) {
         <p className="text-n-4 mt-1">
           Connect your bank account to receive payments automatically.
         </p>
+
+        {/* KYC Status Indicator */}
+        <div className="mt-6">
+          {kycStatus === "verified" && (
+            <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-100 rounded-xl text-green-800">
+              <CheckCircle className="w-6 h-6 text-green-600" />
+              <div>
+                <p className="font-bold">Identity Verified</p>
+                <p className="text-sm text-green-700">
+                  Your payouts are active and ready.
+                </p>
+              </div>
+            </div>
+          )}
+          {kycStatus === "pending" && (
+            <div className="flex items-center gap-3 p-4 bg-yellow-50 border border-yellow-100 rounded-xl text-yellow-800">
+              <Loader className="w-6 h-6 animate-spin text-yellow-600" />
+              <div>
+                <p className="font-bold">Verification Pending</p>
+                <p className="text-sm text-yellow-700">
+                  Paystack is verifying your account details. This usually takes
+                  a few minutes.
+                </p>
+              </div>
+            </div>
+          )}
+          {kycStatus === "failed" && (
+            <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-100 rounded-xl text-red-800">
+              <AlertCircle className="w-6 h-6 text-red-600" />
+              <div>
+                <p className="font-bold">Verification Failed</p>
+                <p className="text-sm text-red-700">
+                  Ensure bank details match your legal name. Update below to
+                  retry.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-8 flex items-start gap-4">
@@ -256,11 +307,36 @@ export function PayoutSettings({ user }) {
           </div>
         )}
 
+        {/* Consent Checkbox */}
+        <div className="bg-n-2/50 p-4 rounded-xl border border-n-3/20">
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={consent}
+              onChange={(e) => setConsent(e.target.checked)}
+              className="mt-1 w-5 h-5 rounded border-n-4 text-primary-3 focus:ring-primary-3"
+            />
+            <span className="text-sm text-n-6">
+              I authorize <strong>Shopydash</strong> to share my banking details
+              with <strong>Paystack</strong> for identity verification and
+              vendor payouts. I adhere to the{" "}
+              <a href="/terms" className="text-primary-3 hover:underline">
+                Terms of Service
+              </a>{" "}
+              and{" "}
+              <a href="/privacy" className="text-primary-3 hover:underline">
+                Privacy Policy
+              </a>
+              .
+            </span>
+          </label>
+        </div>
+
         <div className="pt-6 border-t border-n-3/20">
           <button
             type="submit"
-            disabled={saving || !isVerified}
-            className="flex items-center justify-center w-full md:w-auto px-8 py-3 bg-primary-3 text-white rounded-xl font-bold hover:bg-primary-3/90 transition-all disabled:opacity-70 shadow-lg shadow-primary-3/20 transform active:scale-95"
+            disabled={saving || !isVerified || !consent}
+            className="flex items-center justify-center w-full md:w-auto px-8 py-3 bg-primary-3 text-white rounded-xl font-bold hover:bg-primary-3/90 transition-all disabled:opacity-70 disabled:cursor-not-allowed shadow-lg shadow-primary-3/20 transform active:scale-95"
           >
             {saving ? (
               <span className="flex items-center gap-2">

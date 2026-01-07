@@ -145,8 +145,31 @@ const createSubaccount = async (req, res) => {
       return res.status(404).json({ message: "Vendor profile not found" });
     }
 
+    // 1. Server-Side Identity Verification (The "Shadow KYC")
+    // We resolve the account number again to ensure the name matches the legal bank owner.
+    // This prevents frontend manipulation and ensures we only onboard the REAL bank account owner.
+    let resolvedAccountName;
+    try {
+      const resolveResponse = await paystackRequest(
+        `/bank/resolve?account_number=${account_number}&bank_code=${settlement_bank}`,
+        "GET"
+      );
+      if (!resolveResponse.status || !resolveResponse.data) {
+        throw new Error("Could not verify account identity");
+      }
+      resolvedAccountName = resolveResponse.data.account_name;
+    } catch (err) {
+      return res.status(400).json({
+        message:
+          "Identity Verification Failed: Could not resolve bank account details. Please ensure account number and bank are correct.",
+      });
+    }
+
+    // 2. Create Paystack Subaccount using the VERIFIED IDENTITY
+    // We strictly use the 'resolvedAccountName' as the 'business_name'.
+    // This guarantees that the subaccount is created for the Legal Identity attached to the BVN.
     const paystackResponse = await paystackRequest("/subaccount", "POST", {
-      business_name,
+      business_name: resolvedAccountName, // FORCE the legal bank name
       settlement_bank,
       account_number,
       percentage_charge: 5,
@@ -165,6 +188,15 @@ const createSubaccount = async (req, res) => {
       accountName: paystackResponse.data.business_name,
       subaccountCode: paystackResponse.data.subaccount_code,
     };
+
+    // Determine KYC status based on Paystack response
+    // For specific subaccount types, active=true usually means verified
+    if (paystackResponse.data.active) {
+      vendor.kycStatus = "verified";
+    } else {
+      vendor.kycStatus = "pending";
+    }
+
     await vendor.save();
 
     res.status(200).json({
