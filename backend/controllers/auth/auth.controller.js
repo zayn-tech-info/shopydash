@@ -7,13 +7,11 @@ const customError = require("../../errors/customError");
 const { cloudinary } = require("../vendor/upload.controller");
 const { checkUserHasProfile } = require("../../utils/profileHelper");
 const { sendVerificationEmail } = require("../../utils/email");
-
 const crypto = require("crypto");
 const VerificationToken = require("../../models/verificationToken.model");
 
 const googleAuth = asyncErrorHandler(async (req, res, next) => {
   const { token } = req.body;
-
   const response = await fetch(
     "https://www.googleapis.com/oauth2/v3/userinfo",
     {
@@ -173,14 +171,12 @@ const signup = asyncErrorHandler(async (req, res, next) => {
   }
 
   const existingUser = await User.findOne({ email });
-
   if (existingUser) {
     const err = new customError(`User with ${email} already exist`, 400);
     return next(err);
   }
 
   try {
-    // Check if email was verified via OTP
     const verificationToken = await VerificationToken.findOne({
       identifier: email,
       verified: true,
@@ -195,30 +191,18 @@ const signup = asyncErrorHandler(async (req, res, next) => {
     const user = await User.create({
       ...req.body,
       profileComplete: true,
-      isVerified: true, // Already verified via OTP
+      isVerified: true,
     });
 
-    // Clean up verification token
     await VerificationToken.deleteOne({ _id: verificationToken._id });
 
     const hasProfile = await checkUserHasProfile(user);
     sendToken(user, "User created successfully", res, 201, hasProfile);
   } catch (error) {
-    const fs = require("fs");
-    try {
-      fs.writeFileSync(
-        "signup_error.log",
-        JSON.stringify(error, Object.getOwnPropertyNames(error), 2)
-      );
-    } catch (e) {
-      console.error("Could not write log", e);
-    }
-
     console.error("Signup Error:", error);
     return res.status(500).json({
       success: false,
       message: error.message || "Internal Server Error during signup",
-      error: process.env.NODE_ENV === "development" ? error : undefined,
     });
   }
 });
@@ -229,7 +213,7 @@ const login = asyncErrorHandler(async (req, res, next) => {
 
   if (!identifier || !password) {
     const err = new customError(
-      "Identifier (email / username / schoolId) and password are required",
+      "All credentials are required",
       400
     );
     return next(err);
@@ -251,7 +235,7 @@ const login = asyncErrorHandler(async (req, res, next) => {
   );
   if (!user) {
     const err = new customError(
-      "Invalid email / school id / username or password",
+      "Invalid credentials",
       401
     );
     return next(err);
@@ -268,7 +252,7 @@ const login = asyncErrorHandler(async (req, res, next) => {
   const isPasswordMatch = await user.comparePassword(password);
   if (!isPasswordMatch) {
     const err = new customError(
-      "Invalid email / school id / username or password",
+      "Invalid credentials",
       401
     );
     return next(err);
