@@ -27,7 +27,6 @@ const app = express();
 app.set("trust proxy", 1);
 
 const mode = process.env.NODE_ENV || "development";
-
 const allowedOrigins = [
   "http://localhost:5173",
   "https://app.shopydash.com",
@@ -50,13 +49,9 @@ app.use(
 );
 
 app.use(securityHeaders);
-
 app.use(cookieParser());
-
 app.use(express.json());
-
 app.use(csrfProtection);
-
 app.use(sanitizeInputs);
 
 app.use("/api/v1/auth", authRouter);

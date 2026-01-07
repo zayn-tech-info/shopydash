@@ -29,6 +29,8 @@ import OrderConfirmation from "./pages/OrderConfirmation";
 import OrderList from "./pages/OrderList";
 import SettingsPage from "./pages/SettingsPage";
 
+import { VerifyEmail } from "./pages/VerifyEmail";
+
 const App = () => {
   const authUser = useAuthStore((state) => state.authUser);
   const isCheckingAuth = useAuthStore((state) => state.isCheckingAuth);
@@ -100,6 +102,10 @@ const App = () => {
             element={!authUser ? <Signup /> : <Navigate to="/" />}
           />
           <Route
+            path="/verify-email"
+            element={!authUser ? <VerifyEmail /> : <Navigate to="/" />}
+          />
+          <Route
             path="/create-vendor-profile"
             element={
               authUser ? <CreateVendorProfile /> : <Navigate to="/login" />
@@ -159,7 +165,8 @@ const App = () => {
       </div>
       {location.pathname !== "/messages" &&
       location.pathname !== "/login" &&
-      location.pathname !== "/signup" ? (
+      location.pathname !== "/signup" &&
+      location.pathname !== "/verify-email" ? (
         <Footer />
       ) : (
         ""

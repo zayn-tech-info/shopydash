@@ -6,10 +6,12 @@ const validator = require("validator");
 const customError = require("../../errors/customError");
 const { cloudinary } = require("../vendor/upload.controller");
 const { checkUserHasProfile } = require("../../utils/profileHelper");
+const { sendVerificationEmail } = require("../../utils/email");
+const crypto = require("crypto");
+const VerificationToken = require("../../models/verificationToken.model");
 
 const googleAuth = asyncErrorHandler(async (req, res, next) => {
   const { token } = req.body;
-
   const response = await fetch(
     "https://www.googleapis.com/oauth2/v3/userinfo",
     {
@@ -169,16 +171,40 @@ const signup = asyncErrorHandler(async (req, res, next) => {
   }
 
   const existingUser = await User.findOne({ email });
-
   if (existingUser) {
     const err = new customError(`User with ${email} already exist`, 400);
     return next(err);
   }
 
-  const user = await User.create({ ...req.body, profileComplete: true });
+  try {
+    const verificationToken = await VerificationToken.findOne({
+      identifier: email,
+      verified: true,
+    });
 
-  const hasProfile = await checkUserHasProfile(user);
-  sendToken(user, "User created successfully", res, 201, hasProfile);
+    if (!verificationToken) {
+      return next(
+        new customError("Please verify your email address first", 400)
+      );
+    }
+
+    const user = await User.create({
+      ...req.body,
+      profileComplete: true,
+      isVerified: true,
+    });
+
+    await VerificationToken.deleteOne({ _id: verificationToken._id });
+
+    const hasProfile = await checkUserHasProfile(user);
+    sendToken(user, "User created successfully", res, 201, hasProfile);
+  } catch (error) {
+    console.error("Signup Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Internal Server Error during signup",
+    });
+  }
 });
 
 const login = asyncErrorHandler(async (req, res, next) => {
@@ -187,7 +213,7 @@ const login = asyncErrorHandler(async (req, res, next) => {
 
   if (!identifier || !password) {
     const err = new customError(
-      "Identifier (email / username / schoolId) and password are required",
+      "All credentials are required",
       400
     );
     return next(err);
@@ -204,10 +230,20 @@ const login = asyncErrorHandler(async (req, res, next) => {
     query = { username: trimmed };
   }
 
-  const user = await User.findOne(query);
+  const user = await User.findOne(query).select(
+    "+verificationCode +verificationCodeExpires +isVerified +password"
+  );
   if (!user) {
     const err = new customError(
-      "Invalid email / school id / username or password",
+      "Invalid credentials",
+      401
+    );
+    return next(err);
+  }
+
+  if (!user.isVerified && !user.isGoogleAuth) {
+    const err = new customError(
+      "Please verify your email address before logging in.",
       401
     );
     return next(err);
@@ -216,7 +252,7 @@ const login = asyncErrorHandler(async (req, res, next) => {
   const isPasswordMatch = await user.comparePassword(password);
   if (!isPasswordMatch) {
     const err = new customError(
-      "Invalid email / school id / username or password",
+      "Invalid credentials",
       401
     );
     return next(err);
@@ -411,6 +447,125 @@ const changePassword = asyncErrorHandler(async (req, res, next) => {
   sendToken(user, "Password changed successfully", res, 200);
 });
 
+
+
+const sendOtp = asyncErrorHandler(async (req, res, next) => {
+  const { email } = req.body;
+  if (!email) return next(new customError("Email is required", 400));
+
+  const existingUser = await User.findOne({ email });
+  if (existingUser)
+    return next(new customError("Email already registered", 400));
+
+  const token = Math.floor(100000 + Math.random() * 900000).toString();
+  
+  await VerificationToken.findOneAndUpdate(
+    { identifier: email },
+    { token, expires: Date.now() + 10 * 60 * 1000, verified: false },
+    { upsert: true, new: true }
+  );
+
+  try {
+    await sendVerificationEmail(email, token);
+    res.status(200).json({ success: true, message: "Verification code sent" });
+  } catch (error) {
+    return next(
+      new customError(error.message || "Failed to send verification email", 500)
+    );
+  }
+});
+
+const verifyEmail = asyncErrorHandler(async (req, res, next) => {
+  const { email, code } = req.body;
+  if (!email || !code) {
+    return next(new customError("Email and code are required", 400));
+  }
+
+  const user = await User.findOne({ email }).select(
+    "+verificationCode +verificationCodeExpires"
+  );
+
+  if (!user) {
+    return next(new customError("Invalid or expired verification code", 400));
+  }
+
+  if (user.isVerified) {
+    return next(new customError("Email is already verified", 400));
+  }
+
+  if (
+    user.verificationCode !== code ||
+    user.verificationCodeExpires < Date.now()
+  ) {
+    return next(new customError("Invalid or expired verification code", 400));
+  }
+
+  user.isVerified = true;
+  user.verificationCode = undefined;
+  user.verificationCodeExpires = undefined;
+  await user.save();
+
+  const hasProfile = await checkUserHasProfile(user);
+  sendToken(user, "Email verified successfully", res, 200, hasProfile);
+});
+
+const resendVerificationCode = asyncErrorHandler(async (req, res, next) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return next(new customError("Email is required", 400));
+  }
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return next(new customError("User not found", 404));
+  }
+
+  if (user.isVerified) {
+    return next(new customError("Email is already verified", 400));
+  }
+
+  const verificationCode = Math.floor(
+    100000 + Math.random() * 900000
+  ).toString();
+  const verificationCodeExpires = Date.now() + 10 * 60 * 1000;
+
+  user.verificationCode = verificationCode;
+  user.verificationCodeExpires = verificationCodeExpires;
+  await user.save();
+
+  try {
+    await sendVerificationEmail(email, verificationCode);
+    res.status(200).json({
+      success: true,
+      message: "Verification code sent to your email",
+    });
+  } catch (error) {
+    return next(new customError("Failed to send verification email", 500));
+  }
+});
+
+const validateOtp = asyncErrorHandler(async (req, res, next) => {
+  const { email, code } = req.body;
+  if (!email || !code)
+    return next(new customError("Email and code required", 400));
+
+  const record = await VerificationToken.findOne({ identifier: email });
+  if (!record) return next(new customError("Invalid or expired code", 400));
+
+  if (record.token !== code || record.expires < Date.now()) {
+    return next(new customError("Invalid or expired code", 400));
+  }
+
+  record.verified = true;
+  await record.save();
+
+  res
+    .status(200)
+    .json({ success: true, message: "Email verified successfully" });
+});
+
 module.exports = {
   signup,
   login,
@@ -420,4 +575,8 @@ module.exports = {
   completeRegistration,
   updateUser,
   changePassword,
+  verifyEmail,
+  resendVerificationCode,
+  sendOtp,
+  validateOtp,
 };
