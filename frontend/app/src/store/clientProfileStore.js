@@ -7,11 +7,15 @@ const normalizeProfile = (incoming, previous = null) => {
   const merged = previous ? { ...previous, ...incoming } : { ...incoming };
   if (!merged) return null;
 
-  if (!merged.userId && previous?.userId) {
+  if (
+    (!merged.userId || typeof merged.userId === "string") &&
+    previous?.userId &&
+    typeof previous.userId === "object"
+  ) {
+    // Preserve populated userId from previous state if incoming has only ID string
     merged.userId = previous.userId;
-  }
-
-  if (!merged.userId) {
+  } else if (!merged.userId) {
+    // If incoming has no user info at all, try to fish it from other fields
     const userField = merged.user;
     if (typeof userField === "string") {
       merged.userId = userField;
@@ -106,6 +110,23 @@ export const useClientProfileStore = create((set, get) => ({
         payloadRes;
       set((state) => {
         const normalized = normalizeProfile(profile, state.clientProfile);
+
+        // Optimistically update userId fields if they were in the payload
+        // This is needed because the response only contains the clientProfile doc,
+        // and normalizeProfile restores the OLD populated userId.
+        if (
+          normalized.userId &&
+          typeof normalized.userId === "object" &&
+          (payload.fullName || payload.phoneNumber || payload.schoolArea)
+        ) {
+          normalized.userId = {
+            ...normalized.userId,
+            ...(payload.fullName && { fullName: payload.fullName }),
+            ...(payload.phoneNumber && { phoneNumber: payload.phoneNumber }),
+            ...(payload.schoolArea && { schoolArea: payload.schoolArea }),
+          };
+        }
+
         return {
           clientProfile: normalized,
           clientProfileData: { ...initialProfileData, ...normalized },

@@ -45,13 +45,21 @@ const create = asyncErrorHandler(async (req, res, next) => {
 const update = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user && req.user._id;
 
-  const { fullName, phoneNumber, gender, preferredCategory, wishList, bio } =
-    req.body;
+  const {
+    fullName,
+    phoneNumber,
+    schoolArea,
+    gender,
+    preferredCategory,
+    wishList,
+    bio,
+  } = req.body;
 
-  if (fullName || phoneNumber) {
+  if (fullName || phoneNumber || schoolArea) {
     const userUpdates = {};
     if (fullName) userUpdates.fullName = fullName;
     if (phoneNumber) userUpdates.phoneNumber = phoneNumber;
+    if (schoolArea) userUpdates.schoolArea = schoolArea;
 
     await User.findByIdAndUpdate(userId, userUpdates, {
       new: true,

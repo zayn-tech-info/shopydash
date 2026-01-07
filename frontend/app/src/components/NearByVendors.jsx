@@ -37,7 +37,7 @@ export function NearByVendors({ posts, showHeader = true }) {
         id: post._id,
         vendorName:
           post.vendorId.businessName || post.vendorId.username || "Vendor",
-        vendorAvatar: post.vendorId.logo || post.vendorId.profilePic,
+        vendorAvatar: post.vendorId.profilePic || post.vendorId.logo,
         vendorOwnerId: post.vendorId._id,
         subscriptionPlan: post.vendorId.subscriptionPlan,
         location: post.location,

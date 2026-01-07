@@ -1,5 +1,5 @@
 const { logInfo, logWarn } = require("./logger");
- 
+
 const validateEnv = () => {
   const required = [
     "CONNECTION_URI",
@@ -25,7 +25,6 @@ const validateEnv = () => {
     process.exit(1);
   }
 
-  
   if (process.env.JWT_SECRET_KEY.length < 32) {
     logWarn(
       "Environment Validation",
@@ -41,7 +40,10 @@ const validateEnv = () => {
     );
   }
 
-  logInfo("Environment Validation", "Environment variables validated successfully");
+  logInfo(
+    "Environment Validation",
+    "Environment variables validated successfully"
+  );
 };
 
 module.exports = validateEnv;
