@@ -463,9 +463,36 @@ const changePassword = asyncErrorHandler(async (req, res, next) => {
   sendToken(user, "Password changed successfully", res, 200);
 });
 
+
+
+const sendOtp = asyncErrorHandler(async (req, res, next) => {
+  const { email } = req.body;
+  if (!email) return next(new customError("Email is required", 400));
+
+  const existingUser = await User.findOne({ email });
+  if (existingUser)
+    return next(new customError("Email already registered", 400));
+
+  const token = Math.floor(100000 + Math.random() * 900000).toString();
+  
+  await VerificationToken.findOneAndUpdate(
+    { identifier: email },
+    { token, expires: Date.now() + 10 * 60 * 1000, verified: false },
+    { upsert: true, new: true }
+  );
+
+  try {
+    await sendVerificationEmail(email, token);
+    res.status(200).json({ success: true, message: "Verification code sent" });
+  } catch (error) {
+    return next(
+      new customError(error.message || "Failed to send verification email", 500)
+    );
+  }
+});
+
 const verifyEmail = asyncErrorHandler(async (req, res, next) => {
   const { email, code } = req.body;
-
   if (!email || !code) {
     return next(new customError("Email and code are required", 400));
   }
@@ -532,34 +559,6 @@ const resendVerificationCode = asyncErrorHandler(async (req, res, next) => {
     });
   } catch (error) {
     return next(new customError("Failed to send verification email", 500));
-  }
-});
-
-const sendOtp = asyncErrorHandler(async (req, res, next) => {
-  const { email } = req.body;
-  if (!email) return next(new customError("Email is required", 400));
-
-  // Check if user already exists
-  const existingUser = await User.findOne({ email });
-  if (existingUser)
-    return next(new customError("Email already registered", 400));
-
-  const token = Math.floor(100000 + Math.random() * 900000).toString();
-
-  // Upsert verification token
-  await VerificationToken.findOneAndUpdate(
-    { identifier: email },
-    { token, expires: Date.now() + 10 * 60 * 1000, verified: false },
-    { upsert: true, new: true }
-  );
-
-  try {
-    await sendVerificationEmail(email, token);
-    res.status(200).json({ success: true, message: "Verification code sent" });
-  } catch (error) {
-    return next(
-      new customError(error.message || "Failed to send verification email", 500)
-    );
   }
 });
 
