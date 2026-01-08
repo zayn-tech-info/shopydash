@@ -190,6 +190,10 @@ const App = () => {
           <Route path="/cart" element={<CartPage />} />
           <Route path="/order/confirmation" element={<OrderConfirmation />} />
           <Route path="/orders" element={<OrderList />} />
+          <Route
+            path="/vendor/dashboard/orders"
+            element={<OrderList role="vendor" />}
+          />
           <Route path="/messages" element={<MessagesPage />} />
           <Route
             path="/settings"

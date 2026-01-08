@@ -12,10 +12,11 @@ import {
   Clock,
   ShoppingBag,
   Store,
+  User,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function OrderList({ isEmbedded = false }) {
+export default function OrderList({ isEmbedded = false, role = "client" }) {
   const {
     orders,
     isLoading,
@@ -29,10 +30,11 @@ export default function OrderList({ isEmbedded = false }) {
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [reviewOrder, setReviewOrder] = useState(null);
+  const isVendor = role === "vendor";
 
   useEffect(() => {
-    fetchOrders();
-  }, [fetchOrders]);
+    fetchOrders(role);
+  }, [fetchOrders, role]);
 
   const handleMarkDeliveredClick = (orderId) => {
     setSelectedOrderId(orderId);
@@ -97,15 +99,18 @@ export default function OrderList({ isEmbedded = false }) {
         </motion.div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">No Orders Yet</h2>
         <p className="text-gray-500 mb-8 max-w-sm">
-          Looks like you haven't made any purchases yet. Explore our feed to
-          find something you love!
+          {isVendor
+            ? "You haven't received any orders yet. Keep promoting your products!"
+            : "Looks like you haven't made any purchases yet. Explore our feed to find something you love!"}
         </p>
-        <Link
-          to="/feeds"
-          className="px-8 py-3 bg-primary-3 text-white rounded-full font-semibold shadow-lg shadow-primary-3/20 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
-        >
-          Start Shopping
-        </Link>
+        {!isVendor && (
+          <Link
+            to="/feeds"
+            className="px-8 py-3 bg-primary-3 text-white rounded-full font-semibold shadow-lg shadow-primary-3/20 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+          >
+            Start Shopping
+          </Link>
+        )}
       </div>
     );
   }
@@ -120,10 +125,12 @@ export default function OrderList({ isEmbedded = false }) {
         <header className="mb-10">
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
             <Package className="text-primary-3" size={32} />
-            My Orders
+            {isVendor ? "Incoming Orders" : "My Orders"}
           </h1>
           <p className="text-gray-500 mt-2 ml-1">
-            Track and manage your recent purchases
+            {isVendor
+              ? "Manage and fulfill orders from your customers"
+              : "Track and manage your recent purchases"}
           </p>
         </header>
 
@@ -134,6 +141,7 @@ export default function OrderList({ isEmbedded = false }) {
                 key={order._id}
                 order={order}
                 index={index}
+                isVendor={isVendor}
                 onConfirmDelivery={() => handleMarkDeliveredClick(order._id)}
               />
             ))}
@@ -161,10 +169,12 @@ export default function OrderList({ isEmbedded = false }) {
   );
 }
 
-function OrderCard({ order, index, onConfirmDelivery }) {
+function OrderCard({ order, index, onConfirmDelivery, isVendor }) {
   const isDelivered = order.deliveryStatus === "delivered";
   const canConfirm =
-    order.deliveryStatus === "pending" && order.paymentStatus === "paid";
+    !isVendor &&
+    order.deliveryStatus === "pending" &&
+    order.paymentStatus === "paid";
 
   return (
     <motion.div
@@ -176,17 +186,23 @@ function OrderCard({ order, index, onConfirmDelivery }) {
       <div className="px-6 py-4 border-b border-gray-50 bg-gray-50/30 flex flex-wrap items-center justify-between gap-4">
         <div className="flex gap-4 items-center">
           <div className="bg-white p-2 rounded-lg border border-gray-100 shadow-sm">
-            <Store className="w-5 h-5 text-gray-600" />
+            {isVendor ? (
+              <User className="w-5 h-5 text-gray-600" />
+            ) : (
+              <Store className="w-5 h-5 text-gray-600" />
+            )}
           </div>
           <div>
             <p className="text-xs text-gray-500 font-medium uppercase tracking-wider mb-0.5">
-              Vendor
+              {isVendor ? "Buyer" : "Vendor"}
             </p>
             <h3 className="font-bold text-gray-900 text-sm sm:text-base">
-              {order.vendor?.userId?.businessName ||
-                order.vendor?.storeUsername ||
-                order.vendor?.userId?.fullName ||
-                "Unknown Vendor"}
+              {isVendor
+                ? order.buyer?.fullName || order.buyer?.email || "Unknown Buyer"
+                : order.vendor?.userId?.businessName ||
+                  order.vendor?.storeUsername ||
+                  order.vendor?.userId?.fullName ||
+                  "Unknown Vendor"}
             </h3>
           </div>
         </div>
@@ -269,9 +285,15 @@ function OrderCard({ order, index, onConfirmDelivery }) {
               </div>
             )}
 
-            {!canConfirm && !isDelivered && (
+            {!canConfirm && !isDelivered && !isVendor && (
               <div className="text-sm text-gray-400 italic flex items-center gap-2">
                 <Clock size={16} /> Awaiting Delivery
+              </div>
+            )}
+
+            {isVendor && !isDelivered && (
+              <div className="text-sm text-gray-500 italic">
+                Wait for buyer confirmation to receive funds
               </div>
             )}
           </div>

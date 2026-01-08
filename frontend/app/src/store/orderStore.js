@@ -7,12 +7,14 @@ export const useOrderStore = create((set, get) => ({
   isLoading: true,
   isMarkingDelivered: false,
 
-  fetchOrders: async () => {
+  fetchOrders: async (role) => {
     set({ isLoading: true });
     try {
-      const res = await api.get("/api/v1/orders");
+      const res = await api.get("/api/v1/orders", {
+        params: { role },
+      });
       set({ orders: res.data.data });
-      console.log(res)
+      console.log(res);
     } catch (error) {
       console.error("Fetch Orders Error:", error);
       toast.error(error.response?.data?.message || "Failed to fetch orders");
