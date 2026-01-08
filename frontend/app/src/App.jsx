@@ -14,6 +14,7 @@ import useChatStore from "./store/chatStore";
 import { useNotificationStore } from "./store/notificationStore";
 import toast from "react-hot-toast";
 import { BottomNav } from "./components/BottomNav";
+import EmailVerificationBanner from "./components/common/EmailVerificationBanner";
 import { AppSkeleton } from "./components/skeletons/AppSkeleton";
 import CreateVendorProfile from "./pages/CreateVendorProfile";
 import CreateClientProfile from "./pages/CreateClientProfile";
@@ -107,6 +108,7 @@ const App = () => {
           : ""
       }
     >
+      <EmailVerificationBanner />
       <Header />
       <div
         className={`relative mx-auto ${

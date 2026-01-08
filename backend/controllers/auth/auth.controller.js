@@ -212,10 +212,7 @@ const login = asyncErrorHandler(async (req, res, next) => {
   const identifier = req.body.email || req.body.username || req.body.schoolId;
 
   if (!identifier || !password) {
-    const err = new customError(
-      "All credentials are required",
-      400
-    );
+    const err = new customError("All credentials are required", 400);
     return next(err);
   }
 
@@ -234,27 +231,21 @@ const login = asyncErrorHandler(async (req, res, next) => {
     "+verificationCode +verificationCodeExpires +isVerified +password"
   );
   if (!user) {
-    const err = new customError(
-      "Invalid credentials",
-      401
-    );
+    const err = new customError("Invalid credentials", 401);
     return next(err);
   }
 
-  if (!user.isVerified && !user.isGoogleAuth) {
-    const err = new customError(
-      "Please verify your email address before logging in.",
-      401
-    );
-    return next(err);
-  }
+  // if (!user.isVerified && !user.isGoogleAuth) {
+  //   const err = new customError(
+  //     "Please verify your email address before logging in.",
+  //     401
+  //   );
+  //   return next(err);
+  // }
 
   const isPasswordMatch = await user.comparePassword(password);
   if (!isPasswordMatch) {
-    const err = new customError(
-      "Invalid credentials",
-      401
-    );
+    const err = new customError("Invalid credentials", 401);
     return next(err);
   }
 
@@ -447,8 +438,6 @@ const changePassword = asyncErrorHandler(async (req, res, next) => {
   sendToken(user, "Password changed successfully", res, 200);
 });
 
-
-
 const sendOtp = asyncErrorHandler(async (req, res, next) => {
   const { email } = req.body;
   if (!email) return next(new customError("Email is required", 400));
@@ -458,7 +447,7 @@ const sendOtp = asyncErrorHandler(async (req, res, next) => {
     return next(new customError("Email already registered", 400));
 
   const token = Math.floor(100000 + Math.random() * 900000).toString();
-  
+
   await VerificationToken.findOneAndUpdate(
     { identifier: email },
     { token, expires: Date.now() + 10 * 60 * 1000, verified: false },
