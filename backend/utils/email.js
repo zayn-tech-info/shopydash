@@ -1,6 +1,15 @@
 const { Resend } = require("resend");
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.RESEND_API_KEY
+  ? new Resend(process.env.RESEND_API_KEY)
+  : {
+      emails: {
+        send: async () => {
+          console.warn("RESEND_API_KEY is missing. Email not sent.");
+          return { error: { message: "RESEND_API_KEY is missing" } };
+        },
+      },
+    };
 
 const generateEmailLayout = (title, content) => `
   <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f9f9f9; width: 100%; padding: 40px 0;">

@@ -3,7 +3,14 @@ import { X, Loader } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { api } from "../lib/axios";
 
-export const VerificationModal = ({ isOpen, onClose, email, onVerified }) => {
+export const VerificationModal = ({
+  isOpen,
+  onClose,
+  email,
+  onVerified,
+  verifyEndpoint = "/api/v1/auth/validate-otp",
+  resendEndpoint = "/api/v1/auth/send-otp",
+}) => {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const inputRefs = useRef([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -53,7 +60,7 @@ export const VerificationModal = ({ isOpen, onClose, email, onVerified }) => {
     setError(null);
 
     try {
-      await api.post("/api/v1/auth/validate-otp", {
+      await api.post(verifyEndpoint, {
         email,
         code: verificationCode,
       });
@@ -69,7 +76,7 @@ export const VerificationModal = ({ isOpen, onClose, email, onVerified }) => {
 
   const handleResend = async () => {
     try {
-      await api.post("/api/v1/auth/send-otp", { email });
+      await api.post(resendEndpoint, { email });
       toast.success("Code resent!");
     } catch (err) {
       toast.error("Failed to resend code");

@@ -10,7 +10,7 @@ const VendorPost = require("../models/vendorProduct");
 const { logError } = require("../utils/logger");
 const { processOrderNotifications } = require("./orderNotification.controller");
 
-const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_LIVE_SECRET_KEY;
+const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_TEST_SECRET_KEY;
 
 const paystackRequest = (endpoint, method, body = null) => {
   return new Promise((resolve, reject) => {

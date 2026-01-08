@@ -15,14 +15,14 @@ const EmailVerificationBanner = () => {
   const handleVerifySuccess = () => {
     updateUser({ isVerified: true });
     // Optionally refresh full user data
-    useAuthStore.getState().checkAuth(); 
+    useAuthStore.getState().checkAuth();
   };
 
   const handleOpenVerify = async () => {
     // Optionally send code immediately when opening, or let modal handle resend
     // Modal sends on "Resend Code" click, but initially it expects user to have code.
     // If user deleted old email, they might need a new code.
-    // Let's rely on Modal's flow or trigger a send here if needed. 
+    // Let's rely on Modal's flow or trigger a send here if needed.
     // Usually, "Verify Now" implies "I have a code" or "Send me a code".
     // Let's just open the modal. User can click "Resend Code" in modal if they don't have one.
     setIsModalOpen(true);
@@ -34,7 +34,8 @@ const EmailVerificationBanner = () => {
         <div className="flex items-center gap-2">
           <AlertCircle size={16} />
           <span>
-            Action Required: Please verify your email address ({authUser.email}) to unlock full features.
+            Action Required: Please verify your email address ({authUser.email})
+            to unlock full features.
           </span>
         </div>
         <button
@@ -50,6 +51,8 @@ const EmailVerificationBanner = () => {
         onClose={() => setIsModalOpen(false)}
         email={authUser.email}
         onVerified={handleVerifySuccess}
+        verifyEndpoint="/api/v1/auth/verify-email"
+        resendEndpoint="/api/v1/auth/resend-verification-code"
       />
     </>
   );

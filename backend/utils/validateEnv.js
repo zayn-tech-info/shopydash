@@ -7,7 +7,7 @@ const validateEnv = () => {
     "CLOUDINARY_NAME",
     "CLOUDINARYAPI_KEY",
     "CLOUDINARYAPI_API_SECRET",
-    "PAYSTACK_LIVE_SECRET_KEY",
+    "PAYSTACK_TEST_SECRET_KEY",
     "RESEND_API_KEY",
   ];
 
@@ -17,7 +17,7 @@ const validateEnv = () => {
     if (!process.env[variable]) {
       missing.push(variable);
     }
-  } 
+  }
 
   if (missing.length > 0) {
     console.error("❌ Missing required environment variables:");
