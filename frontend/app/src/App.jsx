@@ -10,6 +10,9 @@ import { Signup } from "./pages/Signup";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/authStore";
 import { useCartStore } from "./store/cartStore";
+import useChatStore from "./store/chatStore";
+import { useNotificationStore } from "./store/notificationStore";
+import toast from "react-hot-toast";
 import { BottomNav } from "./components/BottomNav";
 import { AppSkeleton } from "./components/skeletons/AppSkeleton";
 import CreateVendorProfile from "./pages/CreateVendorProfile";
@@ -28,6 +31,7 @@ import PricingPage from "./pages/PricingPage";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import OrderList from "./pages/OrderList";
 import SettingsPage from "./pages/SettingsPage";
+import NotificationsPage from "./pages/NotificationsPage";
 
 import { VerifyEmail } from "./pages/VerifyEmail";
 
@@ -38,9 +42,48 @@ const App = () => {
   const { getCart } = useCartStore();
   const location = useLocation();
 
+  const { connectSocket, disconnectSocket, socket } = useChatStore();
+  const { addNotification, fetchNotifications } = useNotificationStore();
+
   useEffect(() => {
     checkAuth();
-  }, []);
+  }, [checkAuth]);
+
+  useEffect(() => {
+    if (authUser?._id) {
+      connectSocket(authUser._id);
+      fetchNotifications();
+    }
+    return () => {
+      if (authUser) disconnectSocket();
+    };
+  }, [authUser, connectSocket, disconnectSocket, fetchNotifications]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("order:new", (data) => {
+        addNotification(data.notification);
+        toast(
+          (t) => (
+            <div className="flex items-start gap-3">
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-900">New Order! 🎉</h3>
+                <p className="text-sm text-gray-600">{data.summary}</p>
+              </div>
+            </div>
+          ),
+          { duration: 5000, icon: "📦" }
+        );
+        // Play notification sound if desired
+        const audio = new Audio("/assets/notification.mp3"); // Ensure this file exists or skip
+        audio.play().catch((e) => console.log("Audio play failed", e));
+      });
+
+      return () => {
+        socket.off("order:new");
+      };
+    }
+  }, [socket, addNotification]);
 
   useEffect(() => {
     if (authUser) {
@@ -161,6 +204,12 @@ const App = () => {
             }
           />
           <Route path="*" element={<NotFound />} />
+          <Route
+            path="/notifications"
+            element={
+              authUser ? <NotificationsPage /> : <Navigate to="/login" />
+            }
+          />
         </Routes>
       </div>
       {location.pathname !== "/messages" &&

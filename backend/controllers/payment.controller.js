@@ -8,6 +8,7 @@ const VendorProfile = require("../models/vendorProfile.model");
 const Order = require("../models/order.model");
 const VendorPost = require("../models/vendorProduct");
 const { logError } = require("../utils/logger");
+const { processOrderNotifications } = require("./orderNotification.controller");
 
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_LIVE_SECRET_KEY;
 
@@ -145,8 +146,31 @@ const createSubaccount = async (req, res) => {
       return res.status(404).json({ message: "Vendor profile not found" });
     }
 
+    // 1. Server-Side Identity Verification (The "Shadow KYC")
+    // We resolve the account number again to ensure the name matches the legal bank owner.
+    // This prevents frontend manipulation and ensures we only onboard the REAL bank account owner.
+    let resolvedAccountName;
+    try {
+      const resolveResponse = await paystackRequest(
+        `/bank/resolve?account_number=${account_number}&bank_code=${settlement_bank}`,
+        "GET"
+      );
+      if (!resolveResponse.status || !resolveResponse.data) {
+        throw new Error("Could not verify account identity");
+      }
+      resolvedAccountName = resolveResponse.data.account_name;
+    } catch (err) {
+      return res.status(400).json({
+        message:
+          "Identity Verification Failed: Could not resolve bank account details. Please ensure account number and bank are correct.",
+      });
+    }
+
+    // 2. Create Paystack Subaccount using the VERIFIED IDENTITY
+    // We strictly use the 'resolvedAccountName' as the 'business_name'.
+    // This guarantees that the subaccount is created for the Legal Identity attached to the BVN.
     const paystackResponse = await paystackRequest("/subaccount", "POST", {
-      business_name,
+      business_name: resolvedAccountName, // FORCE the legal bank name
       settlement_bank,
       account_number,
       percentage_charge: 5,
@@ -165,6 +189,15 @@ const createSubaccount = async (req, res) => {
       accountName: paystackResponse.data.business_name,
       subaccountCode: paystackResponse.data.subaccount_code,
     };
+
+    // Determine KYC status based on Paystack response
+    // For specific subaccount types, active=true usually means verified
+    if (paystackResponse.data.active) {
+      vendor.kycStatus = "verified";
+    } else {
+      vendor.kycStatus = "pending";
+    }
+
     await vendor.save();
 
     res.status(200).json({
@@ -324,7 +357,7 @@ const webhook = async (req, res) => {
         (metadata.type === "product_purchase" ||
           metadata.type === "cart_purchase")
       ) {
-        await handleOrderSuccess(event.data);
+        await handleOrderSuccess(event.data, req.app.get("io"));
       } else {
         await handleSubscriptionSuccess(event.data);
       }
@@ -386,16 +419,29 @@ const handleSubscriptionSuccess = async (data) => {
   });
 };
 
-const handleOrderSuccess = async (data) => {
+const handleOrderSuccess = async (data, io) => {
   const { reference, metadata, amount } = data;
 
   if (metadata.type === "cart_purchase") {
     const orderIds = metadata.orderIds;
     if (orderIds && orderIds.length > 0) {
-      await Order.updateMany(
-        { _id: { $in: orderIds } },
-        { paymentStatus: "paid", payoutStatus: "held" }
-      );
+      // Find orders that are not yet paid to avoid duplicate notifications
+      const ordersToUpdate = await Order.find({
+        _id: { $in: orderIds },
+        paymentStatus: { $ne: "paid" },
+      });
+
+      if (ordersToUpdate.length > 0) {
+        await Order.updateMany(
+          { _id: { $in: ordersToUpdate.map((o) => o._id) } },
+          { paymentStatus: "paid", payoutStatus: "held" }
+        );
+
+        // Trigger notifications for each updated order
+        for (const order of ordersToUpdate) {
+          await processOrderNotifications(order._id, io);
+        }
+      }
     }
     return;
   }
@@ -444,10 +490,22 @@ const verifyPayment = async (req, res) => {
 
     if (paystackResponse.status && paystackResponse.data.status === "success") {
       if (isOrder) {
-        await Order.updateMany(
-          { transactionReference: reference },
-          { paymentStatus: "paid", payoutStatus: "held" }
-        );
+        const ordersToUpdate = await Order.find({
+          transactionReference: reference,
+          paymentStatus: { $ne: "paid" },
+        });
+
+        if (ordersToUpdate.length > 0) {
+          await Order.updateMany(
+            { _id: { $in: ordersToUpdate.map((o) => o._id) } },
+            { paymentStatus: "paid", payoutStatus: "held" }
+          );
+
+          const io = req.app.get("io");
+          for (const order of ordersToUpdate) {
+            await processOrderNotifications(order._id, io);
+          }
+        }
         return res.status(200).json({
           success: true,
           message: "Order verified successfully",

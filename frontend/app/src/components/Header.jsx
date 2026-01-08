@@ -6,6 +6,7 @@ import { useCartStore } from "../store/cartStore";
 import useChatStore from "../store/chatStore";
 import { ShoppingCart } from "lucide-react";
 import { useEffect } from "react";
+import Notifications from "./common/Notifications";
 
 export function Header() {
   const { authUser } = useAuthStore();
@@ -44,10 +45,21 @@ export function Header() {
     <header className="sticky top-0 z-50 bg-n-1 md:bg-n-1/90 md:backdrop-blur-sm shadow-md">
       <div className="container flex items-center justify-between">
         <Link to="/">
-          <img src={Logo} className="py-2" alt="Shopydash Logo" width={90} height={40} />
+          <img
+            src={Logo}
+            className="py-2"
+            alt="Shopydash Logo"
+            width={90}
+            height={40}
+          />
         </Link>
 
         <div className="flex items-center gap-4">
+          {authUser && (
+            <div className="md:hidden">
+              <Notifications />
+            </div>
+          )}
           <Link to="/cart" className="relative group md:hidden">
             <div className="p-2 rounded-full hover:bg-n-2/50 transition-colors">
               <ShoppingCart
@@ -114,6 +126,12 @@ export function Header() {
             })}
             {}
           </ul>
+
+          {authUser && (
+            <div className="mr-5">
+              <Notifications />
+            </div>
+          )}
 
           <Link to="/cart" className="relative group mr-5">
             <div className="p-2 rounded-full hover:bg-n-2/50 transition-colors">
