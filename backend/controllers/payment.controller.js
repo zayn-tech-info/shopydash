@@ -8,6 +8,7 @@ const VendorProfile = require("../models/vendorProfile.model");
 const Order = require("../models/order.model");
 const VendorPost = require("../models/vendorProduct");
 const { logError } = require("../utils/logger");
+const { processOrderNotifications } = require("./orderNotification.controller");
 
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_LIVE_SECRET_KEY;
 
@@ -356,7 +357,7 @@ const webhook = async (req, res) => {
         (metadata.type === "product_purchase" ||
           metadata.type === "cart_purchase")
       ) {
-        await handleOrderSuccess(event.data);
+        await handleOrderSuccess(event.data, req.app.get("io"));
       } else {
         await handleSubscriptionSuccess(event.data);
       }
@@ -418,16 +419,29 @@ const handleSubscriptionSuccess = async (data) => {
   });
 };
 
-const handleOrderSuccess = async (data) => {
+const handleOrderSuccess = async (data, io) => {
   const { reference, metadata, amount } = data;
 
   if (metadata.type === "cart_purchase") {
     const orderIds = metadata.orderIds;
     if (orderIds && orderIds.length > 0) {
-      await Order.updateMany(
-        { _id: { $in: orderIds } },
-        { paymentStatus: "paid", payoutStatus: "held" }
-      );
+      // Find orders that are not yet paid to avoid duplicate notifications
+      const ordersToUpdate = await Order.find({
+        _id: { $in: orderIds },
+        paymentStatus: { $ne: "paid" },
+      });
+
+      if (ordersToUpdate.length > 0) {
+        await Order.updateMany(
+          { _id: { $in: ordersToUpdate.map((o) => o._id) } },
+          { paymentStatus: "paid", payoutStatus: "held" }
+        );
+
+        // Trigger notifications for each updated order
+        for (const order of ordersToUpdate) {
+          await processOrderNotifications(order._id, io);
+        }
+      }
     }
     return;
   }
@@ -476,10 +490,22 @@ const verifyPayment = async (req, res) => {
 
     if (paystackResponse.status && paystackResponse.data.status === "success") {
       if (isOrder) {
-        await Order.updateMany(
-          { transactionReference: reference },
-          { paymentStatus: "paid", payoutStatus: "held" }
-        );
+        const ordersToUpdate = await Order.find({
+          transactionReference: reference,
+          paymentStatus: { $ne: "paid" },
+        });
+
+        if (ordersToUpdate.length > 0) {
+          await Order.updateMany(
+            { _id: { $in: ordersToUpdate.map((o) => o._id) } },
+            { paymentStatus: "paid", payoutStatus: "held" }
+          );
+
+          const io = req.app.get("io");
+          for (const order of ordersToUpdate) {
+            await processOrderNotifications(order._id, io);
+          }
+        }
         return res.status(200).json({
           success: true,
           message: "Order verified successfully",

@@ -9,15 +9,11 @@ const MessagesPage = () => {
     useChatStore();
   const { authUser: user } = useAuthStore();
 
-  
   const [showChatOnMobile, setShowChatOnMobile] = useState(false);
 
   useEffect(() => {
-    if (user?._id) {
-      connectSocket(user._id);
-    }
-    return () => disconnectSocket();
-  }, [user, connectSocket, disconnectSocket]);
+    // Socket connection is now handled globally in App.jsx
+  }, []);
 
   useEffect(() => {
     if (activeConversation) {
@@ -32,7 +28,6 @@ const MessagesPage = () => {
 
   const handleBackToConversations = () => {
     setShowChatOnMobile(false);
-    
   };
 
   return (
