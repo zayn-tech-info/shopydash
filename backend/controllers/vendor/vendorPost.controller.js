@@ -497,17 +497,13 @@ const getFreshProducts = asyncErrorHandler(async (req, res, next) => {
   const pageLimit = Math.min(parseInt(limit), 20);
 
   const pipeline = [
+ 
     { $sort: { createdAt: -1 } },
+
+   
     { $unwind: "$products" },
-    {
-      $group: {
-        _id: "$vendorId",
-        doc: { $first: "$$ROOT" },
-      },
-    },
-    {
-      $replaceRoot: { newRoot: "$doc" },
-    },
+
+    // 3. Lookup Vendor Profile
     {
       $lookup: {
         from: "vendorprofiles",
@@ -522,8 +518,7 @@ const getFreshProducts = asyncErrorHandler(async (req, res, next) => {
         preserveNullAndEmptyArrays: true,
       },
     },
-
-    // 6. Project
+ 
     {
       $lookup: {
         from: "users",
@@ -538,8 +533,11 @@ const getFreshProducts = asyncErrorHandler(async (req, res, next) => {
         preserveNullAndEmptyArrays: true,
       },
     },
+
+    
     { $sort: { createdAt: -1 } },
     { $limit: pageLimit },
+ 
     {
       $project: {
         _id: "$products._id",
