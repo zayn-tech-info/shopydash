@@ -12,9 +12,9 @@ const createPost = asyncErrorHandler(async (req, res, next) => {
 
   const limitConfig = req.subscription?.config?.limits || plans.free.limits;
 
-  if (!products || products.length < 4) {
+  if (!products || products.length < 1) {
     return next(
-      new customError(`You must upload at least 4 products per post.`, 400),
+      new customError(`You must upload at least 1 product per post.`, 400),
     );
   }
 
@@ -232,9 +232,9 @@ const update = asyncErrorHandler(async (req, res, next) => {
     );
   }
 
-  if (products && products.length < 4) {
+  if (products && products.length < 1) {
     return next(
-      new customError("You must have at least 4 products in a post.", 400),
+      new customError("You must have at least 1 product in a post.", 400),
     );
   }
 
