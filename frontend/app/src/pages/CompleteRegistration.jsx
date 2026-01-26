@@ -9,6 +9,21 @@ export default function CompleteRegistration() {
   const navigate = useNavigate();
   const { authUser, completeRegistration } = useAuthStore();
   const [loading, setLoading] = useState(false);
+  const [role, setRole] = useState("client");
+  const [username, setUsername] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [whatsAppNumber, setWhatsAppNumber] = useState("");
+  const [businessName, setBusinessName] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [country, setCountry] = useState("");
+  const [schoolName, setSchoolName] = useState("");
+  const [selectedArea, setSelectedArea] = useState("");
+  const [schoolId, setSchoolId] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  const isClient = role === "client";
 
   useEffect(() => {
     if (authUser) {
@@ -26,14 +41,7 @@ export default function CompleteRegistration() {
     }
   }, [authUser]);
 
-  const showPasswordInput = !authUser?.password && !authUser?.isGoogleAuth; 
-  
-  
-  
-  
-  
-  
-  
+  const showPasswordInput = !authUser?.password && !authUser?.isGoogleAuth;
 
   const showUsernameInput = !authUser?.username;
   const showPhoneInput = !authUser?.phoneNumber;
