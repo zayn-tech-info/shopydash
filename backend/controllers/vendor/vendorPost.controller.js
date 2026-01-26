@@ -519,15 +519,11 @@ const getFreshProducts = asyncErrorHandler(async (req, res, next) => {
     {
       $unwind: {
         path: "$vendorProfile",
-        preserveNullAndEmptyArrays: false,
+        preserveNullAndEmptyArrays: true,
       },
     },
 
-    {
-      $match: {
-        "vendorProfile.rating": { $gte: 0 },
-      },
-    },
+    // 6. Project
     {
       $lookup: {
         from: "users",
@@ -554,7 +550,7 @@ const getFreshProducts = asyncErrorHandler(async (req, res, next) => {
         vendorPostId: { $toString: "$_id" },
         vendorId: "$vendorId",
         postedAt: "$createdAt",
-        rating: "$vendorProfile.rating",
+        rating: { $ifNull: ["$vendorProfile.rating", 0] },
         vendor: {
           businessName: "$vendorUser.businessName",
           username: "$vendorUser.username",
