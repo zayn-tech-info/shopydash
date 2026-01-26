@@ -11,7 +11,11 @@ class SocketService {
       return this.socket;
     }
 
-    const serverUrl = "http://localhost:8000";
+    const mode = import.meta.env.MODE;
+    const serverUrl =
+      mode === "development"
+        ? "http://localhost:8000"
+        : "https://vendora-7457.onrender.com";
 
     this.socket = io(serverUrl, {
       auth: {

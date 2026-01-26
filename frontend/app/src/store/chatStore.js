@@ -5,7 +5,11 @@ import { toast } from "react-hot-toast";
 import { useAuthStore } from "./authStore";
 import DOMPurify from "isomorphic-dompurify";
 
-const ENDPOINT = "http://localhost:8000";
+const mode = import.meta.env.MODE;
+const ENDPOINT =
+  mode === "development"
+    ? "http://localhost:8000"
+    : "https://vendora-7457.onrender.com";
 
 const getToken = () => {
   const cookies = document.cookie.split(";");
