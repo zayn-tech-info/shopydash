@@ -10,65 +10,73 @@ export default function CompleteRegistration() {
   const { authUser, completeRegistration } = useAuthStore();
   const [loading, setLoading] = useState(false);
 
-  const [role, setRole] = useState(
-    () => localStorage.getItem("signupRole") || "client"
-  );
+  useEffect(() => {
+    if (authUser) {
+      if (authUser.role) setRole(authUser.role);
+      if (authUser.username) setUsername(authUser.username);
+      if (authUser.phoneNumber) setPhoneNumber(authUser.phoneNumber);
+      if (authUser.whatsAppNumber) setWhatsAppNumber(authUser.whatsAppNumber);
+      if (authUser.businessName) setBusinessName(authUser.businessName);
+      if (authUser.city) setCity(authUser.city);
+      if (authUser.state) setState(authUser.state);
+      if (authUser.country) setCountry(authUser.country);
+      if (authUser.schoolName) setSchoolName(authUser.schoolName);
+      if (authUser.schoolArea) setSelectedArea(authUser.schoolArea);
+      if (authUser.schoolId) setSchoolId(authUser.schoolId);
+    }
+  }, [authUser]);
 
-  // Removed premature cleanup to support StrictMode double-invocations
-  const [username, setUsername] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [schoolName, setSchoolName] = useState("");
-  const [whatsAppNumber, setWhatsAppNumber] = useState("");
-  const [businessName, setBusinessName] = useState("");
-  const [city, setCity] = useState("");
-  const [state, setState] = useState("");
-  const [country, setCountry] = useState("");
+  const showPasswordInput = !authUser?.password && !authUser?.isGoogleAuth; // Only show if no password and not google auth? Or if they want to set one?
+  // Actually, standard signup users have password. Google users don't.
+  // If Google users need password, show it. If not, hide it.
+  // Let's hide it for now unless explicitly required.
+  // Actually, if they used Step 1, they have password.
+  // If they used Google, they don't have password. The backend might complain if we don't send one?
+  // Backend check: "if ((!user.password || user.isGoogleAuth) && !password) ..."
+  // So if Google Auth, we can skip password.
 
-  const [schoolId, setSchoolId] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [selectedArea, setSelectedArea] = useState("");
-
-  const isClient = role === "client";
+  const showUsernameInput = !authUser?.username;
+  const showPhoneInput = !authUser?.phoneNumber;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (
-      !username ||
-      !phoneNumber ||
-      !schoolName ||
-      !whatsAppNumber ||
-      !password ||
       !selectedArea ||
       !city ||
       !state ||
-      !country
+      !country ||
+      !whatsAppNumber ||
+      (!authUser?.role && !role)
     ) {
       return toast.error(
-        "Please fill in all required fields (City, State, Country included)"
+        "Please fill in all required fields (City, State, Country, WhatsApp included)",
       );
     }
 
-    if (!isClient && !businessName) {
+    if (role === "client") {
+      if (!schoolName) return toast.error("School Name is required");
+    }
+
+    if (role === "vendor" && !businessName) {
       return toast.error("Business name is required for vendors");
     }
 
-    if (password.length < 6) {
+    if (showPasswordInput && password.length < 6) {
       return toast.error("Password must be at least 6 characters long");
     }
 
     setLoading(true);
     try {
       await completeRegistration({
-        role,
-        username,
-        phoneNumber,
+        role: authUser?.role || role,
+        username: authUser?.username || username,
+        phoneNumber: authUser?.phoneNumber || phoneNumber,
         schoolName,
         whatsAppNumber,
-        businessName: isClient ? undefined : businessName,
+        businessName: role === "client" ? undefined : businessName,
         schoolId: schoolId ? Number(schoolId) : undefined,
-        password,
+        password: password || undefined,
         area: selectedArea,
         city,
         state,
@@ -91,46 +99,48 @@ export default function CompleteRegistration() {
       <div className="w-full max-w-2xl">
         <div className="bg-white/80 backdrop-blur-xl shadow-2xl shadow-n-3/10 rounded-3xl border border-white/50 overflow-hidden">
           <div className="px-8 pt-10 pb-6 text-center">
-            <h1 className="h4 text-n-8 mb-2">Complete Your Registration</h1>
+            <h1 className="h4 text-n-8 mb-2">Complete Your Profile</h1>
             <p className="body-2 text-n-4">
-              Just a few more details to finish setting up your account
+              Tell us a bit more about you to finish setting up.
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="px-8 pb-8">
-            <div className="mb-6">
-              <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
-                I am a
-              </label>
-              <div className="grid grid-cols-2 p-1 bg-n-2/10 rounded-xl">
-                <button
-                  type="button"
-                  onClick={() => setRole("client")}
-                  className={[
-                    "flex items-center justify-center gap-2 rounded-lg py-3 text-sm font-bold uppercase tracking-wider transition-all duration-300",
-                    isClient
-                      ? "bg-white text-primary-3 shadow-sm"
-                      : "text-n-4 hover:text-n-6 hover:bg-white/50",
-                  ].join(" ")}
-                >
-                  <GraduationCap className="w-4 h-4" />
-                  Student
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRole("vendor")}
-                  className={[
-                    "flex items-center justify-center gap-2 rounded-lg py-3 text-sm font-bold uppercase tracking-wider transition-all duration-300",
-                    !isClient
-                      ? "bg-white text-primary-3 shadow-sm"
-                      : "text-n-4 hover:text-n-6 hover:bg-white/50",
-                  ].join(" ")}
-                >
-                  <Store className="w-4 h-4" />
-                  Vendor
-                </button>
+            {!authUser?.role && (
+              <div className="mb-6">
+                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
+                  I am a
+                </label>
+                <div className="grid grid-cols-2 p-1 bg-n-2/10 rounded-xl">
+                  <button
+                    type="button"
+                    onClick={() => setRole("client")}
+                    className={[
+                      "flex items-center justify-center gap-2 rounded-lg py-3 text-sm font-bold uppercase tracking-wider transition-all duration-300",
+                      isClient
+                        ? "bg-white text-primary-3 shadow-sm"
+                        : "text-n-4 hover:text-n-6 hover:bg-white/50",
+                    ].join(" ")}
+                  >
+                    <GraduationCap className="w-4 h-4" />
+                    Student
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setRole("vendor")}
+                    className={[
+                      "flex items-center justify-center gap-2 rounded-lg py-3 text-sm font-bold uppercase tracking-wider transition-all duration-300",
+                      !isClient
+                        ? "bg-white text-primary-3 shadow-sm"
+                        : "text-n-4 hover:text-n-6 hover:bg-white/50",
+                    ].join(" ")}
+                  >
+                    <Store className="w-4 h-4" />
+                    Vendor
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
 
             {!isClient && (
               <div className="mb-5">
@@ -148,33 +158,37 @@ export default function CompleteRegistration() {
               </div>
             )}
 
-            <div className="mb-5">
-              <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
-                Username
-              </label>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="e.g. johndoe123"
-                className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
-                required
-              />
-            </div>
+            {showUsernameInput && (
+              <div className="mb-5">
+                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="e.g. johndoe123"
+                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
+                  required
+                />
+              </div>
+            )}
 
-            <div className="mb-5">
-              <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder="e.g. +234 801..."
-                className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
-                required
-              />
-            </div>
+            {showPhoneInput && (
+              <div className="mb-5">
+                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  placeholder="e.g. +234 801..."
+                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
+                  required
+                />
+              </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5">
               <div>
@@ -252,33 +266,34 @@ export default function CompleteRegistration() {
               />
             </div>
 
-            {}
-            <div className="mb-5">
-              <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Min. 6 characters"
-                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50 pr-12"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-n-4 hover:text-n-6 transition-colors"
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </button>
+            {showPasswordInput && (
+              <div className="mb-5">
+                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
+                  Create Password
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Min. 6 characters"
+                    className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50 pr-12"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-n-4 hover:text-n-6 transition-colors"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
 
             <button
               type="submit"

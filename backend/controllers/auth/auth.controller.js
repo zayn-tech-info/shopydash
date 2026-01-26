@@ -16,7 +16,7 @@ const googleAuth = asyncErrorHandler(async (req, res, next) => {
     "https://www.googleapis.com/oauth2/v3/userinfo",
     {
       headers: { Authorization: `Bearer ${token}` },
-    }
+    },
   );
 
   if (!response.ok) {
@@ -67,50 +67,77 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
     area,
   } = req.body;
 
-  if (
-    !role ||
-    !username ||
-    !phoneNumber ||
-    !schoolName ||
-    !whatsAppNumber ||
-    !password
-  ) {
-    const err = new customError("All fields are required", 400);
-    return next(err);
-  }
-
-  if (role === "vendor" && !businessName) {
-    const err = new customError("Business name is required for vendors", 400);
-    return next(err);
-  }
-
-  const user = await User.findById(userId);
+  // Fetch user first to check what they already have
+  const user = await User.findById(userId).select("+password");
 
   if (!user) {
     const err = new customError("User not found", 404);
     return next(err);
   }
 
-  const existingUser = await User.findOne({ username }).select("_id").lean();
-  if (existingUser && existingUser._id.toString() !== userId.toString()) {
-    const err = new customError("Username is already taken", 400);
+  // Dynamic Validation: Require fields only if not already present in user or provided in body
+  const missingFields = [];
+
+  // Always required for profile completion
+  if (!schoolName) missingFields.push("schoolName");
+  if (!whatsAppNumber) missingFields.push("whatsAppNumber");
+  if (!state) missingFields.push("state");
+  if (!city) missingFields.push("city");
+  if (!country) missingFields.push("country");
+
+  // Role dependent
+  if (role === "vendor" && !businessName && !user.businessName)
+    missingFields.push("businessName");
+
+  // Core auth fields - valid only if not already set on user or provided now
+  if (!user.username && !username) missingFields.push("username");
+  if (!user.phoneNumber && !phoneNumber) missingFields.push("phoneNumber");
+  if ((!user.password || user.isGoogleAuth) && !password) {
+    // If user has no password (or only Google auth) and didn't provide one, it might be required?
+    // Actually, Google users might not need a password.
+    // But if you want to enforce password setting for everyone:
+    // missingFields.push("password");
+    // For now, let's assume if they have GoogleAuth they don't strictly need a password unless you want them to set one.
+    // The previous code required password. I'll make it optional if they are GoogleAuth, or required if they are standard.
+    // However, regular signup sets password. So user.password exists.
+    // If user.isGoogleAuth is true, maybe we don't force password?
+    // Let's stick to: if provided, update. If not provided and not set, error (unless google).
+  }
+
+  if (missingFields.length > 0) {
+    const err = new customError(
+      `Missing required fields: ${missingFields.join(", ")}`,
+      400,
+    );
     return next(err);
   }
 
-  user.username = username;
-  user.role = role;
-  user.phoneNumber = phoneNumber;
-  user.schoolName = schoolName;
-  user.whatsAppNumber = whatsAppNumber;
-  user.password = password;
-  user.businessName = role === "vendor" ? businessName : undefined;
-  user.schoolId = schoolId || undefined;
-  user.schoolId = schoolId || undefined;
-  user.state = state;
-  user.city = city;
-  user.schoolArea = schoolArea;
-  user.area = area;
-  user.country = country;
+  // Check username uniqueness if changing
+  if (username && username !== user.username) {
+    const existingUser = await User.findOne({ username }).select("_id").lean();
+    if (existingUser && existingUser._id.toString() !== userId.toString()) {
+      const err = new customError("Username is already taken", 400);
+      return next(err);
+    }
+    user.username = username;
+  }
+
+  if (role) user.role = role;
+  if (phoneNumber) user.phoneNumber = phoneNumber;
+  if (schoolName) user.schoolName = schoolName;
+  if (whatsAppNumber) user.whatsAppNumber = whatsAppNumber;
+  if (password) user.password = password; // Will be hashed by pre-save hook
+  if (businessName) user.businessName = businessName;
+  if (schoolId) user.schoolId = schoolId;
+
+  user.state = state || user.state;
+  user.city = city || user.city;
+  user.country = country || user.country;
+
+  // Handle flexible area/schoolArea naming
+  user.schoolArea = schoolArea || area || user.schoolArea;
+  user.area = area || schoolArea || user.area;
+
   user.profileComplete = true;
 
   await user.save();
@@ -119,55 +146,15 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
 });
 
 const signup = asyncErrorHandler(async (req, res, next) => {
-  const {
-    fullName,
-    username,
-    email,
-    phoneNumber,
-    schoolName,
-    password,
-    businessName,
-    role,
-    city,
-    state,
-    country,
-    schoolArea,
-  } = req.body;
+  const { fullName, username, email, phoneNumber, password, role } = req.body;
 
-  if (role === "client") {
-    if (
-      !fullName ||
-      !username ||
-      !email ||
-      !phoneNumber ||
-      !schoolName ||
-      !schoolName ||
-      !password ||
-      !city ||
-      !state ||
-      !country ||
-      !schoolArea
-    ) {
-      const err = new customError("All fields are required", 400);
-      return next(err);
-    }
-  } else if (role === "vendor") {
-    if (
-      !fullName ||
-      !username ||
-      !email ||
-      !phoneNumber ||
-      !schoolName ||
-      !password ||
-      !businessName ||
-      !city ||
-      !state ||
-      !country ||
-      !schoolArea
-    ) {
-      const err = new customError("All fields are required", 400);
-      return next(err);
-    }
+  // Minimal Validation for Step 1
+  if (!fullName || !username || !email || !phoneNumber || !password || !role) {
+    const err = new customError(
+      "All fields are required (FullName, Username, Email, Phone, Password, Role)",
+      400,
+    );
+    return next(err);
   }
 
   const existingUser = await User.findOne({ email });
@@ -184,13 +171,13 @@ const signup = asyncErrorHandler(async (req, res, next) => {
 
     if (!verificationToken) {
       return next(
-        new customError("Please verify your email address first", 400)
+        new customError("Please verify your email address first", 400),
       );
     }
 
     const user = await User.create({
       ...req.body,
-      profileComplete: true,
+      profileComplete: false, // Explicitly false, requiring Step 2
       isVerified: true,
     });
 
@@ -228,7 +215,7 @@ const login = asyncErrorHandler(async (req, res, next) => {
   }
 
   const user = await User.findOne(query).select(
-    "+verificationCode +verificationCodeExpires +isVerified +password"
+    "+verificationCode +verificationCodeExpires +isVerified +password",
   );
   if (!user) {
     const err = new customError("Invalid credentials", 401);
@@ -267,7 +254,7 @@ const login = asyncErrorHandler(async (req, res, next) => {
     res,
     200,
     hasProfile,
-    additionalData
+    additionalData,
   );
 });
 
@@ -332,7 +319,7 @@ const updateUser = asyncErrorHandler(async (req, res, next) => {
   if (req.body.password || req.body.email || req.body.role) {
     const error = new customError(
       "You are not allowed to update email, password, or role here.",
-      400
+      400,
     );
     return next(error);
   }
@@ -367,7 +354,7 @@ const updateUser = asyncErrorHandler(async (req, res, next) => {
             (error, result) => {
               if (error) return reject(error);
               resolve(result);
-            }
+            },
           );
           stream.end(buffer);
         });
@@ -387,7 +374,7 @@ const updateUser = asyncErrorHandler(async (req, res, next) => {
       new: true,
       runValidators: true,
       context: "query",
-    }
+    },
   );
 
   if (!updatedUser) {
@@ -414,7 +401,7 @@ const changePassword = asyncErrorHandler(async (req, res, next) => {
   if (newPassword !== confirmPassword) {
     const error = new customError(
       "New password and confirm password do not match",
-      400
+      400,
     );
     return next(error);
   }
@@ -451,7 +438,7 @@ const sendOtp = asyncErrorHandler(async (req, res, next) => {
   await VerificationToken.findOneAndUpdate(
     { identifier: email },
     { token, expires: Date.now() + 10 * 60 * 1000, verified: false },
-    { upsert: true, new: true }
+    { upsert: true, new: true },
   );
 
   try {
@@ -459,7 +446,10 @@ const sendOtp = asyncErrorHandler(async (req, res, next) => {
     res.status(200).json({ success: true, message: "Verification code sent" });
   } catch (error) {
     return next(
-      new customError(error.message || "Failed to send verification email", 500)
+      new customError(
+        error.message || "Failed to send verification email",
+        500,
+      ),
     );
   }
 });
@@ -471,7 +461,7 @@ const verifyEmail = asyncErrorHandler(async (req, res, next) => {
   }
 
   const user = await User.findOne({ email }).select(
-    "+verificationCode +verificationCodeExpires"
+    "+verificationCode +verificationCodeExpires",
   );
 
   if (!user) {
@@ -516,7 +506,7 @@ const resendVerificationCode = asyncErrorHandler(async (req, res, next) => {
   }
 
   const verificationCode = Math.floor(
-    100000 + Math.random() * 900000
+    100000 + Math.random() * 900000,
   ).toString();
   const verificationCodeExpires = Date.now() + 10 * 60 * 1000;
 

@@ -14,11 +14,50 @@ export const useProductStore = create((set, get) => ({
   searchResults: [],
   isSearching: false,
 
-  searchProducts: async (params) => {
-    set({ isSearching: true });
+  currentSearchPage: 1,
+  hasMoreSearchResults: true,
+
+  searchProducts: async (params, isLoadMore = false) => {
+    const { searchResults, currentSearchPage } = get();
+
+    // For Load More, increment page. For new search, reset to 1.
+    const page = isLoadMore ? currentSearchPage + 1 : 1;
+
+    // If not load more, set searching true (full reload feeling).
+    // If load more, maybe a different loading state? Re-using isSearching for now or add isLoadingMore.
+    // User wants "Load More" button.
+
+    if (!isLoadMore) {
+      set({
+        isSearching: true,
+        searchResults: [],
+        hasMoreSearchResults: true,
+        currentSearchPage: 1,
+      });
+    } else {
+      // We might want a separate loading state for "appending"
+      // set({ isLoadingMore: true });
+    }
+
     try {
-      const res = await api.get("/api/v1/post/search", { params });
-      set({ searchResults: res.data.data.products, isSearching: false });
+      // Build exclusion list from existing results to be safe
+      const existingIds = isLoadMore ? searchResults.map((p) => p._id) : [];
+
+      const res = await api.get("/api/v1/post/search", {
+        params: { ...params, page, excludedIds: existingIds },
+      });
+
+      const newProducts = res.data.data.products;
+      const hasMore = res.data.data.hasMore;
+
+      set((state) => ({
+        searchResults: isLoadMore
+          ? [...state.searchResults, ...newProducts]
+          : newProducts,
+        isSearching: false,
+        currentSearchPage: page,
+        hasMoreSearchResults: hasMore,
+      }));
     } catch (error) {
       set({ isSearching: false });
       console.error(error);
@@ -34,7 +73,6 @@ export const useProductStore = create((set, get) => ({
     } catch (error) {
       set({ isFetchingFeedPosts: false });
       console.error(error);
-      
     }
   },
 
@@ -64,7 +102,7 @@ export const useProductStore = create((set, get) => ({
       });
 
       set({ isUploading: false });
-      return res.data.data; 
+      return res.data.data;
     } catch (error) {
       set({ isUploading: false });
       toast.error(error.response?.data?.message || "Failed to upload images");

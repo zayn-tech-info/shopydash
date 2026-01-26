@@ -11,7 +11,7 @@ import { SignupForm } from "../components/SignupForm";
 
 export function Signup() {
   const createVendorProfile = useVendorProfileStore(
-    (state) => state.createVendorProfile
+    (state) => state.createVendorProfile,
   );
   const [hasChosenRole, setHasChosenRole] = useState(false);
   const {
@@ -55,37 +55,15 @@ export function Signup() {
       email: email?.trim() ?? "",
       password: password?.trim() ?? "",
       phoneNumber: phoneNumber?.trim() ?? "",
-      schoolName: schoolName?.trim() ?? "",
       username: username?.trim() ?? "",
-      businessName: businessName?.trim() ?? "",
-      whatsAppNumber: whatsAppNumber?.trim() ?? "",
-      schoolEmail: schoolEmail?.trim() ?? "",
-      schoolId: schoolId?.trim() ?? "",
-      city: city?.trim() ?? "",
-      state: state?.trim() ?? "",
-      country: country?.trim() ?? "",
-      schoolArea: schoolArea?.trim() ?? "",
     };
 
-    if (!trimmed.fullName) return toast.error("Full name is required"), false;
-    if (!trimmed.email) return toast.error("Email is required"), false;
-    if (!trimmed.password) return toast.error("Password is required"), false;
-    if (!trimmed.username) return toast.error("Username is required"), false;
-    if (!trimmed.city) return toast.error("City is required"), false;
-    if (!trimmed.state) return toast.error("State is required"), false;
-    if (!trimmed.country) return toast.error("Country is required"), false;
-    if (!trimmed.schoolArea)
-      return toast.error("School Area is required"), false;
-    if (!trimmed.whatsAppNumber)
-      return toast.error("WhatsApp number is required"), false;
-
-    if (isClient) {
-      if (!trimmed.schoolName)
-        return toast.error("School name is required"), false;
-    } else {
-      if (!trimmed.businessName)
-        return toast.error("Business name is required"), false;
-    }
+    if (!trimmed.fullName) return (toast.error("Full name is required"), false);
+    if (!trimmed.email) return (toast.error("Email is required"), false);
+    if (!trimmed.password) return (toast.error("Password is required"), false);
+    if (!trimmed.username) return (toast.error("Username is required"), false);
+    if (!trimmed.phoneNumber)
+      return (toast.error("Phone number is required"), false);
 
     return true;
   };
@@ -99,18 +77,6 @@ export function Signup() {
       email,
       password,
       phoneNumber,
-      whatsAppNumber,
-      schoolName,
-      businessName: businessName || undefined,
-      schoolId: schoolId ? Number(schoolId) : undefined,
-      schoolEmail: schoolEmail || undefined,
-      profilePic: profilePic || undefined,
-      bio: bio || undefined,
-      logo: logo || undefined,
-      city,
-      state,
-      country,
-      schoolArea,
     };
 
     const ok = validateForm();
@@ -119,14 +85,19 @@ export function Signup() {
     }
 
     try {
-      const result = await signup(payload);
+      await signup(payload);
 
-      toast.success("Account created successfully! Please login.");
-      resetField();
-      navigate("/login");
+      // Token is set in localStorage by signup store.
+      // Update auth store state immediately so App router detects it
+      toast.success("Account created! Let's finish your profile.");
+
+      // We need to update the auth state.
+      // easiest way is to reload or call checkAuth.
+      await checkAuth();
+      // The App.jsx will automatically redirect to /complete-user-registration because profileComplete is false.
     } catch (err) {
       const msg =
-        typeof err === "string" ? err : err?.message ?? "Signup failed";
+        typeof err === "string" ? err : (err?.message ?? "Signup failed");
       toast.error(msg);
     }
   };
@@ -148,11 +119,6 @@ export function Signup() {
       <div className="w-full max-w-xl relative z-10">
         <div className="bg-white/80 md:backdrop-blur-xl shadow-2xl shadow-n-3/10 rounded-3xl border border-white/50 overflow-hidden">
           <div className="px-8 pt-10 text-center">
-            <img
-              src={logoUrl}
-              alt="Shopydash"
-              className="mx-auto w-auto object-contain mb-4"
-            />
             <h1 className="h4 text-n-8 mb-2">Create your account</h1>
             <p className="body-2 text-n-4">
               Join the campus marketplace to buy and sell with ease.

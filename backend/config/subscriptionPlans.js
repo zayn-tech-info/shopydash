@@ -5,7 +5,7 @@ module.exports = {
     price: 0,
     limits: {
       productsPerPost: 4,
-      postsPer12Hours: 2,
+      postsPer12Hours: 3,  
     },
     features: {
       priorityFeed: false,
@@ -21,8 +21,8 @@ module.exports = {
     slug: "shopydash-boost",
     price: 750,
     limits: {
-      productsPerPost: 6,
-      postsPer12Hours: 4,
+      productsPerPost: 50,
+      postsPer12Hours: 100,
     },
     features: {
       priorityFeed: true,
@@ -40,8 +40,8 @@ module.exports = {
     slug: "shopydash-pro",
     price: 1500,
     limits: {
-      productsPerPost: 10,
-      postsPer12Hours: 6,
+      productsPerPost: 50,
+      postsPer12Hours: 150,
     },
     features: {
       priorityFeed: true,
@@ -59,8 +59,8 @@ module.exports = {
     slug: "shopydash-max",
     price: 3000,
     limits: {
-      productsPerPost: 20,
-      postsPer12Hours: 20,
+      productsPerPost: 50,
+      postsPer12Hours: 200,
     },
     features: {
       priorityFeed: true,

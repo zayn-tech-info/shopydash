@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import {
   Eye,
@@ -9,7 +9,6 @@ import {
   Loader,
 } from "lucide-react";
 import { useGoogleLogin } from "@react-oauth/google";
-import LocationSelector from "./LocationSelector";
 import { VerificationModal } from "../components/VerificationModal";
 import { api } from "../lib/axios";
 
@@ -23,20 +22,12 @@ export function SignupForm({
   isClient,
   username,
   email,
-  schoolId,
   phoneNumber,
-  whatsAppNumber,
-  schoolName,
-  businessName,
   showPassword,
   password,
   toggleShowPassword,
   isSigningUp,
   error,
-  city,
-  state,
-  country,
-  schoolArea,
 }) {
   const { googleAuthenticate } = useAuthStore();
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
@@ -162,42 +153,46 @@ export function SignupForm({
                 />
               </div>
 
-              <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
-                Email
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={email}
-                  onChange={(e) => {
-                    setField("email", e.target.value);
-                    setIsEmailVerified(false);
-                  }}
-                  placeholder="e.g. john@uni.edu"
-                  className={`w-full h-12 px-4 rounded-xl bg-n-2/10 border ${
-                    isEmailVerified ? "border-green-500" : "border-transparent"
-                  } focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50`}
-                  autoComplete="email"
-                  required
-                />
-                <div className="absolute top-1/2 right-2 -translate-y-1/2">
-                  {isEmailVerified ? (
-                    <span className="flex items-center gap-1 text-green-600 bg-green-100 px-3 py-1 rounded-lg text-xs font-bold uppercase">
-                      <BadgeCheck className="w-4 h-4" /> Verified
-                    </span>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={handleVerifyClick}
-                      disabled={isSendingCode || !email}
-                      className="bg-n-8 text-white px-3 py-1.5 rounded-lg text-xs font-bold uppercase hover:bg-n-7 transition-colors disabled:opacity-50 flex items-center gap-2"
-                    >
-                      {isSendingCode && (
-                        <Loader className="w-3 h-3 animate-spin" />
-                      )}
-                      Verify
-                    </button>
-                  )}
+              <div className="md:col-span-2">
+                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
+                  Email
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={email}
+                    onChange={(e) => {
+                      setField("email", e.target.value);
+                      setIsEmailVerified(false);
+                    }}
+                    placeholder="e.g. john@uni.edu"
+                    className={`w-full h-12 px-4 rounded-xl bg-n-2/10 border ${
+                      isEmailVerified
+                        ? "border-green-500"
+                        : "border-transparent"
+                    } focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50`}
+                    autoComplete="email"
+                    required
+                  />
+                  <div className="absolute top-1/2 right-2 -translate-y-1/2">
+                    {isEmailVerified ? (
+                      <span className="flex items-center gap-1 text-green-600 bg-green-100 px-3 py-1 rounded-lg text-xs font-bold uppercase">
+                        <BadgeCheck className="w-4 h-4" /> Verified
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={handleVerifyClick}
+                        disabled={isSendingCode || !email}
+                        className="bg-n-8 text-white px-3 py-1.5 rounded-lg text-xs font-bold uppercase hover:bg-n-7 transition-colors disabled:opacity-50 flex items-center gap-2"
+                      >
+                        {isSendingCode && (
+                          <Loader className="w-3 h-3 animate-spin" />
+                        )}
+                        Verify
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -212,83 +207,6 @@ export function SignupForm({
                   placeholder="e.g. +234 801..."
                   className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
                   required
-                />
-              </div>
-
-              <div className="md:col-span-1">
-                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
-                  City
-                </label>
-                <input
-                  type="text"
-                  value={city}
-                  onChange={(e) => setField("city", e.target.value)}
-                  placeholder="e.g. Lagos"
-                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
-                  required
-                />
-              </div>
-
-              <div className="md:col-span-1">
-                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
-                  State
-                </label>
-                <input
-                  type="text"
-                  value={state}
-                  onChange={(e) => setField("state", e.target.value)}
-                  placeholder="e.g. Lagos"
-                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
-                  required
-                />
-              </div>
-
-              <div className="md:col-span-1">
-                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
-                  Country
-                </label>
-                <input
-                  type="text"
-                  value={country}
-                  onChange={(e) => setField("country", e.target.value)}
-                  placeholder="e.g. Nigeria"
-                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
-                  required
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <LocationSelector
-                  schoolName={schoolName}
-                  setSchoolName={(val) => setField("schoolName", val)}
-                  selectedArea={schoolArea}
-                  setSelectedArea={(val) => setField("schoolArea", val)}
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
-                  Student ID
-                </label>
-                <input
-                  type="text"
-                  value={schoolId}
-                  onChange={(e) => setField("schoolId", e.target.value)}
-                  placeholder="e.g. 20221234"
-                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
-                  WhatsApp Number
-                </label>
-                <input
-                  type="tel"
-                  value={whatsAppNumber}
-                  onChange={(e) => setField("whatsAppNumber", e.target.value)}
-                  placeholder="e.g. +234 801..."
-                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
                 />
               </div>
 
@@ -338,19 +256,6 @@ export function SignupForm({
                   placeholder="e.g. John Doe"
                   className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
                   required
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
-                  Business Name
-                </label>
-                <input
-                  type="text"
-                  value={businessName}
-                  onChange={(e) => setField("businessName", e.target.value)}
-                  placeholder="e.g. Shopydash Shop"
-                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
                 />
               </div>
 
@@ -457,83 +362,6 @@ export function SignupForm({
                   required
                 />
               </div>
-
-              <div className="md:col-span-1">
-                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
-                  City
-                </label>
-                <input
-                  type="text"
-                  value={city}
-                  onChange={(e) => setField("city", e.target.value)}
-                  placeholder="e.g. Lagos"
-                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
-                  required
-                />
-              </div>
-
-              <div className="md:col-span-1">
-                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
-                  State
-                </label>
-                <input
-                  type="text"
-                  value={state}
-                  onChange={(e) => setField("state", e.target.value)}
-                  placeholder="e.g. Lagos"
-                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
-                  required
-                />
-              </div>
-
-              <div className="md:col-span-1">
-                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
-                  Country
-                </label>
-                <input
-                  type="text"
-                  value={country}
-                  onChange={(e) => setField("country", e.target.value)}
-                  placeholder="e.g. Nigeria"
-                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
-                  required
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <LocationSelector
-                  schoolName={schoolName}
-                  setSchoolName={(val) => setField("schoolName", val)}
-                  selectedArea={schoolArea}
-                  setSelectedArea={(val) => setField("schoolArea", val)}
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
-                  Student ID
-                </label>
-                <input
-                  type="text"
-                  value={schoolId}
-                  onChange={(e) => setField("schoolId", e.target.value)}
-                  placeholder="e.g. 20221334"
-                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
-                  WhatsApp Number
-                </label>
-                <input
-                  type="tel"
-                  value={whatsAppNumber}
-                  onChange={(e) => setField("whatsAppNumber", e.target.value)}
-                  placeholder="e.g. +234 801..."
-                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
-                />
-              </div>
             </>
           )}
         </div>
@@ -588,7 +416,7 @@ function CustomDropdown({ options, value, onChange, placeholder }) {
   }, []);
 
   const filteredOptions = options.filter((option) =>
-    option.toLowerCase().includes((value || "").toLowerCase())
+    option.toLowerCase().includes((value || "").toLowerCase()),
   );
 
   return (

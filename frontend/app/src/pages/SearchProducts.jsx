@@ -24,12 +24,8 @@ export function SearchProducts() {
     });
   };
 
-  
   useEffect(() => {
-    
-    return () => {
-      
-    };
+    return () => {};
   }, []);
 
   return (
@@ -176,6 +172,45 @@ export function SearchProducts() {
             </p>
           </div>
         )}
+
+        {!isSearching &&
+          searchResults.length > 0 &&
+          useProductStore.getState().hasMoreSearchResults && (
+            <div className="mt-12 flex justify-center">
+              <button
+                onClick={() => {
+                  searchProducts(
+                    {
+                      search,
+                      school: schoolName,
+                      area: selectedArea,
+                    },
+                    true,
+                  );
+                }}
+                className="group relative px-8 py-3 bg-white border border-n-3/20 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-primary-3/5 group-hover:bg-primary-3/10 transition-colors" />
+                <span className="relative font-code text-xs font-bold uppercase tracking-wider text-n-8 group-hover:text-primary-3 flex items-center gap-2">
+                  Load More Products
+                  <svg
+                    className="w-4 h-4 animate-bounce"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M12 5V19M12 19L5 12M12 19L19 12"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </span>
+              </button>
+            </div>
+          )}
       </main>
     </div>
   );

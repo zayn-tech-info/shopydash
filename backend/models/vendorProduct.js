@@ -97,19 +97,20 @@ const vendorPostSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 vendorPostSchema.index({ school: 1, createdAt: -1 });
 vendorPostSchema.index({ area: 1, createdAt: -1 });
 vendorPostSchema.index({ state: 1, area: 1 });
-vendorPostSchema.index({ "products.title": "text", "caption": "text" });
+vendorPostSchema.index({ "products.title": "text", caption: "text" });
+vendorPostSchema.index({ createdAt: 1 }, { expireAfterSeconds: 604800 });
 
 vendorPostSchema.statics.findBySchool = function (school) {
   return this.find({ school })
     .populate(
       "vendorId",
-      "businessName fullName whatsAppNumber phoneNumber username profilePic"
+      "businessName fullName whatsAppNumber phoneNumber username profilePic",
     )
     .sort({ createdAt: -1 });
 };
