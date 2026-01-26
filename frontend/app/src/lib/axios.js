@@ -5,7 +5,7 @@ export const api = axios.create({
   baseURL:
     mode === "development"
       ? "http://localhost:8000"
-      : "https://shopydash-backend-v1.onrender.com",
+      : "https://vendora-7457.onrender.com",
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
