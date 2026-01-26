@@ -13,7 +13,7 @@ const VerificationToken = require("../../models/verificationToken.model");
 const googleAuth = asyncErrorHandler(async (req, res, next) => {
   const { token } = req.body;
   const response = await fetch(
-    "https:
+    "https://www.googleapis.com/oauth2/v3/userinfo",
     {
       headers: { Authorization: `Bearer ${token}` },
     },
@@ -67,7 +67,6 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
     area,
   } = req.body;
 
-  
   const user = await User.findById(userId).select("+password");
 
   if (!user) {
@@ -75,33 +74,20 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
     return next(err);
   }
 
-  
   const missingFields = [];
 
-  
   if (!schoolName) missingFields.push("schoolName");
   if (!whatsAppNumber) missingFields.push("whatsAppNumber");
   if (!state) missingFields.push("state");
   if (!city) missingFields.push("city");
   if (!country) missingFields.push("country");
 
-  
   if (role === "vendor" && !businessName && !user.businessName)
     missingFields.push("businessName");
 
-  
   if (!user.username && !username) missingFields.push("username");
   if (!user.phoneNumber && !phoneNumber) missingFields.push("phoneNumber");
   if ((!user.password || user.isGoogleAuth) && !password) {
-    
-    
-    
-    
-    
-    
-    
-    
-    
   }
 
   if (missingFields.length > 0) {
@@ -112,7 +98,6 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
     return next(err);
   }
 
-  
   if (username && username !== user.username) {
     const existingUser = await User.findOne({ username }).select("_id").lean();
     if (existingUser && existingUser._id.toString() !== userId.toString()) {
@@ -126,7 +111,7 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
   if (phoneNumber) user.phoneNumber = phoneNumber;
   if (schoolName) user.schoolName = schoolName;
   if (whatsAppNumber) user.whatsAppNumber = whatsAppNumber;
-  if (password) user.password = password; 
+  if (password) user.password = password;
   if (businessName) user.businessName = businessName;
   if (schoolId) user.schoolId = schoolId;
 
@@ -134,7 +119,6 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
   user.city = city || user.city;
   user.country = country || user.country;
 
-  
   user.schoolArea = schoolArea || area || user.schoolArea;
   user.area = area || schoolArea || user.area;
 
@@ -148,7 +132,6 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
 const signup = asyncErrorHandler(async (req, res, next) => {
   const { fullName, username, email, phoneNumber, password, role } = req.body;
 
-  
   if (!fullName || !username || !email || !phoneNumber || !password || !role) {
     const err = new customError(
       "All fields are required (FullName, Username, Email, Phone, Password, Role)",
@@ -177,7 +160,7 @@ const signup = asyncErrorHandler(async (req, res, next) => {
 
     const user = await User.create({
       ...req.body,
-      profileComplete: false, 
+      profileComplete: false,
       isVerified: true,
     });
 
@@ -221,14 +204,6 @@ const login = asyncErrorHandler(async (req, res, next) => {
     const err = new customError("Invalid credentials", 401);
     return next(err);
   }
-
-  
-  
-  
-  
-  
-  
-  
 
   const isPasswordMatch = await user.comparePassword(password);
   if (!isPasswordMatch) {

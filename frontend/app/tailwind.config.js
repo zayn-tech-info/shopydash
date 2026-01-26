@@ -1,18 +1,17 @@
-
 import { fontFamily } from "tailwindcss/defaultTheme";
 import plugin from "tailwindcss/plugin";
 
 export default {
-  content: ["./index.html", "./src*.{js,ts,jsx,tsx}"],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       colors: {
         primary: {
-          1: "#FFA8B8", 
-          2: "#FF8050", 
-          3: "#F7561B", 
-          4: "#C53500", 
-          5: "#8F2700", 
+          1: "#FFA8B8",
+          2: "#FF8050",
+          3: "#F7561B",
+          4: "#C53500",
+          5: "#8F2700",
         },
         stroke: {
           1: "#26242C",

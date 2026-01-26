@@ -62,7 +62,7 @@ export function Hero() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-8">
               <a
-                href="https:
+                href="https://app.shopydash.com/signup"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-full shadow-orange-200 shadow-xl font-bold text-lg transition-all transform hover:-translate-y-1 text-center"
@@ -70,7 +70,7 @@ export function Hero() {
                 Start Selling
               </a>
               <a
-                href="https:
+                href="https://app.shopydash.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full sm:w-auto px-8 py-4 bg-white text-gray-900 border-2 border-gray-100 hover:border-orange-100 hover:bg-orange-50 rounded-full font-bold text-lg transition-all shadow-sm hover:shadow-md text-center"
@@ -81,7 +81,7 @@ export function Hero() {
 
             <div className="flex items-center justify-center lg:justify-start">
               <a
-                href="https:
+                href="https://chat.whatsapp.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group flex items-center gap-3 text-gray-600 hover:text-orange-600 transition-colors font-medium"

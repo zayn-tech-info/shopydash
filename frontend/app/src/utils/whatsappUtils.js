@@ -3,7 +3,7 @@ export const generateWhatsAppMessage = (
   items,
   total,
   authUser,
-  userProfile
+  userProfile,
 ) => {
   const userName = authUser?.fullName || authUser?.username || "A Customer";
   const userPhone = authUser?.phoneNumber || "";
@@ -48,12 +48,11 @@ export const openWhatsApp = (vendor, items, total, authUser, userProfile) => {
     items,
     total,
     authUser,
-    userProfile
+    userProfile,
   );
 
-  
   const cleanPhone = vendor.whatsAppNumber.replace(/[^\d+]/g, "");
   const encodedMessage = encodeURIComponent(message);
 
-  window.open(`https:
+  window.open(`https://wa.me/${cleanPhone}?text=${encodedMessage}`, "_blank");
 };

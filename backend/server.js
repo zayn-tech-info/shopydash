@@ -22,11 +22,12 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: [
-      "http:
-      "https:
-      "https:
-      "https:
-      "https:
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "https://shopydash-v1.vercel.app",
+      "https://app.shopydash.com",
+      "https://shopydash.com",
+      "https://www.shopydash.com",
     ],
     methods: ["GET", "POST"],
     credentials: true,
@@ -100,7 +101,7 @@ io.on("connection", (socket) => {
       }
 
       const isParticipant = conversation.participants.some(
-        (p) => p.toString() === socket.userId
+        (p) => p.toString() === socket.userId,
       );
 
       if (!isParticipant) {
@@ -111,7 +112,7 @@ io.on("connection", (socket) => {
       socket.join(conversationId);
       logInfo(
         "Socket",
-        `User ${socket.userId} joined chat room ${conversationId}`
+        `User ${socket.userId} joined chat room ${conversationId}`,
       );
     } catch (error) {
       logError("Socket", `Error joining chat: ${error.message}`);
@@ -143,7 +144,7 @@ io.on("connection", (socket) => {
       }
 
       const isParticipant = conversation.participants.some(
-        (p) => p.toString() === userId
+        (p) => p.toString() === userId,
       );
 
       if (!isParticipant) {
@@ -201,7 +202,6 @@ io.on("connection", (socket) => {
   });
 });
 
-
 cron.schedule("*/5 * * * *", () => {
   const backendUrl = process.env.BACKEND_URL;
   if (!backendUrl) {
@@ -212,14 +212,12 @@ cron.schedule("*/5 * * * *", () => {
   const protocol = backendUrl.startsWith("https") ? https : http;
 
   protocol
-    .get(`${backendUrl}/health`, (res) => {
-      
-    })
+    .get(`${backendUrl}/health`, (res) => {})
     .on("error", (err) => {
       console.error(`Self-ping failed: ${err.message}`);
     });
 });
 
 server.listen(PORT, () => {
-  console.log(`Server running on http:
+  console.log(`Server running on http://localhost:${PORT}`);
 });

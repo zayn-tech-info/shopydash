@@ -10,14 +10,14 @@ import { ChevronDown, Check } from "lucide-react";
 export default function CreateClientProfile() {
   const navigate = useNavigate();
   const clientProfileData = useClientProfileStore(
-    (state) => state.clientProfileData
+    (state) => state.clientProfileData,
   );
   const setInputField = useClientProfileStore((state) => state.setInputField);
   const resetInputField = useClientProfileStore(
-    (state) => state.resetInputField
+    (state) => state.resetInputField,
   );
   const createClientProfile = useClientProfileStore(
-    (state) => state.createClientProfile
+    (state) => state.createClientProfile,
   );
   const { authUser, updateUser } = useAuthStore();
   const loading = useClientProfileStore((state) => state.loading);
@@ -90,7 +90,7 @@ export default function CreateClientProfile() {
                       key={category}
                       className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
                         (clientProfileData.preferredCategory || []).includes(
-                          category
+                          category,
                         )
                           ? "border-primary-3 bg-primary-3/5"
                           : "border-n-3 hover:border-n-4 bg-white"
@@ -170,7 +170,7 @@ export default function CreateClientProfile() {
                 <>
                   <svg
                     className="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
-                    xmlns="http:
+                    xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
                   >

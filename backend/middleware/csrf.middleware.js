@@ -6,11 +6,12 @@ const csrfProtection = (req, res, next) => {
   }
 
   const allowedOrigins = [
-    "http:
-    "https:
-    "https:
-    "https:
-    "https:
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "https://shopydash-v1.vercel.app",
+    "https://app.shopydash.com",
+    "https://shopydash.com",
+    "https://www.shopydash.com",
   ];
 
   const origin = req.get("origin") || req.get("referer");
@@ -21,13 +22,13 @@ const csrfProtection = (req, res, next) => {
 
   if (!hasCustomHeader && origin) {
     const isValidOrigin = allowedOrigins.some((allowed) =>
-      origin?.startsWith(allowed)
+      origin?.startsWith(allowed),
     );
 
     if (!isValidOrigin) {
       const err = new customError(
         "Invalid request origin - CSRF protection",
-        403
+        403,
       );
       return next(err);
     }

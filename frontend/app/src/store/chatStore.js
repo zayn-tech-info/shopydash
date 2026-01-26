@@ -5,7 +5,7 @@ import { toast } from "react-hot-toast";
 import { useAuthStore } from "./authStore";
 import DOMPurify from "isomorphic-dompurify";
 
-const ENDPOINT = "https:
+const ENDPOINT = "http://localhost:8000";
 
 const getToken = () => {
   const cookies = document.cookie.split(";");
@@ -35,7 +35,7 @@ const useChatStore = create((set, get) => ({
       "Attempting socket connection to:",
       ENDPOINT,
       "with token:",
-      token ? "Found" : "Missing"
+      token ? "Found" : "Missing",
     );
     if (!token) {
       console.error("No authentication token found for socket connection");
@@ -108,7 +108,7 @@ const useChatStore = create((set, get) => ({
       });
 
       updatedConversations.sort(
-        (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+        (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt),
       );
       set({ conversations: updatedConversations });
     });
@@ -145,7 +145,7 @@ const useChatStore = create((set, get) => ({
   addConversation: (conversation) => {
     set((state) => {
       const exists = state.conversations.find(
-        (c) => c._id === conversation._id
+        (c) => c._id === conversation._id,
       );
       if (exists) return state;
       return { conversations: [conversation, ...state.conversations] };
@@ -157,7 +157,7 @@ const useChatStore = create((set, get) => ({
     try {
       const res = await axios.get(
         `${ENDPOINT}/api/v1/messages/${conversationId}`,
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       const { conversations, activeConversation: currentActive } = get();
@@ -217,7 +217,7 @@ const useChatStore = create((set, get) => ({
       const res = await axios.post(
         `${ENDPOINT}/api/v1/messages/check-access`,
         { recipientId },
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       if (res.data.action === "REDIRECT_WHATSAPP") {
@@ -254,7 +254,7 @@ const useChatStore = create((set, get) => ({
           content: content.trim(),
           replyTo,
         },
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       const newMessage = res.data.data.message;
@@ -288,7 +288,7 @@ const useChatStore = create((set, get) => ({
         `${ENDPOINT}/api/v1/messages/available-vendors`,
         {
           withCredentials: true,
-        }
+        },
       );
       set({ availableVendors: res.data.data.vendors });
       return res.data.data.vendors;

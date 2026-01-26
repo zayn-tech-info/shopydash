@@ -40,13 +40,12 @@ const ChatWindow = ({ onBack }) => {
   const handleSend = async (e) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
-    
-    
+
     if (newMessage.length > 2000) {
-      toast.error('Message is too long (max 2000 characters)');
+      toast.error("Message is too long (max 2000 characters)");
       return;
     }
-    
+
     await sendMessage(newMessage);
     setNewMessage("");
   };
@@ -63,7 +62,7 @@ const ChatWindow = ({ onBack }) => {
             src={
               otherUser.profilePic ||
               otherUser.logo ||
-              "https:
+              "https://avatar.iran.liara.run/public"
             }
             alt={otherUser.fullName}
             className="w-10 h-10 rounded-full object-cover"
@@ -82,11 +81,9 @@ const ChatWindow = ({ onBack }) => {
       </div>
 
       {}
-      <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-[url('https:
-        {}
-
+      <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-[#e5ddd5] opacity-90">
         {messages.map((msg, idx) => {
-          const isMe = msg.sender._id === user._id || msg.sender === user._id; 
+          const isMe = msg.sender._id === user._id || msg.sender === user._id;
 
           const currentDate = new Date(msg.createdAt);
           const previousMessage = messages[idx - 1];
@@ -111,8 +108,8 @@ const ChatWindow = ({ onBack }) => {
                     {isToday(currentDate)
                       ? "Today"
                       : isYesterday(currentDate)
-                      ? "Yesterday"
-                      : format(currentDate, "MMMM d, yyyy")}
+                        ? "Yesterday"
+                        : format(currentDate, "MMMM d, yyyy")}
                   </span>
                 </div>
               )}

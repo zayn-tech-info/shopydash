@@ -4,8 +4,8 @@ const mode = import.meta.env.MODE;
 export const api = axios.create({
   baseURL:
     mode === "development"
-      ? "http:
-      : "https:
+      ? "http://localhost:8000"
+      : "https://shopydash-backend-v1.onrender.com",
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",

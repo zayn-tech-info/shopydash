@@ -39,8 +39,8 @@ const paystackRequest = (endpoint, method, body = null) => {
             reject(
               new Error(
                 parsedData.message ||
-                  `Request failed with status ${res.statusCode}`
-              )
+                  `Request failed with status ${res.statusCode}`,
+              ),
             );
           }
         } catch (e) {
@@ -71,7 +71,7 @@ const initializePayment = async (req, res) => {
     }
 
     const planKey = Object.keys(plans).find(
-      (key) => plans[key].slug === planSlug
+      (key) => plans[key].slug === planSlug,
     );
     const plan = plans[planKey];
 
@@ -82,7 +82,7 @@ const initializePayment = async (req, res) => {
     const amountInKobo = plan.price * 100;
 
     const baseUrl =
-      req.headers.origin || process.env.CLIENT_URL || "http:
+      req.headers.origin || process.env.CLIENT_URL || "http://localhost:5173";
     const callbackUrl = `${baseUrl}/pricing`;
 
     const paystackResponse = await paystackRequest(
@@ -98,7 +98,7 @@ const initializePayment = async (req, res) => {
           planKey: planKey,
           planName: plan.name,
         },
-      }
+      },
     );
 
     if (!paystackResponse.status) {
@@ -146,14 +146,11 @@ const createSubaccount = async (req, res) => {
       return res.status(404).json({ message: "Vendor profile not found" });
     }
 
-    
-    
-    
     let resolvedAccountName;
     try {
       const resolveResponse = await paystackRequest(
         `/bank/resolve?account_number=${account_number}&bank_code=${settlement_bank}`,
-        "GET"
+        "GET",
       );
       if (!resolveResponse.status || !resolveResponse.data) {
         throw new Error("Could not verify account identity");
@@ -166,11 +163,8 @@ const createSubaccount = async (req, res) => {
       });
     }
 
-    
-    
-    
     const paystackResponse = await paystackRequest("/subaccount", "POST", {
-      business_name: resolvedAccountName, 
+      business_name: resolvedAccountName,
       settlement_bank,
       account_number,
       percentage_charge: 5,
@@ -190,8 +184,6 @@ const createSubaccount = async (req, res) => {
       subaccountCode: paystackResponse.data.subaccount_code,
     };
 
-    
-    
     if (paystackResponse.data.active) {
       vendor.kycStatus = "verified";
     } else {
@@ -269,7 +261,7 @@ const initializeOrderPayment = async (req, res) => {
 
       const vendorTotal = items.reduce(
         (sum, i) => sum + i.price * i.quantity,
-        0
+        0,
       );
       const platformFee = vendorTotal * 0.05;
       const vendorAmount = vendorTotal - platformFee;
@@ -291,7 +283,7 @@ const initializeOrderPayment = async (req, res) => {
     }
 
     const baseUrl =
-      req.headers.origin || process.env.CLIENT_URL || "http:
+      req.headers.origin || process.env.CLIENT_URL || "http://localhost:5173";
     const callbackUrl = `${baseUrl}/order/confirmation`;
 
     const paystackResponse = await paystackRequest(
@@ -311,7 +303,7 @@ const initializeOrderPayment = async (req, res) => {
             { display_name: "Order Ref", value: checkoutReference },
           ],
         },
-      }
+      },
     );
 
     if (!paystackResponse.status) {
@@ -409,7 +401,7 @@ const handleSubscriptionSuccess = async (data) => {
       amount: amount / 100,
       paystackReference: reference,
     },
-    { upsert: true, new: true }
+    { upsert: true, new: true },
   );
 
   await User.findByIdAndUpdate(userId, {
@@ -425,7 +417,6 @@ const handleOrderSuccess = async (data, io) => {
   if (metadata.type === "cart_purchase") {
     const orderIds = metadata.orderIds;
     if (orderIds && orderIds.length > 0) {
-      
       const ordersToUpdate = await Order.find({
         _id: { $in: orderIds },
         paymentStatus: { $ne: "paid" },
@@ -434,10 +425,9 @@ const handleOrderSuccess = async (data, io) => {
       if (ordersToUpdate.length > 0) {
         await Order.updateMany(
           { _id: { $in: ordersToUpdate.map((o) => o._id) } },
-          { paymentStatus: "paid", payoutStatus: "held" }
+          { paymentStatus: "paid", payoutStatus: "held" },
         );
 
-        
         for (const order of ordersToUpdate) {
           await processOrderNotifications(order._id, io);
         }
@@ -485,7 +475,7 @@ const verifyPayment = async (req, res) => {
 
     const paystackResponse = await paystackRequest(
       `/transaction/verify/${reference}`,
-      "GET"
+      "GET",
     );
 
     if (paystackResponse.status && paystackResponse.data.status === "success") {
@@ -498,7 +488,7 @@ const verifyPayment = async (req, res) => {
         if (ordersToUpdate.length > 0) {
           await Order.updateMany(
             { _id: { $in: ordersToUpdate.map((o) => o._id) } },
-            { paymentStatus: "paid", payoutStatus: "held" }
+            { paymentStatus: "paid", payoutStatus: "held" },
           );
 
           const io = req.app.get("io");
@@ -525,7 +515,7 @@ const verifyPayment = async (req, res) => {
 
       if (!planKey && planNameFromPaystack) {
         planKey = Object.keys(plans).find(
-          (key) => plans[key].name === planNameFromPaystack
+          (key) => plans[key].name === planNameFromPaystack,
         );
       }
 
@@ -546,7 +536,7 @@ const verifyPayment = async (req, res) => {
             amount: amount / 100,
             paystackReference: reference,
           },
-          { upsert: true, new: true }
+          { upsert: true, new: true },
         );
 
         await User.findByIdAndUpdate(transaction.user, {
@@ -599,7 +589,7 @@ const resolveAccountNumber = async (req, res) => {
 
     const response = await paystackRequest(
       `/bank/resolve?account_number=${account_number}&bank_code=${bank_code}`,
-      "GET"
+      "GET",
     );
 
     res.status(200).json({ success: true, data: response.data });

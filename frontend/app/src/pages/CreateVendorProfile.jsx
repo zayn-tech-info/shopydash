@@ -11,16 +11,16 @@ export default function CreateVendorProfile() {
   const navigate = useNavigate();
   const profileData = useVendorProfileStore((state) => state.profileData);
   const setProfileField = useVendorProfileStore(
-    (state) => state.setProfileField
+    (state) => state.setProfileField,
   );
   const resetProfileData = useVendorProfileStore(
-    (state) => state.resetProfileData
+    (state) => state.resetProfileData,
   );
   const createVendorProfile = useVendorProfileStore(
-    (state) => state.createVendorProfile
+    (state) => state.createVendorProfile,
   );
   const isCreatingProfile = useVendorProfileStore(
-    (state) => state.isCreatingProfile
+    (state) => state.isCreatingProfile,
   );
   const { updateUser, authUser } = useAuthStore();
 
@@ -112,7 +112,7 @@ export default function CreateVendorProfile() {
                         type="checkbox"
                         className="peer sr-only"
                         checked={(profileData.businessCategory || []).includes(
-                          category
+                          category,
                         )}
                         onChange={(e) => {
                           const current = profileData.businessCategory || [];
@@ -216,7 +216,7 @@ export default function CreateVendorProfile() {
                 <>
                   <svg
                     className="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
-                    xmlns="http:
+                    xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
                   >

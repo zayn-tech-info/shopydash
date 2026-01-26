@@ -266,10 +266,9 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
     excludedIds = [],
   } = req.query;
 
-  
-  const totalLimit = Math.min(parseInt(limit), 50); 
+  const totalLimit = Math.min(parseInt(limit), 50);
   const premiumConfig = {
-    targetRatio: 0.7, 
+    targetRatio: 0.7,
     get count() {
       return Math.round(totalLimit * this.targetRatio);
     },
@@ -280,7 +279,6 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
   if (school) baseMatch.school = school;
   if (area) baseMatch.area = createSafeRegex(area);
 
-  
   let excludeArray = [];
   if (excludedIds) {
     if (Array.isArray(excludedIds)) excludeArray = excludedIds;
@@ -288,23 +286,15 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
       excludeArray = excludedIds.split(",");
   }
 
-  
-  
-  
-
-  
   const buildPipeline = (isPremium) => {
     const pipe = [];
 
-    
     if (Object.keys(baseMatch).length > 0) {
       pipe.push({ $match: baseMatch });
     }
 
-    
     pipe.push({ $unwind: "$products" });
 
-    
     if (search) {
       pipe.push({
         $match: {
@@ -313,7 +303,6 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
       });
     }
 
-    
     if (excludeArray.length > 0) {
       const objectIds = excludeArray
         .map((id) => {
@@ -334,7 +323,6 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
       }
     }
 
-    
     pipe.push({
       $lookup: {
         from: "subscriptions",
@@ -360,7 +348,6 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
       $addFields: { subscription: { $arrayElemAt: ["$subscription", 0] } },
     });
 
-    
     const premiumPlans = ["Shopydash Max", "Shopydash Pro", "Shopydash Boost"];
     if (isPremium) {
       pipe.push({
@@ -368,10 +355,7 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
           "subscription.plan": { $in: premiumPlans },
         },
       });
-      
-      
-      
-      
+
       pipe.push({
         $addFields: {
           planWeight: {
@@ -405,10 +389,8 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
       pipe.push({ $sort: { createdAt: -1 } });
     }
 
-    
     pipe.push({ $limit: isPremium ? premiumConfig.count : standardCount });
 
-    
     pipe.push({
       $lookup: {
         from: "users",
@@ -421,7 +403,6 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
       $unwind: { path: "$vendor", preserveNullAndEmptyArrays: true },
     });
 
-    
     pipe.push({
       $project: {
         _id: "$products._id",
@@ -436,7 +417,7 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
         school: "$school",
         area: "$area",
         location: "$location",
-        isBoosted: isPremium, 
+        isBoosted: isPremium,
         vendor: {
           _id: "$vendor._id",
           businessName: "$vendor.businessName",
@@ -458,27 +439,10 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
     VendorPost.aggregate(buildPipeline(false)),
   ]);
 
-  
-  
-  
-  
-  
-  
-
   const merged = [];
   const maxLen = Math.max(premiumPosts.length, standardPosts.length);
 
-  
-  
-  
-  
-  
-
   const products = [...premiumPosts, ...standardPosts];
-
-  
-  
-  
 
   res.status(200).json({
     success: true,
@@ -486,8 +450,8 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
       products,
       page: parseInt(page),
       limit: parseInt(limit),
-      
-      hasMore: products.length >= parseInt(limit), 
+
+      hasMore: products.length >= parseInt(limit),
     },
   });
 });
@@ -497,13 +461,10 @@ const getFreshProducts = asyncErrorHandler(async (req, res, next) => {
   const pageLimit = Math.min(parseInt(limit), 20);
 
   const pipeline = [
- 
     { $sort: { createdAt: -1 } },
 
-   
     { $unwind: "$products" },
 
-    
     {
       $lookup: {
         from: "vendorprofiles",
@@ -518,7 +479,7 @@ const getFreshProducts = asyncErrorHandler(async (req, res, next) => {
         preserveNullAndEmptyArrays: true,
       },
     },
- 
+
     {
       $lookup: {
         from: "users",
@@ -534,10 +495,9 @@ const getFreshProducts = asyncErrorHandler(async (req, res, next) => {
       },
     },
 
-    
     { $sort: { createdAt: -1 } },
     { $limit: pageLimit },
- 
+
     {
       $project: {
         _id: "$products._id",

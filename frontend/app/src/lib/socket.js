@@ -11,7 +11,7 @@ class SocketService {
       return this.socket;
     }
 
-    const serverUrl = "https:
+    const serverUrl = "http://localhost:8000";
 
     this.socket = io(serverUrl, {
       auth: {

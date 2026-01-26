@@ -29,11 +29,12 @@ app.set("trust proxy", 1);
 
 const mode = process.env.NODE_ENV || "development";
 const allowedOrigins = [
-  "http:
-  "https:
-  "https:
-  "https:
-  "https:
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "https://app.shopydash.com",
+  "https://shopydash.com",
+  "https://www.shopydash.com",
+  "https://shopydash-v1.vercel.app",
 ];
 
 app.use(
@@ -46,7 +47,7 @@ app.use(
       }
     },
     credentials: true,
-  })
+  }),
 );
 
 app.use(securityHeaders);
@@ -75,7 +76,7 @@ app.get("/health", (req, res) => {
 
 app.all(/(.*)/, (req, res, next) => {
   const err = new customError(
-    `Could not find ${req.originalUrl} on the server`
+    `Could not find ${req.originalUrl} on the server`,
   );
   next(err);
 });

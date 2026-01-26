@@ -17,7 +17,7 @@ export default function VendorSidebar({
   onLogout,
 }) {
   const updateVendorProfile = useVendorProfileStore(
-    (state) => state.updateVendorProfile
+    (state) => state.updateVendorProfile,
   );
   const updateProfile = useAuthStore((state) => state.updateProfile);
   const getProfile = useVendorProfileStore((state) => state.getProfile);
@@ -85,7 +85,7 @@ export default function VendorSidebar({
   const handleContinueToWhatsapp = () => {
     if (whatsappNumber) {
       const formattedNumber = whatsappNumber.replace(/\D/g, "");
-      window.open(`https:
+      window.open(`https://wa.me/${formattedNumber}`, "_blank");
     } else {
       toast.error("Vendor WhatsApp not available");
     }

@@ -13,7 +13,7 @@ const ConversationList = ({ onSelect }) => {
     fetchAvailableVendors,
     availableVendors,
     checkAccess,
-    addConversation, 
+    addConversation,
   } = useChatStore();
   const { authUser: user } = useAuthStore();
   const [isNewChat, setIsNewChat] = React.useState(false);
@@ -36,10 +36,9 @@ const ConversationList = ({ onSelect }) => {
   const handleStartChat = async (recipientId) => {
     const access = await checkAccess(recipientId);
     if (access.allowed && access.conversation) {
-      addConversation(access.conversation); 
+      addConversation(access.conversation);
       onSelect(access.conversation._id);
       setIsNewChat(false);
-      
     }
   };
 
@@ -73,7 +72,6 @@ const ConversationList = ({ onSelect }) => {
       {}
       <div className="flex-1 overflow-y-auto">
         {isNewChat ? (
-          
           <div className="space-y-1">
             {availableVendors.length === 0 ? (
               <div className="p-4 text-center text-gray-500">
@@ -90,7 +88,7 @@ const ConversationList = ({ onSelect }) => {
                     <img
                       src={
                         vendor.profilePic ||
-                        "https:
+                        "https://avatar.iran.liara.run/public"
                       }
                       alt={vendor.businessName || vendor.fullName}
                       className="w-12 h-12 rounded-full object-cover border border-gray-100"
@@ -114,7 +112,6 @@ const ConversationList = ({ onSelect }) => {
             )}
           </div>
         ) : (
-          
           <>
             {isLoading && conversations.length === 0 ? (
               <div className="p-4 text-center text-gray-500">
@@ -144,7 +141,7 @@ const ConversationList = ({ onSelect }) => {
                         src={
                           otherUser.profilePic ||
                           otherUser.logo ||
-                          "https:
+                          "https://avatar.iran.liara.run/public"
                         }
                         alt={otherUser.fullName}
                         className="w-12 h-12 rounded-full object-cover border border-gray-100"

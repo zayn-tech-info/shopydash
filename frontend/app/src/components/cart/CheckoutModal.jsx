@@ -65,7 +65,7 @@ ${address}
 Please confirm this order and provide payment details.`;
 
     const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https:
+    const whatsappUrl = `https://wa.me/${vendorPhone}?text=${encodedMessage}`;
 
     window.open(whatsappUrl, "_blank");
   };

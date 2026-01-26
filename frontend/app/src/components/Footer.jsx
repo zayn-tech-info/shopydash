@@ -15,12 +15,13 @@ export function Footer() {
                 The campus marketplace connecting students. Starting at LAUTECH.
               </p>
               <a
-                href="https:
+                href="https://chat.whatsapp.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 mt-4 text-orange-500"
               >
                 <MessageCircle className="w-5 h-5" />
+                
                 <span>WhatsApp Channel</span>
               </a>
             </div>

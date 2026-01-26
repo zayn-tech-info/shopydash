@@ -159,7 +159,7 @@ export function Pricing() {
                 </ul>
 
                 <a
-                  href="https:
+                  href="https://app.shopydash.com/signup"
                   target="_blank"
                   rel="noopener noreferrer"
                   className={`w-full py-4 px-6 rounded-xl font-bold text-base transition-all duration-300 shadow-lg transform active:scale-95 flex items-center justify-center cursor-pointer ${
