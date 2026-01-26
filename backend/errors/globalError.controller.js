@@ -56,7 +56,8 @@ const globalErrorHandler = (error, req, res, next) => {
     if (error.code === 11000) error = duplicateKeyErrorHandler(error);
     if (error.name === "ValidationError") error = validationErrorHandler(error);
     prodErrors(res, error);
-  } else if (process.env.NODE_ENV === "development") {
+  } else {
+    // Development mode or any other mode
     if (error.name === "ValidationError") error = validationErrorHandler(error);
     devErrors(res, error);
   }
