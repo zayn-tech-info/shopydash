@@ -14,7 +14,7 @@ const EmailVerificationBanner = () => {
 
   const handleVerifySuccess = () => {
     updateUser({ isVerified: true });
-    // Optionally refresh full user data
+    
     useAuthStore.getState().checkAuth();
   };
 

@@ -27,7 +27,7 @@ export function WalletSettings({ user }) {
             </h4>
             <div className="text-4xl font-bold font-code mb-4">
               ₦ {isVendor ? "0.00" : "0.00"}
-              {/* Placeholder for V1. Real data would come from store/API */}
+              {}
             </div>
 
             {isVendor && (

@@ -68,7 +68,7 @@ export function Navbar() {
           </nav>
           <div className="md:flex items-center gap-4 hidden">
             <a
-              href="https://app.shopydash.com/signup"
+              href="https:
               target="_blank"
               rel="noopener noreferrer"
               className="px-5 py-2.5 text-n-6 hover:text-orange-600 font-medium transition-colors duration-200 text-sm"
@@ -76,7 +76,7 @@ export function Navbar() {
               Sign Up
             </a>
             <a
-              href="https://app.shopydash.com"
+              href="https:
               target="_blank"
               rel="noopener noreferrer"
               className="px-6 py-2.5 bg-n-8 text-white rounded-full hover:bg-orange-500 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 font-bold text-sm"
@@ -116,7 +116,7 @@ export function Navbar() {
                 ))}
               <div className="flex flex-col gap-4 mt-8">
                 <a
-                  href="https://app.shopydash.com/signup"
+                  href="https:
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full py-4 text-center text-lg  text-black font-medium border border-n-8 rounded-xl"
@@ -124,7 +124,7 @@ export function Navbar() {
                   Sign Up
                 </a>
                 <a
-                  href="https://app.shopydash.com"
+                  href="https:
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full py-4 text-center text-lg font-bold bg-n-8 text-white rounded-xl shadow-lg"

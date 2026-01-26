@@ -11,7 +11,7 @@ class SocketService {
       return this.socket;
     }
 
-    const serverUrl = "https://vendora-7457.onrender.com";
+    const serverUrl = "https:
 
     this.socket = io(serverUrl, {
       auth: {

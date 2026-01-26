@@ -13,7 +13,7 @@ export function Features() {
   return (
     <div>
       <section id="features" className="bg-n-1 py-24 relative overflow-hidden">
-        {/* Background Decoration */}
+        {}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
           <div className="absolute -top-[20%] -right-[10%] w-[700px] h-[700px] bg-orange-50/50 rounded-full blur-3xl opacity-60" />
           <div className="absolute bottom-[10%] -left-[10%] w-[500px] h-[500px] bg-blue-50/50 rounded-full blur-3xl opacity-60" />

@@ -82,7 +82,7 @@ const initializePayment = async (req, res) => {
     const amountInKobo = plan.price * 100;
 
     const baseUrl =
-      req.headers.origin || process.env.CLIENT_URL || "http://localhost:5173";
+      req.headers.origin || process.env.CLIENT_URL || "http:
     const callbackUrl = `${baseUrl}/pricing`;
 
     const paystackResponse = await paystackRequest(
@@ -146,9 +146,9 @@ const createSubaccount = async (req, res) => {
       return res.status(404).json({ message: "Vendor profile not found" });
     }
 
-    // 1. Server-Side Identity Verification (The "Shadow KYC")
-    // We resolve the account number again to ensure the name matches the legal bank owner.
-    // This prevents frontend manipulation and ensures we only onboard the REAL bank account owner.
+    
+    
+    
     let resolvedAccountName;
     try {
       const resolveResponse = await paystackRequest(
@@ -166,11 +166,11 @@ const createSubaccount = async (req, res) => {
       });
     }
 
-    // 2. Create Paystack Subaccount using the VERIFIED IDENTITY
-    // We strictly use the 'resolvedAccountName' as the 'business_name'.
-    // This guarantees that the subaccount is created for the Legal Identity attached to the BVN.
+    
+    
+    
     const paystackResponse = await paystackRequest("/subaccount", "POST", {
-      business_name: resolvedAccountName, // FORCE the legal bank name
+      business_name: resolvedAccountName, 
       settlement_bank,
       account_number,
       percentage_charge: 5,
@@ -190,8 +190,8 @@ const createSubaccount = async (req, res) => {
       subaccountCode: paystackResponse.data.subaccount_code,
     };
 
-    // Determine KYC status based on Paystack response
-    // For specific subaccount types, active=true usually means verified
+    
+    
     if (paystackResponse.data.active) {
       vendor.kycStatus = "verified";
     } else {
@@ -291,7 +291,7 @@ const initializeOrderPayment = async (req, res) => {
     }
 
     const baseUrl =
-      req.headers.origin || process.env.CLIENT_URL || "http://localhost:5173";
+      req.headers.origin || process.env.CLIENT_URL || "http:
     const callbackUrl = `${baseUrl}/order/confirmation`;
 
     const paystackResponse = await paystackRequest(
@@ -425,7 +425,7 @@ const handleOrderSuccess = async (data, io) => {
   if (metadata.type === "cart_purchase") {
     const orderIds = metadata.orderIds;
     if (orderIds && orderIds.length > 0) {
-      // Find orders that are not yet paid to avoid duplicate notifications
+      
       const ordersToUpdate = await Order.find({
         _id: { $in: orderIds },
         paymentStatus: { $ne: "paid" },
@@ -437,7 +437,7 @@ const handleOrderSuccess = async (data, io) => {
           { paymentStatus: "paid", payoutStatus: "held" }
         );
 
-        // Trigger notifications for each updated order
+        
         for (const order of ordersToUpdate) {
           await processOrderNotifications(order._id, io);
         }

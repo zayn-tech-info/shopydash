@@ -14,12 +14,12 @@ export function FeedSkeleton() {
             key={index}
             className="bg-white border border-n-3/20 rounded-xl p-3 flex flex-col gap-3 h-full"
           >
-            {/* Image Skeleton */}
+            {}
             <div className="w-full aspect-square rounded-lg overflow-hidden">
               <Skeleton variant="rectangular" width="100%" height="100%" />
             </div>
 
-            {/* Content Skeleton */}
+            {}
             <div className="flex-1 flex flex-col gap-2">
               <Skeleton variant="text" width="90%" height={20} />
               <Skeleton variant="text" width="40%" height={24} />

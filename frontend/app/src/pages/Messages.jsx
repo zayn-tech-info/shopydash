@@ -12,7 +12,7 @@ const MessagesPage = () => {
   const [showChatOnMobile, setShowChatOnMobile] = useState(false);
 
   useEffect(() => {
-    // Socket connection is now handled globally in App.jsx
+    
   }, []);
 
   useEffect(() => {

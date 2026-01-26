@@ -19,7 +19,7 @@ export function BusinessProfile({ user }) {
     storeDescription: "",
     phoneNumber: "",
     businessCategory: "",
-    // Add other fields if needed
+    
   });
 
   useEffect(() => {

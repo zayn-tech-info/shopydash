@@ -6,14 +6,14 @@ const testimonials = [
     name: "Bisi",
     school: "LAUTECH",
     quote: "Shopydash helped me sell my sneakers in less than 24 hours!",
-    avatar: "https://i.pravatar.cc/80?img=5",
+    avatar: "https:
   },
   {
     id: "t-2",
     name: "Tobi",
     school: "UI",
     quote: "List, chat, and done. Super easy for campus sales.",
-    avatar: "https://i.pravatar.cc/80?img=12",
+    avatar: "https:
   },
   {
     id: "t-3",
@@ -21,14 +21,14 @@ const testimonials = [
     school: "UNN",
     quote:
       "I sold my old textbooks to juniors and saved money for the semester.",
-    avatar: "https://i.pravatar.cc/80?img=32",
+    avatar: "https:
   },
   {
     id: "t-4",
     name: "Ibrahim",
     school: "LASU",
     quote: "Great way to find legit sellers on campus—fast and safe.",
-    avatar: "https://i.pravatar.cc/80?img=18",
+    avatar: "https:
   },
 ];
 

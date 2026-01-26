@@ -20,12 +20,12 @@ export const useProductStore = create((set, get) => ({
   searchProducts: async (params, isLoadMore = false) => {
     const { searchResults, currentSearchPage } = get();
 
-    // For Load More, increment page. For new search, reset to 1.
+    
     const page = isLoadMore ? currentSearchPage + 1 : 1;
 
-    // If not load more, set searching true (full reload feeling).
-    // If load more, maybe a different loading state? Re-using isSearching for now or add isLoadingMore.
-    // User wants "Load More" button.
+    
+    
+    
 
     if (!isLoadMore) {
       set({
@@ -35,12 +35,12 @@ export const useProductStore = create((set, get) => ({
         currentSearchPage: 1,
       });
     } else {
-      // We might want a separate loading state for "appending"
-      // set({ isLoadingMore: true });
+      
+      
     }
 
     try {
-      // Build exclusion list from existing results to be safe
+      
       const existingIds = isLoadMore ? searchResults.map((p) => p._id) : [];
 
       const res = await api.get("/api/v1/post/search", {

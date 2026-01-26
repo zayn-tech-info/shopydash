@@ -117,8 +117,8 @@ export const useAuthStore = create((set) => ({
     } catch (err) {
       if (err.response && err.response.status === 401) {
         set({ authUser: null, isCheckingAuth: false });
-        // Don't remove token here yet, maybe session expired but let user try to login again or refresh?
-        // actually if 401, token is invalid.
+        
+        
         localStorage.removeItem("token");
         return null;
       }

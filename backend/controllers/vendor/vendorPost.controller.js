@@ -266,10 +266,10 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
     excludedIds = [],
   } = req.query;
 
-  // Limits
-  const totalLimit = Math.min(parseInt(limit), 50); // User asked for 35-50 products max initial
+  
+  const totalLimit = Math.min(parseInt(limit), 50); 
   const premiumConfig = {
-    targetRatio: 0.7, // 70%
+    targetRatio: 0.7, 
     get count() {
       return Math.round(totalLimit * this.targetRatio);
     },
@@ -280,7 +280,7 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
   if (school) baseMatch.school = school;
   if (area) baseMatch.area = createSafeRegex(area);
 
-  // Exclude already loaded IDs
+  
   let excludeArray = [];
   if (excludedIds) {
     if (Array.isArray(excludedIds)) excludeArray = excludedIds;
@@ -288,23 +288,23 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
       excludeArray = excludedIds.split(",");
   }
 
-  // Ensure we exclude IDs at the product level.
-  // Since vendorPost contains an array of products, filtering is complex.
-  // We unwind first, then match.
+  
+  
+  
 
-  // Helper to build pipeline
+  
   const buildPipeline = (isPremium) => {
     const pipe = [];
 
-    // 1. Match basics (VendorPost level)
+    
     if (Object.keys(baseMatch).length > 0) {
       pipe.push({ $match: baseMatch });
     }
 
-    // 2. Unwind products
+    
     pipe.push({ $unwind: "$products" });
 
-    // 3. Match Search in Products
+    
     if (search) {
       pipe.push({
         $match: {
@@ -313,7 +313,7 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
       });
     }
 
-    // 4. Exclude IDs (Product ID level)
+    
     if (excludeArray.length > 0) {
       const objectIds = excludeArray
         .map((id) => {
@@ -334,7 +334,7 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
       }
     }
 
-    // 5. Lookup Subscription
+    
     pipe.push({
       $lookup: {
         from: "subscriptions",
@@ -360,7 +360,7 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
       $addFields: { subscription: { $arrayElemAt: ["$subscription", 0] } },
     });
 
-    // 6. Filter by Plan Type
+    
     const premiumPlans = ["Shopydash Max", "Shopydash Pro", "Shopydash Boost"];
     if (isPremium) {
       pipe.push({
@@ -368,10 +368,10 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
           "subscription.plan": { $in: premiumPlans },
         },
       });
-      // Sort priority for premiums?
-      // User said "show them up... analytics should show them up".
-      // Let's sort by randomized weight or just recent?
-      // "Max" > "Pro" > "Boost".
+      
+      
+      
+      
       pipe.push({
         $addFields: {
           planWeight: {
@@ -405,10 +405,10 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
       pipe.push({ $sort: { createdAt: -1 } });
     }
 
-    // 7. Limit
+    
     pipe.push({ $limit: isPremium ? premiumConfig.count : standardCount });
 
-    // 8. Lookup Vendor Details
+    
     pipe.push({
       $lookup: {
         from: "users",
@@ -421,7 +421,7 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
       $unwind: { path: "$vendor", preserveNullAndEmptyArrays: true },
     });
 
-    // 9. Project
+    
     pipe.push({
       $project: {
         _id: "$products._id",
@@ -436,7 +436,7 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
         school: "$school",
         area: "$area",
         location: "$location",
-        isBoosted: isPremium, // or based on score
+        isBoosted: isPremium, 
         vendor: {
           _id: "$vendor._id",
           businessName: "$vendor.businessName",
@@ -458,27 +458,27 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
     VendorPost.aggregate(buildPipeline(false)),
   ]);
 
-  // Interleave logic: P, P, S, P, P, S... to maintain flow?
-  // Or just concat?
-  // User said "show up 70% in UI".
-  // A simple concat (Premium First) satisfies "Premium users show up".
-  // But strictly interleaving is better UI.
-  // Let's do simple chunks. 2 Premium, 1 Standard...
+  
+  
+  
+  
+  
+  
 
   const merged = [];
   const maxLen = Math.max(premiumPosts.length, standardPosts.length);
 
-  // Strategy: Fill with premium as much as possible, sprinkle standard.
-  // Actually, standard concat is fine if we fetched in ratio.
-  // But let's shuffle slightly to make it look "organic" if desired.
-  // For now, I will concat them to ensure Premiums are seeing their value (top of list).
-  // But wait, if I put all 35 premiums then 15 standards, the user sees mostly premium. That matches "70%".
+  
+  
+  
+  
+  
 
   const products = [...premiumPosts, ...standardPosts];
 
-  // Final safeguard: uniqueness?
-  // We used $nin excludedIds, so we are safe from provided duplicates.
-  // Within this batch? distinct IDs.
+  
+  
+  
 
   res.status(200).json({
     success: true,
@@ -486,8 +486,8 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
       products,
       page: parseInt(page),
       limit: parseInt(limit),
-      // No total pages calc here because dynamic mix implies infinite stream
-      hasMore: products.length >= parseInt(limit), // Approximate
+      
+      hasMore: products.length >= parseInt(limit), 
     },
   });
 });
@@ -503,7 +503,7 @@ const getFreshProducts = asyncErrorHandler(async (req, res, next) => {
    
     { $unwind: "$products" },
 
-    // 3. Lookup Vendor Profile
+    
     {
       $lookup: {
         from: "vendorprofiles",

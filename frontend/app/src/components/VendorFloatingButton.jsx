@@ -22,11 +22,11 @@ export const VendorFloatingButton = () => {
   }, 0);
 
   if (!authUser) return null;
-  // Don't show on specific pages if needed, but user requested "blank" (just icons) messages globally
-  // The original code hid it on /vendor/add. I'll keep that for the PLUS button part maybe?
-  // But for messages it should probably be visible?
-  // The user basically wants a persistent FAB.
-  // I'll keep it simple: Show always for now, maybe hide on /messages?
+  
+  
+  
+  
+  
   if (location.pathname === "/messages") return null;
 
   const isVendor = authUser.role === "vendor";

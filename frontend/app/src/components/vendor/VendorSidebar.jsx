@@ -85,7 +85,7 @@ export default function VendorSidebar({
   const handleContinueToWhatsapp = () => {
     if (whatsappNumber) {
       const formattedNumber = whatsappNumber.replace(/\D/g, "");
-      window.open(`https://wa.me/${formattedNumber}`, "_blank");
+      window.open(`https:
     } else {
       toast.error("Vendor WhatsApp not available");
     }

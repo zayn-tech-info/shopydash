@@ -5,9 +5,9 @@ import { Button } from "./Button";
 export function Hero() {
   return (
     <div className="relative overflow-hidden bg-white">
-      {/* Bold Geometric Patterns */}
+      {}
       <div className="absolute inset-0 overflow-hidden -z-10 bg-white">
-        {/* Diagonal Stripes Pattern */}
+        {}
         <div
           className="absolute top-0 right-0 w-[800px] h-[800px] bg-orange-50/40 rounded-full translate-x-1/3 -translate-y-1/4"
           style={{
@@ -16,7 +16,7 @@ export function Hero() {
           }}
         />
 
-        {/* Polka Dot Grid - Visible & Structured */}
+        {}
         <div
           className="absolute top-20 left-10 w-64 h-64 opacity-20"
           style={{
@@ -25,7 +25,7 @@ export function Hero() {
           }}
         />
 
-        {/* Large Architectural Arc */}
+        {}
         <svg
           className="absolute bottom-0 left-0 w-full md:w-2/3 h-[500px] text-orange-50 -z-20 transform translate-y-1/3"
           viewBox="0 0 1000 1000"
@@ -37,7 +37,7 @@ export function Hero() {
           />
         </svg>
 
-        {/* Abstract Floating Shapes - Solid & Clear */}
+        {}
         <div className="absolute top-1/4 left-0 w-32 h-32 bg-yellow-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob"></div>
         <div className="absolute top-1/4 right-0 w-32 h-32 bg-orange-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000"></div>
         <div className="absolute bottom-1/4 left-1/3 w-32 h-32 bg-pink-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-4000"></div>
@@ -45,7 +45,7 @@ export function Hero() {
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16 lg:py-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-12 lg:gap-20">
-          {/* Left: Text Content */}
+          {}
           <div className="text-center lg:text-left z-10">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-n-8 tracking-tight leading-tight mb-4 font-sora">
               Your Campus Marketplace for{" "}
@@ -62,7 +62,7 @@ export function Hero() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-8">
               <a
-                href="https://app.shopydash.com/signup"
+                href="https:
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-full shadow-orange-200 shadow-xl font-bold text-lg transition-all transform hover:-translate-y-1 text-center"
@@ -70,7 +70,7 @@ export function Hero() {
                 Start Selling
               </a>
               <a
-                href="https://app.shopydash.com"
+                href="https:
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full sm:w-auto px-8 py-4 bg-white text-gray-900 border-2 border-gray-100 hover:border-orange-100 hover:bg-orange-50 rounded-full font-bold text-lg transition-all shadow-sm hover:shadow-md text-center"
@@ -81,7 +81,7 @@ export function Hero() {
 
             <div className="flex items-center justify-center lg:justify-start">
               <a
-                href="https://chat.whatsapp.com/B8lvW4HByWuG45gZwdKtxZ?mode=wwt"
+                href="https:
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group flex items-center gap-3 text-gray-600 hover:text-orange-600 transition-colors font-medium"
@@ -94,18 +94,18 @@ export function Hero() {
             </div>
           </div>
 
-          {/* Right: Image & Decorations */}
+          {}
           <div className="relative order-first lg:order-last flex justify-center perspective-1000">
-            {/* Decorative Patterns */}
+            {}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] h-[140%] bg-[image:radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-orange-100/30 via-transparent to-transparent -z-20 pointer-events-none" />
 
-            {/* Orbiting Elements / Shapes */}
+            {}
             <div className="absolute inset-0 border border-orange-100 rounded-full scale-[1.2] animate-[spin_20s_linear_infinite_reverse] -z-10 pointer-events-none border-dashed opacity-60" />
             <div className="absolute inset-0 border border-orange-200/50 rounded-full scale-110 animate-[spin_15s_linear_infinite] -z-10 pointer-events-none" />
 
-            {/* Structured Geometric Accents */}
+            {}
 
-            {/* Solid Geometric Floaters */}
+            {}
             <div
               className="absolute top-0 right-0 w-20 h-20 border-4 border-orange-200 rounded-full opacity-40 animate-[bounce_6s_infinite]"
               style={{ animationDelay: "1s" }}
@@ -115,7 +115,7 @@ export function Hero() {
               style={{ animationDuration: "20s" }}
             ></div>
 
-            {/* Hexagon Pattern Element */}
+            {}
             <svg
               className="absolute top-1/2 -right-12 w-32 h-32 text-orange-100/60 -z-10"
               viewBox="0 0 100 100"
@@ -124,7 +124,7 @@ export function Hero() {
               <path d="M50 0 L93.3 25 L93.3 75 L50 100 L6.7 75 L6.7 25 Z" />
             </svg>
 
-            {/* Floating Glass Cards */}
+            {}
             <div className="absolute -top-8 -right-4 md:-right-8 w-20 h-20 bg-white/90 backdrop-blur-sm border border-white/50 rounded-2xl shadow-xl flex items-center justify-center animate-bounce z-20 hidden md:flex transform hover:scale-110 transition-transform">
               <span className="text-3xl filter drop-shadow-sm">🛍️</span>
             </div>

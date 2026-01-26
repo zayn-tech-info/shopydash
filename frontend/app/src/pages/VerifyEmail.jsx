@@ -26,7 +26,7 @@ export const VerifyEmail = () => {
   const handleChange = (index, value) => {
     const newCode = [...code];
 
-    // Handle pasted content
+    
     if (value.length > 1) {
       const pastedCode = value.slice(0, 6).split("");
       for (let i = 0; i < 6; i++) {
@@ -99,7 +99,7 @@ export const VerifyEmail = () => {
 
   return (
     <div className="min-h-screen bg-n-1 flex items-center justify-center px-4 py-12 relative overflow-hidden">
-      {/* Background Effects */}
+      {}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute -top-[20%] -right-[10%] w-[70%] h-[70%] rounded-full bg-primary-3/5 blur-[120px]" />
         <div className="absolute top-[40%] -left-[10%] w-[60%] h-[60%] rounded-full bg-primary-2/5 blur-[100px]" />

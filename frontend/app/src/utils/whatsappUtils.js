@@ -55,5 +55,5 @@ export const openWhatsApp = (vendor, items, total, authUser, userProfile) => {
   const cleanPhone = vendor.whatsAppNumber.replace(/[^\d+]/g, "");
   const encodedMessage = encodeURIComponent(message);
 
-  window.open(`https://wa.me/${cleanPhone}?text=${encodedMessage}`, "_blank");
+  window.open(`https:
 };

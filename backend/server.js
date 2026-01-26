@@ -22,11 +22,11 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: [
-      "http://localhost:5173",
-      "https://shopydash-v1.vercel.app",
-      "https://app.shopydash.com",
-      "https://shopydash.com",
-      "https://www.shopydash.com",
+      "http:
+      "https:
+      "https:
+      "https:
+      "https:
     ],
     methods: ["GET", "POST"],
     credentials: true,
@@ -201,7 +201,7 @@ io.on("connection", (socket) => {
   });
 });
 
-// Cron job to ping the server every 5 minutes to avoid Render spin-down
+
 cron.schedule("*/5 * * * *", () => {
   const backendUrl = process.env.BACKEND_URL;
   if (!backendUrl) {
@@ -213,7 +213,7 @@ cron.schedule("*/5 * * * *", () => {
 
   protocol
     .get(`${backendUrl}/health`, (res) => {
-      // console.log(`Self-ping status: ${res.statusCode}`);
+      
     })
     .on("error", (err) => {
       console.error(`Self-ping failed: ${err.message}`);
@@ -221,5 +221,5 @@ cron.schedule("*/5 * * * *", () => {
 });
 
 server.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on http:
 });

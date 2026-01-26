@@ -66,7 +66,7 @@ export function Pricing() {
       id="pricing"
       className="bg-orange-50/30 py-24 font-sans relative overflow-hidden"
     >
-      {/* Background Decoration */}
+      {}
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-orange-100/40 rounded-full blur-3xl opacity-60 -translate-y-1/2 translate-x-1/3 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -159,7 +159,7 @@ export function Pricing() {
                 </ul>
 
                 <a
-                  href="https://app.shopydash.com/pricing"
+                  href="https:
                   target="_blank"
                   rel="noopener noreferrer"
                   className={`w-full py-4 px-6 rounded-xl font-bold text-base transition-all duration-300 shadow-lg transform active:scale-95 flex items-center justify-center cursor-pointer ${

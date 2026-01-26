@@ -70,7 +70,7 @@ export default function OrderList({ isEmbedded = false, role = "client" }) {
     }
   };
 
-  // Filter orders based on selected status
+  
   const filteredOrders = orders.filter((order) => {
     if (filterStatus === "all") return true;
     if (filterStatus === "completed")
@@ -148,7 +148,7 @@ export default function OrderList({ isEmbedded = false, role = "client" }) {
           </p>
         </header>
 
-        {/* Filter Dropdown */}
+        {}
         <div className="mb-6 flex items-center gap-3">
           <Filter className="text-gray-400" size={20} />
           <select
@@ -298,7 +298,7 @@ function OrderCard({ order, index, onConfirmDelivery, isVendor }) {
             </div>
           </div>
 
-          {/* Right: Message Button */}
+          {}
           {isVendor && order.buyer?._id && (
             <button
               onClick={handleMessageBuyer}
@@ -310,7 +310,7 @@ function OrderCard({ order, index, onConfirmDelivery, isVendor }) {
           )}
         </div>
 
-        {/* Bottom Row: Reference, Date, Status - Centered */}
+        {}
         <div className="mt-4 flex flex-wrap items-center justify-center gap-3 text-center">
           <div className="flex items-center gap-3">
             <p className="text-xs bg-white px-3 py-1.5 rounded-lg font-mono border border-gray-200">

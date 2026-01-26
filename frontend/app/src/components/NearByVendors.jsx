@@ -20,14 +20,14 @@ export function NearByVendors({ posts, showHeader = true, loading = false }) {
     posts.forEach((post) => {
       if (post.products && Array.isArray(post.products)) {
         post.products.forEach((product) => {
-          // Flatten product data and attach vendor info
+          
           products.push({
             ...product,
-            _id: product._id, // Ensure ID is accessible
-            name: product.title, // Standardize name
+            _id: product._id, 
+            name: product.title, 
             price: product.price,
             image: product.image,
-            vendorPostId: post._id, // Critical for adding to cart
+            vendorPostId: post._id, 
             vendor: {
               _id: post.vendorId?._id,
               username: post.vendorId?.username,
@@ -43,7 +43,7 @@ export function NearByVendors({ posts, showHeader = true, loading = false }) {
       }
     });
 
-    // Fisher-Yates shuffle to randomize products
+    
     for (let i = products.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [products[i], products[j]] = [products[j], products[i]];

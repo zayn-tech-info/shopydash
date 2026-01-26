@@ -13,7 +13,7 @@ const VerificationToken = require("../../models/verificationToken.model");
 const googleAuth = asyncErrorHandler(async (req, res, next) => {
   const { token } = req.body;
   const response = await fetch(
-    "https://www.googleapis.com/oauth2/v3/userinfo",
+    "https:
     {
       headers: { Authorization: `Bearer ${token}` },
     },
@@ -67,7 +67,7 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
     area,
   } = req.body;
 
-  // Fetch user first to check what they already have
+  
   const user = await User.findById(userId).select("+password");
 
   if (!user) {
@@ -75,33 +75,33 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
     return next(err);
   }
 
-  // Dynamic Validation: Require fields only if not already present in user or provided in body
+  
   const missingFields = [];
 
-  // Always required for profile completion
+  
   if (!schoolName) missingFields.push("schoolName");
   if (!whatsAppNumber) missingFields.push("whatsAppNumber");
   if (!state) missingFields.push("state");
   if (!city) missingFields.push("city");
   if (!country) missingFields.push("country");
 
-  // Role dependent
+  
   if (role === "vendor" && !businessName && !user.businessName)
     missingFields.push("businessName");
 
-  // Core auth fields - valid only if not already set on user or provided now
+  
   if (!user.username && !username) missingFields.push("username");
   if (!user.phoneNumber && !phoneNumber) missingFields.push("phoneNumber");
   if ((!user.password || user.isGoogleAuth) && !password) {
-    // If user has no password (or only Google auth) and didn't provide one, it might be required?
-    // Actually, Google users might not need a password.
-    // But if you want to enforce password setting for everyone:
-    // missingFields.push("password");
-    // For now, let's assume if they have GoogleAuth they don't strictly need a password unless you want them to set one.
-    // The previous code required password. I'll make it optional if they are GoogleAuth, or required if they are standard.
-    // However, regular signup sets password. So user.password exists.
-    // If user.isGoogleAuth is true, maybe we don't force password?
-    // Let's stick to: if provided, update. If not provided and not set, error (unless google).
+    
+    
+    
+    
+    
+    
+    
+    
+    
   }
 
   if (missingFields.length > 0) {
@@ -112,7 +112,7 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
     return next(err);
   }
 
-  // Check username uniqueness if changing
+  
   if (username && username !== user.username) {
     const existingUser = await User.findOne({ username }).select("_id").lean();
     if (existingUser && existingUser._id.toString() !== userId.toString()) {
@@ -126,7 +126,7 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
   if (phoneNumber) user.phoneNumber = phoneNumber;
   if (schoolName) user.schoolName = schoolName;
   if (whatsAppNumber) user.whatsAppNumber = whatsAppNumber;
-  if (password) user.password = password; // Will be hashed by pre-save hook
+  if (password) user.password = password; 
   if (businessName) user.businessName = businessName;
   if (schoolId) user.schoolId = schoolId;
 
@@ -134,7 +134,7 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
   user.city = city || user.city;
   user.country = country || user.country;
 
-  // Handle flexible area/schoolArea naming
+  
   user.schoolArea = schoolArea || area || user.schoolArea;
   user.area = area || schoolArea || user.area;
 
@@ -148,7 +148,7 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
 const signup = asyncErrorHandler(async (req, res, next) => {
   const { fullName, username, email, phoneNumber, password, role } = req.body;
 
-  // Minimal Validation for Step 1
+  
   if (!fullName || !username || !email || !phoneNumber || !password || !role) {
     const err = new customError(
       "All fields are required (FullName, Username, Email, Phone, Password, Role)",
@@ -177,7 +177,7 @@ const signup = asyncErrorHandler(async (req, res, next) => {
 
     const user = await User.create({
       ...req.body,
-      profileComplete: false, // Explicitly false, requiring Step 2
+      profileComplete: false, 
       isVerified: true,
     });
 
@@ -222,13 +222,13 @@ const login = asyncErrorHandler(async (req, res, next) => {
     return next(err);
   }
 
-  // if (!user.isVerified && !user.isGoogleAuth) {
-  //   const err = new customError(
-  //     "Please verify your email address before logging in.",
-  //     401
-  //   );
-  //   return next(err);
-  // }
+  
+  
+  
+  
+  
+  
+  
 
   const isPasswordMatch = await user.comparePassword(password);
   if (!isPasswordMatch) {

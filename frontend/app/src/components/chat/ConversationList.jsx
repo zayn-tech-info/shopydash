@@ -90,7 +90,7 @@ const ConversationList = ({ onSelect }) => {
                     <img
                       src={
                         vendor.profilePic ||
-                        "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"
+                        "https:
                       }
                       alt={vendor.businessName || vendor.fullName}
                       className="w-12 h-12 rounded-full object-cover border border-gray-100"
@@ -144,7 +144,7 @@ const ConversationList = ({ onSelect }) => {
                         src={
                           otherUser.profilePic ||
                           otherUser.logo ||
-                          "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"
+                          "https:
                         }
                         alt={otherUser.fullName}
                         className="w-12 h-12 rounded-full object-cover border border-gray-100"

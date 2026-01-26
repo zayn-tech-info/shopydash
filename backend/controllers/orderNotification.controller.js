@@ -5,7 +5,7 @@ const { logError, logInfo } = require("../utils/logger");
 
 const processOrderNotifications = async (orderId, io) => {
   try {
-    // 1. Fetch full order details
+    
     const order = await Order.findById(orderId)
       .populate("buyer", "fullName email")
       .populate({
@@ -27,7 +27,7 @@ const processOrderNotifications = async (orderId, io) => {
     const vendorEmail = vendor.userId.email;
     const vendorName = vendor.userId.fullName;
 
-    // 2. Create Notification Record
+    
     const notification = await Notification.create({
       userId: vendorUserId,
       type: "order:new",
@@ -42,7 +42,7 @@ const processOrderNotifications = async (orderId, io) => {
       readStatus: false,
     });
 
-    // 3. Emit Real-time Socket Event
+    
     if (io) {
       io.to(vendorUserId).emit("order:new", {
         orderId: order._id,
@@ -59,8 +59,8 @@ const processOrderNotifications = async (orderId, io) => {
       logError("Order Notification", "Socket.IO instance not provided");
     }
 
-    // 4. Send Email (Async/Non-blocking)
-    // We do not await this to ensure the main flow isn't delayed by email sending
+    
+    
     sendOrderNotificationEmail(vendorEmail, vendorName, {
       buyerName: buyer.fullName,
       items: items.map((i) => ({

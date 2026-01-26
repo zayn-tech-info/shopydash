@@ -12,7 +12,7 @@ export function Howitworks() {
           </p>
         </div>
 
-        {/* Vendors Section */}
+        {}
         <div className="mb-24">
           <div className="text-center mb-12">
             <span className="text-orange-600 font-bold bg-orange-100 px-4 py-1 rounded-full text-sm uppercase tracking-wide">
@@ -24,7 +24,7 @@ export function Howitworks() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-12 relative">
-            {/* Connector Line (Desktop) */}
+            {}
             <div className="hidden md:block absolute top-8 left-1/6 right-1/6 h-0.5 bg-dashed border-t-2 border-gray-200 -z-10" />
 
             <div className="text-center relative">
@@ -66,7 +66,7 @@ export function Howitworks() {
           </div>
         </div>
 
-        {/* Shoppers Section */}
+        {}
         <div>
           <div className="text-center mb-12">
             <span className="text-blue-600 font-bold bg-blue-100 px-4 py-1 rounded-full text-sm uppercase tracking-wide">
@@ -78,7 +78,7 @@ export function Howitworks() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-12 relative">
-            {/* Connector Line (Desktop) */}
+            {}
             <div className="hidden md:block absolute top-8 left-1/6 right-1/6 h-0.5 bg-dashed border-t-2 border-gray-200 -z-10" />
 
             <div className="text-center relative">

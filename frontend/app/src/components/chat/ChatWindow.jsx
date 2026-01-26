@@ -63,7 +63,7 @@ const ChatWindow = ({ onBack }) => {
             src={
               otherUser.profilePic ||
               otherUser.logo ||
-              "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"
+              "https:
             }
             alt={otherUser.fullName}
             className="w-10 h-10 rounded-full object-cover"
@@ -82,7 +82,7 @@ const ChatWindow = ({ onBack }) => {
       </div>
 
       {}
-      <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-repeat">
+      <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-[url('https:
         {}
 
         {messages.map((msg, idx) => {

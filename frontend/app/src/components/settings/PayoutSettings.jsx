@@ -53,9 +53,9 @@ export function PayoutSettings({ user }) {
     if (!user?._id) return;
     try {
       setLoadingProfile(true);
-      // We need to fetch the vendor profile which contains bankDetails
-      // Assuming GET /api/v1/vendorProfile/:id returns the profile
-      // Or we can get it from the user store if it includes vendor details
+      
+      
+      
       const res = await api.get(`/api/v1/vendorProfile/${user._id}`);
       if (res.data.success) {
         const profile = res.data.data;
@@ -74,8 +74,8 @@ export function PayoutSettings({ user }) {
         }
       }
     } catch (error) {
-      //   console.error("Fetch Profile Error:", error);
-      // It's possible the profile doesn't exist yet or just no bank details
+      
+      
     } finally {
       setLoadingProfile(false);
     }
@@ -168,7 +168,7 @@ export function PayoutSettings({ user }) {
           Connect your bank account to receive payments automatically.
         </p>
 
-        {/* KYC Status Indicator */}
+        {}
         <div className="mt-6">
           {kycStatus === "verified" && (
             <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-100 rounded-xl text-green-800">
@@ -307,7 +307,7 @@ export function PayoutSettings({ user }) {
           </div>
         )}
 
-        {/* Consent Checkbox */}
+        {}
         <div className="bg-n-2/50 p-4 rounded-xl border border-n-3/20">
           <label className="flex items-start gap-3 cursor-pointer">
             <input

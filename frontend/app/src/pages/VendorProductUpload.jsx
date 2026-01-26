@@ -74,7 +74,7 @@ const VendorProductUpload = () => {
     ];
   });
 
-  // Save to localStorage whenever state changes
+  
   useEffect(() => {
     if (!editingPost) {
       localStorage.setItem(
@@ -90,11 +90,11 @@ const VendorProductUpload = () => {
         JSON.stringify(selectedArea),
       );
 
-      // products need to be sanitized (remove imageFile) before saving
+      
       const sanitizedProducts = products.map((p) => ({
         ...p,
         imageFile: null,
-        previewUrl: null, // Don't persist blob URLs as they expire
+        previewUrl: null, 
       }));
       localStorage.setItem(
         "vendor_post_draft_products",

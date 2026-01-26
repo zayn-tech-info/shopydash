@@ -87,14 +87,14 @@ export function Signup() {
     try {
       await signup(payload);
 
-      // Token is set in localStorage by signup store.
-      // Update auth store state immediately so App router detects it
+      
+      
       toast.success("Account created! Let's finish your profile.");
 
-      // We need to update the auth state.
-      // easiest way is to reload or call checkAuth.
+      
+      
       await checkAuth();
-      // The App.jsx will automatically redirect to /complete-user-registration because profileComplete is false.
+      
     } catch (err) {
       const msg =
         typeof err === "string" ? err : (err?.message ?? "Signup failed");

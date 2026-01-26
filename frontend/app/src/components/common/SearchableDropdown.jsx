@@ -18,11 +18,11 @@ export default function SearchableDropdown({
   const dropdownRef = useRef(null);
   const inputRef = useRef(null);
 
-  // Find the selected object based on value
+  
   const selectedOption = options.find((opt) => opt[valueKey] === value);
 
   useEffect(() => {
-    // Determine the initial search term or display value
+    
     if (selectedOption) {
       setSearchTerm(selectedOption[displayKey]);
     } else {
@@ -34,7 +34,7 @@ export default function SearchableDropdown({
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
-        // Reset search term to selected value on close if no new choice was made
+        
         if (selectedOption) {
           setSearchTerm(selectedOption[displayKey]);
         } else {
@@ -53,9 +53,9 @@ export default function SearchableDropdown({
   const handleInputChange = (e) => {
     setSearchTerm(e.target.value);
     setIsOpen(true);
-    // If user clears input, we might want to clear selection or just let them search
+    
     if (e.target.value === "") {
-      onChange(""); // Optional: clear value if input is cleared?
+      onChange(""); 
     }
   };
 
@@ -80,8 +80,8 @@ export default function SearchableDropdown({
           onChange={handleInputChange}
           onFocus={() => {
             setIsOpen(true);
-            // Optional: clear text on focus to allow easy search?
-            // Usually better to keep it, user can delete if they want.
+            
+            
           }}
           placeholder={placeholder}
           disabled={disabled}

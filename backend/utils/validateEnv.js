@@ -33,7 +33,7 @@ const validateEnv = () => {
     );
   }
 
-  // Validate COOKIE_DOMAIN in production
+  
   if (process.env.NODE_ENV === "production" && !process.env.COOKIE_DOMAIN) {
     logWarn(
       "Environment Validation",

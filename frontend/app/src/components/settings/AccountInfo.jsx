@@ -77,7 +77,7 @@ export function AccountInfo({ user }) {
                   {user.isSubscriptionActive ? "Active" : "Inactive / Free"}
                 </p>
               </div>
-              {/*  Action Button could go here */}
+              {}
             </div>
           </div>
         )}

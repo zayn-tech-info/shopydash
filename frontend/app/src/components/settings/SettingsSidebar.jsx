@@ -44,7 +44,7 @@ export function SettingsSidebar({ activeTab, setActiveTab, role, onLogout }) {
   return (
     <>
       <div className="w-full lg:w-64 flex-shrink-0 bg-white lg:rounded-2xl border border-n-3/20 shadow-sm overflow-hidden h-fit">
-        {/* Mobile Header */}
+        {}
         <div className="p-4 border-b border-n-3/20 flex items-center justify-between lg:hidden">
           <h2 className="text-lg font-bold text-n-8">Settings</h2>
           <button
@@ -55,19 +55,19 @@ export function SettingsSidebar({ activeTab, setActiveTab, role, onLogout }) {
           </button>
         </div>
 
-        {/* Desktop Title */}
+        {}
         <div className="p-4 border-b border-n-3/20 lg:block hidden">
           <h2 className="text-lg font-bold text-n-8">Settings</h2>
         </div>
 
-        {/* Sidebar Content (Drawer on Mobile / Static on Desktop) */}
+        {}
         <div
           className={`
             fixed inset-0 z-50 bg-white p-4 transition-transform duration-300 ease-in-out lg:static lg:p-3 lg:bg-transparent lg:block lg:transform-none
             ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
           `}
         >
-          {/* Mobile Drawer Header */}
+          {}
           <div className="flex items-center justify-between mb-6 lg:hidden">
             <h2 className="text-xl font-bold text-n-8">Settings Menu</h2>
             <button
@@ -111,7 +111,7 @@ export function SettingsSidebar({ activeTab, setActiveTab, role, onLogout }) {
         </div>
       </div>
 
-      {/* Backdrop for Mobile Drawer */}
+      {}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"

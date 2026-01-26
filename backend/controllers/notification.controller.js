@@ -42,13 +42,13 @@ const markAsRead = async (req, res) => {
     const { notificationId } = req.body;
 
     if (notificationId) {
-      // Mark specific notification
+      
       await Notification.findOneAndUpdate(
         { _id: notificationId, userId },
         { readStatus: true }
       );
     } else {
-      // Mark all as read
+      
       await Notification.updateMany({ userId }, { readStatus: true });
     }
 

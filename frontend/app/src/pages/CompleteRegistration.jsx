@@ -26,14 +26,14 @@ export default function CompleteRegistration() {
     }
   }, [authUser]);
 
-  const showPasswordInput = !authUser?.password && !authUser?.isGoogleAuth; // Only show if no password and not google auth? Or if they want to set one?
-  // Actually, standard signup users have password. Google users don't.
-  // If Google users need password, show it. If not, hide it.
-  // Let's hide it for now unless explicitly required.
-  // Actually, if they used Step 1, they have password.
-  // If they used Google, they don't have password. The backend might complain if we don't send one?
-  // Backend check: "if ((!user.password || user.isGoogleAuth) && !password) ..."
-  // So if Google Auth, we can skip password.
+  const showPasswordInput = !authUser?.password && !authUser?.isGoogleAuth; 
+  
+  
+  
+  
+  
+  
+  
 
   const showUsernameInput = !authUser?.username;
   const showPhoneInput = !authUser?.phoneNumber;

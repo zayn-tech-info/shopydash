@@ -81,7 +81,7 @@ const sendOrderNotificationEmail = async (email, vendorName, orderDetails) => {
       )
       .join("");
 
-    const dashboardLink = `https://shopydash.com/vendor/dashboard/orders`;
+    const dashboardLink = `https:
 
     const content = `
       <p style="color: #4a4a4a; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
@@ -117,7 +117,7 @@ const sendOrderNotificationEmail = async (email, vendorName, orderDetails) => {
     return data;
   } catch (error) {
     console.error("Error sending order notification email:", error);
-    // Suppress error to avoid blocking order flow
+    
   }
 };
 

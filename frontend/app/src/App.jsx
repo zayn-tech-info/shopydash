@@ -75,8 +75,8 @@ const App = () => {
           ),
           { duration: 5000, icon: "📦" }
         );
-        // Play notification sound if desired
-        const audio = new Audio("/assets/notification.mp3"); // Ensure this file exists or skip
+        
+        const audio = new Audio("/assets/notification.mp3"); 
         audio.play().catch((e) => console.log("Audio play failed", e));
       });
 

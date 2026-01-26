@@ -15,7 +15,7 @@ const verificationTokenSchema = new mongoose.Schema(
     expires: {
       type: Date,
       required: true,
-      default: () => Date.now() + 10 * 60 * 1000, // 10 minutes
+      default: () => Date.now() + 10 * 60 * 1000, 
     },
     verified: {
       type: Boolean,
@@ -25,7 +25,7 @@ const verificationTokenSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Index for automatic expiration
+
 verificationTokenSchema.index({ expires: 1 }, { expireAfterSeconds: 0 });
 
 module.exports = mongoose.model("VerificationToken", verificationTokenSchema);

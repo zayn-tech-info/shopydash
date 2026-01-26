@@ -65,14 +65,14 @@ ${address}
 Please confirm this order and provide payment details.`;
 
     const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${vendorPhone}?text=${encodedMessage}`;
+    const whatsappUrl = `https:
 
     window.open(whatsappUrl, "_blank");
   };
 
   /* 
-  // PENDING PAYMENT IMPLEMENTATION
-  // Re-enable this function to restore Paystack payments
+  
+  
   const handlePayment = async () => {
     if (!address) {
       toast.error("Please enter a delivery address");
@@ -212,7 +212,7 @@ Please confirm this order and provide payment details.`;
           </p>
 
           {/* 
-          // OLD PAY BUTTON - PENDING REVERT
+          
           <button
             onClick={handlePayment}
             disabled={loading}
