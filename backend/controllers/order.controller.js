@@ -59,12 +59,16 @@ const getMyOrders = async (req, res) => {
 
     const orders = await Order.find(query)
       .populate("items.product", "title image price")
+      .populate(
+        "buyer",
+        "fullName email username phoneNumber whatsAppNumber profilePic"
+      )
       .populate({
         path: "vendor",
         select: "storeUsername userId",
         populate: {
           path: "userId",
-          select: "businessName fullName email",
+          select: "businessName fullName email profilePic",
         },
       })
       .sort({ createdAt: -1 });

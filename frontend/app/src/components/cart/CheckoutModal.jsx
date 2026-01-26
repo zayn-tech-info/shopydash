@@ -16,13 +16,63 @@ const CheckoutModal = ({
 
   if (!isOpen) return null;
 
-  
   const allItems = Object.values(groupedItems).flatMap((g) => g.items);
   const grandTotal = Object.values(groupedItems).reduce(
     (acc, g) => acc + g.total,
-    0
+    0,
   );
 
+  const handleWhatsAppOrder = (group) => {
+    if (!address) {
+      toast.error("Please enter a delivery address");
+      return;
+    }
+
+    const vendorPhone = group.vendor?.whatsAppNumber;
+    if (!vendorPhone) {
+      toast.error("This vendor hasn't set up WhatsApp ordering");
+      return;
+    }
+
+    const itemsList = group.items
+      .map(
+        (item) =>
+          `- ${item.quantity}x ${item.title} (₦${(
+            item.price * item.quantity
+          ).toLocaleString()})`,
+      )
+      .join("\n");
+
+    const groupTotal = group.items.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0,
+    );
+
+    const message = `*New Order Request from Shopydash* 🛍️
+    
+*Vendor:* ${group.vendor?.businessName || "Vendor"}
+    
+*Items:*
+${itemsList}
+    
+*Total:* ₦${groupTotal.toLocaleString()}
+    
+*Delivery Address:*
+${address}
+    
+*Buyer Name:* ${authUser?.fullName || "Guest"}
+    
+Please confirm this order and provide payment details.`;
+
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${vendorPhone}?text=${encodedMessage}`;
+
+    window.open(whatsappUrl, "_blank");
+  };
+
+  /* 
+  // PENDING PAYMENT IMPLEMENTATION
+  // Re-enable this function to restore Paystack payments
   const handlePayment = async () => {
     if (!address) {
       toast.error("Please enter a delivery address");
@@ -53,6 +103,7 @@ const CheckoutModal = ({
       setLoading(false);
     }
   };
+  */
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
@@ -64,7 +115,7 @@ const CheckoutModal = ({
         <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
           <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
             <Lock className="w-5 h-5 text-green-600" />
-            Secure Checkout
+            Checkout via WhatsApp
           </h3>
           <button
             onClick={onClose}
@@ -95,13 +146,13 @@ const CheckoutModal = ({
               <span className="flex-grow h-px bg-gray-100"></span>
             </h4>
 
-            <div className="bg-gray-50/80 rounded-2xl p-4 border border-gray-100 space-y-4">
+            <div className="space-y-4">
               {Object.values(groupedItems).map((group) => (
                 <div
                   key={group.vendor?._id}
-                  className="pb-4 last:pb-0 border-b last:border-0 border-dashed border-gray-200"
+                  className="bg-gray-50/80 rounded-2xl p-4 border border-gray-100"
                 >
-                  <div className="flex items-center gap-2 mb-3 text-gray-900">
+                  <div className="flex items-center gap-2 mb-3 text-gray-900 border-b border-gray-200 pb-2">
                     <div className="w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 text-xs font-bold">
                       {group.vendor?.businessName?.charAt(0) || "V"}
                     </div>
@@ -110,7 +161,7 @@ const CheckoutModal = ({
                     </span>
                   </div>
 
-                  <div className="space-y-2.5 pl-8">
+                  <div className="space-y-2.5 pl-2 mb-4">
                     {group.items.map((item) => (
                       <div
                         key={item._id}
@@ -130,6 +181,14 @@ const CheckoutModal = ({
                       </div>
                     ))}
                   </div>
+
+                  <button
+                    onClick={() => handleWhatsAppOrder(group)}
+                    className="w-full py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-xl font-semibold text-sm transition-all shadow-md shadow-green-500/20 active:scale-[0.98] flex items-center justify-center gap-2"
+                  >
+                    <span>Order on WhatsApp</span>
+                    <CreditCard className="w-4 h-4" />
+                  </button>
                 </div>
               ))}
             </div>
@@ -137,7 +196,7 @@ const CheckoutModal = ({
         </div>
 
         <div className="p-6 border-t border-gray-100 bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)] z-10 relative">
-          <div className="flex justify-between items-end mb-6">
+          <div className="flex justify-between items-end mb-2">
             <div className="text-sm text-gray-500 font-medium">
               Total Amount
             </div>
@@ -148,26 +207,20 @@ const CheckoutModal = ({
               {grandTotal.toLocaleString()}
             </div>
           </div>
+          <p className="text-xs text-gray-400 text-center">
+            * Payments are processed directly with vendors via WhatsApp
+          </p>
 
+          {/* 
+          // OLD PAY BUTTON - PENDING REVERT
           <button
             onClick={handlePayment}
             disabled={loading}
-            className="w-full py-4 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white rounded-2xl font-bold text-lg transition-all shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed group"
+            className="..."
           >
-            {loading ? (
-              <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : (
-              <>
-                <span>Pay Now</span>
-                <CreditCard className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
-              </>
-            )}
+             ...
           </button>
-
-          <div className="mt-4 flex items-center justify-center gap-2 text-[10px] text-gray-400 uppercase tracking-widest font-medium">
-            <Lock className="w-3 h-3 text-green-500" />
-            Secured by Paystack
-          </div>
+          */}
         </div>
       </motion.div>
     </div>

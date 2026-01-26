@@ -21,15 +21,15 @@ export default function Feeds() {
   const [loading, setLoading] = useState(true);
 
   const [searchQuery, setSearchQuery] = useState(
-    searchParams.get("search") || ""
+    searchParams.get("search") || "",
   );
 
   const [selectedSchool, setSelectedSchool] = useState(
-    searchParams.get("school") || authUser?.schoolName || ""
+    searchParams.get("school") || authUser?.schoolName || "",
   );
 
   const schoolInitialized = useRef(
-    !!(searchParams.get("school") || authUser?.schoolName)
+    !!(searchParams.get("school") || authUser?.schoolName),
   );
 
   useEffect(() => {
@@ -48,7 +48,7 @@ export default function Feeds() {
   const [showSchoolDropdown, setShowSchoolDropdown] = useState(false);
 
   const [selectedLocation, setSelectedLocation] = useState(
-    searchParams.get("area") || ""
+    searchParams.get("area") || "",
   );
   const [areaSuggestions, setAreaSuggestions] = useState([]);
   const [loadingAreas, setLoadingAreas] = useState(false);
@@ -270,7 +270,7 @@ export default function Feeds() {
                             <Check className="w-4 h-4 text-primary-3" />
                           )}
                         </button>
-                        
+
                         {authUser?.schoolName && (
                           <button
                             type="button"
@@ -391,11 +391,11 @@ export default function Feeds() {
 
       {}
       <div className="pb-20">
-        {loading ? (
-          <FeedSkeleton />
-        ) : (
-          <NearByVendors posts={filteredPosts} showHeader={false} />
-        )}
+        <NearByVendors
+          posts={filteredPosts}
+          showHeader={false}
+          loading={loading}
+        />
       </div>
     </div>
   );

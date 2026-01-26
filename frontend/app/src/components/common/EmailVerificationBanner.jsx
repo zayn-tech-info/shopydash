@@ -19,13 +19,22 @@ const EmailVerificationBanner = () => {
   };
 
   const handleOpenVerify = async () => {
-    // Optionally send code immediately when opening, or let modal handle resend
-    // Modal sends on "Resend Code" click, but initially it expects user to have code.
-    // If user deleted old email, they might need a new code.
-    // Let's rely on Modal's flow or trigger a send here if needed.
-    // Usually, "Verify Now" implies "I have a code" or "Send me a code".
-    // Let's just open the modal. User can click "Resend Code" in modal if they don't have one.
-    setIsModalOpen(true);
+    if (isSending) return;
+    setIsSending(true);
+    try {
+      await api.post("/api/v1/auth/resend-verification-code", {
+        email: authUser.email,
+      });
+      toast.success(`Verification code sent to ${authUser.email}`);
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        error.response?.data?.message || "Failed to send verification code",
+      );
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
@@ -40,9 +49,10 @@ const EmailVerificationBanner = () => {
         </div>
         <button
           onClick={handleOpenVerify}
-          className="bg-white text-orange-600 px-3 py-1 rounded-md text-xs font-bold hover:bg-orange-50 transition-colors uppercase tracking-wide whitespace-nowrap"
+          disabled={isSending}
+          className="bg-white text-orange-600 px-3 py-1 rounded-md text-xs font-bold hover:bg-orange-50 transition-colors uppercase tracking-wide whitespace-nowrap disabled:opacity-75 disabled:cursor-wait"
         >
-          Verify Now
+          {isSending ? "Sending..." : "Verify Now"}
         </button>
       </div>
 

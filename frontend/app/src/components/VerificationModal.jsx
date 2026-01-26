@@ -138,7 +138,7 @@ export const VerificationModal = ({
           <button
             type="button"
             onClick={handleResend}
-            className="w-full mt-4 text-sm text-n-4 hover:text-primary-3"
+            className="w-full mt-4 text-sm text-n-8 border py-3 rounded-xl border-gray-500 hover:text-primary-3"
           >
             Resend Code
           </button>

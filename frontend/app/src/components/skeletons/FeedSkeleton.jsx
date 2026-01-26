@@ -1,93 +1,37 @@
- import { Skeleton } from "@mui/material";
+import { Skeleton } from "@mui/material";
 
 export function FeedSkeleton() {
   return (
-    <div className="container mx-auto max-w-7xl px-4 md:px-8 mt-12 space-y-8">
-      {}
-      <div className="flex items-center justify-between mb-6">
+    <div className="container mx-auto max-w-7xl px-4 md:px-8 mt-12 pb-20">
+      <div className="flex items-center justify-between mb-8">
         <Skeleton variant="text" width={200} height={32} />
         <Skeleton variant="text" width={60} height={20} />
       </div>
 
-      {}
-      {Array.from({ length: 3 }).map((_, index) => (
-        <div
-          key={index}
-          className="bg-white border border-n-3/10 rounded-2xl overflow-hidden shadow-sm"
-        >
-          {}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-n-3/10">
-            <div className="flex items-center gap-4 w-full">
-              <Skeleton variant="circular" width={40} height={40} />
-              <div className="flex flex-col gap-1 w-full max-w-[200px]">
-                <Skeleton variant="text" width="80%" height={20} />
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+        {Array.from({ length: 10 }).map((_, index) => (
+          <div
+            key={index}
+            className="bg-white border border-n-3/20 rounded-xl p-3 flex flex-col gap-3 h-full"
+          >
+            {/* Image Skeleton */}
+            <div className="w-full aspect-square rounded-lg overflow-hidden">
+              <Skeleton variant="rectangular" width="100%" height="100%" />
+            </div>
+
+            {/* Content Skeleton */}
+            <div className="flex-1 flex flex-col gap-2">
+              <Skeleton variant="text" width="90%" height={20} />
+              <Skeleton variant="text" width="40%" height={24} />
+
+              <div className="flex items-center gap-2 mt-auto pt-2">
+                <Skeleton variant="circular" width={24} height={24} />
                 <Skeleton variant="text" width="60%" height={16} />
               </div>
             </div>
-            <Skeleton variant="circular" width={32} height={32} />
           </div>
-
-          {}
-          <div className="px-6 py-4 border-b border-n-3/10">
-            <Skeleton variant="text" width="90%" height={20} />
-            <Skeleton variant="text" width="70%" height={20} />
-          </div>
-
-          {}
-          <div className="p-6 bg-n-1">
-            <div className="flex gap-4 overflow-hidden">
-              {Array.from({ length: 4 }).map((_, pIndex) => (
-                <div
-                  key={pIndex}
-                  className="flex-shrink-0 w-[calc(50%-8px)] md:w-[calc(25%-12px)]"
-                >
-                  <div className="bg-white rounded-xl border border-n-3/10 overflow-hidden h-full">
-                    <Skeleton variant="rectangular" width="100%" height={200} />
-                    <div className="p-3">
-                      <Skeleton
-                        variant="text"
-                        width="80%"
-                        height={20}
-                        className="mb-2"
-                      />
-                      <div className="flex gap-2">
-                        <Skeleton
-                          variant="rectangular"
-                          width="100%"
-                          height={32}
-                          className="rounded-lg"
-                        />
-                        <Skeleton
-                          variant="rectangular"
-                          width="100%"
-                          height={32}
-                          className="rounded-lg"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {}
-          <div className="px-6 py-4 bg-white border-t border-n-3/10 flex items-center justify-end gap-3">
-            <Skeleton
-              variant="rectangular"
-              width={100}
-              height={40}
-              className="rounded-xl"
-            />
-            <Skeleton
-              variant="rectangular"
-              width={100}
-              height={40}
-              className="rounded-xl"
-            />
-          </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }

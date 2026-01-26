@@ -30,13 +30,13 @@ const VendorProductUpload = () => {
   };
 
   const [caption, setCaption] = useState(() =>
-    getInitialState("caption", editingPost?.caption || "")
+    getInitialState("caption", editingPost?.caption || ""),
   );
   const [schoolName, setSchoolName] = useState(() =>
-    getInitialState("school", editingPost?.school || "")
+    getInitialState("school", editingPost?.school || ""),
   );
   const [selectedArea, setSelectedArea] = useState(() =>
-    getInitialState("area", editingPost?.area || "")
+    getInitialState("area", editingPost?.area || ""),
   );
 
   const [products, setProducts] = useState(() => {
@@ -79,15 +79,15 @@ const VendorProductUpload = () => {
     if (!editingPost) {
       localStorage.setItem(
         "vendor_post_draft_caption",
-        JSON.stringify(caption)
+        JSON.stringify(caption),
       );
       localStorage.setItem(
         "vendor_post_draft_school",
-        JSON.stringify(schoolName)
+        JSON.stringify(schoolName),
       );
       localStorage.setItem(
         "vendor_post_draft_area",
-        JSON.stringify(selectedArea)
+        JSON.stringify(selectedArea),
       );
 
       // products need to be sanitized (remove imageFile) before saving
@@ -98,7 +98,7 @@ const VendorProductUpload = () => {
       }));
       localStorage.setItem(
         "vendor_post_draft_products",
-        JSON.stringify(sanitizedProducts)
+        JSON.stringify(sanitizedProducts),
       );
     }
   }, [caption, schoolName, selectedArea, products, editingPost]);
@@ -134,13 +134,17 @@ const VendorProductUpload = () => {
 
   const updateProduct = (id, field, value) => {
     setProducts((prevProducts) =>
-      prevProducts.map((p) => (p.id === id ? { ...p, [field]: value } : p))
+      prevProducts.map((p) => (p.id === id ? { ...p, [field]: value } : p)),
     );
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (products.length < 4) {
-      toast.error("You must upload at least 4 products per post.");
+    if (products.length === 0) {
+      toast.error("You must upload at least 1 product.");
+      return;
+    }
+    if (products.length > 4) {
+      toast.error("You can upload a maximum of 4 products per post.");
       return;
     }
 
@@ -187,7 +191,7 @@ const VendorProductUpload = () => {
             stock: Number(p.stock),
             image: imageUrl,
           };
-        })
+        }),
       );
 
       const postData = {
@@ -202,7 +206,7 @@ const VendorProductUpload = () => {
         await updatePost(editingPost._id, postData);
       } else {
         await createPost(postData);
-        clearDraft(); 
+        clearDraft();
       }
 
       navigate("/dashboard");
@@ -223,7 +227,7 @@ const VendorProductUpload = () => {
             {editingPost
               ? "Update your post details."
               : "Share your latest products with the community."}{" "}
-            You must add at least 4 products.
+            You can add up to 4 products.
           </p>
 
           {!authUser?.vendorProfile?.bankDetails?.subaccountCode && (
@@ -278,7 +282,12 @@ const VendorProductUpload = () => {
               <button
                 type="button"
                 onClick={addProduct}
-                className="flex items-center justify-center gap-2 px-6 py-3 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 hover:border-orange-500 hover:text-orange-600 transition-colors font-medium"
+                disabled={products.length >= 4}
+                className={`flex items-center justify-center gap-2 px-6 py-3 border-2 border-dashed border-gray-300 rounded-xl transition-colors font-medium ${
+                  products.length >= 4
+                    ? "opacity-50 cursor-not-allowed text-gray-400 bg-gray-50"
+                    : "text-gray-600 hover:border-orange-500 hover:text-orange-600"
+                }`}
               >
                 <Plus size={20} />
                 Add Another Product

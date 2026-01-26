@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useOrderStore } from "../store/orderStore";
 import ConfirmationModal from "../components/common/ConfirmationModal";
 import ReviewModal from "../components/common/ReviewModal";
 import { useReviewStore } from "../store/reviewStore";
 import { toast } from "react-hot-toast";
+import useChatStore from "../store/chatStore";
 import {
   Package,
   CheckCircle,
@@ -13,6 +14,8 @@ import {
   ShoppingBag,
   Store,
   User,
+  Filter,
+  MessageCircle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -30,6 +33,7 @@ export default function OrderList({ isEmbedded = false, role = "client" }) {
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [reviewOrder, setReviewOrder] = useState(null);
+  const [filterStatus, setFilterStatus] = useState("all");
   const isVendor = role === "vendor";
 
   useEffect(() => {
@@ -65,6 +69,16 @@ export default function OrderList({ isEmbedded = false, role = "client" }) {
       toast.error(error);
     }
   };
+
+  // Filter orders based on selected status
+  const filteredOrders = orders.filter((order) => {
+    if (filterStatus === "all") return true;
+    if (filterStatus === "completed")
+      return order.deliveryStatus === "delivered";
+    if (filterStatus === "incomplete")
+      return order.deliveryStatus !== "delivered";
+    return true;
+  });
 
   if (isLoading) {
     return (
@@ -122,7 +136,7 @@ export default function OrderList({ isEmbedded = false, role = "client" }) {
       }`}
     >
       <div className={`${isEmbedded ? "" : "max-w-4xl mx-auto"}`}>
-        <header className="mb-10">
+        <header className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
             <Package className="text-primary-3" size={32} />
             {isVendor ? "Incoming Orders" : "My Orders"}
@@ -134,9 +148,27 @@ export default function OrderList({ isEmbedded = false, role = "client" }) {
           </p>
         </header>
 
+        {/* Filter Dropdown */}
+        <div className="mb-6 flex items-center gap-3">
+          <Filter className="text-gray-400" size={20} />
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="px-6 py-2 bg-white border border-gray-200 rounded-xl text-gray-700 font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-3 focus:border-transparent transition-all cursor-pointer hover:border-gray-300"
+          >
+            <option value="all">All Orders</option>
+            <option value="completed">Completed</option>
+            <option value="incomplete">Incomplete</option>
+          </select>
+          <span className=" border-gray-800 border px-6 py-2 font-medium text-sm text-gray-500 rounded-xl">
+            {filteredOrders.length}{" "}
+            {filteredOrders.length === 1 ? "order" : "orders"}
+          </span>
+        </div>
+
         <div className="space-y-6">
           <AnimatePresence>
-            {orders.map((order, index) => (
+            {filteredOrders.map((order, index) => (
               <OrderCard
                 key={order._id}
                 order={order}
@@ -170,11 +202,31 @@ export default function OrderList({ isEmbedded = false, role = "client" }) {
 }
 
 function OrderCard({ order, index, onConfirmDelivery, isVendor }) {
+  const navigate = useNavigate();
+  const { checkAccess, fetchMessages, addConversation } = useChatStore();
   const isDelivered = order.deliveryStatus === "delivered";
   const canConfirm =
     !isVendor &&
     order.deliveryStatus === "pending" &&
     order.paymentStatus === "paid";
+
+  const handleMessageBuyer = async () => {
+    if (!order.buyer?._id) {
+      toast.error("Buyer information not available");
+      return;
+    }
+
+    try {
+      const result = await checkAccess(order.buyer._id);
+      if (result.allowed && result.conversation) {
+        addConversation(result.conversation);
+        await fetchMessages(result.conversation._id);
+        navigate("/messages");
+      }
+    } catch (error) {
+      console.error("Error opening chat:", error);
+    }
+  };
 
   return (
     <motion.div
@@ -183,36 +235,87 @@ function OrderCard({ order, index, onConfirmDelivery, isVendor }) {
       transition={{ delay: index * 0.1 }}
       className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
     >
-      <div className="px-6 py-4 border-b border-gray-50 bg-gray-50/30 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex gap-4 items-center">
-          <div className="bg-white p-2 rounded-lg border border-gray-100 shadow-sm">
-            {isVendor ? (
-              <User className="w-5 h-5 text-gray-600" />
-            ) : (
-              <Store className="w-5 h-5 text-gray-600" />
-            )}
+      <div className="px-6 py-4 border-b border-gray-50 bg-gray-50/30">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex gap-3 items-center">
+            <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 border-2 border-white shadow-sm flex-shrink-0">
+              {isVendor ? (
+                order.buyer?.profilePic ? (
+                  <img
+                    src={order.buyer.profilePic}
+                    alt={order.buyer.fullName || "Buyer"}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-primary-3 text-white font-bold">
+                    {(
+                      order.buyer?.fullName?.[0] ||
+                      order.buyer?.username?.[0] ||
+                      "?"
+                    ).toUpperCase()}
+                  </div>
+                )
+              ) : order.vendor?.userId?.profilePic ? (
+                <img
+                  src={order.vendor.userId.profilePic}
+                  alt={order.vendor.userId.businessName || "Vendor"}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-primary-3 text-white font-bold">
+                  {(
+                    order.vendor?.userId?.businessName?.[0] ||
+                    order.vendor?.storeUsername?.[0] ||
+                    "?"
+                  ).toUpperCase()}
+                </div>
+              )}
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider mb-1">
+                {isVendor ? "Buyer" : "Vendor"}
+              </p>
+              <h3 className="font-bold text-gray-900 text-base">
+                {isVendor
+                  ? order.buyer?.fullName ||
+                    order.buyer?.username ||
+                    order.buyer?.email ||
+                    "Guest Buyer"
+                  : order.vendor?.userId?.businessName ||
+                    order.vendor?.storeUsername ||
+                    order.vendor?.userId?.fullName ||
+                    "Unknown Vendor"}
+              </h3>
+              {isVendor &&
+                (order.buyer?.phoneNumber || order.buyer?.whatsAppNumber) && (
+                  <p className="text-xs text-gray-600 mt-1 flex items-center gap-1">
+                    <span>📞</span>
+                    <span>
+                      {order.buyer?.phoneNumber || order.buyer?.whatsAppNumber}
+                    </span>
+                  </p>
+                )}
+            </div>
           </div>
-          <div>
-            <p className="text-xs text-gray-500 font-medium uppercase tracking-wider mb-0.5">
-              {isVendor ? "Buyer" : "Vendor"}
+
+          {/* Right: Message Button */}
+          {isVendor && order.buyer?._id && (
+            <button
+              onClick={handleMessageBuyer}
+              className="px-4 py-2 bg-primary-3 text-white rounded-lg font-medium shadow-sm hover:bg-primary-3/90 transition-colors flex items-center gap-2 flex-shrink-0"
+            >
+              <MessageCircle size={18} />
+              <span className="hidden sm:inline">Message</span>
+            </button>
+          )}
+        </div>
+
+        {/* Bottom Row: Reference, Date, Status - Centered */}
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-3 text-center">
+          <div className="flex items-center gap-3">
+            <p className="text-xs bg-white px-3 py-1.5 rounded-lg font-mono border border-gray-200">
+              {order.transactionReference || "N/A"}
             </p>
-            <h3 className="font-bold text-gray-900 text-sm sm:text-base">
-              {isVendor
-                ? order.buyer?.fullName || order.buyer?.email || "Unknown Buyer"
-                : order.vendor?.userId?.businessName ||
-                  order.vendor?.storeUsername ||
-                  order.vendor?.userId?.fullName ||
-                  "Unknown Vendor"}
-            </h3>
-          </div>
-        </div>
-        <div>
-          <p className="text-xs bg-gray-200 px-3 py-1 rounded-md font-mono mb-0.5">
-            REF: {order.transactionReference || "N/A"}
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="text-right mr-2 hidden sm:block">
             <p className="text-xs text-gray-500">
               {new Date(order.createdAt).toLocaleDateString(undefined, {
                 year: "numeric",
@@ -221,8 +324,10 @@ function OrderCard({ order, index, onConfirmDelivery, isVendor }) {
               })}
             </p>
           </div>
-          <StatusBadge status={order.paymentStatus} type="payment" />
-          <StatusBadge status={order.deliveryStatus} type="delivery" />
+          <div className="flex items-center gap-2">
+            <StatusBadge status={order.paymentStatus} type="payment" />
+            <StatusBadge status={order.deliveryStatus} type="delivery" />
+          </div>
         </div>
       </div>
 

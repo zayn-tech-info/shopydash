@@ -40,9 +40,16 @@ const validationErrorHandler = (err) => {
   return new customError(`Invalid input data : ${msg}`, 400);
 };
 
+const tokenExpiredErrorHandler = (err) => {
+  return new customError("Session expired, please login again", 401);
+};
+
 const globalErrorHandler = (error, req, res, next) => {
   error.statusCode = error.statusCode || 500;
   error.status = error.status || "error";
+
+  if (error.name === "TokenExpiredError")
+    error = tokenExpiredErrorHandler(error);
 
   if (process.env.NODE_ENV === "production") {
     if (error.name === "CastError") error = castErrorHandler(error);

@@ -47,7 +47,7 @@ route.post(
 route.patch("/update", protectRoute, generalLimiter, changeAvatar, updateUser);
 route.post("/change-password", protectRoute, authLimiter, changePassword);
 route.post("/verify-email", authLimiter, verifyEmail);
-route.post("/resend-code", authLimiter, resendVerificationCode);
+route.post("/resend-verification-code", authLimiter, resendVerificationCode);
 route.post("/send-otp", authLimiter, sendOtp);
 route.post("/validate-otp", authLimiter, validateOtp);
 

@@ -7,7 +7,7 @@ export function ClientAddress({ clientProfile, authUser, className }) {
         <div>
           <div className="font-medium text-sm">School Area</div>
           <div className="mt-1 text-primary-4 text-base">
-            {clientProfile?.userId?.schoolArea ||
+            {authUser?.schoolArea ||
               "-"}
           </div>
         </div>

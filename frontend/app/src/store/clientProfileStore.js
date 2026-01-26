@@ -70,6 +70,7 @@ export const useClientProfileStore = create((set, get) => ({
 
       let profile =
         payload?.clientProfile ??
+        payload?.vendorProfile ??
         payload?.profile ??
         payload?.client ??
         payload;
@@ -144,7 +145,7 @@ export const useClientProfileStore = create((set, get) => ({
         get()
           .getProfile(username, { silent: true })
           .catch((refreshErr) =>
-            console.error("Silent client profile refresh failed:", refreshErr)
+            console.error("Silent client profile refresh failed:", refreshErr),
           );
       }
 
