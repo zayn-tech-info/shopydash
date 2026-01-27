@@ -28,6 +28,10 @@ const googleAuth = asyncErrorHandler(async (req, res, next) => {
   let user = await User.findOne({ email });
 
   if (user) {
+    if (!user.isVerified) {
+      user.isVerified = true;
+      await user.save();
+    }
     const hasProfile = await checkUserHasProfile(user);
     sendToken(user, "Logged in successfully", res, 200, hasProfile);
   } else {
@@ -43,6 +47,7 @@ const googleAuth = asyncErrorHandler(async (req, res, next) => {
       profilePic: picture,
       isGoogleAuth: true,
       profileComplete: false,
+      isVerified: true,
     });
 
     sendToken(user, "Account created successfully", res, 201, false);
@@ -132,9 +137,9 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
 const signup = asyncErrorHandler(async (req, res, next) => {
   const { fullName, username, email, phoneNumber, password, role } = req.body;
 
-  if (!fullName || !username || !email || !phoneNumber || !password || !role) {
+  if (!fullName || !username || !email || !phoneNumber || !password) {
     const err = new customError(
-      "All fields are required (FullName, Username, Email, Phone, Password, Role)",
+      "All fields are required (FullName, Username, Email, Phone, Password)",
       400,
     );
     return next(err);

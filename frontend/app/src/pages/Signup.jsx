@@ -65,13 +65,22 @@ export function Signup() {
     if (!trimmed.phoneNumber)
       return (toast.error("Phone number is required"), false);
 
+    const nigerianPhoneRegex = /^(?:\+234|234|0)[789][01]\d{8}$/;
+    if (!nigerianPhoneRegex.test(trimmed.phoneNumber)) {
+      return (
+        toast.error(
+          "Invalid phone number. Please use a valid Nigerian number (e.g., 08012345678 or +234...)",
+        ),
+        false
+      );
+    }
+
     return true;
   };
 
   const onSubmit = async (e) => {
     e.preventDefault();
     const payload = {
-      role,
       username,
       fullName,
       email,
@@ -87,14 +96,9 @@ export function Signup() {
     try {
       await signup(payload);
 
-      
-      
       toast.success("Account created! Let's finish your profile.");
 
-      
-      
       await checkAuth();
-      
     } catch (err) {
       const msg =
         typeof err === "string" ? err : (err?.message ?? "Signup failed");
@@ -125,77 +129,30 @@ export function Signup() {
             </p>
           </div>
 
-          <div className="mt-8 px-6">
-            <div className="grid grid-cols-2 p-1 bg-n-2/10 rounded-xl">
-              <button
-                type="button"
-                onClick={() => {
-                  switchTo("client");
-                  setHasChosenRole(true);
-                }}
-                className={[
-                  "flex items-center justify-center gap-2 rounded-lg py-3 text-sm font-bold uppercase tracking-wider transition-all duration-300",
-                  isClient && hasChosenRole
-                    ? "bg-primary-3 text-white shadow-lg shadow-primary-3/25 scale-[1.02]"
-                    : "bg-transparent text-n-4 hover:text-primary-3 hover:bg-white/50",
-                ].join(" ")}
-              >
-                <GraduationCap
-                  className={`w-4 h-4 ${
-                    isClient && hasChosenRole ? "text-white" : "text-inherit"
-                  }`}
-                />
-                Student
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  switchTo("vendor");
-                  setHasChosenRole(true);
-                }}
-                className={[
-                  "flex items-center justify-center gap-2 rounded-lg py-3 text-sm font-bold uppercase tracking-wider transition-all duration-300",
-                  !isClient && hasChosenRole
-                    ? "bg-primary-3 text-white shadow-lg shadow-primary-3/25 scale-[1.02]"
-                    : "bg-transparent text-n-4 hover:text-primary-3 hover:bg-white/50",
-                ].join(" ")}
-              >
-                <Store
-                  className={`w-4 h-4 ${
-                    !isClient && hasChosenRole ? "text-white" : "text-inherit"
-                  }`}
-                />
-                Vendor
-              </button>
-            </div>
+          <div className="mt-2 animate-in fade-in slide-in-from-top-4 duration-500">
+            <SignupForm
+              onSubmit={onSubmit}
+              fullName={fullName}
+              setField={setField}
+              isClient={true} // Default to generic view
+              username={username}
+              email={email}
+              schoolId={schoolId}
+              phoneNumber={phoneNumber}
+              whatsAppNumber={whatsAppNumber}
+              schoolName={schoolName}
+              businessName={businessName}
+              showPassword={showPassword}
+              password={password}
+              toggleShowPassword={toggleShowPassword}
+              isSigningUp={isSigningUp}
+              error={error}
+              city={city}
+              state={state}
+              country={country}
+              schoolArea={schoolArea}
+            />
           </div>
-
-          {hasChosenRole && (
-            <div className="mt-2 animate-in fade-in slide-in-from-top-4 duration-500">
-              <SignupForm
-                onSubmit={onSubmit}
-                fullName={fullName}
-                setField={setField}
-                isClient={isClient}
-                username={username}
-                email={email}
-                schoolId={schoolId}
-                phoneNumber={phoneNumber}
-                whatsAppNumber={whatsAppNumber}
-                schoolName={schoolName}
-                businessName={businessName}
-                showPassword={showPassword}
-                password={password}
-                toggleShowPassword={toggleShowPassword}
-                isSigningUp={isSigningUp}
-                error={error}
-                city={city}
-                state={state}
-                country={country}
-                schoolArea={schoolArea}
-              />
-            </div>
-          )}
 
           {}
           <div className="px-8 pb-8 mt-5">

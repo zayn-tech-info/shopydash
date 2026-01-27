@@ -62,12 +62,11 @@ const userSchema = mongoose.Schema(
       validate: {
         validator: function (v) {
           if (!v) return true;
-          return /^(\+?\d{1,4}[\s-]?)?(\(?\d{1,4}\)?[\s-]?)?[\d\s-]{7,15}$/.test(
-            v
-          );
+          if (!v) return true;
+          return /^(?:\+234|234|0)[789][01]\d{8}$/.test(v);
         },
         message:
-          "Please provide a valid phone number (e.g., +234XXXXXXXXX or 080XXXXXXXX)",
+          "Please provide a valid Nigerian phone number (e.g., 08012345678 or +2348012345678)",
       },
     },
     schoolName: {
@@ -160,11 +159,11 @@ const userSchema = mongoose.Schema(
       validate: {
         validator: function (v) {
           if (!v) return true;
-          return /^(\+?\d{1,4}[\s-]?)?(\(?\d{1,4}\)?[\s-]?)?[\d\s-]{7,15}$/.test(
-            v
-          );
+          if (!v) return true;
+          return /^(?:\+234|234|0)[789][01]\d{8}$/.test(v);
         },
-        message: "Please provide a valid WhatsApp number (e.g., +234XXXXXXXX)",
+        message:
+          "Please provide a valid Nigerian WhatsApp number (e.g., 08012345678)",
       },
     },
     logo: {
@@ -216,11 +215,11 @@ const userSchema = mongoose.Schema(
     },
     isVerified: {
       type: Boolean,
-      default: false,  
+      default: false,
     },
     verificationCode: {
       type: String,
-      select: false,  
+      select: false,
     },
     verificationCodeExpires: {
       type: Date,
@@ -229,7 +228,7 @@ const userSchema = mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 userSchema.pre("save", async function (next) {
@@ -253,14 +252,14 @@ userSchema.methods.generateToken = function () {
     process.env.JWT_SECRET_KEY,
     {
       expiresIn: "7d",
-    }
+    },
   );
 };
 
 userSchema.methods.comparePasswordInDb = async function (password) {
   if (!this.password) {
     throw new Error(
-      "No password set for this user. Please use the appropriate login method."
+      "No password set for this user. Please use the appropriate login method.",
     );
   }
   return await bcrypt.compare(password, this.password);

@@ -70,6 +70,20 @@ export default function CompleteRegistration() {
       return toast.error("Business name is required for vendors");
     }
 
+    const nigerianPhoneRegex = /^(?:\+234|234|0)[789][01]\d{8}$/;
+
+    if (showPhoneInput && !nigerianPhoneRegex.test(phoneNumber)) {
+      return toast.error(
+        "Invalid Phone Number. Please use a valid Nigerian number.",
+      );
+    }
+
+    if (!nigerianPhoneRegex.test(whatsAppNumber)) {
+      return toast.error(
+        "Invalid WhatsApp Number. Please use a valid Nigerian number.",
+      );
+    }
+
     if (showPasswordInput && password.length < 6) {
       return toast.error("Password must be at least 6 characters long");
     }
@@ -114,41 +128,82 @@ export default function CompleteRegistration() {
           </div>
 
           <form onSubmit={handleSubmit} className="px-8 pb-8">
-            {!authUser?.role && (
-              <div className="mb-6">
-                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
-                  I am a
+            <div className="mb-6">
+              <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-3">
+                I am a
+              </label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <label
+                  className={`relative flex items-center p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                    role === "client"
+                      ? "border-primary-3 bg-primary-3/5"
+                      : "border-n-3/10 hover:border-n-4/30 bg-white"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="role"
+                    value="client"
+                    checked={role === "client"}
+                    onChange={() => setRole("client")}
+                    className="w-5 h-5 text-primary-3 border-n-4 focus:ring-primary-3"
+                  />
+                  <div className="ml-4 flex items-center gap-3">
+                    <div
+                      className={`p-2 rounded-lg ${
+                        role === "client"
+                          ? "bg-primary-3 text-white"
+                          : "bg-n-2 text-n-4"
+                      }`}
+                    >
+                      <GraduationCap className="w-5 h-5" />
+                    </div>
+                    <span
+                      className={`font-bold ${
+                        role === "client" ? "text-n-8" : "text-n-5"
+                      }`}
+                    >
+                      Student
+                    </span>
+                  </div>
                 </label>
-                <div className="grid grid-cols-2 p-1 bg-n-2/10 rounded-xl">
-                  <button
-                    type="button"
-                    onClick={() => setRole("client")}
-                    className={[
-                      "flex items-center justify-center gap-2 rounded-lg py-3 text-sm font-bold uppercase tracking-wider transition-all duration-300",
-                      isClient
-                        ? "bg-white text-primary-3 shadow-sm"
-                        : "text-n-4 hover:text-n-6 hover:bg-white/50",
-                    ].join(" ")}
-                  >
-                    <GraduationCap className="w-4 h-4" />
-                    Student
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setRole("vendor")}
-                    className={[
-                      "flex items-center justify-center gap-2 rounded-lg py-3 text-sm font-bold uppercase tracking-wider transition-all duration-300",
-                      !isClient
-                        ? "bg-white text-primary-3 shadow-sm"
-                        : "text-n-4 hover:text-n-6 hover:bg-white/50",
-                    ].join(" ")}
-                  >
-                    <Store className="w-4 h-4" />
-                    Vendor
-                  </button>
-                </div>
+
+                <label
+                  className={`relative flex items-center p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                    role === "vendor"
+                      ? "border-primary-3 bg-primary-3/5"
+                      : "border-n-3/10 hover:border-n-4/30 bg-white"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="role"
+                    value="vendor"
+                    checked={role === "vendor"}
+                    onChange={() => setRole("vendor")}
+                    className="w-5 h-5 text-primary-3 border-n-4 focus:ring-primary-3"
+                  />
+                  <div className="ml-4 flex items-center gap-3">
+                    <div
+                      className={`p-2 rounded-lg ${
+                        role === "vendor"
+                          ? "bg-primary-3 text-white"
+                          : "bg-n-2 text-n-4"
+                      }`}
+                    >
+                      <Store className="w-5 h-5" />
+                    </div>
+                    <span
+                      className={`font-bold ${
+                        role === "vendor" ? "text-n-8" : "text-n-5"
+                      }`}
+                    >
+                      Vendor
+                    </span>
+                  </div>
+                </label>
               </div>
-            )}
+            </div>
 
             {!isClient && (
               <div className="mb-5">
