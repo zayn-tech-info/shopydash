@@ -117,8 +117,7 @@ export const useAuthStore = create((set) => ({
     } catch (err) {
       if (err.response && err.response.status === 401) {
         set({ authUser: null, isCheckingAuth: false });
-        
-        
+
         localStorage.removeItem("token");
         return null;
       }
@@ -186,6 +185,35 @@ export const useAuthStore = create((set) => ({
         (typeof err?.response?.data === "string" ? err.response.data : null) ||
         err?.message ||
         "Failed to change password";
+      set({ error: serverMessage, isUpdatingProfile: false });
+      throw serverMessage;
+    }
+  },
+
+  switchRole: async (role) => {
+    set({ isUpdatingProfile: true, error: null });
+    try {
+      const res = await api.post("/api/v1/auth/switch-role", { role });
+      const payload = res?.data?.data ?? res?.data ?? res;
+
+      if (res.data.token || payload.token) {
+        localStorage.setItem("token", res.data.token || payload.token);
+      }
+
+      const userData = payload.user || payload;
+
+      set((state) => ({
+        authUser: { ...state.authUser, ...userData },
+        isUpdatingProfile: false,
+        error: null,
+      }));
+      return userData;
+    } catch (err) {
+      const serverMessage =
+        err?.response?.data?.message ||
+        (typeof err?.response?.data === "string" ? err.response.data : null) ||
+        err?.message ||
+        "Failed to switch role";
       set({ error: serverMessage, isUpdatingProfile: false });
       throw serverMessage;
     }

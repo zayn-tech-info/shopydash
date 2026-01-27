@@ -14,8 +14,8 @@ const route = express.Router();
 route.post(
   "/createVendorProfile",
   protectRoute,
-  verifyRole("vendor"),
-  createVendorProfile
+  verifyRole("vendor", "client"),
+  createVendorProfile,
 );
 
 route.get("/store/:storeUsername", getPublicVendorProfile);
@@ -28,7 +28,7 @@ route.patch(
   "/updateVendorProfile",
   protectRoute,
   verifyRole("vendor"),
-  updateVendorProfile
+  updateVendorProfile,
 );
 
 module.exports = route;

@@ -525,6 +525,51 @@ const validateOtp = asyncErrorHandler(async (req, res, next) => {
     .json({ success: true, message: "Email verified successfully" });
 });
 
+const switchRole = asyncErrorHandler(async (req, res, next) => {
+  const { role } = req.body;
+  const userId = req.user._id;
+
+  if (!role || !["client", "vendor"].includes(role)) {
+    return next(
+      new customError("Invalid role. Must be 'client' or 'vendor'", 400),
+    );
+  }
+
+  if (role === "vendor") {
+    const vendorProfile = await VendorProfile.findOne({ userId });
+    if (!vendorProfile) {
+      return next(new customError("Vendor profile required", 400));
+    }
+  }
+
+  const user = await User.findByIdAndUpdate(
+    userId,
+    { role },
+    { new: true, runValidators: true },
+  );
+
+  const hasProfile = await checkUserHasProfile(user);
+
+  let additionalData = {};
+  if (user.role === "vendor") {
+    const vendorProfile = await VendorProfile.findOne({
+      userId: user._id,
+    }).select("+bankDetails.subaccountCode");
+    if (vendorProfile) {
+      additionalData.vendorProfile = vendorProfile;
+    }
+  }
+
+  sendToken(
+    user,
+    `Switched to ${role} successfully`,
+    res,
+    200,
+    hasProfile,
+    additionalData,
+  );
+});
+
 module.exports = {
   signup,
   login,
@@ -538,4 +583,5 @@ module.exports = {
   resendVerificationCode,
   sendOtp,
   validateOtp,
+  switchRole,
 };

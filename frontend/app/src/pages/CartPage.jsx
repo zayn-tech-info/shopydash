@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCartStore } from "../store/cartStore";
 import { useAuthStore } from "../store/authStore";
+import AuthRequiredModal from "../components/common/AuthRequiredModal";
 import CheckoutModal from "../components/cart/CheckoutModal";
 import {
   ShoppingBag,
@@ -19,6 +20,7 @@ export default function CartPage() {
     useCartStore();
   const { authUser } = useAuthStore();
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   useEffect(() => {
     getCart();
@@ -62,12 +64,12 @@ export default function CartPage() {
 
   const totalAmount = Object.values(groupedItems).reduce(
     (acc, group) => acc + group.total,
-    0
+    0,
   );
 
   const handleCheckout = () => {
     if (!authUser) {
-      navigate("/login");
+      setIsAuthModalOpen(true);
       return;
     }
     setIsCheckoutOpen(true);
@@ -167,7 +169,7 @@ export default function CartPage() {
                               onClick={() =>
                                 updateQuantity(
                                   item.productId,
-                                  item.quantity - 1
+                                  item.quantity - 1,
                                 )
                               }
                               className="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-gray-600 hover:text-orange-600 disabled:opacity-50 transition-all active:scale-95 border border-gray-100"
@@ -182,7 +184,7 @@ export default function CartPage() {
                               onClick={() =>
                                 updateQuantity(
                                   item.productId,
-                                  item.quantity + 1
+                                  item.quantity + 1,
                                 )
                               }
                               className="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-gray-600 hover:text-orange-600 transition-all active:scale-95 border border-gray-100"
@@ -261,6 +263,11 @@ export default function CartPage() {
         groupedItems={groupedItems}
         authUser={authUser}
         userProfile={authUser}
+      />
+
+      <AuthRequiredModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
       />
     </div>
   );
