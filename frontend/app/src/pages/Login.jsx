@@ -103,7 +103,9 @@ export function Login() {
               By logging in, you agree to our{" "}
               <a
                 className="font-bold text-n-6 hover:text-primary-3 transition-colors"
-                href="#"
+                href="https://shopydash.com/privacy-policy"
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 Terms of Use
               </a>

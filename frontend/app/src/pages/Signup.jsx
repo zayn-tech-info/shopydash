@@ -156,18 +156,6 @@ export function Signup() {
           </div>
 
           {}
-          <div className="px-8 pb-8 mt-5">
-            <p className="text-center text-xs text-n-4">
-              By signing up, you agree to our{" "}
-              <a
-                className="font-bold text-n-6 hover:text-primary-3 transition-colors"
-                href="#"
-              >
-                Terms of Use
-              </a>
-              .
-            </p>
-          </div>
         </div>
       </div>
     </div>

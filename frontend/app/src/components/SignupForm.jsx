@@ -33,6 +33,7 @@ export function SignupForm({
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
   const [isSendingCode, setIsSendingCode] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const handleVerifyClick = async () => {
     if (!email) {
@@ -366,12 +367,37 @@ export function SignupForm({
           )}
         </div>
 
+        <div className="mt-6 mb-6 flex items-start gap-3">
+          <div className="flex items-center h-5">
+            <input
+              id="terms"
+              type="checkbox"
+              checked={termsAccepted}
+              onChange={(e) => setTermsAccepted(e.target.checked)}
+              className="w-4 h-4 rounded border-n-3/10 text-primary-3 focus:ring-primary-3/30 focus:ring-offset-0 bg-transparent cursor-pointer"
+            />
+          </div>
+          <div className="text-sm text-n-4">
+            <label htmlFor="terms" className="cursor-pointer select-none">
+              I agree to the{" "}
+            </label>
+            <a
+              href="https://shopydash.com/privacy-policy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold text-n-8 hover:text-primary-3 transition-colors"
+            >
+              Terms of Use
+            </a>
+          </div>
+        </div>
+
         <button
           type="submit"
-          disabled={isSigningUp || !isEmailVerified}
+          disabled={isSigningUp || !isEmailVerified || !termsAccepted}
           className={[
-            "mt-8 w-full h-12 bg-primary-3 hover:bg-primary-4 text-white rounded-xl font-code text-sm font-bold uppercase tracking-wider transition-all shadow-lg shadow-primary-3/20 hover:shadow-primary-3/40 hover:-translate-y-0.5",
-            isSigningUp || !isEmailVerified
+            "w-full h-12 bg-primary-3 hover:bg-primary-4 text-white rounded-xl font-code text-sm font-bold uppercase tracking-wider transition-all shadow-lg shadow-primary-3/20 hover:shadow-primary-3/40 hover:-translate-y-0.5",
+            isSigningUp || !isEmailVerified || !termsAccepted
               ? "opacity-70 cursor-not-allowed"
               : "cursor-pointer",
           ].join(" ")}

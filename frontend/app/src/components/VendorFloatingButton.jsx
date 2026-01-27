@@ -22,11 +22,7 @@ export const VendorFloatingButton = () => {
   }, 0);
 
   if (!authUser) return null;
-  
-  
-  
-  
-  
+
   if (location.pathname === "/messages") return null;
 
   const isVendor = authUser.role === "vendor";
@@ -66,12 +62,12 @@ export const VendorFloatingButton = () => {
           location.pathname !== "/vendor/add" &&
           (authUser.role !== "vendor" ||
             ["Shopydash Pro", "Shopydash Max"].includes(
-              authUser?.subscriptionPlan
+              authUser?.subscriptionPlan,
             )) && <div className="w-8 h-[1px] bg-white/20" />}
 
         {(authUser.role !== "vendor" ||
           ["Shopydash Pro", "Shopydash Max"].includes(
-            authUser?.subscriptionPlan
+            authUser?.subscriptionPlan,
           )) && (
           <button
             onClick={handleMessageClick}
