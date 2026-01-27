@@ -62,8 +62,8 @@ const userSchema = mongoose.Schema(
       validate: {
         validator: function (v) {
           if (!v) return true;
-          if (!v) return true;
-          return /^(?:\+234|234|0)[789][01]\d{8}$/.test(v);
+          const clean = v.replace(/[\s-]/g, "");
+          return /^(?:\+234|234|0)[789][01]\d{8}$/.test(clean);
         },
         message:
           "Please provide a valid Nigerian phone number (e.g., 08012345678 or +2348012345678)",
@@ -159,8 +159,8 @@ const userSchema = mongoose.Schema(
       validate: {
         validator: function (v) {
           if (!v) return true;
-          if (!v) return true;
-          return /^(?:\+234|234|0)[789][01]\d{8}$/.test(v);
+          const clean = v.replace(/[\s-]/g, "");
+          return /^(?:\+234|234|0)[789][01]\d{8}$/.test(clean);
         },
         message:
           "Please provide a valid Nigerian WhatsApp number (e.g., 08012345678)",

@@ -72,13 +72,17 @@ export default function CompleteRegistration() {
 
     const nigerianPhoneRegex = /^(?:\+234|234|0)[789][01]\d{8}$/;
 
-    if (showPhoneInput && !nigerianPhoneRegex.test(phoneNumber)) {
-      return toast.error(
-        "Invalid Phone Number. Please use a valid Nigerian number.",
-      );
+    if (showPhoneInput) {
+      const cleanPhone = phoneNumber.replace(/[\s-]/g, "");
+      if (!nigerianPhoneRegex.test(cleanPhone)) {
+        return toast.error(
+          "Invalid Phone Number. Please use a valid Nigerian number.",
+        );
+      }
     }
 
-    if (!nigerianPhoneRegex.test(whatsAppNumber)) {
+    const cleanWhatsApp = whatsAppNumber.replace(/[\s-]/g, "");
+    if (!nigerianPhoneRegex.test(cleanWhatsApp)) {
       return toast.error(
         "Invalid WhatsApp Number. Please use a valid Nigerian number.",
       );
@@ -91,7 +95,7 @@ export default function CompleteRegistration() {
     setLoading(true);
     try {
       await completeRegistration({
-        role: authUser?.role || role,
+        role,
         username: authUser?.username || username,
         phoneNumber: authUser?.phoneNumber || phoneNumber,
         schoolName,

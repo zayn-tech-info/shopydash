@@ -65,8 +65,9 @@ export function Signup() {
     if (!trimmed.phoneNumber)
       return (toast.error("Phone number is required"), false);
 
+    const cleanPhone = trimmed.phoneNumber.replace(/[\s-]/g, "");
     const nigerianPhoneRegex = /^(?:\+234|234|0)[789][01]\d{8}$/;
-    if (!nigerianPhoneRegex.test(trimmed.phoneNumber)) {
+    if (!nigerianPhoneRegex.test(cleanPhone)) {
       return (
         toast.error(
           "Invalid phone number. Please use a valid Nigerian number (e.g., 08012345678 or +234...)",
