@@ -8,6 +8,7 @@ import { useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import useChatStore from "../../store/chatStore";
+import AuthRequiredModal from "../common/AuthRequiredModal";
 
 export default function VendorSidebar({
   authUser,
@@ -61,10 +62,11 @@ export default function VendorSidebar({
 
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [whatsappNumber, setWhatsappNumber] = useState("");
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const handleMessage = async () => {
     if (!authUser) {
-      toast.error("Please login to message this vendor");
+      setIsAuthModalOpen(true);
       return;
     }
 
@@ -200,6 +202,14 @@ export default function VendorSidebar({
         title="Premium Vendor Only"
         message="This vendor is not on our Premium plan"
         confirmText="Continue to WhatsApp"
+        cancelText="Cancel"
+      />
+
+      <AuthRequiredModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        title="Login to Message"
+        message="You need to be logged in to message this vendor. Create an account or login to start a conversation."
         cancelText="Cancel"
       />
     </aside>

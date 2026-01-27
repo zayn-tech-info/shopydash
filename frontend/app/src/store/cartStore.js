@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { api } from "../lib/axios";
 import toast from "react-hot-toast";
+import { useAuthStore } from "../store/authStore";
 
 export const useCartStore = create((set, get) => ({
   cart: [],
@@ -9,6 +10,19 @@ export const useCartStore = create((set, get) => ({
 
   getCart: async () => {
     set({ isLoading: true, error: null });
+
+    const { authUser } = useAuthStore.getState();
+
+    if (!authUser) {
+      try {
+        const localCart = JSON.parse(localStorage.getItem("guestCart")) || [];
+        set({ cart: localCart, isLoading: false });
+      } catch (error) {
+        set({ error: "Failed to load local cart", isLoading: false });
+      }
+      return;
+    }
+
     try {
       const res = await api.get("/api/v1/cart/");
       set({ cart: res.data.cart.items, isLoading: false });
@@ -17,8 +31,46 @@ export const useCartStore = create((set, get) => ({
     }
   },
 
-  addToCart: async ({ productId, quantity, vendorPostId }) => {
+  addToCart: async ({ productId, quantity, vendorPostId, productDetails }) => {
     set({ isLoading: true, error: null });
+    const { authUser } = useAuthStore.getState();
+
+    if (!authUser) {
+      try {
+        const currentCart = get().cart;
+        const existingItemIndex = currentCart.findIndex(
+          (item) => item.productId === productId,
+        );
+
+        let newCart;
+        if (existingItemIndex > -1) {
+          newCart = [...currentCart];
+          newCart[existingItemIndex].quantity += quantity;
+        } else {
+          newCart = [
+            ...currentCart,
+            {
+              productId,
+              quantity,
+              vendorPostId,
+              ...productDetails, // Spread passed details (title, price, image, vendor info)
+              vendorId: productDetails?.vendor || {
+                _id: "guest-vendor",
+                businessName: "Vendor",
+              },
+            },
+          ];
+        }
+
+        localStorage.setItem("guestCart", JSON.stringify(newCart));
+        set({ cart: newCart, isLoading: false });
+        toast.success("Item added to cart");
+      } catch (error) {
+        set({ error: "Failed to add to local cart", isLoading: false });
+      }
+      return;
+    }
+
     try {
       const res = await api.post("/api/v1/cart/", {
         productId,
@@ -40,9 +92,19 @@ export const useCartStore = create((set, get) => ({
 
   removeFromCart: async (productId) => {
     const previousCart = get().cart;
+    const { authUser } = useAuthStore.getState();
+
     set({
       cart: previousCart.filter((item) => item.productId !== productId),
     });
+
+    if (!authUser) {
+      const newCart = previousCart.filter(
+        (item) => item.productId !== productId,
+      );
+      localStorage.setItem("guestCart", JSON.stringify(newCart));
+      return;
+    }
 
     try {
       await api.delete("/api/v1/cart/", { data: { productId } });
@@ -58,12 +120,19 @@ export const useCartStore = create((set, get) => ({
       return;
     }
 
+    const { authUser } = useAuthStore.getState();
     const previousCart = get().cart;
-    set({
-      cart: previousCart.map((item) =>
-        item.productId === productId ? { ...item, quantity } : item
-      ),
-    });
+
+    const newCart = previousCart.map((item) =>
+      item.productId === productId ? { ...item, quantity } : item,
+    );
+
+    set({ cart: newCart });
+
+    if (!authUser) {
+      localStorage.setItem("guestCart", JSON.stringify(newCart));
+      return;
+    }
 
     try {
       await api.patch("/api/v1/cart/", { productId, quantity });
@@ -75,6 +144,13 @@ export const useCartStore = create((set, get) => ({
 
   clearCart: async () => {
     set({ cart: [] });
+    const { authUser } = useAuthStore.getState();
+
+    if (!authUser) {
+      localStorage.removeItem("guestCart");
+      return;
+    }
+
     try {
       await api.delete("/api/v1/cart/clear");
     } catch (error) {

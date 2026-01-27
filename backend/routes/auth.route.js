@@ -12,6 +12,7 @@ const {
   resendVerificationCode,
   sendOtp,
   validateOtp,
+  switchRole,
 } = require("../controllers/auth/auth.controller");
 const { protectRoute } = require("../middleware/auth.middleware");
 const { changeAvatar } = require("../controllers/vendor/upload.controller");
@@ -23,13 +24,13 @@ console.log("Auth routes loading...");
 const authLimiter = createRateLimiter(
   10,
   15 * 60 * 1000,
-  "Too many authentication attempts, please try again later"
+  "Too many authentication attempts, please try again later",
 );
 
 const generalLimiter = createRateLimiter(
   100,
   15 * 60 * 1000,
-  "Too many requests, please try again later"
+  "Too many requests, please try again later",
 );
 
 route.post("/signup", authLimiter, signup);
@@ -41,7 +42,7 @@ route.post(
   "/complete-registration",
   protectRoute,
   generalLimiter,
-  completeRegistration
+  completeRegistration,
 );
 
 route.patch("/update", protectRoute, generalLimiter, changeAvatar, updateUser);
@@ -50,5 +51,6 @@ route.post("/verify-email", authLimiter, verifyEmail);
 route.post("/resend-verification-code", authLimiter, resendVerificationCode);
 route.post("/send-otp", authLimiter, sendOtp);
 route.post("/validate-otp", authLimiter, validateOtp);
+route.post("/switch-role", protectRoute, switchRole); // Added new route
 
 module.exports = route;

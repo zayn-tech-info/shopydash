@@ -167,7 +167,7 @@ export default function CompleteRegistration() {
                         role === "client" ? "text-n-8" : "text-n-5"
                       }`}
                     >
-                      Student
+                     Buyer
                     </span>
                   </div>
                 </label>
