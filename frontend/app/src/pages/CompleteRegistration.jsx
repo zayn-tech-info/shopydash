@@ -1,7 +1,16 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { createPortal } from "react-dom";
 import { toast } from "react-hot-toast";
-import { GraduationCap, Store, Eye, EyeOff } from "lucide-react";
+import {
+  GraduationCap,
+  Store,
+  Eye,
+  EyeOff,
+  Info,
+  X,
+  ArrowLeftRight,
+} from "lucide-react";
 import { useAuthStore } from "../store/authStore";
 import LocationSelector from "../components/LocationSelector";
 
@@ -23,7 +32,19 @@ export default function CompleteRegistration() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  // Role info modal state
+  const [showRoleInfo, setShowRoleInfo] = useState(false);
+  const [hasShownRoleInfo, setHasShownRoleInfo] = useState(false);
+
   const isClient = role === "client";
+
+  const handleRoleChange = (newRole) => {
+    setRole(newRole);
+    if (!hasShownRoleInfo) {
+      setShowRoleInfo(true);
+      setHasShownRoleInfo(true);
+    }
+  };
 
   useEffect(() => {
     if (authUser) {
@@ -149,7 +170,7 @@ export default function CompleteRegistration() {
                     name="role"
                     value="client"
                     checked={role === "client"}
-                    onChange={() => setRole("client")}
+                    onChange={() => handleRoleChange("client")}
                     className="w-5 h-5 text-primary-3 border-n-4 focus:ring-primary-3"
                   />
                   <div className="ml-4 flex items-center gap-3">
@@ -167,7 +188,7 @@ export default function CompleteRegistration() {
                         role === "client" ? "text-n-8" : "text-n-5"
                       }`}
                     >
-                     Buyer
+                      Buyer
                     </span>
                   </div>
                 </label>
@@ -184,7 +205,7 @@ export default function CompleteRegistration() {
                     name="role"
                     value="vendor"
                     checked={role === "vendor"}
-                    onChange={() => setRole("vendor")}
+                    onChange={() => handleRoleChange("vendor")}
                     className="w-5 h-5 text-primary-3 border-n-4 focus:ring-primary-3"
                   />
                   <div className="ml-4 flex items-center gap-3">
@@ -375,6 +396,46 @@ export default function CompleteRegistration() {
           </form>
         </div>
       </div>
+
+      {showRoleInfo &&
+        createPortal(
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-n-8/40 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full shadow-xl animate-in zoom-in-95 duration-200 relative">
+              <button
+                onClick={() => setShowRoleInfo(false)}
+                className="absolute top-4 right-4 p-2 hover:bg-n-2 rounded-full transition-colors text-n-5"
+              >
+                <X size={20} />
+              </button>
+
+              <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 bg-primary-3/10 rounded-full flex items-center justify-center text-primary-3 mb-6">
+                  <ArrowLeftRight size={32} />
+                </div>
+
+                <h3 className="text-2xl font-bold text-n-8 mb-2">
+                  Switching Roles
+                </h3>
+                <p className="text-n-4 mb-4">
+                  Don't worry! You can switch between Buyer and Vendor modes at
+                  any time.
+                </p>
+                <p className="text-n-4 text-sm mb-8 bg-n-2/30 p-3 rounded-xl border border-n-3/20">
+                  Go to <strong>Settings {">"} Account Info</strong> to manage
+                  your role later.
+                </p>
+
+                <button
+                  onClick={() => setShowRoleInfo(false)}
+                  className="w-full py-3.5 bg-primary-3 text-white rounded-xl font-bold hover:bg-primary-3/90 transition-colors shadow-lg shadow-primary-3/20"
+                >
+                  Got it
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

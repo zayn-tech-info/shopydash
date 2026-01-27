@@ -1,6 +1,6 @@
 const https = require("https");
 
-const paystackSecretKey = process.env.PAYSTACK_TEST_SECRET_KEY;
+const paystackSecretKey = process.env.PAYSTACK_LIVE_SECRET_KEY;
 
 const options = {
   hostname: "api.paystack.co",

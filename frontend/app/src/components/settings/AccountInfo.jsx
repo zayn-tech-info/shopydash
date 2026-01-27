@@ -32,7 +32,7 @@ export function AccountInfo({ user }) {
     try {
       await switchRole(newRole);
     } catch (error) {
-      if (error === "VENDOR_PROFILE_REQUIRED") {
+      if (error === "Vendor profile required") {
         setShowVendorPopup(true);
       } else {
         alert(error);
