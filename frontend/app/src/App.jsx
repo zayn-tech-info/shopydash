@@ -35,6 +35,8 @@ import SettingsPage from "./pages/SettingsPage";
 import NotificationsPage from "./pages/NotificationsPage";
 
 import { VerifyEmail } from "./pages/VerifyEmail";
+import { ForgotPassword } from "./pages/ForgotPassword";
+import { ResetPassword } from "./pages/ResetPassword";
 
 const App = () => {
   const authUser = useAuthStore((state) => state.authUser);
@@ -73,10 +75,10 @@ const App = () => {
               </div>
             </div>
           ),
-          { duration: 5000, icon: "📦" }
+          { duration: 5000, icon: "📦" },
         );
-        
-        const audio = new Audio("/assets/notification.mp3"); 
+
+        const audio = new Audio("/assets/notification.mp3");
         audio.play().catch((e) => console.log("Audio play failed", e));
       });
 
@@ -215,6 +217,14 @@ const App = () => {
             element={
               authUser ? <NotificationsPage /> : <Navigate to="/login" />
             }
+          />
+          <Route
+            path="/forgot-password"
+            element={!authUser ? <ForgotPassword /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/reset-password"
+            element={!authUser ? <ResetPassword /> : <Navigate to="/" />}
           />
         </Routes>
       </div>

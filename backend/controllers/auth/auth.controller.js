@@ -6,7 +6,10 @@ const validator = require("validator");
 const customError = require("../../errors/customError");
 const { cloudinary } = require("../vendor/upload.controller");
 const { checkUserHasProfile } = require("../../utils/profileHelper");
-const { sendVerificationEmail } = require("../../utils/email");
+const {
+  sendVerificationEmail,
+  sendPasswordResetEmail,
+} = require("../../utils/email");
 const crypto = require("crypto");
 const VerificationToken = require("../../models/verificationToken.model");
 
@@ -570,6 +573,84 @@ const switchRole = asyncErrorHandler(async (req, res, next) => {
   );
 });
 
+const forgotPassword = asyncErrorHandler(async (req, res, next) => {
+  const { email } = req.body;
+  if (!email) {
+    return next(new customError("Email is required", 400));
+  }
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    return next(new customError("User with this email does not exist", 404));
+  }
+
+  const resetToken = Math.floor(100000 + Math.random() * 900000).toString();
+
+  await VerificationToken.findOneAndUpdate(
+    { identifier: email },
+    {
+      token: resetToken,
+      expires: Date.now() + 10 * 60 * 1000,
+      verified: false,
+    },
+    { upsert: true, new: true },
+  );
+
+  try {
+    await sendPasswordResetEmail(email, resetToken);
+    res.status(200).json({
+      success: true,
+      message: "Password reset code sent to your email",
+    });
+  } catch (error) {
+    return next(new customError("Failed to send password reset email", 500));
+  }
+});
+
+const resetPassword = asyncErrorHandler(async (req, res, next) => {
+  const { email, otp, newPassword, confirmPassword } = req.body;
+
+  if (!email || !otp || !newPassword || !confirmPassword) {
+    return next(new customError("All fields are required", 400));
+  }
+
+  if (newPassword !== confirmPassword) {
+    return next(new customError("Passwords do not match", 400));
+  }
+
+  const tokenRecord = await VerificationToken.findOne({ identifier: email });
+  if (!tokenRecord) {
+    return next(new customError("Invalid or expired reset code", 400));
+  }
+
+  if (tokenRecord.token !== otp || tokenRecord.expires < Date.now()) {
+    return next(new customError("Invalid or expired reset code", 400));
+  }
+
+  const user = await User.findOne({ email }).select("+password");
+  if (!user) {
+    return next(new customError("User not found", 404));
+  }
+
+  const isSamePassword = await user.comparePassword(newPassword);
+  if (isSamePassword) {
+    return next(
+      new customError(
+        "New password cannot be the same as the old password",
+        400,
+      ),
+    );
+  }
+
+  user.password = newPassword;
+  await user.save();
+
+  await VerificationToken.deleteOne({ _id: tokenRecord._id });
+
+  const hasProfile = await checkUserHasProfile(user);
+  sendToken(user, "Password reset successfully", res, 200, hasProfile);
+});
+
 module.exports = {
   signup,
   login,
@@ -584,4 +665,6 @@ module.exports = {
   sendOtp,
   validateOtp,
   switchRole,
+  forgotPassword,
+  resetPassword,
 };

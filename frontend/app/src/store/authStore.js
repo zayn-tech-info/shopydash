@@ -218,4 +218,38 @@ export const useAuthStore = create((set) => ({
       throw serverMessage;
     }
   },
+
+  forgotPassword: async (email) => {
+    set({ isLogginIn: true, error: null });
+    try {
+      const res = await api.post("/api/v1/auth/forgot-password", { email });
+      set({ isLogginIn: false, error: null });
+      return res.data;
+    } catch (err) {
+      const serverMessage =
+        err?.response?.data?.message ||
+        (typeof err?.response?.data === "string" ? err.response.data : null) ||
+        err?.message ||
+        "Failed to send reset email";
+      set({ error: serverMessage, isLogginIn: false });
+      throw serverMessage;
+    }
+  },
+
+  resetPassword: async (data) => {
+    set({ isLogginIn: true, error: null });
+    try {
+      const res = await api.post("/api/v1/auth/reset-password", data);
+      set({ isLogginIn: false, error: null });
+      return res.data;
+    } catch (err) {
+      const serverMessage =
+        err?.response?.data?.message ||
+        (typeof err?.response?.data === "string" ? err.response.data : null) ||
+        err?.message ||
+        "Failed to reset password";
+      set({ error: serverMessage, isLogginIn: false });
+      throw serverMessage;
+    }
+  },
 }));

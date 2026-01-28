@@ -29,7 +29,7 @@ export function LoginForm() {
       username: username?.trim() ?? "",
     };
 
-    if (!trimmed.password) return toast.error("Password is required"), false;
+    if (!trimmed.password) return (toast.error("Password is required"), false);
 
     return true;
   };
@@ -55,7 +55,7 @@ export function LoginForm() {
       reloadApp("/", true);
     } catch (err) {
       const msg =
-        typeof err === "string" ? err : err?.message ?? "Signup failed";
+        typeof err === "string" ? err : (err?.message ?? "Signup failed");
       toast.error(msg);
     }
   };
@@ -90,12 +90,12 @@ export function LoginForm() {
               >
                 Password
               </label>
-              <a
-                href="#"
+              <Link
+                to="/forgot-password"
                 className="text-xs font-bold text-primary-3 hover:text-primary-4 transition-colors"
               >
                 Forgot password?
-              </a>
+              </Link>
             </div>
             <div className="relative">
               <input
