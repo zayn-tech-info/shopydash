@@ -120,4 +120,43 @@ const sendOrderNotificationEmail = async (email, vendorName, orderDetails) => {
   }
 };
 
-module.exports = { sendVerificationEmail, sendOrderNotificationEmail };
+const sendPasswordResetEmail = async (email, code) => {
+  try {
+    const content = `
+      <p style="color: #4a4a4a; font-size: 16px; line-height: 1.6; margin-bottom: 30px; text-align: center;">
+        We received a request to reset your password for your ShopyDash account.
+      </p>
+      
+      <div style="margin: 0 auto; width: fit-content; text-align: center; background-color: #FFF0EB; padding: 15px 35px; border-radius: 8px; border: 1px dashed #F7561B;">
+        <span style="font-size: 32px; font-weight: bold; color: #F7561B; letter-spacing: 6px; display: block;">${code}</span>
+      </div>
+      
+      <p style="color: #666666; font-size: 14px; margin-top: 30px; text-align: center;">
+        This code will expire in 10 minutes.
+      </p>
+      
+      <p style="color: #888888; font-size: 13px; margin-top: 20px; text-align: center; border-top: 1px solid #eeeeee; padding-top: 20px;">
+        If you didn't request a password reset, you can safely ignore this email.
+      </p>
+    `;
+
+    const data = await resend.emails.send({
+      from: "Shopydash <noreply@shopydash.com>",
+      to: [email],
+      subject: "Reset your password",
+      html: generateEmailLayout("Password Reset Request", content),
+    });
+
+    if (data.error) throw new Error(data.error.message);
+    return data;
+  } catch (error) {
+    console.error("Error sending password reset email:", error);
+    throw error;
+  }
+};
+
+module.exports = {
+  sendVerificationEmail,
+  sendOrderNotificationEmail,
+  sendPasswordResetEmail,
+};

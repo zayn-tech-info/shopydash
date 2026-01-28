@@ -13,6 +13,8 @@ const {
   sendOtp,
   validateOtp,
   switchRole,
+  forgotPassword,
+  resetPassword,
 } = require("../controllers/auth/auth.controller");
 const { protectRoute } = require("../middleware/auth.middleware");
 const { changeAvatar } = require("../controllers/vendor/upload.controller");
@@ -51,6 +53,8 @@ route.post("/verify-email", authLimiter, verifyEmail);
 route.post("/resend-verification-code", authLimiter, resendVerificationCode);
 route.post("/send-otp", authLimiter, sendOtp);
 route.post("/validate-otp", authLimiter, validateOtp);
-route.post("/switch-role", protectRoute, switchRole); // Added new route
+route.post("/switch-role", protectRoute, switchRole);
+route.post("/forgot-password", authLimiter, forgotPassword);
+route.post("/reset-password", authLimiter, resetPassword);
 
 module.exports = route;
