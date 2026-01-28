@@ -97,9 +97,15 @@ export function Signup() {
     try {
       await signup(payload);
 
-      toast.success("Account created! Let's finish your profile.");
+      toast.success("Account created! Please choose a plan.");
 
       await checkAuth();
+
+      if (role === "vendor") {
+        navigate("/pricing");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       const msg =
         typeof err === "string" ? err : (err?.message ?? "Signup failed");
