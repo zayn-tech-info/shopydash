@@ -64,7 +64,7 @@ export function NearByVendors({ posts, showHeader = true, loading = false }) {
     <section className="container mx-auto max-w-7xl px-4 md:px-8 mt-12 pb-20">
       {showHeader && (
         <header className="flex items-center justify-between mb-8">
-          <h2 className="h4 text-n-8">New Arrivals</h2>
+          <h2 className="h4 text-n-8">Featured products</h2>
           <Link to="/feeds">
             <button
               type="button"
