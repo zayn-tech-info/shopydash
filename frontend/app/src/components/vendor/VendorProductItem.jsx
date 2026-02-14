@@ -3,7 +3,7 @@ import SubscriptionBadge from "../common/SubscriptionBadge";
 import UserAvatar from "../UserAvatar";
 import { useAuthStore } from "../../store/authStore";
 import { useCartStore } from "../../store/cartStore";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Star, Plus, MapPin, Tag, Package } from "lucide-react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 
@@ -11,20 +11,25 @@ function VendorProductItem({ product, vendorId }) {
   const { authUser } = useAuthStore();
   const addToCart = useCartStore((state) => state.addToCart);
 
-  const title =
-    product?.title || product?.name || `Product ${product?._id || ""}`;
-  const img =
-    product?.images?.[0] || product?.image || "/public/product-placeholder.png";
-  const price = product?.price ? `₦${product.price}` : null;
+  const title = product?.title || product?.name || `Product ${product?._id || ""}`;
+  const img = product?.images?.[0] || product?.image || "/public/product-placeholder.png";
+  const price = product?.price ? Number(product.price) : 0;
+  // Simulated original price for demo (20% more), or use real one if available
+  const originalPrice = product?.originalPrice || price * 1.2;
+  const description = product?.description || "";
+  const stock = product?.stock ?? product?.quantity ?? null;
+  const rating = product?.rating || (Math.random() * 2 + 3).toFixed(1); // Fallback to random rating if missing
+  const sold = product?.sold || Math.floor(Math.random() * 500) + 10; // Fallback sold count
+  const isOutOfStock = stock === 0;
 
-  const handleAddToCart = async () => {
+  const handleAddToCart = async (e) => {
+    e.preventDefault(); // Prevent navigation if clicking the button works inside a Link
+    
     try {
-      const postId =
-        product.vendorPostId || product.sectionId || product.postId;
+      const postId = product.vendorPostId || product.sectionId || product.postId;
 
       if (!postId) {
-        toast.error("Unable to add this item: Missing post reference");
-        console.error("Product missing vendorPostId:", product);
+        toast.error("Unable to add: Missing info");
         return;
       }
 
@@ -39,71 +44,103 @@ function VendorProductItem({ product, vendorId }) {
           vendor: product.vendor,
         },
       });
+      // success toast handled inside cartStore; avoid duplicate notifications
     } catch (error) {
       console.error(error);
-      toast.error(
-        error.response?.data?.message ||
-          error.message ||
-          "Failed to add to cart",
-      );
+      toast.error("Failed to add to cart");
     }
   };
 
   return (
-    <div className="bg-white border border-n-3/20 rounded-xl p-3 flex flex-col gap-3 h-full group md:hover:shadow-lg transition-all duration-300 md:hover:-translate-y-1">
-      <div className="w-full aspect-square bg-n-2 rounded-lg overflow-hidden relative">
+    <div className="group relative bg-white rounded-lg border border-n-3/10 overflow-hidden hover:shadow-md transition-shadow duration-300">
+      {/* Product Image */}
+      <div className="relative aspect-square bg-n-2/10 overflow-hidden">
         <img
           src={img}
           alt={title}
-          className="w-full h-full object-cover md:group-hover:scale-110 transition-transform duration-500"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
-        <div className="absolute inset-0 bg-black/0 md:group-hover:bg-black/10 transition-colors duration-300" />
+        
+        {/* View Profile Tag */}
         {product?.vendor && (
           <Link
             to={`/p/${product.vendor.username}`}
-            className="absolute top-0 right-0 z-10 bg-primary-3 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl rounded-tr-lg shadow-sm hover:bg-primary-4 transition-colors"
+            className="absolute top-0 right-0 bg-primary-3 text-white text-[10px] font-bold px-3 py-1.5 rounded-bl-xl z-20 hover:bg-primary-4 transition-colors shadow-sm"
           >
             View Profile
           </Link>
         )}
+
+        {/* Description Overlay on Hover */}
+        {description && (
+          <div className="absolute inset-0 bg-black/60 p-4 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center text-center backdrop-blur-[2px]">
+            <p className="line-clamp-6 font-medium leading-relaxed">{description}</p>
+          </div>
+        )}
+
+        {/* Out of Stock Overlay */}
+        {isOutOfStock && (
+          <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
+            <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded">Out of Stock</span>
+          </div>
+        )}
       </div>
 
-      <div className="flex-1 flex flex-col min-w-0">
-        <div className="text-sm font-bold text-n-8 truncate mb-1">{title}</div>
+      {/* Product Info */}
+      <div className="p-2.5">
+        {/* Title (no navigation to product details) */}
+        <h3
+          className="text-[13px] md:text-base leading-snug text-n-8 font-bold line-clamp-2 min-h-[2.5em] mb-1.5"
+          title={title}
+        >
+          {title}
+        </h3>
 
-        {price && (
-          <div className="text-sm font-code font-bold text-primary-3 mb-2">
-            {price}
+
+        {/* Rating & Sold - Mimicking the marketplace style */}
+        <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center text-orange-400">
+            <Star size={10} fill="currentColor" />
+            <Star size={10} fill="currentColor" />
+            <Star size={10} fill="currentColor" />
+            <Star size={10} fill="currentColor" />
+            <Star size={10} fill="currentColor" className="text-n-3" />
           </div>
-        )}
-
-        {product?.vendor && (
-          <div className="flex items-center gap-2 mb-3">
-            <UserAvatar
-              profilePic={product.vendor.profilePic || product.vendor.logo}
-              alt={product.vendor.businessName}
-              className="w-6 h-6 border border-n-3 shrink-0"
-            />
-            <span className="text-xs text-n-5 font-medium truncate">
-              {product.vendor.businessName || product.vendor.username}
-            </span>
-            <SubscriptionBadge
-              plan={product.vendor.subscriptionPlan}
-              size="sm"
-            />
+          <span className="text-[10px] text-n-4">{sold} sold</span>
+        </div>
+ 
+        <div className="flex items-end justify-between gap-2 mt-auto">
+          <div>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-base font-bold text-n-8">₦{price.toLocaleString()}</span>
+              {/* <span className="text-[10px] text-n-4 line-through">₦{Math.round(originalPrice).toLocaleString()}</span> */}
+            </div>
+            {/* Vendor Name */}
+            {product?.vendor && (
+               <Link to={`/p/${product.vendor.username}`} className="flex items-center gap-2 mt-1.5 group/vendor hover:opacity-80 transition-opacity">
+                 <UserAvatar 
+                    profilePic={product.vendor.profilePic} 
+                    alt={product.vendor.businessName} 
+                    className="w-5 h-5 rounded-full border border-n-3/10 shadow-sm flex-shrink-0" 
+                 />
+                 <span className="text-[11px] font-medium text-n-6 truncate hover:text-primary-3 transition-colors max-w-[120px]">
+                   {product.vendor.businessName || product.vendor.username}
+                 </span>
+               </Link>
+            )}
           </div>
-        )}
 
-        {String(authUser?._id) !==
-          String(product?.vendorId?._id || product?.vendorId || vendorId) && (
-          <button
-            onClick={handleAddToCart}
-            className="w-full h-7 rounded-md bg-primary-3 text-white font-code text-xs font-bold uppercase tracking-wider hover:bg-primary-4 transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-95"
-          >
-            {}
-            Add to cart
-          </button>
-        )}
+        
+          {String(authUser?._id) !== String(product?.vendorId?._id || product?.vendorId || vendorId) && !isOutOfStock && (
+            <button
+              onClick={handleAddToCart}
+              className="w-8 h-8 rounded-full border border-primary-3 text-primary-3 flex items-center justify-center hover:bg-primary-3 hover:text-white transition-all shadow-sm active:scale-95 flex-shrink-0"
+              title="Add to Cart"
+            >
+              <Plus size={18} />
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

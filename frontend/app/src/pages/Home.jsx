@@ -19,14 +19,13 @@ export function Home() {
 
   return (
     <Fragment>
-      <div className="bg-n-1 min-h-screen pb-20 md:pb-0">
+      <div className="bg-n-1 min-h-screen pb-5 md:pb-0">
         <HomeContent />
-        <div className="space-y-12 md:space-y-16 pb-12">
+        <div className="pb-12">
           <NewArrival />
           <Trending />
           <NearByVendors posts={feedPosts} />
           <FeaturedVendor />
-          {}
         </div>
       </div>
       <BottomNav />

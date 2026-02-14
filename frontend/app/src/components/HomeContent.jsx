@@ -134,19 +134,19 @@ export function HomeContent({
         />
       )}
 
-      <section className="pt-8 pb-6 px-4 md:px-8 bg-white border-b border-n-3/10 shadow-sm relative">
+      <section className="py-2 px-2 md:px-4 bg-white border-b border-n-3/10 shadow-sm relative">
         <div className="container mx-auto max-w-7xl">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 relative">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-2 relative">
             <div>
               {authUser ? (
                 <>
-                  <h1 className="h4 text-n-8">
+                  <h1 className="text-lg font-bold text-n-8">
                     Hi{" "}
                     <span className="text-primary-3 break-all">
                       {authUser.username}👋
                     </span>
                   </h1>
-                  <p className="body-2 text-n-4 mt-1">
+                  <p className="text-xs text-n-4">
                     Ready to shop or sell something today?
                   </p>
                 </>
@@ -193,12 +193,12 @@ export function HomeContent({
                     {}
                     <div className="relative group">
                       <Search
-                        className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-300 ${
+                        className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-300 ${
                           isSearchActive
                             ? "text-n-4"
                             : "text-n-4 group-hover:text-primary-3"
                         }`}
-                        size={20}
+                        size={18}
                       />
 
                       <input
@@ -208,35 +208,35 @@ export function HomeContent({
                         onFocus={() => setIsSearchActive(true)}
                         placeholder={placeholder}
                         aria-label="text"
-                        className={`w-full h-12 bg-n-2/30 border border-transparent outline-none text-n-8 placeholder:text-n-4/60 transition-all duration-300 ${
+                        className={`w-full h-10 bg-n-2/30 border border-transparent outline-none text-sm text-n-8 placeholder:text-n-4/60 transition-all duration-300 ${
                           isSearchActive
-                            ? "rounded-xl pl-12 pr-10 focus:bg-n-2/50"
-                            : "rounded-xl pl-12 pr-14 focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10"
+                            ? "rounded-xl pl-10 pr-9 focus:bg-n-2/50"
+                            : "rounded-xl pl-10 pr-12 focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10"
                         }`}
                       />
 
-                      {}
-                      <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                      {/* Search Button */}
+                      <div className="absolute right-1.5 top-1/2 -translate-y-1/2">
                         {isSearchActive ? (
                           <button
                             type="button"
                             onClick={() => setIsSearchActive(false)}
-                            className="p-2 hover:bg-n-3/20 rounded-full text-n-4 transition-colors"
+                            className="p-1.5 hover:bg-n-3/20 rounded-full text-n-4 transition-colors"
                           >
-                            <X size={18} />
+                            <X size={16} />
                           </button>
                         ) : (
                           <button
                             type="submit"
-                            className="p-2 bg-primary-3 text-white rounded-lg hover:bg-primary-4 transition-all shadow-md shadow-primary-3/20 hover:shadow-lg hover:shadow-primary-3/30"
+                            className="p-1.5 bg-primary-3 text-white rounded-lg hover:bg-primary-4 transition-all shadow-sm shadow-primary-3/20 hover:shadow-md hover:shadow-primary-3/30"
                           >
-                            <SearchIcon size={18} />
+                            <SearchIcon size={16} />
                           </button>
                         )}
                       </div>
                     </div>
 
-                    {}
+                    {/* Filter Options */}
                     <div
                       className={`grid grid-cols-1 md:grid-cols-2 gap-4 transition-all duration-500 ease-in-out overflow-hidden ${
                         isSearchActive
@@ -394,25 +394,27 @@ export function HomeContent({
             </div>
           </div>
 
-          <div className="relative">
-            <div className="w-full flex gap-6 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0 md:justify-between">
+          {/* Categories Section */}
+          <div className="relative my-10">
+            <div className="w-full flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-1 -mx-2 px-2 md:mx-0 md:px-0 md:justify-between md:flex-nowrap">
               {categories.map((item) => {
                 const Icon = item.icon;
 
                 return (
-                  <div
+                  <Link
                     key={item.id}
-                    className="flex-shrink-0 group cursor-pointer"
+                    to={`/feeds?category=${encodeURIComponent(item.text)}`}
+                    className="flex-shrink-0 group"
                   >
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="w-16 h-16 rounded-2xl bg-n-2/20 group-hover:bg-primary-3/10 flex items-center justify-center text-n-6 group-hover:text-primary-3 transition-all duration-300 border border-transparent group-hover:border-primary-3/20">
-                        {Icon && <Icon size={24} />}
+                    <div className="flex flex-col items-center gap-1">
+                      <div className="w-11 h-11 md:w-12 md:h-12 rounded-full bg-n-2/30 group-hover:bg-primary-3/10 flex items-center justify-center text-n-6 group-hover:text-primary-3 transition-all duration-200 border border-n-3/10 group-hover:border-primary-3/30">
+                        {Icon && <Icon size={18} strokeWidth={1.5} />}
                       </div>
-                      <p className="text-xs font-bold uppercase tracking-wider text-n-5 group-hover:text-n-8 transition-colors">
+                      <p className="text-[9px] font-bold text-n-6 group-hover:text-primary-3 transition-colors whitespace-nowrap">
                         {item.text}
                       </p>
                     </div>
-                  </div>
+                  </Link>
                 );
               })}
             </div>
