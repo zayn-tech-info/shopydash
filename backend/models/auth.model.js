@@ -217,6 +217,14 @@ const userSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isBanned: {
+      type: Boolean,
+      default: false,
+    },
+    banReason: {
+      type: String,
+      trim: true,
+    },
     verificationCode: {
       type: String,
       select: false,

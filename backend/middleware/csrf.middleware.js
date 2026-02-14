@@ -8,8 +8,10 @@ const csrfProtection = (req, res, next) => {
   const allowedOrigins = [
     "http://localhost:5173",
     "http://localhost:5174",
+    "http://localhost:5175",
     "https://shopydash-v1.vercel.app",
     "https://app.shopydash.com",
+    "https://admin.shopydash.com",
     "https://shopydash.com",
     "https://www.shopydash.com",
   ];

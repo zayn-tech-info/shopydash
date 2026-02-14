@@ -39,6 +39,14 @@ const protectRoute = asyncErrorHandler(async (req, res, next) => {
     });
   }
 
+  if (user.isBanned) {
+    const error = new customError(
+      "Your account has been suspended. Contact support for assistance.",
+      403
+    );
+    return next(error);
+  }
+
   if (await user.isPasswordChanged(decodeToken.iat)) {
     const error = new customError(
       "Your password was changed recently. Please login again.",
