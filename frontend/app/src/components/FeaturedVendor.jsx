@@ -5,9 +5,10 @@ import { VendorsPost } from "../constants";
 import { useVendorProfileStore } from "../store/vendorProfileStore";
 import { useEffect } from "react";
 import UserAvatar from "./UserAvatar";
+import { FeedSkeleton } from "./skeletons/FeedSkeleton";
 
 export function FeaturedVendor({ limit = 10 }) {
-  const { vendors, getAllVendorProfile } = useVendorProfileStore();
+  const { vendors, getAllVendorProfile, isGettingVendorProfile } = useVendorProfileStore();
 
   useEffect(() => {
     async function getVendors() {
@@ -20,6 +21,7 @@ export function FeaturedVendor({ limit = 10 }) {
     getVendors();
   }, [getAllVendorProfile]);
 
+  if (isGettingVendorProfile) return <FeedSkeleton />;
   if (!vendors) return null;
 
   const featuredVendors = vendors.filter(

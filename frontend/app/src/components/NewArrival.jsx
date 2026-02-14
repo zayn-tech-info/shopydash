@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { api } from "../lib/axios";
 import VendorProductItem from "./vendor/VendorProductItem";
 import { Sparkles, ArrowRight } from "lucide-react";
+import { FeedSkeleton } from "./skeletons/FeedSkeleton";
 
 export function NewArrival({ limit = 8 }) {
   const [arrivals, setArrivals] = useState([]);
@@ -23,6 +24,8 @@ export function NewArrival({ limit = 8 }) {
   }, [limit]);
 
   if (!loading && arrivals.length === 0) return null;
+
+  if (loading) return <FeedSkeleton />;
 
   return (
     <section className="container mx-auto max-w-7xl px-2 md:px-4 py-4">

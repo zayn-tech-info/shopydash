@@ -2,13 +2,13 @@ import { Skeleton } from "@mui/material";
 
 export function FeedSkeleton() {
   return (
-    <div className="container mx-auto max-w-7xl px-4 md:px-8 mt-12 pb-20">
-      <div className="flex items-center justify-between mb-8">
-        <Skeleton variant="text" width={200} height={32} />
-        <Skeleton variant="text" width={60} height={20} />
+    <div className="container mx-auto max-w-7xl px-2 md:px-4 py-4">
+      <div className="flex items-center justify-between mb-5">
+        <Skeleton variant="text" width={220} height={28} />
+        <Skeleton variant="text" width={70} height={20} />
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
         {Array.from({ length: 10 }).map((_, index) => (
           <div
             key={index}

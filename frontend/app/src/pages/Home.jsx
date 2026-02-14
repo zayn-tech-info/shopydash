@@ -11,6 +11,7 @@ import { useProductStore } from "../store/productStore";
 export function Home() {
   const feedPosts = useProductStore((state) => state.feedPosts);
   const getFeedPosts = useProductStore((state) => state.getFeedPosts);
+  const isFetchingFeedPosts = useProductStore((state) => state.isFetchingFeedPosts);
 
   useEffect(() => {
     getFeedPosts();
@@ -24,7 +25,7 @@ export function Home() {
         <div className="pb-12">
           <NewArrival />
           <Trending />
-          <NearByVendors posts={feedPosts} />
+          <NearByVendors posts={feedPosts} loading={isFetchingFeedPosts} />
           <FeaturedVendor />
         </div>
       </div>

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { api } from "../lib/axios";
 import VendorProductItem from "./vendor/VendorProductItem";
 import { Flame, ArrowRight } from "lucide-react";
+import { FeedSkeleton } from "./skeletons/FeedSkeleton";
 
 export function Trending({ limit = 8, title = "Trending Now" }) {
   const [items, setItems] = useState([]);
@@ -23,6 +24,8 @@ export function Trending({ limit = 8, title = "Trending Now" }) {
   }, [limit]);
 
   if (!loading && items.length < 4) return null;
+
+  if (loading) return <FeedSkeleton />;
 
   return (
     <section className="container mx-auto max-w-7xl px-2 md:px-4 py-4">
