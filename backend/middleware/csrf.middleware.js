@@ -14,7 +14,7 @@ const csrfProtection = (req, res, next) => {
     "https://admin.shopydash.com",
     "https://shopydash.com",
     "https://www.shopydash.com",
-    "https://adminshopydash.vercel.app",
+    "https://admin.shopydash.com",
   ];
 
    
