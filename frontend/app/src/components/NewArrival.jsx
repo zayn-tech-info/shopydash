@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { api } from "../lib/axios";
 import VendorProductItem from "./vendor/VendorProductItem";
+import { Sparkles, ArrowRight } from "lucide-react";
 
-export function NewArrival({ limit = 10 }) {
+export function NewArrival({ limit = 8 }) {
   const [arrivals, setArrivals] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -23,24 +25,22 @@ export function NewArrival({ limit = 10 }) {
   if (!loading && arrivals.length === 0) return null;
 
   return (
-    <section className="container mx-auto max-w-7xl px-4 md:px-8 mt-12">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-        <div>
-          <h2 className="h4 text-n-8">New Arrivals</h2>
-          <p className="body-2 text-n-4 mt-1">
-            Fresh on Campus! Newly listed items from vendors near you.
-          </p>
-        </div>
-        <button className="hidden md:flex items-center gap-2 font-code text-xs font-bold uppercase tracking-wider text-primary-3 hover:text-primary-4 transition-colors">
-          View all items
-        </button>
+    <section className="container mx-auto max-w-7xl px-2 md:px-4 py-4">
+      {/* Section Header */}
+      <div className="flex flex-row items-center justify-between gap-4 mb-5">
+        <h2 className="text-xl md:text-2xl font-bold text-n-8">New Arrivals</h2>
+        <Link 
+          to="/feeds?sort=newest"
+          className="text-sm font-semibold text-primary-3 hover:text-primary-4 transition-colors flex items-center gap-1"
+        >
+          See All <ArrowRight size={16} />
+        </Link>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+      {/* Products Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
         {arrivals.map((item) => (
-          <div key={item._id} className="h-full">
-            <VendorProductItem product={item} vendorId={item.vendorId} />
-          </div>
+          <VendorProductItem key={item._id} product={item} vendorId={item.vendorId} />
         ))}
       </div>
     </section>

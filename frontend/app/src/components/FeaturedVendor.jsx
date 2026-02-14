@@ -1,4 +1,4 @@
-import { Star } from "lucide-react";
+import { Star, Store, ArrowRight } from "lucide-react";
 import SubscriptionBadge from "./common/SubscriptionBadge";
 import { Link } from "react-router-dom";
 import { VendorsPost } from "../constants";
@@ -29,60 +29,53 @@ export function FeaturedVendor({ limit = 10 }) {
   if (featuredVendors.length === 0) return null;
 
   return (
-    <section className="container mx-auto max-w-7xl px-4 md:px-8 mt-12 pb-8">
-      <div className="flex items-end justify-between gap-4 mb-6">
-        <div>
-          <h2 className="h4 text-n-8">Featured vendors</h2>
-          <p className="body-2 text-n-4 mt-1">
-            Top {Math.min(limit, featuredVendors.length)} trusted sellers
-          </p>
-        </div>
+    <section className="container mx-auto max-w-7xl px-2 md:px-4 py-4">
+      {/* Section Header */}
+      <div className="flex flex-row items-center justify-between gap-4 mb-5">
+        <h2 className="text-xl md:text-2xl font-bold text-n-8">Top Sellers</h2>
+        <Link 
+          to="/feeds"
+          className="text-sm font-semibold text-primary-3 hover:text-primary-4 transition-colors flex items-center gap-1"
+        >
+          See All <ArrowRight size={16} />
+        </Link>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      {/* Vendors Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
         {featuredVendors.slice(0, limit).map((vendor) => (
-          <article
-            key={vendor._id}
-            className="group rounded-2xl border border-n-3/10 bg-white p-5 md:hover:shadow-xl md:hover:shadow-n-3/10 transition-all duration-300 md:hover:-translate-y-1"
+          <Link 
+            key={vendor._id} 
+            to={`/p/${vendor.username}`}
+            className="group block rounded-xl border border-n-3/15 bg-white p-3 hover:border-primary-3/30 transition-all duration-300"
           >
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col items-center text-center gap-2">
               <UserAvatar
                 profilePic={vendor.profilePic}
                 alt={`${vendor.businessName} avatar`}
-                className="h-14 w-14 border-2 border-n-1 shadow-sm"
+                className="h-12 w-12 border border-n-3/10 shadow-sm rounded-full"
               />
 
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className="truncate font-bold text-n-8 text-lg">
-                    {vendor.businessName}
-                  </p>
+              <div className="min-w-0 w-full">
+                <p className="truncate text-sm font-bold underline text-n-8">
+                  {vendor.businessName}
+                </p>
+                
+                <div className="flex items-center justify-center gap-2 mt-1">
+                  <div className="flex items-center gap-0.5 text-amber-500">
+                    <Star size={10} className="fill-current" />
+                    <span className="text-[10px] font-bold text-n-7">
+                      {vendor.rating || "5.0"}
+                    </span>
+                  </div>
                   <SubscriptionBadge
                     plan={vendor.subscriptionPlan}
-                    size="sm"
-                    className="flex-shrink-0"
+                    size="xs"
                   />
-                </div>
-                <div className="flex items-center gap-1 text-primary-3">
-                  <Star size={14} className="fill-current" />
-                  <span className="text-sm font-bold text-n-8">
-                    {vendor.rating || "5.0"}
-                  </span>
                 </div>
               </div>
             </div>
-
-            <div className="mt-5">
-              <Link to={`/p/${vendor.username}`}>
-                <button
-                  type="button"
-                  className="w-full h-10 inline-flex items-center justify-center rounded-xl bg-n-8 text-white font-code text-xs font-bold uppercase tracking-wider hover:bg-n-6 transition-colors shadow-md"
-                >
-                  View Shop
-                </button>
-              </Link>
-            </div>
-          </article>
+          </Link>
         ))}
       </div>
     </section>

@@ -4,6 +4,7 @@ import { useCartStore } from "../store/cartStore";
 import { useAuthStore } from "../store/authStore";
 import { FeedSkeleton } from "./skeletons/FeedSkeleton";
 import VendorProductItem from "./vendor/VendorProductItem";
+import { Grid3X3, ArrowRight } from "lucide-react";
 
 export function NearByVendors({ posts, showHeader = true, loading = false }) {
   const getCart = useCartStore((state) => state.getCart);
@@ -61,36 +62,31 @@ export function NearByVendors({ posts, showHeader = true, loading = false }) {
   }
 
   return (
-    <section className="container mx-auto max-w-7xl px-4 md:px-8 mt-12 pb-20">
+    <section className="container mx-auto max-w-7xl px-2 md:px-4 py-4">
       {showHeader && (
-        <header className="flex items-center justify-between mb-8">
-          <h2 className="h4 text-n-8">Featured products</h2>
-          <Link to="/feeds">
-            <button
-              type="button"
-              className="font-code text-xs font-bold uppercase tracking-wider text-primary-3 hover:text-primary-4 transition-colors"
-              aria-label="See all products"
-            >
-              See all
-            </button>
+        <div className="flex flex-row items-center justify-between gap-4 mb-5">
+          <h2 className="text-xl md:text-2xl font-bold text-n-8">Featured Products</h2>
+          <Link 
+            to="/feeds"
+            className="text-sm font-semibold text-primary-3 hover:text-primary-4 transition-colors flex items-center gap-1"
+          >
+            See All <ArrowRight size={16} />
           </Link>
-        </header>
+        </div>
       )}
 
       {allProducts.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
           {allProducts.map((product) => (
-            <div
-              key={`${product._id}-${product.vendorPostId}`}
-              className="h-full"
-            >
-              <VendorProductItem product={product} />
-            </div>
+            <VendorProductItem 
+              key={`${product._id}-${product.vendorPostId}`} 
+              product={product} 
+            />
           ))}
         </div>
       ) : (
-        <div className="text-center py-12 bg-white rounded-2xl border border-n-3/10">
-          <p className="body-2 text-n-4">No products found nearby.</p>
+        <div className="text-center py-10 bg-n-2/10 rounded-xl border border-n-3/10">
+          <p className="text-n-5 text-sm font-medium">No products found nearby</p>
         </div>
       )}
     </section>
