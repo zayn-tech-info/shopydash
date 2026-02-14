@@ -40,6 +40,7 @@ const allowedOrigins = [
   "https://shopydash.com",
   "https://www.shopydash.com",
   "https://shopydash-v1.vercel.app",
+  "https://adminshopydash.vercel.app"
 ];
 
 const corsOptions = {
