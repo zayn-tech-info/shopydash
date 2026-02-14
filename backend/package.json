@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node server.js",
     "start_prod": "SET NODE_ENV=production& nodemon server.js",
-    "dev": "nodemon server.js",
+    "dev": "SET NODE_ENV=development& nodemon server.js",
     "test": "echo \"No tests yet\" && exit 0"
   },
   "keywords": [],

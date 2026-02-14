@@ -1,5 +1,5 @@
 const dotenv = require("dotenv");
-dotenv.config({ path: ".env" });
+dotenv.config({ path: `.env${process.env.NODE_ENV ? `.${process.env.NODE_ENV}` : ""}` });
 const http = require("http");
 const cron = require("node-cron");
 const https = require("https");

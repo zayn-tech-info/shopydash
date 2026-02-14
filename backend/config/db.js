@@ -3,8 +3,14 @@ const customError = require("../errors/customError");
 const { logInfo, logError } = require("../utils/logger");
 
 const connectDB = async () => {
-  const uri = process.env.CONNECTION_URI;
+  const isProduction = process.env.NODE_ENV === "production";
+  const uri =
+    process.env.CONNECTION_URI ||
+    (isProduction
+      ? process.env.CONNECTION_URI_PROD
+      : process.env.CONNECTION_URI_DEV);
 
+  console.log("Connecting to MongoDB with URI:", uri);
   try {
     await mongoose.connect(uri, {
       serverSelectionTimeoutMS: 10000,

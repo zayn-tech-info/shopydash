@@ -2,14 +2,28 @@ const { logInfo, logWarn } = require("./logger");
 
 const validateEnv = () => {
   const required = [
-    "CONNECTION_URI",
     "JWT_SECRET_KEY",
     "CLOUDINARY_NAME",
     "CLOUDINARYAPI_KEY",
     "CLOUDINARYAPI_API_SECRET",
-    "PAYSTACK_LIVE_SECRET_KEY",
     "RESEND_API_KEY",
   ];
+
+  if (process.env.NODE_ENV === "production") {
+    required.push("PAYSTACK_LIVE_SECRET_KEY");
+  } else {
+    required.push("PAYSTACK_TEST_SECRET_KEY");
+  }
+
+  const isProduction = process.env.NODE_ENV === "production";
+  const hasDefaultUri = Boolean(process.env.CONNECTION_URI);
+  const hasEnvUri = isProduction
+    ? Boolean(process.env.CONNECTION_URI_PROD)
+    : Boolean(process.env.CONNECTION_URI_DEV);
+
+  if (!hasDefaultUri && !hasEnvUri) {
+    required.push(isProduction ? "CONNECTION_URI_PROD" : "CONNECTION_URI_DEV");
+  }
 
   const missing = [];
 
