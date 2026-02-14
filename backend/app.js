@@ -21,6 +21,9 @@ const orderRouter = require("./routes/order.route");
 const reviewRouter = require("./routes/review.route");
 const messageRouter = require("./routes/message.route");
 const notificationRouter = require("./routes/notification.route");
+const adminRouter = require("./routes/admin.route");
+const { protectRoute } = require("./middleware/auth.middleware");
+const { adminOnly } = require("./middleware/adminOnly.middleware");
 
 connectDB();
 const app = express();
@@ -31,7 +34,9 @@ const mode = process.env.NODE_ENV || "development";
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
+  "http://localhost:5175",
   "https://app.shopydash.com",
+  "https://admin.shopydash.com",
   "https://shopydash.com",
   "https://www.shopydash.com",
   "https://shopydash-v1.vercel.app",
@@ -77,6 +82,7 @@ app.use("/api/v1/orders", orderRouter);
 app.use("/api/v1/reviews", reviewRouter);
 app.use("/api/v1/messages", messageRouter);
 app.use("/api/v1/notifications", notificationRouter);
+app.use("/api/v1/admin", protectRoute, adminOnly, adminRouter);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.get("/health", (req, res) => {
