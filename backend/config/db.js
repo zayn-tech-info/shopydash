@@ -1,6 +1,11 @@
 const mongoose = require("mongoose");
+const dns = require("dns");
 const customError = require("../errors/customError");
 const { logInfo, logError } = require("../utils/logger");
+
+
+dns.setServers(["8.8.8.8", "8.8.4.4", "1.1.1.1"]);
+dns.setDefaultResultOrder("ipv4first");
 
 const connectDB = async () => {
   const isProduction = process.env.NODE_ENV === "production";
@@ -13,7 +18,8 @@ const connectDB = async () => {
   console.log("Connecting to MongoDB with URI:", uri);
   try {
     await mongoose.connect(uri, {
-      serverSelectionTimeoutMS: 10000,
+      serverSelectionTimeoutMS: 30000,
+      connectTimeoutMS: 30000,
       maxPoolSize: 10,
       minPoolSize: 2,
       socketTimeoutMS: 45000,

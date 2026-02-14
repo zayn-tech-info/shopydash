@@ -126,6 +126,9 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
     ];
   }
 
+  // Only filter by location if explicitly requested
+  // Comment out automatic user location filtering to show all products by default
+  /*
   if (!school && !req.query.area) {
     if (req.user) {
       if (req.user.state) query.state = req.user.state;
@@ -135,6 +138,7 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
       query.area = req.query.area;
     }
   }
+  */
 
   const pageLimit = Math.min(parseInt(limit), 50);
   const currentPage = Math.max(parseInt(page), 1);
