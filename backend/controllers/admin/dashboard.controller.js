@@ -15,6 +15,7 @@ const getStats = asyncErrorHandler(async (req, res) => {
 
   const [
     totalUsers,
+    totalClients,
     totalVendors,
     totalOrders,
     ordersToday,
@@ -23,6 +24,7 @@ const getStats = asyncErrorHandler(async (req, res) => {
     failedPayments,
     activeSubscriptions,
   ] = await Promise.all([
+    User.countDocuments(),
     User.countDocuments({ role: "client" }),
     User.countDocuments({ role: "vendor" }),
     Order.countDocuments(),
@@ -43,6 +45,7 @@ const getStats = asyncErrorHandler(async (req, res) => {
     success: true,
     data: {
       totalUsers,
+      totalClients,
       totalVendors,
       totalOrders,
       ordersToday,
