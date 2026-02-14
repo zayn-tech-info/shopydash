@@ -1,5 +1,26 @@
 const customError = require("./customError");
 
+// Allowed origins for CORS error responses
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "http://localhost:5175",
+  "https://app.shopydash.com",
+  "https://admin.shopydash.com",
+  "https://shopydash.com",
+  "https://www.shopydash.com",
+  "https://adminshopydash.vercel.app",
+];
+const vercelPattern = /^https:\/\/.*\.vercel\.app$/;
+
+const setCorsHeaders = (req, res) => {
+  const origin = req.headers.origin;
+  if (origin && (allowedOrigins.includes(origin) || vercelPattern.test(origin))) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+  }
+};
+
 const devErrors = (res, error) => {
   res.status(error.statusCode).json({
     status: error.statusCode,
@@ -47,6 +68,9 @@ const tokenExpiredErrorHandler = (err) => {
 const globalErrorHandler = (error, req, res, next) => {
   error.statusCode = error.statusCode || 500;
   error.status = error.status || "error";
+
+  // Ensure CORS headers are set for error responses
+  setCorsHeaders(req, res);
 
   if (error.name === "TokenExpiredError")
     error = tokenExpiredErrorHandler(error);

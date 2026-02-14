@@ -43,9 +43,12 @@ const allowedOrigins = [
   "https://adminshopydash.vercel.app"
 ];
 
+// Pattern for Vercel preview deployments
+const vercelPattern = /^https:\/\/.*\.vercel\.app$/;
+
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.includes(origin) || vercelPattern.test(origin || '')) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));

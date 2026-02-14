@@ -14,7 +14,11 @@ const csrfProtection = (req, res, next) => {
     "https://admin.shopydash.com",
     "https://shopydash.com",
     "https://www.shopydash.com",
+    "https://adminshopydash.vercel.app",
   ];
+
+   
+  const vercelPattern = /^https:\/\/.*\.vercel\.app$/;
 
   const origin = req.get("origin") || req.get("referer");
 
@@ -25,7 +29,7 @@ const csrfProtection = (req, res, next) => {
   if (!hasCustomHeader && origin) {
     const isValidOrigin = allowedOrigins.some((allowed) =>
       origin?.startsWith(allowed),
-    );
+    ) || vercelPattern.test(origin);
 
     if (!isValidOrigin) {
       const err = new customError(
