@@ -97,7 +97,7 @@ export const useVendorProfileStore = create((set, get) => ({
       const payload = response?.data?.data ?? response?.vendor ?? response;
 
       const vendors = payload?.vendors ?? payload;
-      set({ vendors });
+      set({ vendors, isGettingVendorProfile: false });
       return vendors;
     } catch (err) {
       if (err.response && err.response.status === 404) {

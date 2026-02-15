@@ -134,28 +134,28 @@ export function HomeContent({
         />
       )}
 
-      <section className="py-2 px-2 md:px-4 bg-white border-b border-n-3/10 shadow-sm relative">
+      <section className="py-4 md:py-6 px-4 md:px-6 bg-white border-b border-n-3/10 shadow-sm relative">
         <div className="container mx-auto max-w-7xl">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-2 relative">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6 mb-4 relative">
             <div>
               {authUser ? (
                 <>
-                  <h1 className="text-lg font-bold text-n-8">
+                  <h1 className="text-xl md:text-2xl font-bold text-n-8">
                     Hi{" "}
                     <span className="text-primary-3 break-all">
                       {authUser.username}👋
                     </span>
                   </h1>
-                  <p className="text-xs text-n-4">
+                  <p className="text-sm md:text-base text-n-5 mt-1">
                     Ready to shop or sell something today?
                   </p>
                 </>
               ) : (
                 <>
-                  <h1 className="h4 text-n-8">
+                  <h1 className="text-xl md:text-2xl font-bold text-n-8">
                     Welcome to <span className="text-primary-3">Shopydash</span>
                   </h1>
-                  <p className="body-2 text-n-4 mt-1">
+                  <p className="text-sm md:text-base text-n-5 mt-1">
                     <Link
                       to="/signup"
                       className="text-primary-3 font-bold hover:underline"
@@ -169,7 +169,7 @@ export function HomeContent({
             </div>
 
             <div
-              className={`w-full md:max-w-md transition-all duration-300 ${
+              className={`w-full md:max-w-lg transition-all duration-300 ${
                 isSearchActive ? "z-50 relative" : "relative"
               }`}
             >
@@ -198,7 +198,7 @@ export function HomeContent({
                             ? "text-n-4"
                             : "text-n-4 group-hover:text-primary-3"
                         }`}
-                        size={18}
+                        size={20}
                       />
 
                       <input
@@ -208,7 +208,7 @@ export function HomeContent({
                         onFocus={() => setIsSearchActive(true)}
                         placeholder={placeholder}
                         aria-label="text"
-                        className={`w-full h-10 bg-n-2/30 border border-transparent outline-none text-sm text-n-8 placeholder:text-n-4/60 transition-all duration-300 ${
+                        className={`w-full h-11 md:h-12 bg-n-2/30 border border-transparent outline-none text-sm md:text-base text-n-8 placeholder:text-n-4/60 transition-all duration-300 ${
                           isSearchActive
                             ? "rounded-xl pl-10 pr-9 focus:bg-n-2/50"
                             : "rounded-xl pl-10 pr-12 focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10"
@@ -221,16 +221,16 @@ export function HomeContent({
                           <button
                             type="button"
                             onClick={() => setIsSearchActive(false)}
-                            className="p-1.5 hover:bg-n-3/20 rounded-full text-n-4 transition-colors"
+                            className="p-2 hover:bg-n-3/20 rounded-full text-n-4 transition-colors"
                           >
-                            <X size={16} />
+                            <X size={18} />
                           </button>
                         ) : (
                           <button
                             type="submit"
-                            className="p-1.5 bg-primary-3 text-white rounded-lg hover:bg-primary-4 transition-all shadow-sm shadow-primary-3/20 hover:shadow-md hover:shadow-primary-3/30"
+                            className="p-2 bg-primary-3 text-white rounded-lg hover:bg-primary-4 transition-all shadow-sm shadow-primary-3/20 hover:shadow-md hover:shadow-primary-3/30"
                           >
-                            <SearchIcon size={16} />
+                            <SearchIcon size={18} />
                           </button>
                         )}
                       </div>
@@ -395,8 +395,8 @@ export function HomeContent({
           </div>
 
           {/* Categories Section */}
-          <div className="relative my-10">
-            <div className="w-full flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-1 -mx-2 px-2 md:mx-0 md:px-0 md:justify-between md:flex-nowrap">
+          <div className="relative mt-6 md:mt-8 mb-4">
+            <div className="w-full flex gap-4 md:gap-6 lg:gap-8 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0 md:justify-between md:flex-nowrap">
               {categories.map((item) => {
                 const Icon = item.icon;
 
@@ -406,11 +406,11 @@ export function HomeContent({
                     to={`/feeds?category=${encodeURIComponent(item.text)}`}
                     className="flex-shrink-0 group"
                   >
-                    <div className="flex flex-col items-center gap-1">
-                      <div className="w-11 h-11 md:w-12 md:h-12 rounded-full bg-n-2/30 group-hover:bg-primary-3/10 flex items-center justify-center text-n-6 group-hover:text-primary-3 transition-all duration-200 border border-n-3/10 group-hover:border-primary-3/30">
-                        {Icon && <Icon size={18} strokeWidth={1.5} />}
+                    <div className="flex flex-col items-center gap-2 md:gap-2.5">
+                      <div className="w-14 h-14 md:w-16 md:h-16 lg:w-18 lg:h-18 rounded-full bg-n-2/40 group-hover:bg-primary-3/10 flex items-center justify-center text-n-6 group-hover:text-primary-3 transition-all duration-200 border border-n-3/20 group-hover:border-primary-3/30 shadow-sm">
+                        {Icon && <Icon size={22} className="md:w-6 md:h-6" strokeWidth={1.5} />}
                       </div>
-                      <p className="text-[9px] font-bold text-n-6 group-hover:text-primary-3 transition-colors whitespace-nowrap">
+                      <p className="text-xs md:text-sm font-semibold text-n-6 group-hover:text-primary-3 transition-colors whitespace-nowrap">
                         {item.text}
                       </p>
                     </div>

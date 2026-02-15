@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { X, CreditCard, Lock, MapPin } from "lucide-react";
 import { api } from "../../lib/axios";
 import { toast } from "react-hot-toast";
+import SubscriptionBadge from "../common/SubscriptionBadge";
 
 const CheckoutModal = ({
   isOpen,
@@ -159,6 +160,9 @@ Please confirm this order and provide payment details.`;
                     <span className="font-semibold text-sm">
                       {group.vendor?.businessName || "Vendor"}
                     </span>
+                    {group.vendor?.subscriptionPlan && (
+                      <SubscriptionBadge plan={group.vendor.subscriptionPlan} size="sm" />
+                    )}
                   </div>
 
                   <div className="space-y-2.5 pl-2 mb-4">

@@ -4,7 +4,7 @@ import { HomeContent } from "../components/HomeContent";
 import { NewArrival } from "../components/NewArrival";
 import { Trending } from "../components/Trending";
 import { NearByVendors } from "../components/NearByVendors";
-import { FeaturedVendor } from "../components/FeaturedVendor";
+import { TopSellers } from "../components/TopSellers";
 
 import { useProductStore } from "../store/productStore";
 
@@ -24,9 +24,9 @@ export function Home() {
         <HomeContent />
         <div className="pb-12">
           <NewArrival />
+          <TopSellers />
           <Trending />
           <NearByVendors posts={feedPosts} loading={isFetchingFeedPosts} />
-          <FeaturedVendor />
         </div>
       </div>
       <BottomNav />

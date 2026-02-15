@@ -123,6 +123,24 @@ const getAllVendorsProfile = asyncErrorHandler(async (req, res, next) => {
         businessName: 1,
         whatsAppNumber: 1,
         subscriptionPlan: 1,
+        isVerified: 1,
+      },
+    },
+
+    // Lookup vendor profile for rating
+    {
+      $lookup: {
+        from: "vendorprofiles",
+        localField: "_id",
+        foreignField: "userId",
+        as: "vendorProfile",
+      },
+    },
+    {
+      $addFields: {
+        rating: {
+          $ifNull: [{ $arrayElemAt: ["$vendorProfile.rating", 0] }, 0],
+        },
       },
     },
 
@@ -179,6 +197,7 @@ const getAllVendorsProfile = asyncErrorHandler(async (req, res, next) => {
     {
       $project: {
         subscription: 0,
+        vendorProfile: 0,
       },
     },
   ]);

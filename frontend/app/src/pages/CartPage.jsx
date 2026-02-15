@@ -4,6 +4,7 @@ import { useCartStore } from "../store/cartStore";
 import { useAuthStore } from "../store/authStore";
 import AuthRequiredModal from "../components/common/AuthRequiredModal";
 import CheckoutModal from "../components/cart/CheckoutModal";
+import SubscriptionBadge from "../components/common/SubscriptionBadge";
 import {
   ShoppingBag,
   Trash2,
@@ -121,12 +122,19 @@ export default function CartPage() {
                       {group.vendor?.businessName?.charAt(0) || "V"}
                     </div>
                     <div>
-                      <h3 className="font-bold text-gray-900 text-lg">
-                        {group.vendor?.businessName || "Vendor"}
-                      </h3>
-                      <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">
-                        Verified Vendor
-                      </p>
+                      <div className="flex items-center gap-1.5">
+                        <h3 className="font-bold text-gray-900 text-lg">
+                          {group.vendor?.businessName || "Vendor"}
+                        </h3>
+                        {group.vendor?.subscriptionPlan && (
+                          <SubscriptionBadge plan={group.vendor.subscriptionPlan} size="md" />
+                        )}
+                      </div>
+                      {group.vendor?.subscriptionPlan && (
+                        <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">
+                          {group.vendor.subscriptionPlan}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>

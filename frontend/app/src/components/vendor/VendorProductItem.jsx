@@ -14,16 +14,15 @@ function VendorProductItem({ product, vendorId }) {
   const title = product?.title || product?.name || `Product ${product?._id || ""}`;
   const img = product?.images?.[0] || product?.image || "/public/product-placeholder.png";
   const price = product?.price ? Number(product.price) : 0;
-  // Simulated original price for demo (20% more), or use real one if available
   const originalPrice = product?.originalPrice || price * 1.2;
   const description = product?.description || "";
   const stock = product?.stock ?? product?.quantity ?? null;
-  const rating = product?.rating || (Math.random() * 2 + 3).toFixed(1); // Fallback to random rating if missing
-  const sold = product?.sold || Math.floor(Math.random() * 500) + 10; // Fallback sold count
+  const rating = product?.rating || (Math.random() * 2 + 3).toFixed(1); 
+  const sold = product?.sold || Math.floor(Math.random() * 500) + 10;  
   const isOutOfStock = stock === 0;
 
   const handleAddToCart = async (e) => {
-    e.preventDefault(); // Prevent navigation if clicking the button works inside a Link
+    e.preventDefault();  
     
     try {
       const postId = product.vendorPostId || product.sectionId || product.postId;
@@ -44,7 +43,6 @@ function VendorProductItem({ product, vendorId }) {
           vendor: product.vendor,
         },
       });
-      // success toast handled inside cartStore; avoid duplicate notifications
     } catch (error) {
       console.error(error);
       toast.error("Failed to add to cart");
@@ -113,19 +111,21 @@ function VendorProductItem({ product, vendorId }) {
           <div>
             <div className="flex items-baseline gap-1.5">
               <span className="text-base font-bold text-n-8">₦{price.toLocaleString()}</span>
-              {/* <span className="text-[10px] text-n-4 line-through">₦{Math.round(originalPrice).toLocaleString()}</span> */}
             </div>
             {/* Vendor Name */}
             {product?.vendor && (
-               <Link to={`/p/${product.vendor.username}`} className="flex items-center gap-2 mt-1.5 group/vendor hover:opacity-80 transition-opacity">
+               <Link to={`/p/${product.vendor.username}`} className="flex items-center gap-1.5 mt-1.5 group/vendor hover:opacity-80 transition-opacity">
                  <UserAvatar 
                     profilePic={product.vendor.profilePic} 
                     alt={product.vendor.businessName} 
                     className="w-5 h-5 rounded-full border border-n-3/10 shadow-sm flex-shrink-0" 
                  />
-                 <span className="text-[11px] font-medium text-n-6 truncate hover:text-primary-3 transition-colors max-w-[120px]">
+                 <span className="text-[11px] font-medium text-n-6 truncate hover:text-primary-3 transition-colors max-w-[100px]">
                    {product.vendor.businessName || product.vendor.username}
                  </span>
+                 {product.vendor.subscriptionPlan && (
+                   <SubscriptionBadge plan={product.vendor.subscriptionPlan} size="sm" />
+                 )}
                </Link>
             )}
           </div>
