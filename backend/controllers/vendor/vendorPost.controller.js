@@ -8,7 +8,7 @@ const plans = require("../../config/subscriptionPlans");
 
 const createPost = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user._id;
-  const { caption, products, school, location, state, area } = req.body;
+  const { products, school, location, state, area } = req.body;
 
   const limitConfig = req.subscription?.config?.limits || plans.free.limits;
 
@@ -64,7 +64,6 @@ const createPost = asyncErrorHandler(async (req, res, next) => {
 
   const newPost = await VendorPost.create({
     vendorId: userId,
-    caption,
     products: productsWithVendorId,
     school: school || vendorProfile.schoolName || user.schoolName,
     location,
@@ -120,7 +119,6 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
   if (req.query.search) {
     const searchRegex = createSafeRegex(req.query.search);
     query.$or = [
-      { caption: searchRegex },
       { "products.title": searchRegex },
       { "products.description": searchRegex },
     ];
@@ -222,7 +220,7 @@ const remove = asyncErrorHandler(async (req, res, next) => {
 const update = asyncErrorHandler(async (req, res, next) => {
   const { postId } = req.params;
   const userId = req.user._id;
-  const { caption, products, location, state, area } = req.body;
+  const { products, location, state, area } = req.body;
 
   const post = await VendorPost.findById(postId);
 
@@ -242,7 +240,6 @@ const update = asyncErrorHandler(async (req, res, next) => {
     );
   }
 
-  post.caption = caption || post.caption;
   post.location = location || post.location;
   post.state = state || post.state;
 

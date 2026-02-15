@@ -107,13 +107,6 @@ function PostCardComponent({ post, onDelete }) {
       </div>
 
       {}
-      {post.caption && (
-        <p className="text-gray-600 mb-6 text-sm sm:text-base leading-relaxed font-light">
-          {post.caption}
-        </p>
-      )}
-
-      {}
       <div className="relative group/swiper -mx-2 px-2">
         <Swiper
           modules={[Pagination, Navigation]}

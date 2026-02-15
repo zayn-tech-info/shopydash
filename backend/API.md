@@ -126,7 +126,6 @@ Create a new product post (protected, vendor only).
 **Body**:
 ```json
 {
-  "caption": "Check out my products!",
   "products": [
     {
       "title": "Product Name",
@@ -409,7 +408,7 @@ curl -X GET http://localhost:8000/api/v1/post/feed?school=Example%20University
 curl -X POST http://localhost:8000/api/v1/post/create \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"caption":"New products!","products":[...],"school":"Example Uni","location":"Under G"}'
+  -d '{"products":[...],"school":"Example Uni","location":"Under G"}'
 ```
 
 ---

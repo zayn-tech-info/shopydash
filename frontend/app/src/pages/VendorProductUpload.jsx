@@ -29,9 +29,6 @@ const VendorProductUpload = () => {
     return saved ? JSON.parse(saved) : defaultValue;
   };
 
-  const [caption, setCaption] = useState(() =>
-    getInitialState("caption", editingPost?.caption || ""),
-  );
   const [schoolName, setSchoolName] = useState(() =>
     getInitialState("school", editingPost?.school || ""),
   );
@@ -78,10 +75,6 @@ const VendorProductUpload = () => {
   useEffect(() => {
     if (!editingPost) {
       localStorage.setItem(
-        "vendor_post_draft_caption",
-        JSON.stringify(caption),
-      );
-      localStorage.setItem(
         "vendor_post_draft_school",
         JSON.stringify(schoolName),
       );
@@ -101,10 +94,9 @@ const VendorProductUpload = () => {
         JSON.stringify(sanitizedProducts),
       );
     }
-  }, [caption, schoolName, selectedArea, products, editingPost]);
+  }, [schoolName, selectedArea, products, editingPost]);
 
   const clearDraft = () => {
-    localStorage.removeItem("vendor_post_draft_caption");
     localStorage.removeItem("vendor_post_draft_school");
     localStorage.removeItem("vendor_post_draft_area");
     localStorage.removeItem("vendor_post_draft_products");
@@ -195,7 +187,6 @@ const VendorProductUpload = () => {
       );
 
       const postData = {
-        caption,
         location: selectedArea,
         school: schoolName,
         area: selectedArea,
@@ -258,8 +249,6 @@ const VendorProductUpload = () => {
         {authUser?.vendorProfile?.bankDetails?.subaccountCode ? (
           <form onSubmit={handleSubmit} className="space-y-8">
             <PostDetails
-              caption={caption}
-              setCaption={setCaption}
               schoolName={schoolName}
               setSchoolName={setSchoolName}
               selectedArea={selectedArea}
