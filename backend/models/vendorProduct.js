@@ -64,11 +64,6 @@ const vendorPostSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
-    caption: {
-      type: String,
-      required: [true, "Post caption is required"],
-      trim: true,
-    },
     products: {
       type: [productItemSchema],
     },
@@ -103,7 +98,7 @@ const vendorPostSchema = new mongoose.Schema(
 vendorPostSchema.index({ school: 1, createdAt: -1 });
 vendorPostSchema.index({ area: 1, createdAt: -1 });
 vendorPostSchema.index({ state: 1, area: 1 });
-vendorPostSchema.index({ "products.title": "text", caption: "text" });
+vendorPostSchema.index({ "products.title": "text", "products.description": "text" });
 
 vendorPostSchema.statics.findBySchool = function (school) {
   return this.find({ school })
