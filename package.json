@@ -2,5 +2,9 @@
   "devDependencies": {
     "@commitlint/cli": "^20.3.0",
     "@commitlint/config-conventional": "^20.3.0"
+  },
+  "dependencies": {
+    "mailtrap": "^4.4.0",
+    "nodemailer": "^7.0.13"
   }
 }

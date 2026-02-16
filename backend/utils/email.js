@@ -1,13 +1,18 @@
-const { Resend } = require("resend");
+const nodemailer = require("nodemailer");
+const { MailtrapTransport } = require("mailtrap");
 
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
+const TOKEN = process.env.MAILTRAP_API_TOKEN;
+
+const transport = TOKEN
+  ? nodemailer.createTransport(
+      MailtrapTransport({
+        token: TOKEN,
+      }),
+    )
   : {
-      emails: {
-        send: async () => {
-          console.warn("RESEND_API_KEY is missing. Email not sent.");
-          return { error: { message: "RESEND_API_KEY is missing" } };
-        },
+      sendMail: async () => {
+        console.warn("MAILTRAP_API_TOKEN is missing. Email not sent.");
+        throw new Error("MAILTRAP_API_TOKEN is missing");
       },
     };
 
@@ -52,14 +57,13 @@ const sendVerificationEmail = async (email, code) => {
       </p>
     `;
 
-    const data = await resend.emails.send({
-      from: "Shopydash <noreply@shopydash.com>",
-      to: [email],
+    const data = await transport.sendMail({
+      from: { address: "noreply@shopydash.com", name: "Shopydash" },
+      to: email,
       subject: "Verify your email address",
       html: generateEmailLayout("Verify Your Email Address", content),
     });
 
-    if (data.error) throw new Error(data.error.message);
     return data;
   } catch (error) {
     console.error("Error sending verification email:", error);
@@ -106,14 +110,13 @@ const sendOrderNotificationEmail = async (email, vendorName, orderDetails) => {
       </div>
     `;
 
-    const data = await resend.emails.send({
-      from: "Shopydash <noreply@shopydash.com>",
-      to: [email],
+    const data = await transport.sendMail({
+      from: { address: "noreply@shopydash.com", name: "Shopydash" },
+      to: email,
       subject: "New Order Received on Shopydash",
       html: generateEmailLayout("New Order Received! 🚀", content),
     });
 
-    if (data.error) throw new Error(data.error.message);
     return data;
   } catch (error) {
     console.error("Error sending order notification email:", error);
@@ -140,14 +143,13 @@ const sendPasswordResetEmail = async (email, code) => {
       </p>
     `;
 
-    const data = await resend.emails.send({
-      from: "Shopydash <noreply@shopydash.com>",
-      to: [email],
+    const data = await transport.sendMail({
+      from: { address: "noreply@shopydash.com", name: "Shopydash" },
+      to: email,
       subject: "Reset your password",
       html: generateEmailLayout("Password Reset Request", content),
     });
 
-    if (data.error) throw new Error(data.error.message);
     return data;
   } catch (error) {
     console.error("Error sending password reset email:", error);
