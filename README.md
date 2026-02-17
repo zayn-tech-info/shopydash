@@ -28,42 +28,109 @@ Shopydash is a campus-focused social commerce platform where student buyers disc
 
 ---
 
-## Subscription Section (Feature-First Revision)
+## Subscription Plans (Detailed Feature Packages)
 
-Instead of centering your plan messaging on price, anchor each plan to the **strongest implemented capability** and the business outcome it drives.
+This section focuses on **what users get per plan**, using features already implemented in the app, plus practical additions to make each plan clearer.
 
-### Plan positioning by best feature
+## 1) Free Plan (Recommended: make it generous, not strict)
 
-| Plan | Best feature to highlight | Why this is the best headline |
-|---|---|---|
-| **Boost** | **Priority visibility** (higher feed and location ranking) | This is the fastest value loop for new vendors: more impressions quickly from nearby buyers. |
-| **Pro** | **Performance insights + brand control** (analytics + custom storefront + pinned post) | Pro is best sold as a conversion plan: vendors can optimize what they post and how they present it. |
-| **Max** | **Scale operations** (advanced analytics + scheduling + priority support + profile suggestions) | Max is best for serious sellers who need repeatable growth and operational efficiency. |
+### What Free users should get (recommended package)
+- Unlimited access to core marketplace posting and discovery.
+- Basic listing visibility in feed/search.
+- Basic profile setup.
+- Basic analytics (views only).
+- Cart/order participation as normal user behavior.
 
-### How to analyze which plan fits each vendor (recommended method)
+### Why this is best for growth
+- Free vendors can fully experience the product before paying.
+- Lower friction = more vendors onboarded = richer marketplace inventory.
+- Paid plans then become “growth accelerators,” not “basic unlocks.”
 
-Use a **feature-outcome scorecard** based on implemented capabilities:
+### What to include next for Free (so it is not too strict)
+- Remove hard-feeling post frequency caps for active new vendors.
+- Keep visibility basic, but do not block essential actions.
+- Keep advanced growth tools (priority ranking, advanced analytics, scheduling) as paid differentiators.
+
+---
+
+## 2) Boost Plan (Visibility Package)
+
+### Best feature headline
+- **Priority visibility**.
+
+### Feature list users get
+- Higher placement in student feeds.
+- Priority in location-based search results.
+- “Boosted Vendor” badge.
+- Increased impressions vs free visibility.
+- Expanded analytics beyond views (entry-level growth metrics).
+
+### Best fit users
+- New or small vendors who need more traffic quickly.
+
+---
+
+## 3) Pro Plan (Conversion + Branding Package)
+
+### Best feature headline
+- **Convert better with insight + brand control**.
+
+### Feature list users get
+- Everything in Boost.
+- Custom storefront branding (banner/brand identity).
+- Ability to pin one post to top of store.
+- Deeper analytics (views, saves, clicks).
+- Stronger merchandising controls for catalog presentation.
+
+### Best fit users
+- Vendors already getting traffic who want better conversion and stronger store identity.
+
+---
+
+## 4) Max Plan (Scale + Operations Package)
+
+### Best feature headline
+- **Scale reliably with advanced operations tools**.
+
+### Feature list users get
+- Everything in Pro.
+- Advanced analytics dashboard.
+- Post scheduling.
+- Priority support.
+- Verification-style trust badge.
+- Profile suggestion/spotlight behavior for broader exposure.
+
+### Best fit users
+- High-activity vendors and business-focused sellers managing repeat posting and growth workflows.
+
+---
+
+## Plan Analysis Method (How to recommend the right plan)
+
+Use this vendor scorecard during onboarding/checkouts:
 
 1. **Visibility Need (0–5)**
-   - Needs better discoverability in feed/search? -> Strong fit for **Boost+**.
+   - Need more reach/impressions quickly? prioritize Boost.
 
 2. **Conversion Need (0–5)**
-   - Needs better product storytelling, storefront identity, and insight tracking? -> Strong fit for **Pro+**.
+   - Need better branding + performance insight to improve sales? prioritize Pro.
 
-3. **Scale & Workflow Need (0–5)**
-   - Needs scheduling, deeper analytics, and faster support as catalog/posting volume grows? -> Strong fit for **Max**.
+3. **Scale Need (0–5)**
+   - Need scheduling, advanced analytics, and support for high volume? prioritize Max.
 
-4. **Decision rule**
-   - Highest score determines recommended plan:
-   - Visibility highest -> **Boost**
-   - Conversion highest -> **Pro**
-   - Scale highest -> **Max**
+### Decision rule
+- Visibility highest -> **Boost**
+- Conversion highest -> **Pro**
+- Scale highest -> **Max**
+- If all scores are low/new vendor -> **Free (generous package)** until usage maturity.
 
-### Practical recommendation for your app copy
+---
 
-- Keep Free/entry messaging minimal.
-- Sell **Boost** as “Get seen”.
-- Sell **Pro** as “Convert better”.
-- Sell **Max** as “Scale reliably”.
+## Suggested Messaging in App
 
-This aligns your plans with features already implemented, making upgrade decisions clearer for vendors and easier to justify with product behavior.
+- **Free**: “Start selling with full core access.”
+- **Boost**: “Get seen by more nearby buyers.”
+- **Pro**: “Turn traffic into more sales.”
+- **Max**: “Run your store like a serious business.”
+
+This keeps plan communication feature-based, user-focused, and aligned with what has already been implemented while clearly showing what can be included next.
