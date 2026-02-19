@@ -62,7 +62,7 @@ export function NearByVendors({ posts, showHeader = true, loading = false }) {
   }
 
   return (
-    <section className="container mx-auto max-w-7xl px-2 md:px-4 py-4">
+    <section className="container mx-auto max-w-full px-2 md:px-4 py-4">
       {showHeader && (
         <div className="flex flex-row items-center justify-between gap-4 mb-5">
           <h2 className="text-xl md:text-2xl font-bold text-n-8">Featured Products</h2>

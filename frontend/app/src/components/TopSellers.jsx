@@ -10,7 +10,7 @@ const PAID_PLANS = ["Shopydash Boost", "Shopydash Pro", "Shopydash Max"];
 
 function TopSellersSkeleton() {
   return (
-    <section className="container mx-auto max-w-7xl px-2 md:px-4 py-6">
+    <section className="container mx-auto max-w-full px-2 md:px-4 py-6">
       <div className="flex items-center justify-between mb-5">
         <Skeleton variant="text" width={150} height={32} />
         <Skeleton variant="text" width={70} height={20} />
@@ -60,7 +60,7 @@ export function TopSellers({ limit = 10 }) {
   if (topSellers.length === 0) return null;
 
   return (
-    <section className="container mx-auto max-w-7xl px-2 md:px-4 py-6">
+    <section className="container mx-auto max-w-full px-2 md:px-4 py-6">
       {/* Section Header */}
       <div className="flex flex-row items-center justify-between gap-4 mb-5">
         <h2 className="text-xl md:text-2xl font-bold text-n-8">Top Sellers</h2>

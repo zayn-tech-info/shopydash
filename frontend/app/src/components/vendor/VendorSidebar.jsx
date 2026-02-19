@@ -27,10 +27,6 @@ export default function VendorSidebar({
   const fileInputRef = useRef(null);
   const isOwner = authUser?._id === vendorProfile?.userId?._id;
 
-  const plan =
-    vendorProfile?.userId?.subscriptionPlan ||
-    (isOwner ? authUser?.subscriptionPlan : null);
-
   const businessName =
     vendorProfile?.userId?.businessName ||
     (isOwner ? authUser?.businessName : null) ||
@@ -118,11 +114,7 @@ export default function VendorSidebar({
           <Share2 size={16} />
         </button>
 
-        <div className="flex items-center justify-center gap-2 mb-1">
-          <h2 className="h5 text-n-8 text-center">{businessName}</h2>
-          <SubscriptionBadge plan={plan} size="sm" />
-        </div>
-        <p className="body-2 text-n-4 text-center font-code">@{username}</p>
+        <p className="body-2 text-n-5 font-medium text-center font-code">@{username}</p>
 
         {isOwner ? (
           <button

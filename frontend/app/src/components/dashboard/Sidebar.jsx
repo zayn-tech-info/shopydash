@@ -34,31 +34,27 @@ const navItems = [
 function SidebarComponent({ activeTab, onTabChange, isOpen, onClose }) {
   return (
     <>
-      {/* Mobile overlay */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={onClose}
         />
       )}
-
-      {/* Sidebar */}
       <aside
         className={`
-          mt-10 fixed lg:sticky top-0 left-0 z-40 h-screen w-64 bg-white border-r border-gray-200
+         fixed lg:sticky top-0 left-0 z-40 h-screen w-64 bg-white border-r border-gray-200
           transform transition-transform duration-300 ease-in-out
           lg:top-0 lg:h-[calc(100vh-0px)]
           ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
         `}
       >
-        <div className="flex flex-col h-full">
-          {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-100">
+        <div className="flex flex-col h-full md:-my-7">
+          <div className="flex items-start justify-between p-4 border-b border-gray-100">
             <div className="flex items-center mt-10 gap-2 justify-between">
               <div className="w-8 h-8 bg-primary-3 rounded-lg flex items-center justify-center">
                 <Package className="w-5 h-5 text-white" />
               </div>
-              <span className="font-semibold text-gray-900">Vendor Panel</span>
+              <span className="font-semibold text-gray-900 up font-sans">Vendor Panel</span>
               <button
                 onClick={onClose}
                 className="lg:hidden p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"

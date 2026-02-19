@@ -42,7 +42,9 @@ function RecentProductCard({ product, post }) {
           ₦{Number(product.price).toLocaleString()}
         </p>
       </div>
-      <span className="text-xs text-gray-400">{formatDate(post.createdAt)}</span>
+      <span className="text-xs text-gray-400">
+        {formatDate(post.createdAt)}
+      </span>
     </div>
   );
 }
@@ -52,12 +54,11 @@ function OverviewTabComponent({ posts, loading, orders }) {
   const { authUser } = useAuthStore();
 
   const stats = useMemo(() => {
-    if (!posts)
-      return { totalProducts: 0, activeListings: 0, totalOrders: 0 };
+    if (!posts) return { totalProducts: 0, activeListings: 0, totalOrders: 0 };
 
     const totalProducts = posts.reduce(
       (acc, post) => acc + post.products.length,
-      0
+      0,
     );
 
     return {
@@ -76,7 +77,7 @@ function OverviewTabComponent({ posts, loading, orders }) {
         post.products.map((product) => ({
           ...product,
           post,
-        }))
+        })),
       )
       .sort((a, b) => new Date(b.post.createdAt) - new Date(a.post.createdAt))
       .slice(0, 5);
@@ -139,52 +140,29 @@ function OverviewTabComponent({ posts, loading, orders }) {
         />
       </div>
 
-      {/* Recent Products */}
-      <div className="bg-white rounded-xl border border-gray-100 p-4">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-gray-900">Recent Products</h3>
-          <button
-            onClick={() => navigate("/vendor/add")}
-            className="text-sm text-primary-3 hover:text-primary-4 font-medium"
-          >
-            + Add New
-          </button>
-        </div>
-
-        {recentProducts.length === 0 ? (
-          <div className="text-center py-8 text-gray-500 text-sm">
-            No products yet. Add your first product to get started!
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {recentProducts.map((product) => (
-              <RecentProductCard
-                key={product._id}
-                product={product}
-                post={product.post}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Quick Actions */}
-      <div className="grid grid-cols-2 gap-4">
+      {/* Quick Actions (Reduced Size) */}
+      <div className="grid grid-cols-2 gap-3">
         <button
           onClick={() => navigate("/vendor/add")}
-          className="p-4 bg-primary-3 text-white rounded-xl text-left hover:bg-primary-4 transition-colors"
+          className="flex items-center p-2 bg-primary-3 text-white rounded-lg text-left hover:bg-primary-4 transition-colors min-h-0"
+          style={{ minHeight: 0 }}
         >
-          <Package className="w-6 h-6 mb-2" />
-          <p className="font-medium">Add Product</p>
-          <p className="text-xs opacity-80">List a new item for sale</p>
+          <Package className="w-5 h-5 mr-2" />
+          <div>
+            <p className="font-medium text-base leading-tight">Add Product</p>
+            <p className="text-xs opacity-80 leading-tight">List a new item for sale</p>
+          </div>
         </button>
         <button
           onClick={() => navigate(`/p/${authUser?.username}`)}
-          className="p-4 bg-gray-100 text-gray-900 rounded-xl text-left hover:bg-gray-200 transition-colors"
+          className="flex items-center p-2 bg-gray-100 text-gray-900 rounded-lg text-left hover:bg-gray-200 transition-colors min-h-0"
+          style={{ minHeight: 0 }}
         >
-          <TrendingUp className="w-6 h-6 mb-2" />
-          <p className="font-medium">View Profile</p>
-          <p className="text-xs text-gray-500">Update your store info</p>
+          <TrendingUp className="w-5 h-5 mr-2" />
+          <div>
+            <p className="font-medium text-base leading-tight">View Profile</p>
+            <p className="text-xs text-gray-500 leading-tight">Update your store info</p>
+          </div>
         </button>
       </div>
     </div>
