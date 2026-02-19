@@ -5,7 +5,7 @@ import VendorProductItem from "./vendor/VendorProductItem";
 import { Sparkles, ArrowRight } from "lucide-react";
 import { FeedSkeleton } from "./skeletons/FeedSkeleton";
 
-export function NewArrival({ limit = 8 }) {
+export function NewArrival({ limit = 10 }) {
   const [arrivals, setArrivals] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -28,7 +28,7 @@ export function NewArrival({ limit = 8 }) {
   if (loading) return <FeedSkeleton />;
 
   return (
-    <section className="container mx-auto max-w-7xl px-2 md:px-4 py-4">
+    <section className="container mx-auto max-w-full px-2 md:px-4 py-4">
       {/* Section Header */}
       <div className="flex flex-row items-center justify-between gap-4 mb-5">
         <h2 className="text-xl md:text-2xl font-bold text-n-8">New Arrivals</h2>

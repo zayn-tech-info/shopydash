@@ -8,7 +8,8 @@ import UserAvatar from "./UserAvatar";
 import { FeedSkeleton } from "./skeletons/FeedSkeleton";
 
 export function FeaturedVendor({ limit = 10 }) {
-  const { vendors, getAllVendorProfile, isGettingVendorProfile } = useVendorProfileStore();
+  const { vendors, getAllVendorProfile, isGettingVendorProfile } =
+    useVendorProfileStore();
 
   useEffect(() => {
     async function getVendors() {
@@ -25,17 +26,18 @@ export function FeaturedVendor({ limit = 10 }) {
   if (!vendors) return null;
 
   const featuredVendors = vendors.filter(
-    (vendor) => vendor.isVerified && vendor.subscriptionPlan === "Shopydash Max"
+    (vendor) =>
+      vendor.isVerified && vendor.subscriptionPlan === "Shopydash Max",
   );
 
   if (featuredVendors.length === 0) return null;
 
   return (
-    <section className="container mx-auto max-w-7xl px-2 md:px-4 py-4">
+    <section className="container mx-auto max-w-full px-2 md:px-4 py-4">
       {/* Section Header */}
       <div className="flex flex-row items-center justify-between gap-4 mb-5">
         <h2 className="text-xl md:text-2xl font-bold text-n-8">Top Sellers</h2>
-        <Link 
+        <Link
           to="/feeds"
           className="text-sm font-semibold text-primary-3 hover:text-primary-4 transition-colors flex items-center gap-1"
         >
@@ -46,8 +48,8 @@ export function FeaturedVendor({ limit = 10 }) {
       {/* Vendors Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
         {featuredVendors.slice(0, limit).map((vendor) => (
-          <Link 
-            key={vendor._id} 
+          <Link
+            key={vendor._id}
             to={`/p/${vendor.username}`}
             className="group block rounded-xl border border-n-3/15 bg-white p-3 hover:border-primary-3/30 transition-all duration-300"
           >
@@ -62,7 +64,7 @@ export function FeaturedVendor({ limit = 10 }) {
                 <p className="truncate text-sm font-bold underline text-n-8">
                   {vendor.businessName}
                 </p>
-                
+
                 <div className="flex items-center justify-center gap-2 mt-1">
                   <div className="flex items-center gap-0.5 text-amber-500">
                     <Star size={10} className="fill-current" />
@@ -70,10 +72,7 @@ export function FeaturedVendor({ limit = 10 }) {
                       {vendor.rating || "5.0"}
                     </span>
                   </div>
-                  <SubscriptionBadge
-                    plan={vendor.subscriptionPlan}
-                    size="xs"
-                  />
+                  <SubscriptionBadge plan={vendor.subscriptionPlan} size="xs" />
                 </div>
               </div>
             </div>
