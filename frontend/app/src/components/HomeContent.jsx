@@ -134,8 +134,8 @@ export function HomeContent({
         />
       )}
 
-      <section className="py-4 md:py-6 px-4 md:px-6 bg-white border-b border-n-3/10 shadow-sm relative">
-        <div className="container mx-auto max-w-7xl">
+      <section className="py-4 -ml-2 md:-ml-0 md:py-6 md:px-6 bg-white border-b border-n-3/10 shadow-sm relative">
+        <div className="container mx-auto max-w-full">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6 mb-4 relative">
             <div>
               {authUser ? (
@@ -396,10 +396,23 @@ export function HomeContent({
 
           {/* Categories Section */}
           <div className="relative mt-6 md:mt-8 mb-4">
-            <div className="w-full flex gap-4 md:gap-6 lg:gap-8 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0 md:justify-between md:flex-nowrap">
+            {/* Fade indicators for scroll hint */}
+              <div className="pointer-events-none select-none absolute left-0 top-0 h-full w-10 z-5 block md:hidden" style={{background: 'linear-gradient(to right, #fff 70%, transparent)'}} />
+              <div className="pointer-events-none select-none absolute right-0 top-0 h-full w-10 z-5 block md:hidden" style={{background: 'linear-gradient(to left, #fff 70%, transparent)'}} />
+            <button
+              type="button"
+              aria-label="Scroll categories left"
+              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-gradient-to-r from-white/90 via-white/70 to-transparent hover:from-primary-3/90 hover:via-primary-3/80 hover:to-primary-3/60 text-primary-3 hover:text-white shadow-lg rounded-full p-2 transition-all duration-200 flex"
+              style={{ boxShadow: '0 4px 16px 0 rgba(0,0,0,0.10)' }}
+              onClick={() => {
+                document.getElementById('category-scroll').scrollBy({ left: -200, behavior: 'smooth' });
+              }}
+            >
+              <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <div id="category-scroll" className="w-full flex gap-4 md:gap-6 lg:gap-8 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0 md:justify-between md:flex-nowrap scroll-smooth">
               {categories.map((item) => {
                 const Icon = item.icon;
-
                 return (
                   <Link
                     key={item.id}
@@ -418,6 +431,17 @@ export function HomeContent({
                 );
               })}
             </div>
+            <button
+              type="button"
+              aria-label="Scroll categories right"
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-gradient-to-l from-white/90 via-white/70 to-transparent hover:from-primary-3/90 hover:via-primary-3/80 hover:to-primary-3/60 text-primary-3 hover:text-white shadow-lg rounded-full p-2 transition-all duration-200 flex"
+              style={{ boxShadow: '0 4px 16px 0 rgba(0,0,0,0.10)' }}
+              onClick={() => {
+                document.getElementById('category-scroll').scrollBy({ left: 200, behavior: 'smooth' });
+              }}
+            >
+              <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+            </button>
           </div>
         </div>
       </section>

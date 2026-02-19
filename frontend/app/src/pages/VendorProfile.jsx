@@ -14,7 +14,7 @@ import { VendorProfileSkeleton } from "../components/skeletons/VendorProfileSkel
 
 export default function VendorProfile() {
   const isGettingVendorProfile = useVendorProfileStore(
-    (state) => state.isGettingVendorProfile
+    (state) => state.isGettingVendorProfile,
   );
 
   const vendorProfile = useVendorProfileStore((state) => state.vendorProfile);
@@ -95,51 +95,42 @@ export default function VendorProfile() {
 
   if (isGettingVendorProfile) return <VendorProfileSkeleton />;
 
+  const plan =
+    vendorProfile?.userId?.subscriptionPlan ||
+    (isOwner ? authUser?.subscriptionPlan : null);
+
   return (
     <main className="py-8 bg-n-1 min-h-[80vh]">
       <div className="container">
-        <div className="relative bg-n-2/10 rounded-3xl overflow-hidden mb-8 border border-n-3/20 shadow-sm group">
-          <div className="w-full h-32 md:h-48 lg:h-56 bg-n-3 relative">
-            {vendorProfile?.coverImage ? (
-              <img
-                name="avatar"
-                src={vendorProfile.coverImage}
-                alt="cover"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-r from-primary-3 to-primary-4" />
+        <div className="relative bg-gradient-to-b from-primary-3 to-[#2d120a] rounded-3xl overflow-hidden mb-8 border border-n-3/20 shadow-sm group flex items-center min-h-[220px] md:min-h-[260px]">
+          {authUser &&
+            vendorProfile &&
+            authUser._id === vendorProfile.userId?._id && (
+              <button
+                onClick={() => navigate("/settings")}
+                className="absolute top-4 right-4 md:top-10 md:right-10 p-3 bg-black/30 hover:bg-black/50 backdrop-blur-md rounded-full text-white transition-all z-20"
+                title="Settings"
+              >
+                <Settings size={20} />
+              </button>
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-n-8/80 via-n-8/20 to-transparent" />
-
-            {authUser &&
-              vendorProfile &&
-              authUser._id === vendorProfile.userId?._id && (
-                <button
-                  onClick={() => navigate("/settings")}
-                  className="absolute top-4 right-4 p-2 bg-black/30 hover:bg-black/50 backdrop-blur-md rounded-full text-white transition-all z-20"
-                  title="Settings"
-                >
-                  <Settings size={20} />
-                </button>
-              )}
-
-            {vendorLocation && (
-              <div className="absolute bottom-6 right-6 md:bottom-8 md:right-8 z-20">
-                <span className="flex items-center gap-1.5 font-bold text-sm bg-black/30 backdrop-blur-md px-3 py-1 rounded-lg border border-white/10 text-white">
-                  <MapPin size={14} className="text-white" />
-                  {vendorLocation}
-                </span>
-              </div>
-            )}
-
-            <div className="absolute bottom-0 left-0 p-6 md:p-8 z-10 w-full">
-              <div className="flex items-center gap-2 mb-2">
-                <h1 className="h2 text-white drop-shadow-md">
+          {/* Responsive Content Layout */}
+          <div className="flex flex-col justify-center h-full w-full px-4 py-6 md:px-10 md:py-8">
+            <div className="flex flex-col items-start md:flex-row md:items-center md:justify-between w-full">
+              <div className="flex flex-col items-start md:flex-row md:items-center gap-2 md:gap-3 w-full">
+                <h1 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold drop-shadow-md flex items-center">
                   {vendorProfile?.userId?.businessName}
+                  <span className="ml-2 md:ml-3 flex items-center">
+                    <SubscriptionBadge plan={plan} size="sm" />
+                  </span>
                 </h1>
               </div>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-white/90 body-2"></div>
+              {vendorLocation && (
+                <span className="flex items-center gap-2 font-bold text-base sm:text-lg bg-black/30 backdrop-blur-md px-3 py-2 sm:px-6 rounded-lg border border-white/10 text-white mt-6 md:mt-0 w-full md:w-auto justify-center md:justify-end">
+                  <MapPin size={18} className="text-white" />
+                  {vendorLocation}
+                </span>
+              )}
             </div>
           </div>
         </div>

@@ -5,7 +5,7 @@ import VendorProductItem from "./vendor/VendorProductItem";
 import { Flame, ArrowRight } from "lucide-react";
 import { FeedSkeleton } from "./skeletons/FeedSkeleton";
 
-export function Trending({ limit = 8, title = "Trending Now" }) {
+export function Trending({ limit = 10, title = "Trending Now" }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -28,7 +28,7 @@ export function Trending({ limit = 8, title = "Trending Now" }) {
   if (loading) return <FeedSkeleton />;
 
   return (
-    <section className="container mx-auto max-w-7xl px-2 md:px-4 py-4">
+    <section className="container mx-auto max-w-full px-2 md:px-4 py-4">
       {/* Section Header */}
       <div className="flex flex-row items-center justify-between gap-4 mb-5">
         <h2 className="text-xl md:text-2xl font-bold text-n-8">{title}</h2>
