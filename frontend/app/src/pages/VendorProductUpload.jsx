@@ -218,8 +218,7 @@ const VendorProductUpload = () => {
             {editingPost
               ? "Update your post details."
               : "Share your latest products with the community."}{" "}
-            You can add up to 4 products. Products are automatically deleted
-            after 7 days.
+            You can add up to 4 products in a roll.
           </p>
 
           {!authUser?.vendorProfile?.bankDetails?.subaccountCode && (
