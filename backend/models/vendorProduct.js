@@ -54,6 +54,22 @@ const productItemSchema = new mongoose.Schema({
     enum: ["New", "Like New", "Good", "Fair", "Used"],
     default: "New",
   },
+  slug: {
+    type: String,
+    index: true,
+  },
+});
+
+const slugify = require("slugify");
+const crypto = require("crypto");
+
+productItemSchema.pre("save", function (next) {
+  if (this.isModified("title") || !this.slug) {
+    const baseSlug = slugify(this.title, { lower: true, strict: true });
+    const shortId = crypto.randomBytes(3).toString("hex");
+    this.slug = `${baseSlug}-${shortId}`;
+  }
+  next();
 });
 
 const vendorPostSchema = new mongoose.Schema(
@@ -98,7 +114,10 @@ const vendorPostSchema = new mongoose.Schema(
 vendorPostSchema.index({ school: 1, createdAt: -1 });
 vendorPostSchema.index({ area: 1, createdAt: -1 });
 vendorPostSchema.index({ state: 1, area: 1 });
-vendorPostSchema.index({ "products.title": "text", "products.description": "text" });
+vendorPostSchema.index({
+  "products.title": "text",
+  "products.description": "text",
+});
 
 vendorPostSchema.statics.findBySchool = function (school) {
   return this.find({ school })

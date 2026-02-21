@@ -22,6 +22,7 @@ const reviewRouter = require("./routes/review.route");
 const messageRouter = require("./routes/message.route");
 const notificationRouter = require("./routes/notification.route");
 const adminRouter = require("./routes/admin.route");
+const shareRouter = require("./routes/share.route");
 const { protectRoute } = require("./middleware/auth.middleware");
 const { adminOnly } = require("./middleware/adminOnly.middleware");
 
@@ -40,7 +41,7 @@ const allowedOrigins = [
   "https://shopydash.com",
   "https://www.shopydash.com",
   "https://shopydash-v1.vercel.app",
-  "https://admin.shopydash.com"
+  "https://admin.shopydash.com",
 ];
 
 // Pattern for Vercel preview deployments
@@ -48,7 +49,11 @@ const vercelPattern = /^https:\/\/.*\.vercel\.app$/;
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin) || vercelPattern.test(origin || '')) {
+    if (
+      !origin ||
+      allowedOrigins.includes(origin) ||
+      vercelPattern.test(origin || "")
+    ) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
@@ -71,6 +76,7 @@ app.options(/(.*)/, cors(corsOptions));
 app.use(securityHeaders);
 app.use(cookieParser());
 app.use(express.json());
+app.use("/p", shareRouter);
 app.use(csrfProtection);
 app.use(sanitizeInputs);
 
