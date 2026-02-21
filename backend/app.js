@@ -77,6 +77,7 @@ app.use(securityHeaders);
 app.use(cookieParser());
 app.use(express.json());
 app.use("/p", shareRouter);
+app.use("/share", shareRouter);
 app.use(csrfProtection);
 app.use(sanitizeInputs);
 

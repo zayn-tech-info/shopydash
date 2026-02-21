@@ -26,14 +26,13 @@ exports.generateSharePreview = async (req, res) => {
       (p) => p.slug === slug || (p._id && p._id.toString() === slug),
     );
     const storeName = post.vendorId?.businessName || "ShopyDash Store";
-    const username = post.vendorId?.username || "";
     const frontendUrl = process.env.FRONTEND_URL
-      ? `${process.env.FRONTEND_URL}/p/${username}`
-      : `https://app.shopydash.com/p/${username}`;
+      ? `${process.env.FRONTEND_URL}/product/${slug}`
+      : `https://app.shopydash.com/product/${slug}`;
 
     let ogImage =
       product.image ||
-      product.images[0] ||
+      (product.images && product.images[0]) ||
       "https://shopydash.com/default-share-image.jpg";
 
     if (

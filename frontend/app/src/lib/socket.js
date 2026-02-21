@@ -15,7 +15,7 @@ class SocketService {
     const serverUrl =
       mode === "development"
         ? "http://localhost:8000"
-        : "https://vendora-7457.onrender.com";
+        : "https://api.shopydash.com";
 
     this.socket = io(serverUrl, {
       auth: {

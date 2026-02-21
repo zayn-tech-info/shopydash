@@ -9,7 +9,7 @@ const mode = import.meta.env.MODE;
 const ENDPOINT =
   mode === "development"
     ? "http://localhost:8000"
-    : "https://vendora-7457.onrender.com";
+    : "https://api.shopydash.com";
 
 const getToken = () => {
   const cookies = document.cookie.split(";");

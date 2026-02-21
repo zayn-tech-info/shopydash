@@ -187,6 +187,75 @@ const getById = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
+const getProductById = asyncErrorHandler(async (req, res, next) => {
+  const { productId } = req.params;
+  const mongoose = require("mongoose");
+
+  if (!mongoose.Types.ObjectId.isValid(productId)) {
+    return next(new customError("Invalid product ID format", 400));
+  }
+
+  const pipeline = [
+    { $match: { "products._id": new mongoose.Types.ObjectId(productId) } },
+    { $unwind: "$products" },
+    { $match: { "products._id": new mongoose.Types.ObjectId(productId) } },
+    {
+      $lookup: {
+        from: "users",
+        localField: "vendorId",
+        foreignField: "_id",
+        as: "vendorUser",
+      },
+    },
+    {
+      $unwind: {
+        path: "$vendorUser",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $project: {
+        _id: "$products._id",
+        title: "$products.title",
+        price: "$products.price",
+        image: "$products.image",
+        description: "$products.description",
+        condition: "$products.condition",
+        category: "$products.category",
+        vendorPostId: { $toString: "$_id" },
+        vendorId: "$vendorId",
+        postedAt: "$createdAt",
+        school: "$school",
+        location: "$location",
+        area: "$area",
+        state: "$state",
+        vendor: {
+          _id: "$vendorUser._id",
+          businessName: "$vendorUser.businessName",
+          username: "$vendorUser.username",
+          profilePic: "$vendorUser.profilePic",
+          logo: "$vendorUser.logo",
+          whatsAppNumber: "$vendorUser.whatsAppNumber",
+          phoneNumber: "$vendorUser.phoneNumber",
+          subscriptionPlan: "$vendorUser.subscriptionPlan",
+          isVerified: "$vendorUser.isVerified",
+        },
+      },
+    },
+  ];
+
+  const result = await VendorPost.aggregate(pipeline);
+
+  if (!result || result.length === 0) {
+    return next(new customError("Product not found", 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    data: { product: result[0] },
+  });
+});
+
 const remove = asyncErrorHandler(async (req, res, next) => {
   const { postId } = req.params;
   const userId = req.user._id;
@@ -612,6 +681,7 @@ module.exports = {
   getMyPosts,
   getFeedPosts,
   getById,
+  getProductById,
   remove,
   update,
   searchPosts,
