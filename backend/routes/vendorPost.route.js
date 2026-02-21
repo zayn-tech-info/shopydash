@@ -5,6 +5,7 @@ const {
   getMyPosts,
   getFeedPosts,
   getById,
+  getProductById,
   remove,
   update,
   searchPosts,
@@ -24,6 +25,7 @@ vendorPostRouter.get("/feed", getFeedPosts);
 vendorPostRouter.get("/search", searchPosts);
 vendorPostRouter.get("/fresh", getFreshProducts);
 vendorPostRouter.get("/trending", getTrendingProducts);
+vendorPostRouter.get("/product/:productId", getProductById);
 
 vendorPostRouter.use(protectRoute);
 vendorPostRouter.use(checkSubscription);
@@ -32,7 +34,7 @@ vendorPostRouter.post(
   "/upload",
   verifyRole("vendor"),
   uploadMiddleware,
-  uploadImages
+  uploadImages,
 );
 
 vendorPostRouter.post("/", verifyRole("vendor"), createPost);

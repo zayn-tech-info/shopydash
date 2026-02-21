@@ -9,6 +9,9 @@ export const useProductStore = create((set, get) => ({
   posts: [],
   isFetchingPosts: false,
 
+  currentProduct: null,
+  isFetchingProduct: false,
+
   feedPosts: [],
   isFetchingFeedPosts: false,
   searchResults: [],
@@ -20,12 +23,7 @@ export const useProductStore = create((set, get) => ({
   searchProducts: async (params, isLoadMore = false) => {
     const { searchResults, currentSearchPage } = get();
 
-    
     const page = isLoadMore ? currentSearchPage + 1 : 1;
-
-    
-    
-    
 
     if (!isLoadMore) {
       set({
@@ -35,12 +33,9 @@ export const useProductStore = create((set, get) => ({
         currentSearchPage: 1,
       });
     } else {
-      
-      
     }
 
     try {
-      
       const existingIds = isLoadMore ? searchResults.map((p) => p._id) : [];
 
       const res = await api.get("/api/v1/post/search", {
@@ -149,6 +144,20 @@ export const useProductStore = create((set, get) => ({
     } catch (error) {
       set({ isDeletingPost: false });
       toast.error(error.response?.data?.message || "Failed to delete post");
+      throw error;
+    }
+  },
+
+  getProductById: async (productId) => {
+    set({ isFetchingProduct: true, currentProduct: null });
+    try {
+      const res = await api.get(`/api/v1/post/product/${productId}`);
+      set({ currentProduct: res.data.data.product, isFetchingProduct: false });
+      return res.data.data.product;
+    } catch (error) {
+      set({ isFetchingProduct: false });
+      console.error(error);
+      toast.error("Failed to load product details");
       throw error;
     }
   },

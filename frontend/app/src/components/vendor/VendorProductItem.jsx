@@ -3,10 +3,18 @@ import SubscriptionBadge from "../common/SubscriptionBadge";
 import UserAvatar from "../UserAvatar";
 import { useAuthStore } from "../../store/authStore";
 import { useCartStore } from "../../store/cartStore";
-import { ShoppingCart, Star, Plus, MapPin, Tag, Package } from "lucide-react";
+import {
+  ShoppingCart,
+  Star,
+  Plus,
+  MapPin,
+  Tag,
+  Package,
+  Eye,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
-import ShareToWhatsApp from "../ShareToWhatsApp";
+import ShareProduct from "../ShareProduct";
 
 function VendorProductItem({ product, vendorId }) {
   const { authUser } = useAuthStore();
@@ -94,13 +102,18 @@ function VendorProductItem({ product, vendorId }) {
 
       {/* Product Info */}
       <div className="p-2.5">
-        {/* Title (no navigation to product details) */}
-        <h3
-          className="text-[13px] md:text-base leading-snug text-n-8 font-bold line-clamp-2 min-h-[2.5em] mb-1.5"
-          title={title}
-        >
-          {title}
-        </h3>
+        <div className="flex items-start justify-between gap-2 mb-1.5">
+          <Link
+            to={`/product/${product._id || product.slug}`}
+            className="text-[13px] md:text-base leading-snug text-n-8 font-bold line-clamp-2 min-h-[2.5em] hover:text-primary-3 transition-colors flex-1"
+            title={title}
+          >
+            {title}
+          </Link>
+          <div className="scale-90 origin-top-right transform">
+            <ShareProduct product={product} variant="icon" />
+          </div>
+        </div>
 
         {/* Rating & Sold - Mimicking the marketplace style */}
         <div className="flex items-center gap-2 mb-2">
@@ -146,7 +159,13 @@ function VendorProductItem({ product, vendorId }) {
           </div>
 
           <div className="flex items-center gap-1.5 flex-shrink-0">
-            <ShareToWhatsApp product={product} variant="icon" />
+            <Link
+              to={`/product/${product._id || product.slug}`}
+              className="w-8 h-8 rounded-full border border-blue-500 text-blue-500 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-all shadow-sm active:scale-95 flex-shrink-0 bg-white"
+              title="View Detail"
+            >
+              <Eye size={16} />
+            </Link>
 
             {String(authUser?._id) !==
               String(product?.vendorId?._id || product?.vendorId || vendorId) &&

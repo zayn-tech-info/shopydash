@@ -34,6 +34,7 @@ import OrderConfirmation from "./pages/OrderConfirmation";
 import OrderList from "./pages/OrderList";
 import SettingsPage from "./pages/SettingsPage";
 import NotificationsPage from "./pages/NotificationsPage";
+import ProductDetailPage from "./pages/ProductDetailPage";
 
 import { VerifyEmail } from "./pages/VerifyEmail";
 import { ForgotPassword } from "./pages/ForgotPassword";
@@ -191,6 +192,7 @@ const App = () => {
           <Route path="/feeds" element={<Feeds />} />
           <Route path="/search" element={<SearchProducts />} />
           <Route path="/p/:username" element={<ProfileDispatcher />} />
+          <Route path="/product/:id" element={<ProductDetailPage />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/order/confirmation" element={<OrderConfirmation />} />
           <Route path="/orders" element={<OrderList />} />
