@@ -6,8 +6,13 @@ const ShareProduct = ({ product, variant = "default" }) => {
     e.preventDefault();
     e.stopPropagation();
 
-    const rawBackendUrl =
+    let rawBackendUrl =
       import.meta.env.VITE_BACKEND_URL || "https://api.shopydash.com";
+
+    if (!rawBackendUrl.startsWith("http")) {
+      rawBackendUrl = `https://${rawBackendUrl}`;
+    }
+
     const baseUrl = rawBackendUrl.replace(/\/api\/v1\/?$/, "");
 
     const identifier = product.slug || product._id;
@@ -16,14 +21,15 @@ const ShareProduct = ({ product, variant = "default" }) => {
     const title = product.title || "Product";
     const priceStr = product.price ? `₦${product.price.toLocaleString()}` : "";
 
-    const message = `Hey! Check out this item on Shopydash\n\n*${title}*\nPrice: ${priceStr}\n\nTap the link below to view details:`;
+ 
+    const message = `Hey! Check out this item on Shopydash\n\n*${title}*\nPrice: ${priceStr}\n\nTap the link below to view details:\n${shareUrl}`;
 
     if (navigator.share) {
       try {
         await navigator.share({
-          title: "Share Product",
+          title: title,
           text: message,
-          url: shareUrl,
+ 
         });
       } catch (error) {
         if (error.name !== "AbortError") {
@@ -31,7 +37,7 @@ const ShareProduct = ({ product, variant = "default" }) => {
         }
       }
     } else {
-      navigator.clipboard.writeText(`${message}\n${shareUrl}`);
+      navigator.clipboard.writeText(message);
       toast.success("Link copied to clipboard!");
     }
   };

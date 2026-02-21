@@ -35,7 +35,12 @@ exports.generateSharePreview = async (req, res) => {
       (product.images && product.images[0]) ||
       "https://shopydash.com/default-share-image.jpg";
 
+    if (typeof ogImage === "string" && ogImage.startsWith("http://")) {
+      ogImage = ogImage.replace("http://", "https://");
+    }
+
     if (
+      typeof ogImage === "string" &&
       ogImage.includes("res.cloudinary.com") &&
       ogImage.includes("/upload/")
     ) {
@@ -61,6 +66,7 @@ exports.generateSharePreview = async (req, res) => {
           <meta property="og:description" content="${description}" />
           <meta property="og:image" content="${ogImage}" />
           <meta property="og:image:secure_url" content="${ogImage}" />
+          <meta property="og:image:type" content="image/jpeg" />
           <meta property="og:image:width" content="1200" />
           <meta property="og:image:height" content="630" />
           <meta property="og:url" content="${frontendUrl}" />
