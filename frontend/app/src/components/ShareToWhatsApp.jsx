@@ -1,5 +1,4 @@
-import React from "react";
-import { MessageCircle, ShoppingCart } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 
 const ShareToWhatsApp = ({ product, variant = "default" }) => {
   const handleShare = (e) => {
@@ -15,7 +14,7 @@ const ShareToWhatsApp = ({ product, variant = "default" }) => {
     const title = product.title || "Product";
     const priceStr = product.price ? `₦${product.price.toLocaleString()}` : "";
 
-    const message = `Hey! Check out this item on Shopydash ${(<ShoppingCart />)}\n\n*${title}*\nPrice: ${priceStr}\n\nTap the link below to view details:\n${shareUrl}`;
+    const message = `Hey! Check out this item on Shopydash\n\n*${title}*\nPrice: ${priceStr}\n\nTap the link below to view details:\n${shareUrl}`;
 
     const encodedMessage = encodeURIComponent(message);
     const waIntent = `https://wa.me/?text=${encodedMessage}`;

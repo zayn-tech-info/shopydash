@@ -31,10 +31,20 @@ exports.generateSharePreview = async (req, res) => {
       ? `${process.env.FRONTEND_URL}/p/${username}`
       : `https://app.shopydash.com/p/${username}`;
 
-    const ogImage =
+    let ogImage =
       product.image ||
       product.images[0] ||
       "https://shopydash.com/default-share-image.jpg";
+
+    if (
+      ogImage.includes("res.cloudinary.com") &&
+      ogImage.includes("/upload/")
+    ) {
+      ogImage = ogImage.replace(
+        "/upload/",
+        "/upload/w_1200,h_630,c_pad,b_white,q_80,f_jpg/",
+      );
+    }
 
     const title = product.title || "Product";
     const price = product.price ? `₦${product.price.toLocaleString()}` : "";
@@ -51,6 +61,9 @@ exports.generateSharePreview = async (req, res) => {
           <meta property="og:title" content="${title} ${price ? `- ${price}` : ""}" />
           <meta property="og:description" content="${description}" />
           <meta property="og:image" content="${ogImage}" />
+          <meta property="og:image:secure_url" content="${ogImage}" />
+          <meta property="og:image:width" content="1200" />
+          <meta property="og:image:height" content="630" />
           <meta property="og:url" content="${frontendUrl}" />
           <meta property="og:type" content="product" />
           <meta property="og:site_name" content="ShopyDash" />
