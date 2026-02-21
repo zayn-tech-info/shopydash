@@ -15,7 +15,8 @@ const get = asyncErrorHandler(async (req, res, next) => {
 
   const cart = await Cart.findOne({ userId }).populate({
     path: "items.vendorId",
-    select: "businessName schoolName username profilePic whatsAppNumber isVerified subscriptionPlan",
+    select:
+      "businessName schoolName username profilePic whatsAppNumber isVerified subscriptionPlan email phoneNumber",
   });
   if (!cart) {
     return res.status(200).json({
@@ -43,10 +44,7 @@ const add = asyncErrorHandler(async (req, res, next) => {
   }
 
   if (quantity < 1 || quantity > 100) {
-    const error = new customError(
-      "Quantity must be between 1 and 100",
-      400
-    );
+    const error = new customError("Quantity must be between 1 and 100", 400);
     return next(error);
   }
 
@@ -62,7 +60,7 @@ const add = asyncErrorHandler(async (req, res, next) => {
 
   if (productPost.vendorId.toString() === userId.toString()) {
     return next(
-      new customError("You cannot add your own products to cart", 403)
+      new customError("You cannot add your own products to cart", 403),
     );
   }
 
@@ -77,19 +75,22 @@ const add = asyncErrorHandler(async (req, res, next) => {
 
   if (cart) {
     const itemIndex = cart.items.findIndex(
-      (p) => p.productId.toString() === productId
+      (p) => p.productId.toString() === productId,
     );
 
     if (itemIndex > -1) {
       let productItem = cart.items[itemIndex];
       const newQuantity = productItem.quantity + Number(quantity);
-      
+
       if (newQuantity > 100) {
         return next(
-          new customError("Cannot add more than 100 items of the same product", 400)
+          new customError(
+            "Cannot add more than 100 items of the same product",
+            400,
+          ),
         );
       }
-      
+
       productItem.quantity = newQuantity;
     } else {
       cart.items.push({
@@ -158,7 +159,7 @@ const updateItemQuantity = asyncErrorHandler(async (req, res, next) => {
   }
 
   const itemIndex = cart.items.findIndex(
-    (p) => p.productId.toString() === productId
+    (p) => p.productId.toString() === productId,
   );
 
   if (itemIndex > -1) {
@@ -193,7 +194,7 @@ const remove = asyncErrorHandler(async (req, res, next) => {
   }
 
   cart.items = cart.items.filter(
-    (item) => item.productId.toString() !== productId
+    (item) => item.productId.toString() !== productId,
   );
 
   await cart.save();
