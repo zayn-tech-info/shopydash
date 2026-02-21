@@ -9,7 +9,6 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  // Fix URL resolution issue: strip leading slash so it appends to baseURL correctly
   if (config.url && config.url.startsWith("/")) {
     config.url = config.url.substring(1);
   }
