@@ -23,7 +23,7 @@ export function Footer() {
               sell, and vibe securely.
             </p>
             <a
-              href="https://chat.whatsapp.com"
+              href="https://chat.whatsapp.com/B8lvW4HByWuG45gZwdKtxZ"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-4 py-2 bg-green-600/10 text-green-500 rounded-full hover:bg-green-600/20 transition-colors text-sm font-bold"
