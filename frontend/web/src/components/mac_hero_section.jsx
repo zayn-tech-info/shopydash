@@ -1,12 +1,11 @@
 import React from "react";
 import MacHeroImg from "../assets/images/mac_hero_section.png";
 
-// This component is styled to match the Shopify hero section on mobile
 const MacHeroSection = () => {
   return (
-    <section className="flex flex-col items-center justify-center min-h-screen bg-[#f6f6f6] px-4 pt-2 pb-8">
+    <section className="flex flex-col items-center justify-center min-h-screen bg-[#f6f6f6] px-4 pt-0 pb-8">
       <div className="w-full max-w-md">
-        <h1 className="text-3xl font-extrabold leading-tight mb-2 text-left font-sora">
+        <h1 className="text-3xl font-extrabold leading-tight mb-2 mt-0 text-left font-sora">
           <span className="text-black">The fastest way to </span>
           <span className="text-orange-500">turn your campus hustle into sales.</span>
         </h1>
