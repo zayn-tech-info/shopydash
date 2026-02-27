@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import { Check, Star, Crown, Zap } from "lucide-react";
 
 const plans = [
@@ -66,7 +65,6 @@ export function Pricing() {
       id="pricing"
       className="bg-orange-50/30 py-24 font-sans relative overflow-hidden"
     >
-      {}
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-orange-100/40 rounded-full blur-3xl opacity-60 -translate-y-1/2 translate-x-1/3 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

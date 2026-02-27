@@ -1,6 +1,6 @@
 export function Howitworks() {
   return (
-    <section id="howitworks" className="py-24 bg-gray-50/50 relative">
+    <section id="howitworks" className="py-24 bg-n-1 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-20">
           <h2 className="text-4xl font-bold font-sora text-n-8 mb-4">
@@ -12,7 +12,6 @@ export function Howitworks() {
           </p>
         </div>
 
-        {}
         <div className="mb-24">
           <div className="text-center mb-12">
             <span className="text-orange-600 font-bold bg-orange-100 px-4 py-1 rounded-full text-sm uppercase tracking-wide">
@@ -24,8 +23,7 @@ export function Howitworks() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-12 relative">
-            {}
-            <div className="hidden md:block absolute top-8 left-1/6 right-1/6 h-0.5 bg-dashed border-t-2 border-gray-200 -z-10" />
+            <div className="hidden md:block absolute top-8 left-[16%] right-[16%] h-0.5 border-t-2 border-dashed border-gray-200 -z-10" aria-hidden="true" />
 
             <div className="text-center relative">
               <div className="w-16 h-16 mx-auto bg-n-8 text-white rounded-2xl flex items-center justify-center text-2xl font-bold shadow-lg mb-6 transform rotate-3 transition-transform hover:rotate-6">
@@ -66,7 +64,6 @@ export function Howitworks() {
           </div>
         </div>
 
-        {}
         <div>
           <div className="text-center mb-12">
             <span className="text-blue-600 font-bold bg-blue-100 px-4 py-1 rounded-full text-sm uppercase tracking-wide">
@@ -78,8 +75,7 @@ export function Howitworks() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-12 relative">
-            {}
-            <div className="hidden md:block absolute top-8 left-1/6 right-1/6 h-0.5 bg-dashed border-t-2 border-gray-200 -z-10" />
+            <div className="hidden md:block absolute top-8 left-[16%] right-[16%] h-0.5 border-t-2 border-dashed border-gray-200 -z-10" aria-hidden="true" />
 
             <div className="text-center relative">
               <div className="w-16 h-16 mx-auto bg-n-8 text-white rounded-full flex items-center justify-center text-2xl font-bold shadow-lg mb-6">
