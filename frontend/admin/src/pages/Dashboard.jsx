@@ -11,6 +11,8 @@ import {
   AlertTriangle,
   XCircle,
   Crown,
+  Package,
+  CreditCard,
 } from "lucide-react";
 
 export default function Dashboard() {
@@ -40,6 +42,12 @@ export default function Dashboard() {
       color: "#8b5cf6",
     },
     {
+      title: "Total Products Listed by Vendors",
+      value: formatNumber(stats?.totalProducts),
+      icon: Package,
+      color: "#0ea5e9",
+    },
+    {
       title: "Total Orders",
       value: formatNumber(stats?.totalOrders),
       icon: ShoppingCart,
@@ -50,6 +58,12 @@ export default function Dashboard() {
       value: formatCurrency(stats?.totalRevenue),
       icon: DollarSign,
       color: "#10b981",
+    },
+    {
+      title: "Successful Payments",
+      value: formatNumber(stats?.successfulPayments),
+      icon: CreditCard,
+      color: "#059669",
     },
     {
       title: "Orders Today",
