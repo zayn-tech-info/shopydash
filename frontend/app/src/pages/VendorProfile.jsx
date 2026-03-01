@@ -1,16 +1,18 @@
-import SubscriptionBadge from "../components/common/SubscriptionBadge";
 import { toast } from "react-hot-toast";
 import Logo from "../assets/images/shopydash_logo.png";
-import { useEffect, useState, useRef, useCallback } from "react";
-import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { LogOut, Plus, MapPin, Settings } from "lucide-react";
+import { useEffect, useState, useCallback } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { LogOut } from "lucide-react";
 import { useVendorProfileStore } from "../store/vendorProfileStore";
 import { useAuthStore } from "../store/authStore";
+import useChatStore from "../store/chatStore";
 import { EditVendorProfile } from "../components/vendor/EditVendorProfile";
-import VendorSidebar from "../components/vendor/VendorSidebar";
+import VendorProfileHeader from "../components/vendor/VendorProfileHeader";
 import AboutAndProducts from "../components/vendor/AboutAndProducts";
 import { VendorAddress } from "../components/vendor/VendorAddress";
 import { VendorProfileSkeleton } from "../components/skeletons/VendorProfileSkeleton";
+import ConfirmationModal from "../components/common/ConfirmationModal";
+import AuthRequiredModal from "../components/common/AuthRequiredModal";
 
 export default function VendorProfile() {
   const isGettingVendorProfile = useVendorProfileStore(
@@ -19,6 +21,8 @@ export default function VendorProfile() {
 
   const vendorProfile = useVendorProfileStore((state) => state.vendorProfile);
   const getProfile = useVendorProfileStore((state) => state.getProfile);
+  const updateCoverImage = useVendorProfileStore((state) => state.updateCoverImage);
+  const isUpdatingVendorProfile = useVendorProfileStore((state) => state.isUpdatingVendorProfile);
 
   const authUser = useAuthStore((s) => s.authUser);
   const logout = useAuthStore((s) => s.logout);
@@ -27,10 +31,12 @@ export default function VendorProfile() {
   const navigate = useNavigate();
 
   const params = useParams();
-  const location = useLocation();
   const [showEditModal, setShowEditModal] = useState(false);
   const [formData, setFormData] = useState(null);
-  const fileInputRef = useRef(null);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [whatsappNumber, setWhatsappNumber] = useState("");
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const { checkAccess, fetchMessages } = useChatStore();
 
   const isOwner = authUser?._id === vendorProfile?.userId?._id;
   const displayProfileImage = isOwner
@@ -93,97 +99,127 @@ export default function VendorProfile() {
     }
   }, [logout, checkAuth, navigate]);
 
+  const handleMessage = useCallback(async () => {
+    if (!authUser) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+    const recipientId = vendorProfile?.userId?._id;
+    if (!recipientId) return;
+    const result = await checkAccess(recipientId);
+    if (result.allowed) {
+      await fetchMessages(result.conversation._id);
+      navigate("/messages");
+    } else if (result.action === "REDIRECT_WHATSAPP") {
+      setWhatsappNumber(result.data.whatsAppNumber ?? "");
+      setShowPremiumModal(true);
+    }
+  }, [authUser, vendorProfile?.userId?._id, checkAccess, fetchMessages, navigate]);
+
+  const handleContinueToWhatsapp = useCallback(() => {
+    if (whatsappNumber) {
+      const formatted = whatsappNumber.replace(/\D/g, "");
+      window.open(`https://wa.me/${formatted}`, "_blank");
+    } else {
+      toast.error("Vendor WhatsApp not available");
+    }
+    setShowPremiumModal(false);
+  }, [whatsappNumber]);
+
+  const handleCoverUpload = useCallback(
+    async (file) => {
+      try {
+        await updateCoverImage(file);
+        const usernameToRefetch = params?.username || authUser?.username;
+        if (usernameToRefetch) await getProfile(usernameToRefetch);
+        toast.success("Cover image updated");
+      } catch (e) {
+        toast.error(e?.message || "Failed to update cover image");
+      }
+    },
+    [updateCoverImage, getProfile, params?.username, authUser?.username]
+  );
+
   if (isGettingVendorProfile) return <VendorProfileSkeleton />;
 
   const plan =
     vendorProfile?.userId?.subscriptionPlan ||
     (isOwner ? authUser?.subscriptionPlan : null);
 
+  const businessName =
+    vendorProfile?.userId?.businessName ||
+    (isOwner ? authUser?.businessName : null) ||
+    "Store";
+  const username =
+    vendorProfile?.storeUsername || vendorProfile?.userId?.username || "vendor";
+
   return (
-    <main className="py-8 bg-n-1 min-h-[80vh]">
-      <div className="container">
-        <div className="relative bg-gradient-to-b from-primary-3 to-[#2d120a] rounded-3xl overflow-hidden mb-8 border border-n-3/20 shadow-sm group flex items-center min-h-[220px] md:min-h-[260px]">
-          {authUser &&
-            vendorProfile &&
-            authUser._id === vendorProfile.userId?._id && (
-              <button
-                onClick={() => navigate("/settings")}
-                className="absolute top-4 right-4 md:top-10 md:right-10 p-3 bg-black/30 hover:bg-black/50 backdrop-blur-md rounded-full text-white transition-all z-20"
-                title="Settings"
-              >
-                <Settings size={20} />
-              </button>
-            )}
-          {/* Responsive Content Layout */}
-          <div className="flex flex-col justify-center h-full w-full px-4 py-6 md:px-10 md:py-8">
-            <div className="flex flex-col items-start md:flex-row md:items-center md:justify-between w-full">
-              <div className="flex flex-col items-start md:flex-row md:items-center gap-2 md:gap-3 w-full">
-                <h1 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold drop-shadow-md flex items-center">
-                  {vendorProfile?.userId?.businessName}
-                  <span className="ml-2 md:ml-3 flex items-center">
-                    <SubscriptionBadge plan={plan} size="sm" />
-                  </span>
-                </h1>
+    <main className="min-h-[80vh] bg-n-1">
+      <div className="w-full max-w-6xl lg:max-w-7xl xl:max-w-[80rem] 2xl:max-w-[90rem] mx-auto px-3 sm:px-4 md:px-5 lg:px-6 xl:px-8 py-4 sm:py-6 md:py-8">
+        {/* Twitter-style profile header */}
+        <VendorProfileHeader
+          vendorProfile={vendorProfile}
+          authUser={authUser}
+          isOwner={isOwner}
+          plan={plan}
+          displayProfileImage={displayProfileImage}
+          businessName={businessName}
+          username={username}
+          vendorLocation={vendorLocation}
+          onCopy={copyProfileLink}
+          openEdit={openEdit}
+          onSettings={() => navigate("/settings")}
+          onMessage={handleMessage}
+          onCoverUpload={handleCoverUpload}
+          isCoverUploading={isUpdatingVendorProfile}
+        />
+
+        {/* Main content - single column, full width */}
+        <div className="mt-6 sm:mt-8 space-y-6 sm:space-y-8">
+          <div className="bg-white rounded-2xl p-6 sm:p-8 border border-n-3/20 shadow-sm min-h-[320px]">
+            <AboutAndProducts vendor={vendorProfile} />
+          </div>
+
+          <div className="bg-white rounded-2xl p-6 sm:p-8 border border-n-3/20 shadow-sm">
+            <VendorAddress
+              vendorProfile={vendorProfile}
+              authUser={authUser}
+            />
+          </div>
+        </div>
+
+        {/* Auth card: logged-in (logout) or guest (login CTA) */}
+        <div className="mt-6 sm:mt-8 bg-white rounded-2xl p-4 sm:p-6 border border-n-3/20 shadow-sm">
+          {authUser ? (
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <div className="font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-0.5">
+                  Logged in as
+                </div>
+                <div className="truncate text-n-6 font-medium">
+                  {authUser?.fullName || authUser?.username || authUser?.email}
+                </div>
               </div>
-              {vendorLocation && (
-                <span className="flex items-center gap-2 font-bold text-base sm:text-lg bg-black/30 backdrop-blur-md px-3 py-2 sm:px-6 rounded-lg border border-white/10 text-white mt-6 md:mt-0 w-full md:w-auto justify-center md:justify-end">
-                  <MapPin size={18} className="text-white" />
-                  {vendorLocation}
-                </span>
-              )}
+              <button
+                onClick={handleLogout}
+                className="flex items-center justify-center gap-2 px-4 py-2.5 border border-n-3/20 rounded-xl text-xs font-bold uppercase tracking-wider text-n-5 hover:text-primary-3 hover:border-primary-3 transition-all shrink-0"
+              >
+                <LogOut size={14} />
+                Logout
+              </button>
             </div>
-          </div>
+          ) : (
+            <div className="text-center py-2">
+              <p className="font-medium text-n-6 mb-3">Have an account?</p>
+              <a
+                href="/login"
+                className="inline-block px-6 py-2.5 bg-n-1 border border-n-3/20 hover:border-primary-3 text-n-6 hover:text-primary-3 rounded-xl font-code text-xs font-bold uppercase tracking-wider transition-all"
+              >
+                Login
+              </a>
+            </div>
+          )}
         </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <div className="lg:col-span-4 xl:col-span-3">
-            <div className="sticky top-24 space-y-6">
-              <VendorSidebar
-                vendorProfile={vendorProfile}
-                authUser={authUser}
-                onCopy={copyProfileLink}
-                openEdit={openEdit}
-                onLogout={async () => {
-                  await logout();
-                  window.location.href = "/login";
-                }}
-              />
-            </div>
-          </div>
-
-          {}
-          <div className="lg:col-span-8 xl:col-span-9 space-y-8">
-            <div className="bg-white rounded-2xl p-8 border border-n-3/20 shadow-sm min-h-[400px]">
-              <AboutAndProducts vendor={vendorProfile} />
-            </div>
-
-            {}
-            <div className="bg-white rounded-2xl p-8 border border-n-3/20 shadow-sm">
-              <VendorAddress
-                vendorProfile={vendorProfile}
-                authUser={authUser}
-              />
-            </div>
-          </div>
-        </div>
-
-        {authUser && (
-          <div className="lg:hidden mt-8 bg-white rounded-2xl p-6 border border-n-3/20 shadow-sm text-center">
-            <div className="font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-1">
-              Logged in as
-            </div>
-            <div className="truncate text-n-6 font-medium mb-2">
-              {authUser?.fullName || authUser?.username || authUser?.email}
-            </div>
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2 mt-3 border border-n-3/20 rounded-xl text-xs font-bold uppercase tracking-wider text-n-5 hover:text-primary-3 hover:border-primary-3 transition-all"
-            >
-              <LogOut size={14} />
-              Logout
-            </button>
-          </div>
-        )}
 
         {showEditModal && formData ? (
           <EditVendorProfile
@@ -192,6 +228,24 @@ export default function VendorProfile() {
           />
         ) : null}
       </div>
+
+      <ConfirmationModal
+        isOpen={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+        onConfirm={handleContinueToWhatsapp}
+        title="Premium Vendor Only"
+        message="This vendor is not on our Premium plan. You can continue to WhatsApp to contact them."
+        confirmText="Continue to WhatsApp"
+        cancelText="Cancel"
+      />
+
+      <AuthRequiredModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        title="Login to Message"
+        message="You need to be logged in to message this vendor. Create an account or login to start a conversation."
+        cancelText="Cancel"
+      />
     </main>
   );
 }

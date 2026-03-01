@@ -4,6 +4,7 @@ const vendorProfileModel = require("../../models/vendorProfile.model");
 const User = require("../../models/auth.model");
 const Subscription = require("../../models/subscription.model");
 const PLANS = require("../../config/subscriptionPlans");
+const { cloudinary } = require("./upload.controller");
 
 const createVendorProfile = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user && req.user._id;
@@ -283,6 +284,57 @@ const updateVendorProfile = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
+/**
+ * PATCH /api/v1/vendorProfile/updateVendorProfile/cover
+ * Upload cover/banner image for vendor profile (multipart: cover)
+ */
+const updateCoverImage = asyncErrorHandler(async (req, res, next) => {
+  const userId = req.user && req.user._id;
+  if (!userId) {
+    const err = new customError("Unauthorized", 401);
+    return next(err);
+  }
+  if (!req.file || !req.file.buffer) {
+    const err = new customError("Please upload a cover image", 400);
+    return next(err);
+  }
+
+  let coverImage;
+  try {
+    const mime = req.file.mimetype || "image/jpeg";
+    const base64 = req.file.buffer.toString("base64");
+    const dataUri = `data:${mime};base64,${base64}`;
+    const uploaded = await cloudinary.uploader.upload(dataUri, {
+      folder: "vendor/covers",
+      resource_type: "image",
+    });
+    coverImage = uploaded.secure_url;
+  } catch (err) {
+    console.error("Cover image Cloudinary upload error:", err);
+    const statusCode = Number(err.http_code) || 500;
+    return next(
+      new customError(err.message || "Cover image upload failed", statusCode)
+    );
+  }
+
+  const updated = await vendorProfileModel.findOneAndUpdate(
+    { userId },
+    { $set: { coverImage } },
+    { new: true, runValidators: true }
+  );
+
+  if (!updated) {
+    const err = new customError("Vendor profile not found", 404);
+    return next(err);
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "Cover image updated successfully",
+    data: { vendorProfile: updated },
+  });
+});
+
 const getVendorProfileByUserId = asyncErrorHandler(async (req, res, next) => {
   const userId = req.params.userId;
   const vendorProfile = await vendorProfileModel.findOne({ userId });
@@ -302,6 +354,7 @@ module.exports = {
   createVendorProfile,
   getPublicVendorProfile,
   updateVendorProfile,
+  updateCoverImage,
   getAllVendorsProfile,
   getVendorProfileByUserId,
 };

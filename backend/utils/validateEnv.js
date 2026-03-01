@@ -3,9 +3,6 @@ const { logInfo, logWarn } = require("./logger");
 const validateEnv = () => {
   const required = [
     "JWT_SECRET_KEY",
-    "CLOUDINARY_NAME",
-    "CLOUDINARYAPI_KEY",
-    "CLOUDINARYAPI_API_SECRET",
     "RESEND_API_KEY",
   ];
 
@@ -31,6 +28,23 @@ const validateEnv = () => {
     if (!process.env[variable]) {
       missing.push(variable);
     }
+  }
+
+  // Cloudinary: accept either old or new env names (must have one of each)
+  const hasCloudName =
+    process.env.CLOUDINARY_NAME || process.env.CLOUDINARY_CLOUD_NAME;
+  const hasCloudKey =
+    process.env.CLOUDINARYAPI_KEY || process.env.CLOUDINARY_API_KEY;
+  const hasCloudSecret =
+    process.env.CLOUDINARYAPI_API_SECRET || process.env.CLOUDINARY_API_SECRET;
+  if (!hasCloudName) {
+    missing.push("CLOUDINARY_NAME or CLOUDINARY_CLOUD_NAME");
+  }
+  if (!hasCloudKey) {
+    missing.push("CLOUDINARYAPI_KEY or CLOUDINARY_API_KEY");
+  }
+  if (!hasCloudSecret) {
+    missing.push("CLOUDINARYAPI_API_SECRET or CLOUDINARY_API_SECRET");
   }
 
   if (missing.length > 0) {

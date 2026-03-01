@@ -42,7 +42,7 @@ export default function Dashboard() {
       color: "#8b5cf6",
     },
     {
-      title: "Total Products Listed by Vendors",
+      title: "Total Products",
       value: formatNumber(stats?.totalProducts),
       icon: Package,
       color: "#0ea5e9",

@@ -5,9 +5,10 @@ const customError = require("../../errors/customError");
 const fs = require("fs");
 
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_NAME,
-  api_key: process.env.CLOUDINARYAPI_KEY,
-  api_secret: process.env.CLOUDINARYAPI_API_SECRET,
+  cloud_name: process.env.CLOUDINARY_NAME || process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARYAPI_KEY || process.env.CLOUDINARY_API_KEY,
+  api_secret:
+    process.env.CLOUDINARYAPI_API_SECRET || process.env.CLOUDINARY_API_SECRET,
 });
 
 const storage = multer.memoryStorage();
@@ -74,6 +75,7 @@ const uploadImages = asyncErrorHandler(async (req, res, next) => {
 module.exports = {
   uploadMiddleware: upload.array("images", 6),
   changeAvatar: upload.single("avatar"),
+  uploadCover: upload.single("cover"),
   uploadImages,
   cloudinary,
 };

@@ -144,4 +144,39 @@ export const useVendorProfileStore = create((set, get) => ({
       throw serverMessage;
     }
   },
+
+  updateCoverImage: async (file) => {
+    set({ isUpdatingVendorProfile: true, error: null });
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        set({ isUpdatingVendorProfile: false });
+        throw new Error("Please log in to update your cover image");
+      }
+      const formData = new FormData();
+      formData.append("cover", file);
+      const res = await api.patch(
+        `/api/v1/vendorProfile/updateVendorProfile/cover`,
+        formData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const payload = res?.data?.data ?? res?.data ?? res;
+      const profile = payload?.vendorProfile ?? payload;
+      set({
+        vendorProfile: profile,
+        isUpdatingVendorProfile: false,
+        error: null,
+      });
+      return profile;
+    } catch (err) {
+      const serverMessage =
+        err?.response?.data?.message ||
+        (typeof err?.response?.data === "string" ? err.response.data : null) ||
+        err?.message ||
+        "An unknown error occurred";
+      console.error("Update cover image error:", err);
+      set({ error: serverMessage, isUpdatingVendorProfile: false });
+      throw serverMessage;
+    }
+  },
 }));
