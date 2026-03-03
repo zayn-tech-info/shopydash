@@ -128,7 +128,7 @@ const getAllVendorsProfile = asyncErrorHandler(async (req, res, next) => {
       },
     },
 
-    // Lookup vendor profile for rating
+    // Lookup vendor profile for rating, cover, reviews
     {
       $lookup: {
         from: "vendorprofiles",
@@ -137,10 +137,35 @@ const getAllVendorsProfile = asyncErrorHandler(async (req, res, next) => {
         as: "vendorProfile",
       },
     },
+    // Lookup vendor posts to count real product count
+    {
+      $lookup: {
+        from: "vendorposts",
+        localField: "_id",
+        foreignField: "vendorId",
+        as: "vendorPosts",
+        pipeline: [{ $project: { products: 1 } }],
+      },
+    },
     {
       $addFields: {
         rating: {
           $ifNull: [{ $arrayElemAt: ["$vendorProfile.rating", 0] }, 0],
+        },
+        coverImage: {
+          $ifNull: [{ $arrayElemAt: ["$vendorProfile.coverImage", 0] }, ""],
+        },
+        numReviews: {
+          $ifNull: [{ $arrayElemAt: ["$vendorProfile.numReviews", 0] }, 0],
+        },
+        productCount: {
+          $sum: {
+            $map: {
+              input: "$vendorPosts",
+              as: "post",
+              in: { $size: { $ifNull: ["$$post.products", []] } },
+            },
+          },
         },
       },
     },
@@ -199,6 +224,7 @@ const getAllVendorsProfile = asyncErrorHandler(async (req, res, next) => {
       $project: {
         subscription: 0,
         vendorProfile: 0,
+        vendorPosts: 0,
       },
     },
   ]);
