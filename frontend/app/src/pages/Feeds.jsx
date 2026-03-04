@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback, useRef } from "react";
+import { useEffect, useLayoutEffect, useState, useCallback, useRef } from "react";
 import { api } from "../lib/axios";
 import { NearByVendors } from "../components/NearByVendors";
 import {
@@ -10,38 +10,28 @@ import {
   Check,
   Loader,
 } from "lucide-react";
-import { FeedSkeleton } from "../components/skeletons/FeedSkeleton";
 import { useSearchParams } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
+
+const FEEDS_TUTORIAL_KEY = "feeds_school_filter_tutorial_seen";
 
 export default function Feeds() {
   const [searchParams] = useSearchParams();
   const { authUser } = useAuthStore();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showTutorial, setShowTutorial] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return !localStorage.getItem(FEEDS_TUTORIAL_KEY);
+  });
 
   const [searchQuery, setSearchQuery] = useState(
     searchParams.get("search") || "",
   );
 
   const [selectedSchool, setSelectedSchool] = useState(
-    searchParams.get("school") || authUser?.schoolName || "",
+    searchParams.get("school") || "",
   );
-
-  const schoolInitialized = useRef(
-    !!(searchParams.get("school") || authUser?.schoolName),
-  );
-
-  useEffect(() => {
-    if (
-      !schoolInitialized.current &&
-      authUser?.schoolName &&
-      !searchParams.get("school")
-    ) {
-      setSelectedSchool(authUser.schoolName);
-      schoolInitialized.current = true;
-    }
-  }, [authUser, searchParams]);
 
   const [schools, setSchools] = useState([]);
   const [loadingSchools, setLoadingSchools] = useState(false);
@@ -58,6 +48,35 @@ export default function Feeds() {
 
   const schoolDropdownRef = useRef(null);
   const locationDropdownRef = useRef(null);
+  const schoolFilterChipRef = useRef(null);
+  const [tooltipAnchor, setTooltipAnchor] = useState(null);
+
+  useLayoutEffect(() => {
+    if (!showTutorial) return;
+    const updateAnchor = () => {
+      const el = schoolFilterChipRef.current;
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        setTooltipAnchor({
+          bottom: window.innerHeight - rect.top + 8,
+          left: rect.left + rect.width / 2,
+        });
+        return true;
+      }
+      return false;
+    };
+    updateAnchor();
+    const t1 = setTimeout(updateAnchor, 50);
+    const t2 = setTimeout(updateAnchor, 150);
+    const t3 = setTimeout(updateAnchor, 400);
+    window.addEventListener("resize", updateAnchor);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      window.removeEventListener("resize", updateAnchor);
+    };
+  }, [showTutorial]);
 
   useEffect(() => {
     const fetchSchools = async () => {
@@ -156,9 +175,68 @@ export default function Feeds() {
 
   const filteredPosts = posts;
 
+  const dismissTutorial = () => {
+    localStorage.setItem(FEEDS_TUTORIAL_KEY, "true");
+    setShowTutorial(false);
+  };
+
   return (
     <div className="relative min-h-screen">
-      {}
+      {/* First-time tutorial: dimmed overlay + tooltip on filter chip */}
+      {showTutorial && (
+        <div
+          className="fixed inset-0 z-[100] animate-in fade-in duration-300"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="feeds-tutorial-title"
+        >
+          <div
+            className="absolute inset-0 bg-black/50 transition-opacity"
+            onClick={dismissTutorial}
+            aria-hidden
+          />
+          <div
+            className="absolute z-10 w-[calc(100%-2rem)] max-w-xs animate-in fade-in zoom-in-95 duration-200"
+            style={
+              tooltipAnchor
+                ? {
+                    bottom: tooltipAnchor.bottom,
+                    left: tooltipAnchor.left,
+                    transform: "translateX(-50%)",
+                  }
+                : {
+                    bottom: "40%",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                  }
+            }
+          >
+              <div className="bg-white rounded-xl shadow-xl border border-n-3/10 p-4">
+                <p
+                  id="feeds-tutorial-title"
+                  className="text-sm text-n-7 mb-3"
+                >
+                  Tap here to filter by your school or browse all.
+                </p>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    dismissTutorial();
+                  }}
+                  className="w-full py-2 px-3 rounded-lg bg-primary-3 text-white font-semibold text-xs hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary-3 focus:ring-offset-2"
+                >
+                  Got it
+                </button>
+              </div>
+              <div
+                className="absolute left-1/2 -translate-x-1/2 -bottom-2 w-4 h-4 bg-white border-r border-b border-n-3/10 rotate-45"
+                aria-hidden
+              />
+            </div>
+        </div>
+      )}
+
       {isSearchActive && (
         <div
           className="fixed inset-0 bg-black/20 md:backdrop-blur-sm z-40 transition-all duration-300"
@@ -194,7 +272,10 @@ export default function Feeds() {
                 />
 
                 {!isSearchActive && (
-                  <div className="flex items-center gap-1.5 px-2 py-1.5 bg-white rounded-lg border border-n-3/10 shadow-sm">
+                  <div
+                    ref={schoolFilterChipRef}
+                    className="flex items-center gap-1.5 px-2 py-1.5 bg-white rounded-lg border border-n-3/10 shadow-sm"
+                  >
                     <School size={12} className="text-primary-3" />
                     <span className="text-xs font-bold text-n-6 whitespace-nowrap max-w-[80px] sm:max-w-xs truncate">
                       {selectedSchool || "All Schools"}
