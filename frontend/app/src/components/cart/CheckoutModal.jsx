@@ -50,7 +50,6 @@ const CheckoutModal = ({
     Object.values(groupedItems).forEach((group) => {
       message += `*Vendor:* ${group.vendor?.businessName || "Vendor"}\n`;
       message += `*Vendor Phone:* ${group.vendor?.phoneNumber || "N/A"}\n`;
-      message += `*Vendor WhatsApp:* ${group.vendor?.whatsAppNumber || "N/A"}\n`;
       message += `*Vendor Email:* ${group.vendor?.email || "N/A"}\n\n`;
       message += `*Items:*\n`;
       group.items.forEach((item) => {

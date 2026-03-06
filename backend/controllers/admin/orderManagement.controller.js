@@ -40,8 +40,8 @@ const getOrders = asyncErrorHandler(async (req, res) => {
       .populate("buyer", "fullName email")
       .populate({
         path: "vendor",
-        select: "storeUsername userId",
-        populate: { path: "userId", select: "businessName" },
+        select: "userId",
+        populate: { path: "userId", select: "businessName username" },
       })
       .sort(sort)
       .skip(skip)
@@ -73,8 +73,8 @@ const getOrderDetail = asyncErrorHandler(async (req, res) => {
     .populate("buyer", "fullName email phoneNumber")
     .populate({
       path: "vendor",
-      select: "storeUsername userId bankDetails status",
-      populate: { path: "userId", select: "businessName fullName email" },
+      select: "userId bankDetails activeStatus",
+      populate: { path: "userId", select: "businessName fullName email username" },
     })
     .lean();
 

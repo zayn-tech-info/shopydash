@@ -1,6 +1,7 @@
 const asyncErrorHandler = require("../../errors/asyncErrorHandle");
 const User = require("../../models/auth.model");
 const VendorProfile = require("../../models/vendorProfile.model");
+const ClientProfile = require("../../models/clientProfile.model");
 const sendToken = require("../../utils/sendToken");
 const validator = require("validator");
 const customError = require("../../errors/customError");
@@ -12,6 +13,19 @@ const {
 } = require("../../utils/email");
 const crypto = require("crypto");
 const VerificationToken = require("../../models/verificationToken.model");
+
+async function generateUniqueUsername(email) {
+  const base = email.split("@")[0].replace(/[^a-z0-9_.]/gi, "").toLowerCase();
+  const baseUsername = base.length >= 3 ? base : `${base}${Math.floor(Math.random() * 1000)}`;
+  let username = baseUsername.slice(0, 30);
+  let suffix = 0;
+  while (true) {
+    const candidate = suffix === 0 ? username : `${username.slice(0, 26)}${String(suffix).padStart(4, "0")}`.slice(0, 30);
+    const exists = await User.findOne({ username: candidate }).select("_id").lean();
+    if (!exists) return candidate;
+    suffix += 1;
+  }
+}
 
 const googleAuth = asyncErrorHandler(async (req, res, next) => {
   const { token } = req.body;
@@ -38,14 +52,17 @@ const googleAuth = asyncErrorHandler(async (req, res, next) => {
     const hasProfile = await checkUserHasProfile(user);
     sendToken(user, "Logged in successfully", res, 200, hasProfile);
   } else {
-    let username = email.split("@")[0].replace(/[^a-zA-Z0-9_.]/g, "");
-    if (username.length < 3) {
-      username = `${username}${Math.floor(Math.random() * 1000)}`;
-    }
+    const username = await generateUniqueUsername(email);
 
+    const fullName =
+      name && String(name).trim()
+        ? String(name).trim()
+        : email
+          ? email.split("@")[0]
+          : "User";
     user = await User.create({
       email,
-      fullName: name,
+      fullName,
       username,
       profilePic: picture,
       isGoogleAuth: true,
@@ -61,18 +78,20 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
   const userId = req.user._id;
   const {
     role,
-    username,
+    fullName,
     phoneNumber,
     schoolName,
-    whatsAppNumber,
+    schoolEmail,
     businessName,
-    schoolId,
     password,
     state,
     city,
     country,
     schoolArea,
     area,
+    gender,
+    preferredCategory,
+    businessCategory,
   } = req.body;
 
   const user = await User.findById(userId).select("+password");
@@ -83,19 +102,19 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
   }
 
   const missingFields = [];
-
-  if (!schoolName) missingFields.push("schoolName");
-  if (!whatsAppNumber) missingFields.push("whatsAppNumber");
+  if (!fullName || !fullName.trim()) missingFields.push("fullName");
+  if (!phoneNumber) missingFields.push("phoneNumber");
   if (!state) missingFields.push("state");
   if (!city) missingFields.push("city");
   if (!country) missingFields.push("country");
 
-  if (role === "vendor" && !businessName && !user.businessName)
+  const effectiveRole = role || user.role;
+  if (effectiveRole === "vendor" && !businessName && !user.businessName) {
     missingFields.push("businessName");
+  }
 
-  if (!user.username && !username) missingFields.push("username");
-  if (!user.phoneNumber && !phoneNumber) missingFields.push("phoneNumber");
   if ((!user.password || user.isGoogleAuth) && !password) {
+    // optional password for Google users
   }
 
   if (missingFields.length > 0) {
@@ -106,48 +125,74 @@ const completeRegistration = asyncErrorHandler(async (req, res, next) => {
     return next(err);
   }
 
-  if (username && username !== user.username) {
-    const existingUser = await User.findOne({ username }).select("_id").lean();
-    if (existingUser && existingUser._id.toString() !== userId.toString()) {
-      const err = new customError("Username is already taken", 400);
-      return next(err);
-    }
-    user.username = username;
-  }
-
-  if (role) user.role = role;
-  if (phoneNumber) user.phoneNumber = phoneNumber;
-  if (schoolName) user.schoolName = schoolName;
-  if (whatsAppNumber) user.whatsAppNumber = whatsAppNumber;
-  if (password) user.password = password;
-  if (businessName) user.businessName = businessName;
-  if (schoolId) user.schoolId = schoolId;
-
-  user.state = state || user.state;
-  user.city = city || user.city;
-  user.country = country || user.country;
-
-  user.schoolArea = schoolArea || area || user.schoolArea;
-  user.area = area || schoolArea || user.area;
-
-  user.profileComplete = true;
-
-  await user.save();
-
-  sendToken(user, "Registration completed successfully", res, 200, false);
-});
-
-const signup = asyncErrorHandler(async (req, res, next) => {
-  const { fullName, username, email, phoneNumber, password, role } = req.body;
-
-  if (!fullName || !username || !email || !phoneNumber || !password) {
+  const trimmedFullName = fullName.trim();
+  if (
+    trimmedFullName.length < 2 ||
+    !/^[a-zA-Z\s'-]+$/.test(trimmedFullName)
+  ) {
     const err = new customError(
-      "All fields are required (FullName, Username, Email, Phone, Password)",
+      "Full name must be at least 2 characters and contain only letters, spaces, hyphens, and apostrophes",
       400,
     );
     return next(err);
   }
 
+  user.fullName = trimmedFullName;
+  user.phoneNumber = phoneNumber.trim();
+  if (schoolName) user.schoolName = schoolName.trim();
+  if (schoolEmail) user.schoolEmail = schoolEmail.trim().toLowerCase();
+  if (password) user.password = password;
+  if (businessName) user.businessName = businessName.trim();
+  if (gender) user.gender = gender;
+  if (effectiveRole) user.role = effectiveRole;
+
+  user.state = state || user.state;
+  user.city = city || user.city;
+  user.country = country || user.country;
+  user.schoolArea = schoolArea || user.schoolArea;
+  user.profileComplete = true;
+
+  await user.save();
+
+  if (effectiveRole === "client") {
+    let clientProfile = await ClientProfile.findOne({ userId }).select("_id").lean();
+    if (!clientProfile) {
+      clientProfile = await ClientProfile.create({
+        userId,
+        preferredCategory: Array.isArray(preferredCategory) ? preferredCategory : [],
+      });
+      if (!clientProfile?._id) {
+        const err = new customError("Failed to create client profile", 500);
+        return next(err);
+      }
+    }
+  } else if (effectiveRole === "vendor") {
+    let vendorProfile = await VendorProfile.findOne({ userId }).select("_id").lean();
+    if (!vendorProfile) {
+      vendorProfile = await VendorProfile.create({
+        userId,
+        businessCategory: Array.isArray(businessCategory) ? businessCategory : [],
+      });
+      if (!vendorProfile?._id) {
+        const err = new customError("Failed to create vendor profile", 500);
+        return next(err);
+      }
+    }
+  }
+
+  const hasProfile = await checkUserHasProfile(user);
+  sendToken(user, "Registration completed successfully", res, 200, hasProfile);
+});
+
+const signup = asyncErrorHandler(async (req, res, next) => {
+  const { email, password, role } = req.body;
+
+  if (!email || !password) {
+    const err = new customError("Email and password are required", 400);
+    return next(err);
+  }
+
+  const validRole = role === "vendor" ? "vendor" : "client";
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     const err = new customError(`User with ${email} already exist`, 400);
@@ -156,7 +201,7 @@ const signup = asyncErrorHandler(async (req, res, next) => {
 
   try {
     const verificationToken = await VerificationToken.findOne({
-      identifier: email,
+      identifier: email.toLowerCase(),
       verified: true,
     });
 
@@ -166,8 +211,13 @@ const signup = asyncErrorHandler(async (req, res, next) => {
       );
     }
 
+    const username = await generateUniqueUsername(email);
+
     const user = await User.create({
-      ...req.body,
+      email: email.trim().toLowerCase(),
+      password,
+      username,
+      role: validRole,
       profileComplete: false,
       isVerified: true,
     });
@@ -187,20 +237,18 @@ const signup = asyncErrorHandler(async (req, res, next) => {
 
 const login = asyncErrorHandler(async (req, res, next) => {
   const { password } = req.body;
-  const identifier = req.body.email || req.body.username || req.body.schoolId;
+  const identifier = req.body.email || req.body.username;
 
   if (!identifier || !password) {
     const err = new customError("All credentials are required", 400);
     return next(err);
   }
 
-  const trimmed = String(identifier).trim();
+  const trimmed = String(identifier).trim().toLowerCase();
   let query = null;
 
   if (validator.isEmail(trimmed)) {
     query = { email: trimmed };
-  } else if (/^\d+$/.test(trimmed)) {
-    query = { schoolId: trimmed };
   } else {
     query = { username: trimmed };
   }
@@ -311,14 +359,16 @@ const updateUser = asyncErrorHandler(async (req, res, next) => {
     "fullName",
     "phoneNumber",
     "schoolName",
+    "schoolEmail",
     "businessName",
     "profilePic",
     "state",
     "city",
     "country",
     "schoolArea",
-    "area",
     "username",
+    "gender",
+    "bio",
   ];
 
   let filteredBody = filterField(req.body, ...allowedFields);

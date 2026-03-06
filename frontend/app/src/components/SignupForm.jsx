@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   Eye,
@@ -17,12 +17,8 @@ import { toast } from "react-hot-toast";
 
 export function SignupForm({
   onSubmit,
-  fullName,
   setField,
-  isClient,
-  username,
   email,
-  phoneNumber,
   showPassword,
   password,
   toggleShowPassword,
@@ -123,248 +119,77 @@ export function SignupForm({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {isClient ? (
-            <>
-              {}
-              <div className="md:col-span-2">
-                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
-                  Full name
-                </label>
-                <input
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => setField("fullName", e.target.value)}
-                  placeholder="e.g. John Doe"
-                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
-                  required
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
-                  Username
-                </label>
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setField("username", e.target.value)}
-                  placeholder="e.g. johndoe123"
-                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
-                  required
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
-                  Email
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={email}
-                    onChange={(e) => {
-                      setField("email", e.target.value);
-                      setIsEmailVerified(false);
-                    }}
-                    placeholder="e.g. john@uni.edu"
-                    className={`w-full h-12 px-4 rounded-xl bg-n-2/10 border ${
-                      isEmailVerified
-                        ? "border-green-500"
-                        : "border-transparent"
-                    } focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50`}
-                    autoComplete="email"
-                    required
-                  />
-                  <div className="absolute top-1/2 right-2 -translate-y-1/2">
-                    {isEmailVerified ? (
-                      <span className="flex items-center gap-1 text-green-600 bg-green-100 px-3 py-1 rounded-lg text-xs font-bold uppercase">
-                        <BadgeCheck className="w-4 h-4" /> Verified
-                      </span>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={handleVerifyClick}
-                        disabled={isSendingCode || !email}
-                        className="bg-n-8 text-white px-3 py-1.5 rounded-lg text-xs font-bold uppercase hover:bg-n-7 transition-colors disabled:opacity-50 flex items-center gap-2"
-                      >
-                        {isSendingCode && (
-                          <Loader className="w-3 h-3 animate-spin" />
-                        )}
-                        Verify
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  value={phoneNumber}
-                  onChange={(e) => setField("phoneNumber", e.target.value)}
-                  placeholder="e.g. +234 801..."
-                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
-                  required
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <div className="flex items-center justify-between mb-2">
-                  <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider">
-                    Password
-                  </label>
-                </div>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setField("password", e.target.value)}
-                    placeholder="Create a strong password"
-                    className="w-full h-12 pl-4 pr-12 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
-                    autoComplete="new-password"
-                    required
-                  />
+          <div className="md:col-span-2">
+            <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
+              Email
+            </label>
+            <div className="relative">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => {
+                  setField("email", e.target.value);
+                  setIsEmailVerified(false);
+                }}
+                placeholder="e.g. you@example.com"
+                className={`w-full h-12 px-4 rounded-xl bg-n-2/10 border ${
+                  isEmailVerified ? "border-green-500" : "border-transparent"
+                } focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50`}
+                autoComplete="email"
+                required
+              />
+              <div className="absolute top-1/2 right-2 -translate-y-1/2">
+                {isEmailVerified ? (
+                  <span className="flex items-center gap-1 text-green-600 bg-green-100 px-3 py-1 rounded-lg text-xs font-bold uppercase">
+                    <BadgeCheck className="w-4 h-4" /> Verified
+                  </span>
+                ) : (
                   <button
                     type="button"
-                    onClick={toggleShowPassword}
-                    className="absolute inset-y-0 right-0 flex items-center px-4 text-n-4 hover:text-n-6 transition-colors"
-                    aria-label={
-                      showPassword ? "Hide password" : "Show password"
-                    }
+                    onClick={handleVerifyClick}
+                    disabled={isSendingCode || !email}
+                    className="bg-n-8 text-white px-3 py-1.5 rounded-lg text-xs font-bold uppercase hover:bg-n-7 transition-colors disabled:opacity-50 flex items-center gap-2"
                   >
-                    {showPassword ? (
-                      <EyeOff className="w-5 h-5" />
-                    ) : (
-                      <Eye className="w-5 h-5" />
+                    {isSendingCode && (
+                      <Loader className="w-3 h-3 animate-spin" />
                     )}
+                    Verify
                   </button>
-                </div>
+                )}
               </div>
-            </>
-          ) : (
-            <>
-              <div className="md:col-span-2">
-                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
-                  Full name
-                </label>
-                <input
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => setField("fullName", e.target.value)}
-                  placeholder="e.g. John Doe"
-                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
-                  required
-                />
-              </div>
+            </div>
+          </div>
 
-              <div className="md:col-span-2">
-                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
-                  Username
-                </label>
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setField("username", e.target.value)}
-                  placeholder="e.g. johndoe123"
-                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
-                  required
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
-                  Email
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={email}
-                    onChange={(e) => {
-                      setField("email", e.target.value);
-                      setIsEmailVerified(false);
-                    }}
-                    placeholder="e.g. vendor@shop.com"
-                    className={`w-full h-12 px-4 rounded-xl bg-n-2/10 border ${
-                      isEmailVerified
-                        ? "border-green-500"
-                        : "border-transparent"
-                    } focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50`}
-                    autoComplete="email"
-                    required
-                  />
-                  <div className="absolute top-1/2 right-2 -translate-y-1/2">
-                    {isEmailVerified ? (
-                      <span className="flex items-center gap-1 text-green-600 bg-green-100 px-3 py-1 rounded-lg text-xs font-bold uppercase">
-                        <BadgeCheck className="w-4 h-4" /> Verified
-                      </span>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={handleVerifyClick}
-                        disabled={isSendingCode || !email}
-                        className="bg-n-8 text-white px-3 py-1.5 rounded-lg text-xs font-bold uppercase hover:bg-n-7 transition-colors disabled:opacity-50 flex items-center gap-2"
-                      >
-                        {isSendingCode && (
-                          <Loader className="w-3 h-3 animate-spin" />
-                        )}
-                        Verify
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="md:col-span-2">
-                <div className="flex items-center justify-between mb-2">
-                  <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider">
-                    Password
-                  </label>
-                </div>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setField("password", e.target.value)}
-                    placeholder="Create a strong password"
-                    className="w-full h-12 pl-4 pr-12 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
-                    autoComplete="new-password"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={toggleShowPassword}
-                    className="absolute inset-y-0 right-0 flex items-center px-4 text-n-4 hover:text-n-6 transition-colors"
-                    aria-label={
-                      showPassword ? "Hide password" : "Show password"
-                    }
-                  >
-                    {showPassword ? (
-                      <EyeOff className="w-5 h-5" />
-                    ) : (
-                      <Eye className="w-5 h-5" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2">
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  value={phoneNumber}
-                  onChange={(e) => setField("phoneNumber", e.target.value)}
-                  placeholder="e.g. +234 801..."
-                  className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
-                  required
-                />
-              </div>
-            </>
-          )}
+          <div className="md:col-span-2">
+            <div className="flex items-center justify-between mb-2">
+              <label className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider">
+                Password
+              </label>
+            </div>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setField("password", e.target.value)}
+                placeholder="Create a strong password (8+ chars, upper, lower, number, symbol)"
+                className="w-full h-12 pl-4 pr-12 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
+                autoComplete="new-password"
+                required
+              />
+              <button
+                type="button"
+                onClick={toggleShowPassword}
+                className="absolute inset-y-0 right-0 flex items-center px-4 text-n-4 hover:text-n-6 transition-colors"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
+            </div>
+          </div>
         </div>
 
         <div className="mt-6 mb-6 flex items-start gap-3">
@@ -404,7 +229,7 @@ export function SignupForm({
         >
           {isSigningUp
             ? "Creating your account..."
-            : "Create your Shopydash account"}
+            : "Create your account"}
         </button>
 
         {error && (

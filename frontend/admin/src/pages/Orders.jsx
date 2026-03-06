@@ -48,7 +48,7 @@ export default function Orders() {
       id: "vendor",
       label: "Vendor",
       render: (row) =>
-        row.vendor?.userId?.businessName || row.vendor?.storeUsername || "—",
+        row.vendor?.userId?.businessName || row.vendor?.userId?.username || "—",
     },
     {
       id: "items",

@@ -62,8 +62,8 @@ export default function ReviewModal({ isOpen, onClose, order, onSubmit }) {
           <div className="flex flex-col items-center gap-2 mb-8">
             <p className="text-sm text-gray-500">How was your order from</p>
             <p className="font-bold text-lg text-gray-900 text-center">
-              {order.vendor?.storeUsername ||
-                order.vendor?.businessName ||
+              {order.vendor?.userId?.businessName ||
+                order.vendor?.userId?.username ||
                 "the vendor"}
             </p>
 

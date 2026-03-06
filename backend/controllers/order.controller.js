@@ -61,14 +61,14 @@ const getMyOrders = async (req, res) => {
       .populate("items.product", "title image price")
       .populate(
         "buyer",
-        "fullName email username phoneNumber whatsAppNumber profilePic"
+        "fullName email username phoneNumber profilePic"
       )
       .populate({
         path: "vendor",
-        select: "storeUsername userId",
+        select: "userId",
         populate: {
           path: "userId",
-          select: "businessName fullName email profilePic",
+          select: "businessName fullName username email profilePic",
         },
       })
       .sort({ createdAt: -1 });

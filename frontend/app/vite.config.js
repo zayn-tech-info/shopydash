@@ -5,6 +5,10 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react()],
   optimizeDeps: {
-    include: ["isomorphic-dompurify"],
+    include: ["light-hand"],
+  },
+  server: {
+    host: true,
+    allowedHosts: ["light-hand.outray.app", ".outray.app"],
   },
 });

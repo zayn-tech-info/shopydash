@@ -123,7 +123,7 @@ vendorPostSchema.statics.findBySchool = function (school) {
   return this.find({ school })
     .populate(
       "vendorId",
-      "businessName fullName whatsAppNumber phoneNumber username profilePic",
+      "businessName fullName phoneNumber username profilePic",
     )
     .sort({ createdAt: -1 });
 };

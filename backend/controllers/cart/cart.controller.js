@@ -16,7 +16,7 @@ const get = asyncErrorHandler(async (req, res, next) => {
   const cart = await Cart.findOne({ userId }).populate({
     path: "items.vendorId",
     select:
-      "businessName schoolName username profilePic whatsAppNumber isVerified subscriptionPlan email phoneNumber",
+      "businessName schoolName username profilePic phoneNumber isVerified subscriptionPlan email",
   });
   if (!cart) {
     return res.status(200).json({

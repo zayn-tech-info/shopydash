@@ -62,13 +62,21 @@ const getSchoolAreas = asyncErrorHandler(async (req, res, next) => {
     userMatch.schoolName = matchStage.schoolName;
   }
 
-  if (search) {
-    userMatch.area = createSafeRegex(search);
-  } else {
-    userMatch.area = { $exists: true, $ne: "" };
-  }
+  const areaCondition = search
+    ? { $or: [{ schoolArea: createSafeRegex(search) }, { area: createSafeRegex(search) }] }
+    : {
+        $or: [
+          { schoolArea: { $exists: true, $ne: "" } },
+          { area: { $exists: true, $ne: "" } },
+        ],
+      };
+  Object.assign(userMatch, areaCondition);
 
-  const userAreas = await User.find(userMatch).distinct("area");
+  const [userAreasSchool, userAreasLegacy] = await Promise.all([
+    User.find(userMatch).distinct("schoolArea"),
+    User.find(userMatch).distinct("area"),
+  ]);
+  const userAreas = [...userAreasSchool, ...userAreasLegacy];
 
   const combined = [...new Set([...areaNames, ...userAreas])]
     .filter((a) => a && a.trim().length > 0)

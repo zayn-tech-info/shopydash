@@ -32,7 +32,7 @@ export default function VendorSidebar({
     (isOwner ? authUser?.businessName : null) ||
     "Store";
   const username =
-    vendorProfile?.storeUsername || vendorProfile?.userId?.username || "vendor";
+    vendorProfile?.userId?.username || "vendor";
   const profileImage = isOwner
     ? authUser?.profilePic
     : vendorProfile?.userId?.profilePic;
@@ -75,7 +75,7 @@ export default function VendorSidebar({
       await fetchMessages(result.conversation._id);
       navigate("/messages");
     } else if (result.action === "REDIRECT_WHATSAPP") {
-      setWhatsappNumber(result.data.whatsAppNumber);
+      setWhatsappNumber(result.data.phoneNumber || result.data.whatsAppNumber);
       setShowPremiumModal(true);
     }
   };

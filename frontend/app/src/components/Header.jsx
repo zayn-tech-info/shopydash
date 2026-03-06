@@ -88,7 +88,9 @@ export function Header() {
                 let to = nav.href === "/home" ? "/" : nav.href;
 
                 if (authUser && nav.href === "/profile") {
-                  to = `/p/${authUser.username}`;
+                  to = authUser.hasProfile
+                    ? `/p/${authUser.username}`
+                    : "/complete-user-registration";
                 }
                 const navResult = renderNav(nav.text, authUser?.role);
                 if (navResult === null) return null;

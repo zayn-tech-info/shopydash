@@ -49,8 +49,8 @@ export default function VendorDashboard() {
         }
 
         if (me && !me.hasProfile) {
-          toast("Please complete your vendor profile first", { icon: "📝" });
-          navigate("/create-vendor-profile");
+          toast("Please complete your profile first", { icon: "📝" });
+          navigate("/complete-user-registration");
           return;
         }
 

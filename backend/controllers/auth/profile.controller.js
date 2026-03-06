@@ -24,7 +24,7 @@ const get = asyncErrorHandler(async (req, res, next) => {
         .findOne({ userId: user._id })
         .populate(
           "userId",
-          "businessName username email phoneNumber whatsAppNumber schoolName profilePic subscriptionPlan city state country schoolArea area"
+          "businessName username email phoneNumber schoolName profilePic subscriptionPlan city state country schoolArea"
         )
         .lean(),
       VendorPost.find({ vendorId: user._id })
@@ -53,7 +53,7 @@ const get = asyncErrorHandler(async (req, res, next) => {
       .findOne({ userId: user._id })
       .populate(
         "userId",
-        "fullName username email phoneNumber schoolName profilePic city state country schoolArea area"
+        "fullName username email phoneNumber schoolName profilePic city state country schoolArea"
       )
       .lean();
     profileKey = "clientProfile";

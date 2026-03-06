@@ -7,13 +7,9 @@ import { useAuthStore } from "../store/authStore";
 export function LoginForm() {
   const navigate = useNavigate();
   const {
-    role,
     email,
-    schoolId,
-    username,
     password,
     showPassword,
-    setRole,
     setEmail,
     setPassword,
     toggleShowPassword,
@@ -23,23 +19,22 @@ export function LoginForm() {
 
   const validateForm = () => {
     const trimmed = {
-      email: email?.trim() ?? "",
-      password: password?.trim() ?? "",
-      schoolId: schoolId?.trim() ?? "",
-      username: username?.trim() ?? "",
+      identifier: (email ?? "").trim(),
+      password: (password ?? "").trim(),
     };
 
+    if (!trimmed.identifier) return (toast.error("Email or username is required"), false);
     if (!trimmed.password) return (toast.error("Password is required"), false);
 
     return true;
   };
   const onSubmit = async (e) => {
     e.preventDefault();
+    const identifier = (email ?? "").trim();
     const payload = {
-      email,
+      email: identifier,
+      username: identifier,
       password,
-      username,
-      schoolId,
     };
 
     const ok = validateForm();
@@ -68,14 +63,14 @@ export function LoginForm() {
               htmlFor="email"
               className="block font-code text-xs font-bold text-n-4 uppercase tracking-wider mb-2"
             >
-              Email / Client ID
+              Email or username
             </label>
             <input
               id="email"
               type="text"
-              value={email || username || schoolId}
+              value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="e.g. email@address.com or Student ID"
+              placeholder="e.g. email@example.com or username"
               className="w-full h-12 px-4 rounded-xl bg-n-2/10 border border-transparent focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all outline-none text-n-8 placeholder:text-n-4/50"
               autoComplete="username"
               required

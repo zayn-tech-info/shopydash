@@ -33,7 +33,7 @@ export const VendorFloatingButton = () => {
         navigate("/vendor/add");
       }
     } else {
-      navigate("/create-vendor-profile");
+      navigate("/complete-user-registration");
     }
   };
 

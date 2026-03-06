@@ -145,7 +145,7 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
     VendorPost.find(query)
       .populate(
         "vendorId",
-        "businessName fullName whatsAppNumber phoneNumber username profilePic logo subscriptionPlan isVerified",
+        "businessName fullName phoneNumber username profilePic subscriptionPlan isVerified",
       )
       .sort({ createdAt: -1 })
       .skip((currentPage - 1) * pageLimit)
@@ -173,7 +173,7 @@ const getById = asyncErrorHandler(async (req, res, next) => {
   const post = await VendorPost.findById(postId)
     .populate(
       "vendorId",
-      "businessName fullName whatsAppNumber phoneNumber username profilePic isVerified",
+      "businessName fullName phoneNumber username profilePic isVerified",
     )
     .lean();
 
@@ -234,8 +234,6 @@ const getProductById = asyncErrorHandler(async (req, res, next) => {
           businessName: "$vendorUser.businessName",
           username: "$vendorUser.username",
           profilePic: "$vendorUser.profilePic",
-          logo: "$vendorUser.logo",
-          whatsAppNumber: "$vendorUser.whatsAppNumber",
           phoneNumber: "$vendorUser.phoneNumber",
           subscriptionPlan: "$vendorUser.subscriptionPlan",
           isVerified: "$vendorUser.isVerified",
@@ -493,9 +491,7 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
           businessName: "$vendor.businessName",
           username: "$vendor.username",
           profilePic: "$vendor.profilePic",
-          logo: "$vendor.logo",
           phoneNumber: "$vendor.phoneNumber",
-          whatsAppNumber: "$vendor.whatsAppNumber",
           subscriptionPlan: "$vendor.subscriptionPlan",
         },
       },

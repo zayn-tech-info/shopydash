@@ -49,7 +49,9 @@ export function BottomNav() {
 
             if (nav.href === "/profile") {
               if (authUser && authUser.username) {
-                to = `/p/${authUser.username}`;
+                to = authUser.hasProfile
+                  ? `/p/${authUser.username}`
+                  : "/complete-user-registration";
               } else {
                 to = "/login";
               }

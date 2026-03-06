@@ -7,6 +7,8 @@ const useAuthStore = create((set) => ({
   initializing: true,
   error: null,
 
+  clearError: () => set({ error: null }),
+
   login: async (email, password) => {
     try {
       set({ loading: true, error: null });
@@ -35,13 +37,14 @@ const useAuthStore = create((set) => ({
   },
 
   checkAuth: async () => {
+    set({ error: null });
     try {
       const res = await api.get("/auth/check");
       // checkAuth returns flat user object: { ...userData, token }
       const user = res.data.data?.user || res.data.user || res.data;
 
       if (!user?._id || user?.role !== "admin") {
-        set({ admin: null, initializing: false });
+        set({ admin: null, initializing: false, error: null });
         return false;
       }
 
@@ -50,10 +53,10 @@ const useAuthStore = create((set) => ({
         localStorage.setItem("admin_token", res.data.token);
       }
 
-      set({ admin: user, initializing: false });
+      set({ admin: user, initializing: false, error: null });
       return true;
     } catch {
-      set({ admin: null, initializing: false });
+      set({ admin: null, initializing: false, error: null });
       return false;
     }
   },

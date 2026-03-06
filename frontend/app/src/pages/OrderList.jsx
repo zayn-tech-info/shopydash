@@ -265,7 +265,7 @@ function OrderCard({ order, index, onConfirmDelivery, isVendor }) {
                 <div className="w-full h-full flex items-center justify-center bg-primary-3 text-white font-bold">
                   {(
                     order.vendor?.userId?.businessName?.[0] ||
-                    order.vendor?.storeUsername?.[0] ||
+                    order.vendor?.userId?.username?.[0] ||
                     "?"
                   ).toUpperCase()}
                 </div>
@@ -282,17 +282,14 @@ function OrderCard({ order, index, onConfirmDelivery, isVendor }) {
                     order.buyer?.email ||
                     "Guest Buyer"
                   : order.vendor?.userId?.businessName ||
-                    order.vendor?.storeUsername ||
+                    order.vendor?.userId?.username ||
                     order.vendor?.userId?.fullName ||
                     "Unknown Vendor"}
               </h3>
-              {isVendor &&
-                (order.buyer?.phoneNumber || order.buyer?.whatsAppNumber) && (
+              {isVendor && order.buyer?.phoneNumber && (
                   <p className="text-xs text-gray-600 mt-1 flex items-center gap-1">
                     <span>📞</span>
-                    <span>
-                      {order.buyer?.phoneNumber || order.buyer?.whatsAppNumber}
-                    </span>
+                    <span>{order.buyer.phoneNumber}</span>
                   </p>
                 )}
             </div>

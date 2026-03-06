@@ -11,17 +11,13 @@ export default function CompleteProfile() {
       navigate("/login");
       return;
     }
-    if (authUser.role === "vendor") {
-      navigate("/create-vendor-profile");
-    } else {
-      navigate("/create-client-profile");
-    }
+    navigate("/complete-user-registration", { replace: true });
   }, [authUser, navigate]);
 
   return (
     <div className="min-h-screen bg-n-1 flex items-center justify-center">
       <div className="text-center">
-        <p className="text-n-4">Redirecting to profile creation...</p>
+        <p className="text-n-4">Redirecting to complete your profile...</p>
       </div>
     </div>
   );

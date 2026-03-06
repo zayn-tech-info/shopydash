@@ -158,13 +158,25 @@ const App = () => {
           <Route
             path="/create-vendor-profile"
             element={
-              authUser ? <CreateVendorProfile /> : <Navigate to="/login" />
+              !authUser ? (
+                <Navigate to="/login" />
+              ) : authUser && !authUser.hasProfile ? (
+                <Navigate to="/complete-user-registration" replace />
+              ) : (
+                <CreateVendorProfile />
+              )
             }
           />
           <Route
             path="/create-client-profile"
             element={
-              authUser ? <CreateClientProfile /> : <Navigate to="/login" />
+              !authUser ? (
+                <Navigate to="/login" />
+              ) : authUser && !authUser.hasProfile ? (
+                <Navigate to="/complete-user-registration" replace />
+              ) : (
+                <CreateClientProfile />
+              )
             }
           />
           <Route

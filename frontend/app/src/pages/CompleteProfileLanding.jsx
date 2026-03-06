@@ -19,11 +19,7 @@ export  function CompleteProfileLanding() {
   }, [authUser, navigate]);
 
   const handleCompleteProfile = () => {
-    if (authUser?.role === "vendor") {
-      navigate("/create-vendor-profile");
-    } else {
-      navigate("/create-client-profile");
-    }
+    navigate("/complete-user-registration");
   };
 
   const handleLogout = async () => {

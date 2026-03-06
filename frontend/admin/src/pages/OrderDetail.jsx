@@ -129,10 +129,10 @@ export default function OrderDetail() {
               Vendor
             </h3>
             <div className="space-y-2 text-sm">
-              <p>{order.vendor?.userId?.businessName || order.vendor?.storeUsername || "—"}</p>
+              <p>{order.vendor?.userId?.businessName || order.vendor?.userId?.username || "—"}</p>
               <p className="text-gray-500">{order.vendor?.userId?.email}</p>
               <p>
-                <StatusBadge status={order.vendor?.status || "active"} />
+                <StatusBadge status={order.vendor?.activeStatus || order.vendor?.status || "active"} />
               </p>
             </div>
           </CardContent>

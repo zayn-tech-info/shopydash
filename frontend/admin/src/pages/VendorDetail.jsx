@@ -76,19 +76,19 @@ export default function VendorDetail() {
         </button>
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-gray-900">
-            {user?.businessName || v.storeUsername || "Vendor"}
+            {user?.businessName || user?.username || "Vendor"}
           </h1>
           <p className="text-sm text-gray-500">{user?.email}</p>
         </div>
         <div className="flex items-center gap-2">
-          <StatusBadge status={v.status} />
+          <StatusBadge status={v.activeStatus || v.status} />
           <StatusBadge status={v.kycStatus} />
         </div>
       </div>
 
       {/* Action Bar */}
       <div className="flex flex-wrap gap-2 mb-6">
-        {v.status === "active" ? (
+        {(v.activeStatus || v.status) === "active" ? (
           <Button
             variant="outlined"
             color="error"
@@ -164,7 +164,7 @@ export default function VendorDetail() {
               Store Info
             </h3>
             <div className="space-y-2 text-sm">
-              <p><span className="text-gray-500">Store:</span> {v.storeUsername || "—"}</p>
+              <p><span className="text-gray-500">Username:</span> {user?.username || "—"}</p>
               <p><span className="text-gray-500">Rating:</span> {v.rating || 0} ({v.numReviews || 0} reviews)</p>
               <p><span className="text-gray-500">Total Sales:</span> {v.totalSales || 0}</p>
               <p><span className="text-gray-500">Delivery:</span> {v.offersDelivery ? "Yes" : "No"}</p>
@@ -208,10 +208,9 @@ export default function VendorDetail() {
               Location
             </h3>
             <div className="space-y-2 text-sm">
-              <p><span className="text-gray-500">Address:</span> {v.address || "—"}</p>
-              <p><span className="text-gray-500">City:</span> {v.city || "—"}</p>
-              <p><span className="text-gray-500">State:</span> {v.state || "—"}</p>
-              <p><span className="text-gray-500">Area:</span> {v.area || "—"}</p>
+              <p><span className="text-gray-500">City:</span> {user?.city || "—"}</p>
+              <p><span className="text-gray-500">State:</span> {user?.state || "—"}</p>
+              <p><span className="text-gray-500">Area:</span> {user?.schoolArea || "—"}</p>
             </div>
           </CardContent>
         </Card>
