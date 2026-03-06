@@ -177,7 +177,7 @@ export function AccountInfo({ user }) {
 
               <div className="flex flex-col gap-3 w-full">
                 <button
-                  onClick={() => navigate("/create-vendor-profile")}
+                  onClick={() => navigate("/complete-user-registration")}
                   className="w-full py-3.5 bg-primary-3 text-white rounded-xl font-bold hover:bg-primary-3/90 transition-colors shadow-lg shadow-primary-3/20"
                 >
                   Create Vendor Profile

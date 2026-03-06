@@ -120,7 +120,7 @@ const getTopVendors = asyncErrorHandler(async (req, res) => {
         _id: 1,
         totalRevenue: 1,
         totalOrders: 1,
-        storeName: "$profile.storeUsername",
+        storeName: "$user.username",
         businessName: "$user.businessName",
         fullName: "$user.fullName",
       },

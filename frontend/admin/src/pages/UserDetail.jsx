@@ -128,10 +128,10 @@ export default function UserDetail() {
             </h3>
             <div className="space-y-2 text-sm">
               <p><span className="text-gray-500">School:</span> {user.schoolName || "—"}</p>
-              <p><span className="text-gray-500">School ID:</span> {user.schoolId || "—"}</p>
+              <p><span className="text-gray-500">School email:</span> {user.schoolEmail || "—"}</p>
               <p><span className="text-gray-500">State:</span> {user.state || "—"}</p>
               <p><span className="text-gray-500">City:</span> {user.city || "—"}</p>
-              <p><span className="text-gray-500">Area:</span> {user.area || "—"}</p>
+              <p><span className="text-gray-500">Area:</span> {user.schoolArea || "—"}</p>
             </div>
           </CardContent>
         </Card>
@@ -147,8 +147,8 @@ export default function UserDetail() {
                   Vendor Profile
                 </h3>
                 <p className="text-sm mt-1">
-                  {data.vendorProfile.storeUsername || "Store"} ·{" "}
-                  <StatusBadge status={data.vendorProfile.status} />
+                  {data.vendorProfile.userId?.username || data.vendorProfile.userId?.businessName || "Store"} ·{" "}
+                  <StatusBadge status={data.vendorProfile.activeStatus || data.vendorProfile.status} />
                 </p>
               </div>
               <Button

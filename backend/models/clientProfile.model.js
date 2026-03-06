@@ -8,46 +8,9 @@ const clientProfileSchema = new mongoose.Schema({
     unique: true,
   },
 
-  address: {
-    type: String,
-    trim: true,
-    maxlength: 300,
-  },
-  city: {
-    type: String,
-    trim: true,
-    maxlength: 100,
-  },
-  state: {
-    type: String,
-    trim: true,
-    maxlength: 100,
-  },
-
-  area: {
-    type: String,
-    trim: true,
-    maxlength: 100,
-  },
-  country: {
-    type: String,
-    trim: true,
-    maxlength: 100,
-    default: "Nigeria",
-  },
-
   preferredCategory: {
     type: [String],
     default: [],
-  },
-
-  gender: {
-    type: String,
-    enum: ["Male", "Female", "Other", "Prefer not to say"],
-  },
-  bio: {
-    type: String,
-    maxlength: 500,
   },
 
   wishlist: [
@@ -63,9 +26,6 @@ const clientProfileSchema = new mongoose.Schema({
     },
   ],
 
-  lastLogin: {
-    type: Date,
-  },
   createdAt: {
     type: Date,
     default: Date.now,

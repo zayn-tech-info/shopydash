@@ -54,7 +54,7 @@ exports.checkMessagingAccess = asyncErrorHandler(async (req, res, next) => {
         action: "REDIRECT_WHATSAPP",
         message: "This vendor uses WhatsApp for communication.",
         data: {
-          whatsAppNumber: recipient.whatsAppNumber,
+          phoneNumber: recipient.phoneNumber,
         },
       });
     }
@@ -242,11 +242,12 @@ exports.getMessages = asyncErrorHandler(async (req, res, next) => {
 
 exports.getAvailableVendorsForChat = asyncErrorHandler(
   async (req, res, next) => {
-    const { schoolId, _id: currentUserId } = req.user;
+    const { schoolName, _id: currentUserId } = req.user;
 
+    // Filter by current user's school (User has schoolName; schoolId was removed)
     const vendors = await User.find({
       role: "vendor",
-      schoolId: schoolId,
+      ...(schoolName ? { schoolName } : {}),
       subscriptionPlan: {
         $in: ["Shopydash Pro", "Shopydash Max"],
       },

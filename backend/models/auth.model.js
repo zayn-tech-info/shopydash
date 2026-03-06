@@ -6,19 +6,22 @@ const jwt = require("jsonwebtoken");
 const userSchema = mongoose.Schema(
   {
     fullName: {
-      required: [true, "Please provide your full name"],
       type: String,
       trim: true,
       minlength: [2, "Full name must be at least 2 characters long"],
       maxlength: [100, "Full name cannot exceed 100 characters"],
       validate: {
         validator: function (v) {
-          return /^[a-zA-Z\s'-]+$/.test(v);
+          if (v === undefined || v === null) return true;
+          const t = String(v).trim();
+          if (t.length === 0) return false;
+          return t.length >= 2 && /^[a-zA-Z\s'-]+$/.test(t);
         },
         message:
-          "Full name can only contain letters, spaces, hyphens, and apostrophes",
+          "Full name can only contain letters, spaces, hyphens, and apostrophes (min 2 characters when provided)",
       },
     },
+
     username: {
       type: String,
       unique: true,
@@ -34,6 +37,7 @@ const userSchema = mongoose.Schema(
           "Username can only contain lowercase letters, numbers, underscores, and dots",
       },
     },
+
     email: {
       required: [true, "Please provide your email address"],
       type: String,
@@ -51,65 +55,7 @@ const userSchema = mongoose.Schema(
           "Please provide a valid email address (e.g., user@example.com)",
       },
     },
-    phoneNumber: {
-      type: String,
-      trim: true,
-      unique: [
-        true,
-        "This phone number is already registered. Please use a different number.",
-      ],
-      sparse: true,
-      validate: {
-        validator: function (v) {
-          if (!v) return true;
-          const clean = v.replace(/[\s-]/g, "");
-          return /^(?:\+234|234|0)[789][01]\d{8}$/.test(clean);
-        },
-        message:
-          "Please provide a valid Nigerian phone number (e.g., 08012345678 or +2348012345678)",
-      },
-    },
-    schoolName: {
-      type: String,
-      trim: true,
-    },
-    schoolId: {
-      type: String,
-      trim: true,
-      unique: [
-        true,
-        "This School ID is already registered. Please verify your ID or contact support.",
-      ],
-      sparse: true,
-      validate: {
-        validator: function (v) {
-          if (!v) return true;
-          return /^[A-Za-z0-9-/]+$/.test(v) && v.length >= 4 && v.length <= 20;
-        },
-        message:
-          "School ID must be 4-20 characters and can only contain letters, numbers, hyphens, and slashes",
-      },
-    },
-    schoolEmail: {
-      type: String,
-      trim: true,
-      lowercase: true,
-      validate: {
-        validator: function (v) {
-          if (!v) return true;
-          return validator.isEmail(v);
-        },
-        message: "Please provide a valid school email address",
-      },
-    },
-    profilePic: {
-      type: String,
-      trim: true,
-    },
-    bio: {
-      type: String,
-      trim: true,
-    },
+
     password: {
       type: String,
       trim: true,
@@ -133,6 +79,69 @@ const userSchema = mongoose.Schema(
           "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&#, etc.)",
       },
     },
+
+    phoneNumber: {
+      type: String,
+      trim: true,
+      unique: [
+        true,
+        "This phone number is already registered. Please use a different number.",
+      ],
+      sparse: true,
+      validate: {
+        validator: function (v) {
+          if (!v) return true;
+          const clean = v.replace(/[\s-]/g, "");
+          return /^(?:\+234|234|0)[789][01]\d{8}$/.test(clean);
+        },
+        message:
+          "Please provide a valid Nigerian phone number (e.g., 080XXXXXXX or +23480XXXXXXX)",
+      },
+    },
+
+    gender: {
+      type: String,
+      enum: ["Male", "Female", "Other", "Prefer not to say"],
+    },
+
+    schoolName: {
+      type: String,
+      trim: true,
+      minlength: [2, "School name must be at least 2 characters long"],
+      maxlength: [100, "School name cannot exceed 100 characters"],
+      validate: {
+        validator: function (v) {
+          return /^[a-zA-Z\s'-]+$/.test(v);
+        },
+        message:
+          "School name can only contain letters, spaces, hyphens, and apostrophes",
+      },
+    },
+
+    schoolEmail: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      validate: {
+        validator: function (v) {
+          if (!v) return true;
+          return validator.isEmail(v);
+        },
+        message: "Please provide a valid school email address",
+      },
+    },
+
+    profilePic: {
+      type: String,
+      trim: true,
+    },
+
+    bio: {
+      type: String,
+      trim: true,
+      maxlength: [500, "Bio cannot exceed 500 characters"],
+    },
+
     role: {
       type: String,
       trim: true,
@@ -142,6 +151,11 @@ const userSchema = mongoose.Schema(
       },
       default: "client",
     },
+
+    lastLogin: {
+      type: Date,
+    },
+
     businessName: {
       type: String,
       unique: [
@@ -153,27 +167,12 @@ const userSchema = mongoose.Schema(
       minlength: [2, "Business name must be at least 2 characters long"],
       maxlength: [100, "Business name cannot exceed 100 characters"],
     },
-    whatsAppNumber: {
-      type: String,
-      trim: true,
-      validate: {
-        validator: function (v) {
-          if (!v) return true;
-          const clean = v.replace(/[\s-]/g, "");
-          return /^(?:\+234|234|0)[789][01]\d{8}$/.test(clean);
-        },
-        message:
-          "Please provide a valid Nigerian WhatsApp number (e.g., 08012345678)",
-      },
-    },
-    logo: {
-      type: String,
-      trim: true,
-    },
+
     isGoogleAuth: {
       type: Boolean,
       default: false,
     },
+
     profileComplete: {
       type: Boolean,
       default: false,
@@ -197,13 +196,14 @@ const userSchema = mongoose.Schema(
       type: String,
       trim: true,
     },
+    /** @deprecated Legacy field; prefer schoolArea. Kept for backward compatibility with existing documents. */
     area: {
       type: String,
       trim: true,
     },
     subscriptionPlan: {
       type: String,
-      enum: ["Shopydash Boost", "Shopydash Pro", "Shopydash Max"],
+      enum: ["Free", "Shopydash Boost", "Shopydash Pro", "Shopydash Max"],
       default: null,
     },
     subscriptionExpiresAt: {

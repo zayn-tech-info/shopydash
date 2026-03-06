@@ -38,8 +38,9 @@ export const generateWhatsAppMessage = (
 };
 
 export const openWhatsApp = (vendor, items, total, authUser, userProfile) => {
-  if (!vendor?.whatsAppNumber) {
-    alert("This vendor does not have a WhatsApp number connected.");
+  const vendorPhone = vendor?.phoneNumber || vendor?.whatsAppNumber;
+  if (!vendorPhone) {
+    alert("This vendor does not have a phone number connected.");
     return;
   }
 
@@ -51,7 +52,7 @@ export const openWhatsApp = (vendor, items, total, authUser, userProfile) => {
     userProfile,
   );
 
-  const cleanPhone = vendor.whatsAppNumber.replace(/[^\d+]/g, "");
+  const cleanPhone = vendorPhone.replace(/[^\d+]/g, "");
   const encodedMessage = encodeURIComponent(message);
 
   window.open(`https://wa.me/${cleanPhone}?text=${encodedMessage}`, "_blank");

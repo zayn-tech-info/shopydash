@@ -8,23 +8,8 @@ export const useSignupStore = create((set) => ({
   userData: null,
 
   role: "client",
-  fullName: "",
   email: "",
   password: "",
-  phoneNumber: "",
-  schoolName: "",
-  username: "",
-  businessName: "",
-  whatsAppNumber: "",
-  schoolId: "",
-  schoolEmail: "",
-  profilePic: "",
-  bio: "",
-  logo: "",
-  city: "",
-  state: "",
-  country: "",
-  schoolArea: "",
 
   setRole: (role) => set({ role }),
 
@@ -33,23 +18,8 @@ export const useSignupStore = create((set) => ({
   setField: (key, value) => set(() => ({ [key]: value })),
   resetField: () =>
     set({
-      fullName: "",
       email: "",
       password: "",
-      phoneNumber: "",
-      schoolName: "",
-      username: "",
-      businessName: "",
-      whatsAppNumber: "",
-      schoolId: "",
-      schoolEmail: "",
-      profilePic: "",
-      bio: "",
-      logo: "",
-      city: "",
-      state: "",
-      country: "",
-      schoolArea: "",
     }),
 
   signup: async (data) => {

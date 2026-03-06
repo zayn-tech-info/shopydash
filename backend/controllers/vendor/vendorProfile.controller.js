@@ -27,7 +27,6 @@ const createVendorProfile = asyncErrorHandler(async (req, res, next) => {
     businessName,
     email,
     phoneNumber,
-    whatsAppNumber,
     schoolName,
     profileImage,
     ...allowedData
@@ -56,20 +55,24 @@ const createVendorProfile = asyncErrorHandler(async (req, res, next) => {
 });
 
 const getPublicVendorProfile = asyncErrorHandler(async (req, res, next) => {
-  const storeUsername = req.params.storeUsername;
+  const username = req.params.storeUsername;
 
-  if (!storeUsername) {
-    const error = new customError("Store username is required", 400);
+  if (!username) {
+    const error = new customError("Username is required", 400);
+    return next(error);
+  }
+
+  const user = await User.findOne({ username }).select("_id").lean();
+  if (!user) {
+    const error = new customError("Vendor not found", 404);
     return next(error);
   }
 
   const vendorProfile = await vendorProfileModel
-    .findOne({
-      storeUsername: storeUsername,
-    })
+    .findOne({ userId: user._id })
     .populate(
       "userId",
-      "businessName email phoneNumber whatsAppNumber schoolName logo isVerified profilePic subscriptionPlan city state country schoolArea area"
+      "businessName username email phoneNumber schoolName profilePic isVerified subscriptionPlan city state country schoolArea"
     );
 
   if (!vendorProfile) {
@@ -122,7 +125,7 @@ const getAllVendorsProfile = asyncErrorHandler(async (req, res, next) => {
         username: 1,
         profilePic: 1,
         businessName: 1,
-        whatsAppNumber: 1,
+        phoneNumber: 1,
         subscriptionPlan: 1,
         isVerified: 1,
       },
@@ -253,14 +256,12 @@ const updateVendorProfile = asyncErrorHandler(async (req, res, next) => {
   const {
     businessName,
     phoneNumber,
-    storeDescription,
     businessCategory,
     accountNumber,
     paymentMethods,
     instagram,
     facebook,
     twitter,
-    storeUsername,
     sellingDuration,
     offersDelivery,
   } = req.body;
@@ -277,7 +278,6 @@ const updateVendorProfile = asyncErrorHandler(async (req, res, next) => {
   }
 
   const updates = {
-    storeDescription,
     businessCategory,
     sellingDuration,
     offersDelivery,
@@ -288,7 +288,6 @@ const updateVendorProfile = asyncErrorHandler(async (req, res, next) => {
       facebook,
       twitter,
     },
-    storeUsername,
   };
 
   const updated = await vendorProfileModel.findOneAndUpdate(

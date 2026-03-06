@@ -57,8 +57,7 @@ export default function VendorProfile() {
         const usernameToFetch = params?.username || authUser?.username;
         if (
           vendorProfile &&
-          (vendorProfile?.userId?.username === usernameToFetch ||
-            vendorProfile?.storeUsername === usernameToFetch)
+          vendorProfile?.userId?.username === usernameToFetch
         ) {
           return;
         }
@@ -111,7 +110,7 @@ export default function VendorProfile() {
       await fetchMessages(result.conversation._id);
       navigate("/messages");
     } else if (result.action === "REDIRECT_WHATSAPP") {
-      setWhatsappNumber(result.data.whatsAppNumber ?? "");
+      setWhatsappNumber(result.data.phoneNumber ?? result.data.whatsAppNumber ?? "");
       setShowPremiumModal(true);
     }
   }, [authUser, vendorProfile?.userId?._id, checkAccess, fetchMessages, navigate]);
@@ -151,7 +150,7 @@ export default function VendorProfile() {
     (isOwner ? authUser?.businessName : null) ||
     "Store";
   const username =
-    vendorProfile?.storeUsername || vendorProfile?.userId?.username || "vendor";
+    vendorProfile?.userId?.username || "vendor";
 
   return (
     <main className="min-h-[80vh] bg-n-1">

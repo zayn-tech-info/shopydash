@@ -42,6 +42,7 @@ const allowedOrigins = [
   "https://www.shopydash.com",
   "https://shopydash-v1.vercel.app",
   "https://admin.shopydash.com",
+  "https://healthy-director.outray.app",
 ];
 
 // Pattern for Vercel preview deployments

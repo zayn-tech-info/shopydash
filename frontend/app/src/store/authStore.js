@@ -4,7 +4,6 @@ import { api } from "../lib/axios";
 export const useAuthStore = create((set) => ({
   role: "client",
   email: "",
-  schoolId: "",
   username: "",
   password: "",
   showPassword: false,
@@ -30,8 +29,18 @@ export const useAuthStore = create((set) => ({
         localStorage.setItem("token", res.data.token);
       }
 
-      set({ authUser: payload, isLogginIn: false, error: null });
-      return payload;
+      const userData = payload.user ?? payload;
+      const hasProfile =
+        payload.hasProfile !== undefined
+          ? payload.hasProfile
+          : userData.hasProfile === true;
+
+      set({
+        authUser: { ...userData, hasProfile },
+        isLogginIn: false,
+        error: null,
+      });
+      return { ...payload, user: { ...userData, hasProfile } };
     } catch (err) {
       const serverMessage =
         err?.response?.data?.message ||
@@ -56,7 +65,9 @@ export const useAuthStore = create((set) => ({
 
       const userData = payload.user || payload;
       const hasProfile =
-        payload.hasProfile !== undefined ? payload.hasProfile : false;
+        payload.hasProfile !== undefined
+          ? payload.hasProfile
+          : (userData.hasProfile === true);
 
       set({
         authUser: { ...userData, hasProfile },
@@ -90,8 +101,11 @@ export const useAuthStore = create((set) => ({
       }
 
       const userData = payload.user || payload;
+      // Backend sends hasProfile inside data.user, not on payload root
       const hasProfile =
-        payload.hasProfile !== undefined ? payload.hasProfile : false;
+        payload.hasProfile !== undefined
+          ? payload.hasProfile
+          : (userData.hasProfile === true);
 
       set({ authUser: { ...userData, hasProfile } });
       return payload;
@@ -113,7 +127,12 @@ export const useAuthStore = create((set) => ({
       if (payload.token) {
         localStorage.setItem("token", payload.token);
       }
-      set({ authUser: payload, isCheckingAuth: false, error: null });
+      const hasProfile = payload.hasProfile === true;
+      set({
+        authUser: { ...payload, hasProfile },
+        isCheckingAuth: false,
+        error: null,
+      });
     } catch (err) {
       if (err.response && err.response.status === 401) {
         set({ authUser: null, isCheckingAuth: false });

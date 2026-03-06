@@ -28,6 +28,12 @@ export default function ProfileDispatcher() {
     const checkRole = async () => {
       setLoading(true);
       setError(null);
+      const isSelf = authUser && username && (authUser.username === username || authUser.username?.toLowerCase() === username?.toLowerCase());
+      if (isSelf && authUser && !authUser.hasProfile) {
+        setLoading(false);
+        setError("Profile not found");
+        return;
+      }
       try {
         const res = await api.get(`/api/v1/profile/${username}`);
         const data = res.data.data;
@@ -60,7 +66,17 @@ export default function ProfileDispatcher() {
     if (username) {
       checkRole();
     }
-  }, [username]);
+  }, [username, authUser]);
+
+  // Current user viewing own profile but hasn't completed one yet — redirect without calling API
+  const isViewingSelf =
+    authUser &&
+    username &&
+    (authUser.username === username ||
+      authUser.username?.toLowerCase() === username?.toLowerCase());
+  if (isViewingSelf && authUser && !authUser.hasProfile) {
+    return <Navigate to="/complete-user-registration" replace />;
+  }
 
   if (loading) return <ClientProfileSkeleton />;
 
@@ -74,15 +90,7 @@ export default function ProfileDispatcher() {
         authUser.username.toLowerCase() === username.toLowerCase());
 
     if (isCurrentUser) {
-      return (
-        <Navigate
-          to={
-            authUser.role === "vendor"
-              ? "/create-vendor-profile"
-              : "/create-client-profile"
-          }
-        />
-      );
+      return <Navigate to="/complete-user-registration" replace />;
     }
     return (
       <div className="flex flex-col items-center justify-center min-h-[70vh] px-4 text-center">

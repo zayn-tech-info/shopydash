@@ -15,6 +15,7 @@ const csrfProtection = (req, res, next) => {
     "https://shopydash.com",
     "https://www.shopydash.com",
     "https://admin.shopydash.com",
+    "https://healthy-director.outray.app",
   ];
 
    
