@@ -29,19 +29,10 @@ const createPost = asyncErrorHandler(async (req, res, next) => {
 
   const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000);
 
-  const postsLast12Hours = await VendorPost.countDocuments({
-    vendorId: userId,
-    createdAt: { $gte: twelveHoursAgo },
-  });
-
-  if (postsLast12Hours >= limitConfig.postsPer12Hours) {
-    return next(
-      new customError(
-        `You have reached your limit of ${limitConfig.postsPer12Hours} posts every 12 hours. Upgrade to post more.`,
-        400,
-      ),
-    );
-  }
+  // NOTE: Previously, we enforced a per-12-hours post limit using
+  // limitConfig.postsPer12Hours and VendorPost.countDocuments here.
+  // This restriction has been intentionally removed so that all vendors
+  // can create an unlimited number of posts for now.
 
   const [vendorProfile, user] = await Promise.all([
     VendorProfile.findOne({ userId }).select("schoolName").lean(),

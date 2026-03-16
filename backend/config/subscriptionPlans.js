@@ -5,7 +5,6 @@ module.exports = {
     price: 0,
     limits: {
       productsPerPost: 4,
-      postsPer12Hours: 3,  
     },
     features: {
       priorityFeed: false,
@@ -22,7 +21,6 @@ module.exports = {
     price: 750,
     limits: {
       productsPerPost: 50,
-      postsPer12Hours: 100,
     },
     features: {
       priorityFeed: true,
@@ -41,7 +39,6 @@ module.exports = {
     price: 1500,
     limits: {
       productsPerPost: 50,
-      postsPer12Hours: 150,
     },
     features: {
       priorityFeed: true,
@@ -60,7 +57,6 @@ module.exports = {
     price: 3000,
     limits: {
       productsPerPost: 50,
-      postsPer12Hours: 200,
     },
     features: {
       priorityFeed: true,
