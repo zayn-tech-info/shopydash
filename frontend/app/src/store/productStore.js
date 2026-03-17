@@ -64,10 +64,14 @@ export const useProductStore = create((set, get) => ({
     set({ isFetchingFeedPosts: true });
     try {
       const res = await api.get("/api/v1/post/feed", { params });
-      set({ feedPosts: res.data.data.posts, isFetchingFeedPosts: false });
+      const posts = res.data?.data?.posts ?? [];
+      set({ feedPosts: Array.isArray(posts) ? posts : [], isFetchingFeedPosts: false });
     } catch (error) {
-      set({ isFetchingFeedPosts: false });
-      console.error(error);
+      set({ feedPosts: [], isFetchingFeedPosts: false });
+      console.error("Feed request failed:", error?.response?.status, error?.message);
+      toast.error(
+        error.response?.data?.message || "Failed to load feed. Check your connection.",
+      );
     }
   },
 

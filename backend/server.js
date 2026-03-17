@@ -24,6 +24,8 @@ const io = new Server(server, {
     origin: [
       "http://localhost:5173",
       "http://localhost:5174",
+      "http://127.0.0.1:5173",
+      "http://127.0.0.1:5174",
       "https://shopydash-v1.vercel.app",
       "https://app.shopydash.com",
       "https://shopydash.com",

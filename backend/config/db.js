@@ -4,16 +4,27 @@ const customError = require("../errors/customError");
 const { logInfo, logError } = require("../utils/logger");
 
 
-dns.setServers(["8.8.8.8", "8.8.4.4", "1.1.1.1"]);
-dns.setDefaultResultOrder("ipv4first");
+// dns.setServers(["8.8.8.8", "8.8.4.4", "1.1.1.1"]);
+// dns.setDefaultResultOrder("ipv4first");
 
 const connectDB = async () => {
   const isProduction = process.env.NODE_ENV === "production";
-  const uri =
+  let uri =
     process.env.CONNECTION_URI ||
     (isProduction
       ? process.env.CONNECTION_URI_PROD
       : process.env.CONNECTION_URI_DEV);
+
+  // Non-SRV URIs often have no database path (e.g. .../?ssl=...), so the driver uses "test".
+  // If MONGODB_DATABASE is set, insert it so we connect to the correct database.
+  const dbNameFromEnv = process.env.MONGODB_DATABASE;
+  if (dbNameFromEnv && uri) {
+    if (uri.includes("/?")) {
+      uri = uri.replace("/?", `/${dbNameFromEnv}?`);
+    } else if (uri.includes("?") && !uri.match(/\/[^/?]+\?/)) {
+      uri = uri.replace("?", `/${dbNameFromEnv}?`);
+    }
+  }
 
   console.log("Connecting to MongoDB with URI:", uri);
   try {

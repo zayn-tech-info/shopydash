@@ -1,14 +1,15 @@
 import axios from "axios";
 
 const mode = import.meta.env.MODE;
+// VITE_API_URL overrides default so production build can point to localhost or staging
+const defaultBaseURL =
+  mode === "development" ? "http://localhost:8000" : "https://api.shopydash.com";
 export const api = axios.create({
-  baseURL:
-    mode === "development"
-      ? "http://localhost:8000"
-      : "https://api.shopydash.com",
+  baseURL: import.meta.env.VITE_API_URL || defaultBaseURL,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
+    "X-Requested-With": "XMLHttpRequest",
   },
 });
 api.interceptors.request.use((config) => {
