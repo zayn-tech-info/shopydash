@@ -244,7 +244,7 @@ const getFeedProducts = asyncErrorHandler(async (req, res, next) => {
 });
 
 const getFeedProductsRandom = asyncErrorHandler(async (req, res, next) => {
-  const { school } = req.query;
+  const { school, category } = req.query;
   const body = req.body || {};
   let excludedIds = Array.isArray(body.excludedIds) ? body.excludedIds : [];
   const limit = Math.min(Math.max(parseInt(body.limit, 10) || 100, 1), 100);
@@ -252,6 +252,9 @@ const getFeedProductsRandom = asyncErrorHandler(async (req, res, next) => {
   const query = {};
   if (school) query.school = school;
   if (req.query.area) query.area = createSafeRegex(req.query.area);
+  if (category && typeof category === "string" && category.trim()) {
+    query["products.category"] = category.trim();
+  }
   if (req.query.search) {
     const searchRegex = createSafeRegex(req.query.search);
     query.$or = [
@@ -274,6 +277,9 @@ const getFeedProductsRandom = asyncErrorHandler(async (req, res, next) => {
     { $match: query },
     { $unwind: "$products" },
   ];
+  if (query["products.category"]) {
+    samplePipeline.push({ $match: { "products.category": query["products.category"] } });
+  }
   if (excludedObjectIds.length > 0) {
     samplePipeline.push({ $match: { "products._id": { $nin: excludedObjectIds } } });
   }

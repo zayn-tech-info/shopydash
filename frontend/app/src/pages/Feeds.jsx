@@ -151,6 +151,8 @@ export default function Feeds() {
       if (selectedSchool) params.school = selectedSchool;
       if (selectedLocation) params.area = selectedLocation;
       if (searchQuery) params.search = searchQuery;
+      const category = searchParams.get("category");
+      if (category) params.category = category;
 
       const res = await api.post("/api/v1/post/feed/products/random", { limit: 100 }, { params });
       const products = res.data?.data?.products ?? [];
@@ -161,7 +163,7 @@ export default function Feeds() {
     } finally {
       setLoading(false);
     }
-  }, [selectedSchool, selectedLocation, searchQuery]);
+  }, [selectedSchool, selectedLocation, searchQuery, searchParams]);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
