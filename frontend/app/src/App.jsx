@@ -84,8 +84,27 @@ const App = () => {
         audio.play().catch((e) => console.log("Audio play failed", e));
       });
 
+      socket.on("notification", (data) => {
+        if (data?.notification) {
+          addNotification(data.notification);
+          const n = data.notification;
+          toast(
+            (t) => (
+              <div className="flex items-start gap-3">
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-900">{n.title || "Notification"}</h3>
+                  <p className="text-sm text-gray-600">{n.message}</p>
+                </div>
+              </div>
+            ),
+            { duration: 5000, icon: "🔔" },
+          );
+        }
+      });
+
       return () => {
         socket.off("order:new");
+        socket.off("notification");
       };
     }
   }, [socket, addNotification]);

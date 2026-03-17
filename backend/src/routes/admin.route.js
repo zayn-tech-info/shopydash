@@ -64,14 +64,14 @@ router.patch("/users/:id/ban", toggleBanUser);
 router.patch("/users/:id/role", changeUserRole);
 
 // ─── Subscription Management ────────────────────────────
-router.get("/subscriptions", getSubscriptions);
 router.get("/subscriptions/stats", getSubscriptionStats);
+router.get("/subscriptions", getSubscriptions);
 router.patch("/subscriptions/:id/activate", activateSubscription);
 router.patch("/subscriptions/:id/cancel", cancelSubscription);
 
 // ─── Payment / Transaction ──────────────────────────────
-router.get("/transactions", getTransactions);
 router.get("/transactions/stats", getTransactionStats);
+router.get("/transactions", getTransactions);
 router.get("/transactions/:id", getTransactionDetail);
 
 // ─── Analytics ──────────────────────────────────────────

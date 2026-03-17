@@ -234,6 +234,17 @@ export const preferredCategories = [
   "Accessories",
   "Textbooks / Stationaries",
   "Services",
+  "Phones & Tablets",
+  "Home & Living",
+  "Sports & Fitness",
+  "Food & Beverages",
+  "Art & Crafts",
+  "Health & Wellness",
+  "Gaming",
+  "Furniture & Decor",
+  "Party & Events",
+  "Baby & Kids",
+  "Books & Media",
   "Others",
 ];
 

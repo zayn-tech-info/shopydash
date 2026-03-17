@@ -97,6 +97,7 @@ const getMyPosts = asyncErrorHandler(async (req, res, next) => {
 
 const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
   const { school, page = 1, limit = 10 } = req.query;
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
   const query = {};
   if (school) {
@@ -115,35 +116,347 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
     ];
   }
 
-  // Only filter by location if explicitly requested
-  // Comment out automatic user location filtering to show all products by default
-  /*
-  if (!school && !req.query.area) {
-    if (req.user) {
-      if (req.user.state) query.state = req.user.state;
-      if (req.user.area) query.area = req.user.area;
-    } else if (req.query.state && req.query.area) {
-      query.state = req.query.state;
-      query.area = req.query.area;
-    }
-  }
-  */
-
   const pageLimit = Math.min(parseInt(limit), 50);
   const currentPage = Math.max(parseInt(page), 1);
+  const skip = (currentPage - 1) * pageLimit;
 
-  const [posts, total] = await Promise.all([
-    VendorPost.find(query)
-      .populate(
-        "vendorId",
-        "businessName fullName phoneNumber username profilePic subscriptionPlan isVerified",
-      )
-      .sort({ createdAt: -1 })
-      .skip((currentPage - 1) * pageLimit)
-      .limit(pageLimit)
-      .lean(),
-    VendorPost.countDocuments(query),
-  ]);
+  // Near Me Discovery: when buyer has location, score by proximity (same area = 2, same school = 1, other = 0), then sort by createdAt
+  const buyerSchool =
+    (req.user && req.user.schoolName && req.user.schoolName.trim()) || null;
+  const buyerArea =
+    (req.user &&
+      (req.user.schoolArea || req.user.area) &&
+      (req.user.schoolArea || req.user.area).trim()) ||
+    null;
+  const buyerSchoolLower = buyerSchool ? buyerSchool.toLowerCase() : null;
+  const buyerAreaLower = buyerArea ? buyerArea.toLowerCase() : null;
+  const useProximitySort = !!(buyerSchoolLower || buyerAreaLower);
+
+  if (useProximitySort) {
+    const matchStage = { $match: query };
+    const lookupVendorProfileStage = {
+      $lookup: {
+        from: "vendorprofiles",
+        localField: "vendorId",
+        foreignField: "userId",
+        as: "vendorProfileDoc",
+      },
+    };
+    const addFieldsVendorProfileIdStage = {
+      $addFields: {
+        vendorProfileId: { $arrayElemAt: ["$vendorProfileDoc._id", 0] },
+      },
+    };
+    const lookupReviewsStage = {
+      $lookup: {
+        from: "reviews",
+        let: { vendorProfileId: "$vendorProfileId" },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$vendor", "$$vendorProfileId"] } } },
+          {
+            $group: {
+              _id: null,
+              avgRating: { $avg: "$rating" },
+              reviewCount: { $sum: 1 },
+            },
+          },
+        ],
+        as: "reviewStats",
+      },
+    };
+    const lookupOrdersStage = {
+      $lookup: {
+        from: "orders",
+        let: { vendorProfileId: "$vendorProfileId" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ["$vendor", "$$vendorProfileId"] },
+                  { $gte: ["$createdAt", sevenDaysAgo] },
+                  { $eq: ["$paymentStatus", "paid"] },
+                ],
+              },
+            },
+          },
+          { $count: "count" },
+        ],
+        as: "weeklyOrdersArr",
+      },
+    };
+    const addFieldsSocialProofStage = {
+      $addFields: {
+        ratingAvg: {
+          $ifNull: [{ $arrayElemAt: ["$reviewStats.avgRating", 0] }, 0],
+        },
+        reviewCount: {
+          $ifNull: [{ $arrayElemAt: ["$reviewStats.reviewCount", 0] }, 0],
+        },
+        weeklyOrders: {
+          $ifNull: [{ $arrayElemAt: ["$weeklyOrdersArr.count", 0] }, 0],
+        },
+      },
+    };
+    const addFieldsStage = {
+      $addFields: {
+        proximityScore: {
+          $switch: {
+            branches: [
+              {
+                case: {
+                  $and: [
+                    buyerAreaLower !== null,
+                    {
+                      $eq: [
+                        { $toLower: { $ifNull: ["$area", ""] } },
+                        buyerAreaLower,
+                      ],
+                    },
+                  ],
+                },
+                then: 2,
+              },
+              {
+                case: {
+                  $and: [
+                    buyerSchoolLower !== null,
+                    {
+                      $eq: [
+                        { $toLower: { $ifNull: ["$school", ""] } },
+                        buyerSchoolLower,
+                      ],
+                    },
+                  ],
+                },
+                then: 1,
+              },
+            ],
+            default: 0,
+          },
+        },
+      },
+    };
+    const sortStage = { $sort: { proximityScore: -1, createdAt: -1 } };
+    const skipStage = { $skip: skip };
+    const limitStage = { $limit: pageLimit };
+    const lookupStage = {
+      $lookup: {
+        from: "users",
+        localField: "vendorId",
+        foreignField: "_id",
+        as: "vendorId",
+        pipeline: [
+          {
+            $project: {
+              businessName: 1,
+              fullName: 1,
+              phoneNumber: 1,
+              username: 1,
+              profilePic: 1,
+              subscriptionPlan: 1,
+              isVerified: 1,
+            },
+          },
+        ],
+      },
+    };
+    const unwindStage = {
+      $unwind: {
+        path: "$vendorId",
+        preserveNullAndEmptyArrays: true,
+      },
+    };
+    const projectStage = {
+      $project: {
+        proximityScore: 0,
+        vendorProfileDoc: 0,
+        reviewStats: 0,
+        weeklyOrdersArr: 0,
+        vendorProfileId: 0,
+        ratingAvg: 1,
+        reviewCount: 1,
+        weeklyOrders: 1,
+      },
+    };
+
+    const facetPipeline = [
+      matchStage,
+      {
+        $facet: {
+          total: [{ $count: "count" }],
+          posts: [
+            lookupVendorProfileStage,
+            addFieldsVendorProfileIdStage,
+            lookupReviewsStage,
+            lookupOrdersStage,
+            addFieldsSocialProofStage,
+            addFieldsStage,
+            sortStage,
+            skipStage,
+            limitStage,
+            lookupStage,
+            unwindStage,
+            projectStage,
+          ],
+        },
+      },
+    ];
+
+    const result = await VendorPost.aggregate(facetPipeline);
+    const totalCount =
+      result[0] && result[0].total && result[0].total[0]
+        ? result[0].total[0].count
+        : 0;
+    const posts = result[0] && result[0].posts ? result[0].posts : [];
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        posts,
+        pagination: {
+          currentPage,
+          totalPages: Math.ceil(totalCount / pageLimit),
+          totalItems: totalCount,
+        },
+      },
+    });
+  }
+
+  // Non-proximity path: aggregation with social proof (ratingAvg, reviewCount, weeklyOrders)
+  const nonProximityMatch = { $match: query };
+  const nonProximityLookupVendorProfile = {
+    $lookup: {
+      from: "vendorprofiles",
+      localField: "vendorId",
+      foreignField: "userId",
+      as: "vendorProfileDoc",
+    },
+  };
+  const nonProximityAddVendorProfileId = {
+    $addFields: {
+      vendorProfileId: { $arrayElemAt: ["$vendorProfileDoc._id", 0] },
+    },
+  };
+  const nonProximityLookupReviews = {
+    $lookup: {
+      from: "reviews",
+      let: { vendorProfileId: "$vendorProfileId" },
+      pipeline: [
+        { $match: { $expr: { $eq: ["$vendor", "$$vendorProfileId"] } } },
+        {
+          $group: {
+            _id: null,
+            avgRating: { $avg: "$rating" },
+            reviewCount: { $sum: 1 },
+          },
+        },
+      ],
+      as: "reviewStats",
+    },
+  };
+  const nonProximityLookupOrders = {
+    $lookup: {
+      from: "orders",
+      let: { vendorProfileId: "$vendorProfileId" },
+      pipeline: [
+        {
+          $match: {
+            $expr: {
+              $and: [
+                { $eq: ["$vendor", "$$vendorProfileId"] },
+                { $gte: ["$createdAt", sevenDaysAgo] },
+                { $eq: ["$paymentStatus", "paid"] },
+              ],
+            },
+          },
+        },
+        { $count: "count" },
+      ],
+      as: "weeklyOrdersArr",
+    },
+  };
+  const nonProximityAddSocialProof = {
+    $addFields: {
+      ratingAvg: {
+        $ifNull: [{ $arrayElemAt: ["$reviewStats.avgRating", 0] }, 0],
+      },
+      reviewCount: {
+        $ifNull: [{ $arrayElemAt: ["$reviewStats.reviewCount", 0] }, 0],
+      },
+      weeklyOrders: {
+        $ifNull: [{ $arrayElemAt: ["$weeklyOrdersArr.count", 0] }, 0],
+      },
+    },
+  };
+  const nonProximitySort = { $sort: { createdAt: -1 } };
+  const nonProximitySkip = { $skip: skip };
+  const nonProximityLimit = { $limit: pageLimit };
+  const nonProximityLookupUsers = {
+    $lookup: {
+      from: "users",
+      localField: "vendorId",
+      foreignField: "_id",
+      as: "vendorId",
+      pipeline: [
+        {
+          $project: {
+            businessName: 1,
+            fullName: 1,
+            phoneNumber: 1,
+            username: 1,
+            profilePic: 1,
+            subscriptionPlan: 1,
+            isVerified: 1,
+          },
+        },
+      ],
+    },
+  };
+  const nonProximityUnwind = {
+    $unwind: {
+      path: "$vendorId",
+      preserveNullAndEmptyArrays: true,
+    },
+  };
+  const nonProximityProject = {
+    $project: {
+      vendorProfileDoc: 0,
+      reviewStats: 0,
+      weeklyOrdersArr: 0,
+      vendorProfileId: 0,
+      ratingAvg: 1,
+      reviewCount: 1,
+      weeklyOrders: 1,
+    },
+  };
+
+  const nonProximityFacet = [
+    nonProximityMatch,
+    {
+      $facet: {
+        total: [{ $count: "count" }],
+        posts: [
+          nonProximityLookupVendorProfile,
+          nonProximityAddVendorProfileId,
+          nonProximityLookupReviews,
+          nonProximityLookupOrders,
+          nonProximityAddSocialProof,
+          nonProximitySort,
+          nonProximitySkip,
+          nonProximityLimit,
+          nonProximityLookupUsers,
+          nonProximityUnwind,
+          nonProximityProject,
+        ],
+      },
+    },
+  ];
+
+  const nonProximityResult = await VendorPost.aggregate(nonProximityFacet);
+  const total =
+    nonProximityResult[0]?.total?.[0]?.count ?? 0;
+  const posts = nonProximityResult[0]?.posts ?? [];
 
   res.status(200).json({
     success: true,
@@ -324,8 +637,10 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
     limit = 50,
     excludedIds = [],
   } = req.query;
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
   const totalLimit = Math.min(parseInt(limit), 50);
+  const currentPage = Math.max(parseInt(page) || 1, 1);
   const premiumConfig = {
     targetRatio: 0.7,
     get count() {
@@ -333,6 +648,8 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
     },
   };
   const standardCount = totalLimit - premiumConfig.count;
+  const premiumSkip = (currentPage - 1) * premiumConfig.count;
+  const standardSkip = (currentPage - 1) * standardCount;
 
   const baseMatch = {};
   if (school) baseMatch.school = school;
@@ -407,6 +724,72 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
       $addFields: { subscription: { $arrayElemAt: ["$subscription", 0] } },
     });
 
+    // Social proof: vendor rating, review count, 7-day order count
+    pipe.push({
+      $lookup: {
+        from: "vendorprofiles",
+        localField: "vendorId",
+        foreignField: "userId",
+        as: "vendorProfileDoc",
+      },
+    });
+    pipe.push({
+      $addFields: {
+        vendorProfileId: { $arrayElemAt: ["$vendorProfileDoc._id", 0] },
+      },
+    });
+    pipe.push({
+      $lookup: {
+        from: "reviews",
+        let: { vendorProfileId: "$vendorProfileId" },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$vendor", "$$vendorProfileId"] } } },
+          {
+            $group: {
+              _id: null,
+              avgRating: { $avg: "$rating" },
+              reviewCount: { $sum: 1 },
+            },
+          },
+        ],
+        as: "reviewStats",
+      },
+    });
+    pipe.push({
+      $lookup: {
+        from: "orders",
+        let: { vendorProfileId: "$vendorProfileId" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ["$vendor", "$$vendorProfileId"] },
+                  { $gte: ["$createdAt", sevenDaysAgo] },
+                  { $eq: ["$paymentStatus", "paid"] },
+                ],
+              },
+            },
+          },
+          { $count: "count" },
+        ],
+        as: "weeklyOrdersArr",
+      },
+    });
+    pipe.push({
+      $addFields: {
+        ratingAvg: {
+          $ifNull: [{ $arrayElemAt: ["$reviewStats.avgRating", 0] }, 0],
+        },
+        reviewCount: {
+          $ifNull: [{ $arrayElemAt: ["$reviewStats.reviewCount", 0] }, 0],
+        },
+        weeklyOrders: {
+          $ifNull: [{ $arrayElemAt: ["$weeklyOrdersArr.count", 0] }, 0],
+        },
+      },
+    });
+
     const premiumPlans = ["Shopydash Max", "Shopydash Pro", "Shopydash Boost"];
     if (isPremium) {
       pipe.push({
@@ -448,7 +831,10 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
       pipe.push({ $sort: { createdAt: -1 } });
     }
 
-    pipe.push({ $limit: isPremium ? premiumConfig.count : standardCount });
+    const skip = isPremium ? premiumSkip : standardSkip;
+    const limitCount = isPremium ? premiumConfig.count : standardCount;
+    pipe.push({ $skip: skip });
+    pipe.push({ $limit: limitCount });
 
     pipe.push({
       $lookup: {
@@ -477,6 +863,9 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
         area: "$area",
         location: "$location",
         isBoosted: isPremium,
+        ratingAvg: 1,
+        reviewCount: 1,
+        weeklyOrders: 1,
         vendor: {
           _id: "$vendor._id",
           businessName: "$vendor.businessName",
@@ -505,10 +894,9 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
     success: true,
     data: {
       products,
-      page: parseInt(page),
-      limit: parseInt(limit),
-
-      hasMore: products.length >= parseInt(limit),
+      page: currentPage,
+      limit: totalLimit,
+      hasMore: products.length >= totalLimit,
     },
   });
 });

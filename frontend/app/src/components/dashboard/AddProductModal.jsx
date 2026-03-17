@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { X } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { preferredCategories } from "../../constants";
 
 export function AddProductModal({ isOpen, onClose, onAdd }) {
   const [name, setName] = useState("");
@@ -143,11 +144,18 @@ export function AddProductModal({ isOpen, onClose, onAdd }) {
             <div className="mt-3 grid grid-cols-2 gap-2">
               <div>
                 <label className="block text-sm font-medium">Category</label>
-                <input
+                <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                   className="mt-1 w-full rounded border px-3 py-2"
-                />
+                >
+                  <option value="">Select category</option>
+                  {preferredCategories.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="block text-sm font-medium">Price (NGN)</label>

@@ -8,7 +8,7 @@ const checkSubscription = async (req, res, next) => {
 
   try {
     const sub = await Subscription.findOne({
-      user: req.user.id,
+      user: req.user._id,
       status: "active",
       endDate: { $gt: new Date() },
     });
