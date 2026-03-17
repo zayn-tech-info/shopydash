@@ -2,29 +2,29 @@ const express = require("express");
 const path = require("path");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const connectDB = require("./config/db");
-const globalErrorHandler = require("./errors/globalError.controller");
-const customError = require("./errors/customError");
-const sanitizeInputs = require("./middleware/sanitize.middleware");
-const securityHeaders = require("./middleware/security.middleware");
-const csrfProtection = require("./middleware/csrf.middleware");
+const connectDB = require("./src/config/db");
+const globalErrorHandler = require("./src/errors/globalError.controller");
+const customError = require("./src/errors/customError");
+const sanitizeInputs = require("./src/middleware/sanitize.middleware");
+const securityHeaders = require("./src/middleware/security.middleware");
+const csrfProtection = require("./src/middleware/csrf.middleware");
 
-const authRouter = require("./routes/auth.route");
-const vendorProfile = require("./routes/vendorProfle.route");
-const clientProfileRouter = require("./routes/clientProfile.route");
-const profileRouter = require("./routes/profile.route");
-const vendorPost = require("./routes/vendorPost.route");
-const cartRouter = require("./routes/cart.route");
-const locationRouter = require("./routes/location.route");
-const paymentRouter = require("./routes/payment.routes");
-const orderRouter = require("./routes/order.route");
-const reviewRouter = require("./routes/review.route");
-const messageRouter = require("./routes/message.route");
-const notificationRouter = require("./routes/notification.route");
-const adminRouter = require("./routes/admin.route");
-const shareRouter = require("./routes/share.route");
-const { protectRoute } = require("./middleware/auth.middleware");
-const { adminOnly } = require("./middleware/adminOnly.middleware");
+const authRouter = require("./src/routes/auth.route");
+const vendorProfile = require("./src/routes/vendorProfle.route");
+const clientProfileRouter = require("./src/routes/clientProfile.route");
+const profileRouter = require("./src/routes/profile.route");
+const vendorPost = require("./src/routes/vendorPost.route");
+const cartRouter = require("./src/routes/cart.route");
+const locationRouter = require("./src/routes/location.route");
+const paymentRouter = require("./src/routes/payment.routes");
+const orderRouter = require("./src/routes/order.route");
+const reviewRouter = require("./src/routes/review.route");
+const messageRouter = require("./src/routes/message.route");
+const notificationRouter = require("./src/routes/notification.route");
+const adminRouter = require("./src/routes/admin.route");
+const shareRouter = require("./src/routes/share.route");
+const { protectRoute } = require("./src/middleware/auth.middleware");
+const { adminOnly } = require("./src/middleware/adminOnly.middleware");
 
 connectDB();
 const app = express();
@@ -100,6 +100,21 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
 });
+
+// Dev-only: trigger buyer match job for testing (404 in production)
+if (process.env.NODE_ENV !== "production") {
+  app.get("/api/v1/test/buyer-match-job", (req, res) => {
+    const { runBuyerMatchJob } = require("./src/jobs/buyerMatchJob");
+    const io = req.app.get("io");
+    runBuyerMatchJob(io)
+      .then(() =>
+        res.status(200).json({ success: true, message: "Buyer match job completed" })
+      )
+      .catch((err) =>
+        res.status(500).json({ success: false, message: err.message })
+      );
+  });
+}
 
 app.all(/(.*)/, (req, res, next) => {
   const err = new customError(

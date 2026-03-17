@@ -3,7 +3,7 @@ const { logError } = require("../utils/logger");
 
 const getNotifications = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
@@ -38,7 +38,7 @@ const getNotifications = async (req, res) => {
 
 const markAsRead = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
     const { notificationId } = req.body;
 
     if (notificationId) {

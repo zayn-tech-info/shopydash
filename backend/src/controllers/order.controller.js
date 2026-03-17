@@ -6,7 +6,7 @@ const { logError } = require("../utils/logger");
 const markOrderDelivered = async (req, res) => {
   try {
     const { orderId } = req.params;
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     const order = await Order.findById(orderId);
 
@@ -14,7 +14,7 @@ const markOrderDelivered = async (req, res) => {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    if (order.buyer.toString() !== userId) {
+    if (order.buyer.toString() !== userId.toString()) {
       return res
         .status(403)
         .json({ message: "Only the buyer can confirm delivery" });
@@ -45,7 +45,7 @@ const markOrderDelivered = async (req, res) => {
 
 const getMyOrders = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
     const { role } = req.query;
 
     let query = {};

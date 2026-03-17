@@ -63,7 +63,7 @@ const paystackRequest = (endpoint, method, body = null) => {
 const initializePayment = async (req, res) => {
   try {
     const { planSlug } = req.body;
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     const user = await User.findById(userId);
     if (!user) {
@@ -139,7 +139,7 @@ const createSubaccount = async (req, res) => {
       account_number,
       percentage_charge,
     } = req.body;
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     const vendor = await VendorProfile.findOne({ userId });
     if (!vendor) {
@@ -209,7 +209,7 @@ const createSubaccount = async (req, res) => {
 const initializeOrderPayment = async (req, res) => {
   try {
     const { cartItems, deliveryAddress } = req.body;
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     if (!cartItems || cartItems.length === 0) {
       return res.status(400).json({ message: "No items in checkout" });

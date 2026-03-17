@@ -76,7 +76,7 @@ exports.checkMessagingAccess = asyncErrorHandler(async (req, res, next) => {
 exports.initiateOrGetConversation = asyncErrorHandler(
   async (req, res, next) => {
     const { recipientId } = req.body;
-    const senderId = req.user.id;
+    const senderId = req.user._id;
 
     let conversation = await Conversation.findOne({
       participants: { $all: [senderId, recipientId] },
@@ -108,7 +108,7 @@ exports.initiateOrGetConversation = asyncErrorHandler(
 
 exports.sendMessage = asyncErrorHandler(async (req, res, next) => {
   const { conversationId, content, replyTo } = req.body;
-  const senderId = req.user.id;
+  const senderId = req.user._id;
 
   if (!conversationId || !content) {
     return next(
@@ -140,8 +140,9 @@ exports.sendMessage = asyncErrorHandler(async (req, res, next) => {
 
   conversation.lastMessage = message._id;
 
+  const senderIdStr = senderId.toString();
   conversation.participants.forEach((pId) => {
-    if (pId.toString() !== senderId) {
+    if (pId.toString() !== senderIdStr) {
       const currentCount = conversation.unreadCounts.get(pId.toString()) || 0;
       conversation.unreadCounts.set(pId.toString(), currentCount + 1);
     }
@@ -160,7 +161,7 @@ exports.sendMessage = asyncErrorHandler(async (req, res, next) => {
     io.to(conversationId).emit("receive_message", message);
 
     conversation.participants.forEach((pId) => {
-      if (pId.toString() !== senderId) {
+      if (pId.toString() !== senderIdStr) {
         io.to(pId.toString()).emit("conversation_updated", {
           conversationId: conversation._id,
           lastMessage: message,
@@ -179,7 +180,7 @@ exports.sendMessage = asyncErrorHandler(async (req, res, next) => {
 });
 
 exports.getConversations = asyncErrorHandler(async (req, res, next) => {
-  const userId = req.user.id;
+  const userId = req.user._id;
 
   const conversations = await Conversation.find({
     participants: userId,
@@ -200,7 +201,7 @@ exports.getConversations = asyncErrorHandler(async (req, res, next) => {
 
 exports.getMessages = asyncErrorHandler(async (req, res, next) => {
   const { conversationId } = req.params;
-  const userId = req.user.id;
+  const userId = req.user._id;
 
   const page = req.query.page * 1 || 1;
   const limit = Math.min(req.query.limit * 1 || 50, 100);

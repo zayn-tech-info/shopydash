@@ -115,22 +115,136 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
     ];
   }
 
-  // Only filter by location if explicitly requested
-  // Comment out automatic user location filtering to show all products by default
-  /*
-  if (!school && !req.query.area) {
-    if (req.user) {
-      if (req.user.state) query.state = req.user.state;
-      if (req.user.area) query.area = req.user.area;
-    } else if (req.query.state && req.query.area) {
-      query.state = req.query.state;
-      query.area = req.query.area;
-    }
-  }
-  */
-
   const pageLimit = Math.min(parseInt(limit), 50);
   const currentPage = Math.max(parseInt(page), 1);
+  const skip = (currentPage - 1) * pageLimit;
+
+  // Near Me Discovery: when buyer has location, score by proximity (same area = 2, same school = 1, other = 0), then sort by createdAt
+  const buyerSchool =
+    (req.user && req.user.schoolName && req.user.schoolName.trim()) || null;
+  const buyerArea =
+    (req.user &&
+      (req.user.schoolArea || req.user.area) &&
+      (req.user.schoolArea || req.user.area).trim()) ||
+    null;
+  const buyerSchoolLower = buyerSchool ? buyerSchool.toLowerCase() : null;
+  const buyerAreaLower = buyerArea ? buyerArea.toLowerCase() : null;
+  const useProximitySort = !!(buyerSchoolLower || buyerAreaLower);
+
+  if (useProximitySort) {
+    const matchStage = { $match: query };
+    const addFieldsStage = {
+      $addFields: {
+        proximityScore: {
+          $switch: {
+            branches: [
+              {
+                case: {
+                  $and: [
+                    buyerAreaLower !== null,
+                    {
+                      $eq: [
+                        { $toLower: { $ifNull: ["$area", ""] } },
+                        buyerAreaLower,
+                      ],
+                    },
+                  ],
+                },
+                then: 2,
+              },
+              {
+                case: {
+                  $and: [
+                    buyerSchoolLower !== null,
+                    {
+                      $eq: [
+                        { $toLower: { $ifNull: ["$school", ""] } },
+                        buyerSchoolLower,
+                      ],
+                    },
+                  ],
+                },
+                then: 1,
+              },
+            ],
+            default: 0,
+          },
+        },
+      },
+    };
+    const sortStage = { $sort: { proximityScore: -1, createdAt: -1 } };
+    const skipStage = { $skip: skip };
+    const limitStage = { $limit: pageLimit };
+    const lookupStage = {
+      $lookup: {
+        from: "users",
+        localField: "vendorId",
+        foreignField: "_id",
+        as: "vendorId",
+        pipeline: [
+          {
+            $project: {
+              businessName: 1,
+              fullName: 1,
+              phoneNumber: 1,
+              username: 1,
+              profilePic: 1,
+              subscriptionPlan: 1,
+              isVerified: 1,
+            },
+          },
+        ],
+      },
+    };
+    const unwindStage = {
+      $unwind: {
+        path: "$vendorId",
+        preserveNullAndEmptyArrays: true,
+      },
+    };
+    const projectStage = {
+      $project: {
+        proximityScore: 0,
+      },
+    };
+
+    const facetPipeline = [
+      matchStage,
+      {
+        $facet: {
+          total: [{ $count: "count" }],
+          posts: [
+            addFieldsStage,
+            sortStage,
+            skipStage,
+            limitStage,
+            lookupStage,
+            unwindStage,
+            projectStage,
+          ],
+        },
+      },
+    ];
+
+    const result = await VendorPost.aggregate(facetPipeline);
+    const totalCount =
+      result[0] && result[0].total && result[0].total[0]
+        ? result[0].total[0].count
+        : 0;
+    const posts = result[0] && result[0].posts ? result[0].posts : [];
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        posts,
+        pagination: {
+          currentPage,
+          totalPages: Math.ceil(totalCount / pageLimit),
+          totalItems: totalCount,
+        },
+      },
+    });
+  }
 
   const [posts, total] = await Promise.all([
     VendorPost.find(query)
@@ -139,7 +253,7 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
         "businessName fullName phoneNumber username profilePic subscriptionPlan isVerified",
       )
       .sort({ createdAt: -1 })
-      .skip((currentPage - 1) * pageLimit)
+      .skip(skip)
       .limit(pageLimit)
       .lean(),
     VendorPost.countDocuments(query),
@@ -326,6 +440,7 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
   } = req.query;
 
   const totalLimit = Math.min(parseInt(limit), 50);
+  const currentPage = Math.max(parseInt(page) || 1, 1);
   const premiumConfig = {
     targetRatio: 0.7,
     get count() {
@@ -333,6 +448,8 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
     },
   };
   const standardCount = totalLimit - premiumConfig.count;
+  const premiumSkip = (currentPage - 1) * premiumConfig.count;
+  const standardSkip = (currentPage - 1) * standardCount;
 
   const baseMatch = {};
   if (school) baseMatch.school = school;
@@ -448,7 +565,10 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
       pipe.push({ $sort: { createdAt: -1 } });
     }
 
-    pipe.push({ $limit: isPremium ? premiumConfig.count : standardCount });
+    const skip = isPremium ? premiumSkip : standardSkip;
+    const limitCount = isPremium ? premiumConfig.count : standardCount;
+    pipe.push({ $skip: skip });
+    pipe.push({ $limit: limitCount });
 
     pipe.push({
       $lookup: {
@@ -505,10 +625,9 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
     success: true,
     data: {
       products,
-      page: parseInt(page),
-      limit: parseInt(limit),
-
-      hasMore: products.length >= parseInt(limit),
+      page: currentPage,
+      limit: totalLimit,
+      hasMore: products.length >= totalLimit,
     },
   });
 });

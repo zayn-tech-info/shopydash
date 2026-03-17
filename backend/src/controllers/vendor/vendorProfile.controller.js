@@ -101,8 +101,8 @@ const getPublicVendorProfile = asyncErrorHandler(async (req, res, next) => {
       (p) => p.name === subscription.plan
     );
     if (planConfig) {
-      if (planConfig.features.boostedBadge) badges.isBoosted = true;
-      if (planConfig.features.verifiedBadge) badges.isVerified = true;
+      if (planConfig.features.badge === "Boosted Vendor") badges.isBoosted = true;
+      if (planConfig.features.badge === "Verification Badge") badges.isVerified = true;
     }
   }
 

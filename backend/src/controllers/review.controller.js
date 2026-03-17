@@ -6,7 +6,7 @@ const customError = require("../errors/customError");
 const createReview = async (req, res, next) => {
   try {
     const { orderId, rating, comment, vendorId } = req.body;
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     if (!orderId || !rating || !vendorId) {
       return next(new customError("Please provide all required fields", 400));
@@ -21,7 +21,7 @@ const createReview = async (req, res, next) => {
       return next(new customError("Order not found", 404));
     }
 
-    if (order.buyer.toString() !== userId) {
+    if (order.buyer.toString() !== userId.toString()) {
       return next(
         new customError("You are not authorized to review this order", 403)
       );

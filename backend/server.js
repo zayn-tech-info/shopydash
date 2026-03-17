@@ -6,12 +6,12 @@ const https = require("https");
 const { Server } = require("socket.io");
 const DOMPurify = require("isomorphic-dompurify");
 
-const validateEnv = require("./utils/validateEnv");
+const validateEnv = require("./src/utils/validateEnv");
 const app = require("./app");
-const socketAuthMiddleware = require("./middleware/socketAuth");
-const Message = require("./models/message.model");
-const Conversation = require("./models/conversation.model");
-const { logError, logInfo } = require("./utils/logger");
+const socketAuthMiddleware = require("./src/middleware/socketAuth");
+const Message = require("./src/models/message.model");
+const Conversation = require("./src/models/conversation.model");
+const { logError, logInfo } = require("./src/utils/logger");
 
 validateEnv();
 
@@ -216,6 +216,21 @@ cron.schedule("*/5 * * * *", () => {
     .on("error", (err) => {
       console.error(`Self-ping failed: ${err.message}`);
     });
+});
+
+const { runBuyerMatchJob } = require("./src/jobs/buyerMatchJob");
+const { runExpireFlashDealsJob } = require("./src/jobs/expireFlashDealsJob");
+
+cron.schedule("0 9 * * *", () => {
+  runBuyerMatchJob(io).catch((err) => {
+    logError("BuyerMatchJob", err);
+  });
+});
+
+cron.schedule("*/15 * * * *", () => {
+  runExpireFlashDealsJob().catch((err) => {
+    logError("ExpireFlashDealsJob", err);
+  });
 });
 
 server.listen(PORT, () => {

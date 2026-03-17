@@ -16,12 +16,18 @@ const {
   uploadMiddleware,
   uploadImages,
 } = require("../controllers/vendor/upload.controller");
+const {
+  getFlashDeals,
+  activateFlash,
+  deactivateFlash,
+  requireGrindPlus,
+} = require("../controllers/vendor/flashDeal.controller");
 const { checkSubscription } = require("../middleware/subscription.middleware");
 
 const vendorPostRouter = express.Router();
 
 vendorPostRouter.get("/feed", getFeedPosts);
-
+vendorPostRouter.get("/flash", getFlashDeals);
 vendorPostRouter.get("/search", searchPosts);
 vendorPostRouter.get("/fresh", getFreshProducts);
 vendorPostRouter.get("/trending", getTrendingProducts);
@@ -44,5 +50,18 @@ vendorPostRouter
   .get(getById)
   .patch(verifyRole("vendor"), update)
   .delete(protectRoute, verifyRole("vendor"), remove);
+
+vendorPostRouter.post(
+  "/:postId/product/:productId/flash",
+  verifyRole("vendor"),
+  requireGrindPlus,
+  activateFlash
+);
+vendorPostRouter.delete(
+  "/:postId/product/:productId/flash",
+  verifyRole("vendor"),
+  requireGrindPlus,
+  deactivateFlash
+);
 
 module.exports = vendorPostRouter;

@@ -74,6 +74,10 @@ const vendorProfileSchema = new mongoose.Schema(
       },
       default: {},
     },
+    coverImage: {
+      type: String,
+      default: null,
+    },
     bankDetails: {
       bankName: String,
       bankCode: String,
