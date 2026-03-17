@@ -6,29 +6,30 @@ import { FeedSkeleton } from "./skeletons/FeedSkeleton";
 import VendorProductItem from "./vendor/VendorProductItem";
 import { Grid3X3, ArrowRight } from "lucide-react";
 
-export function NearByVendors({ posts, showHeader = true, loading = false }) {
+export function NearByVendors({ posts, products: productsProp, showHeader = true, loading = false }) {
   const getCart = useCartStore((state) => state.getCart);
-  const { authUser } = useAuthStore();
 
   useEffect(() => {
     getCart();
   }, []);
 
   const allProducts = useMemo(() => {
+    if (productsProp && Array.isArray(productsProp) && productsProp.length > 0) {
+      return productsProp;
+    }
     if (!posts || posts.length === 0) return [];
 
     const products = [];
     posts.forEach((post) => {
       if (post.products && Array.isArray(post.products)) {
         post.products.forEach((product) => {
-          
           products.push({
             ...product,
-            _id: product._id, 
-            name: product.title, 
+            _id: product._id,
+            name: product.title,
             price: product.price,
             image: product.image,
-            vendorPostId: post._id, 
+            vendorPostId: post._id,
             vendor: {
               _id: post.vendorId?._id,
               username: post.vendorId?.username,
@@ -44,20 +45,20 @@ export function NearByVendors({ posts, showHeader = true, loading = false }) {
       }
     });
 
-    
     for (let i = products.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [products[i], products[j]] = [products[j], products[i]];
     }
 
     return products;
-  }, [posts]);
+  }, [posts, productsProp]);
 
   if (loading) {
     return <FeedSkeleton />;
   }
 
-  if (!posts) {
+  const hasData = (productsProp && Array.isArray(productsProp)) || (posts && posts.length > 0);
+  if (!hasData) {
     return null;
   }
 

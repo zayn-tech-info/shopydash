@@ -2,6 +2,95 @@ import { create } from "zustand";
 import { api } from "../lib/axios";
 import toast from "react-hot-toast";
 
+function shuffleInPlace(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function getVendorKey(product) {
+  return String(
+    product?.vendorId?._id ??
+      product?.vendorId ??
+      product?.vendor?._id ??
+      product?.vendor?.id ??
+      "unknown",
+  );
+}
+
+// Best-effort: rearrange so the same vendor doesn't appear side-by-side.
+// If it's mathematically impossible (one vendor dominates), we minimize collisions.
+function avoidAdjacentSameVendor(products) {
+  if (!Array.isArray(products) || products.length < 3) return products;
+
+  const byVendor = new Map();
+  for (const p of products) {
+    const k = getVendorKey(p);
+    const list = byVendor.get(k);
+    if (list) list.push(p);
+    else byVendor.set(k, [p]);
+  }
+
+  // Add randomness within each vendor bucket, so the final ordering is less predictable.
+  for (const list of byVendor.values()) shuffleInPlace(list);
+
+  const result = [];
+  let prevVendor = null;
+
+  while (result.length < products.length) {
+    let bestVendor = null;
+    let bestCount = -1;
+
+    for (const [vendor, list] of byVendor.entries()) {
+      if (list.length === 0) continue;
+      if (vendor === prevVendor) continue;
+      if (list.length > bestCount) {
+        bestCount = list.length;
+        bestVendor = vendor;
+      }
+    }
+
+    // If we can't pick a different vendor, pick any remaining vendor.
+    if (!bestVendor) {
+      for (const [vendor, list] of byVendor.entries()) {
+        if (list.length > 0) {
+          bestVendor = vendor;
+          break;
+        }
+      }
+    }
+
+    const bucket = byVendor.get(bestVendor);
+    const item = bucket.shift();
+    result.push(item);
+    prevVendor = bestVendor;
+  }
+
+  // One more pass to reduce any remaining adjacent duplicates via swaps.
+  for (let i = 1; i < result.length; i++) {
+    if (getVendorKey(result[i]) !== getVendorKey(result[i - 1])) continue;
+    let swapped = false;
+    for (let j = i + 1; j < result.length; j++) {
+      if (
+        getVendorKey(result[j]) !== getVendorKey(result[i]) &&
+        getVendorKey(result[j]) !== getVendorKey(result[i - 1])
+      ) {
+        [result[i], result[j]] = [result[j], result[i]];
+        swapped = true;
+        break;
+      }
+    }
+    if (!swapped) {
+      // Nothing left to swap with; best-effort ends here.
+      break;
+    }
+  }
+
+  return result;
+}
+
 export const useProductStore = create((set, get) => ({
   isUploading: false,
   isCreatingPost: false,
@@ -14,6 +103,8 @@ export const useProductStore = create((set, get) => ({
 
   feedPosts: [],
   isFetchingFeedPosts: false,
+  featuredProducts: [],
+  isFetchingFeaturedProducts: false,
   searchResults: [],
   isSearching: false,
 
@@ -71,6 +162,69 @@ export const useProductStore = create((set, get) => ({
       console.error("Feed request failed:", error?.response?.status, error?.message);
       toast.error(
         error.response?.data?.message || "Failed to load feed. Check your connection.",
+      );
+    }
+  },
+
+  getFeaturedProducts: async () => {
+    const SEEN_KEY = "featuredSeenIds";
+    const TOTAL_KEY = "featuredTotal";
+    const TARGET = 100;
+    const COVERAGE_RESET_RATIO = 0.8;
+
+    let seenIds = [];
+    try {
+      const stored = sessionStorage.getItem(SEEN_KEY);
+      if (stored) seenIds = JSON.parse(stored);
+      if (!Array.isArray(seenIds)) seenIds = [];
+    } catch (_) {
+      seenIds = [];
+    }
+    let total = parseInt(sessionStorage.getItem(TOTAL_KEY) || "0", 10) || 0;
+
+    set({ isFetchingFeaturedProducts: true });
+    try {
+      const res = await api.post("/api/v1/post/feed/products/random", {
+        excludedIds: seenIds,
+        limit: TARGET,
+      });
+      let products = res.data?.data?.products ?? [];
+      const newTotal = res.data?.data?.total ?? 0;
+      if (newTotal > 0) total = newTotal;
+      sessionStorage.setItem(TOTAL_KEY, String(total));
+
+      if (products.length < TARGET && total >= TARGET) {
+        const fillRes = await api.post("/api/v1/post/feed/products/random", {
+          limit: TARGET - products.length,
+        });
+        const fill = fillRes.data?.data?.products ?? [];
+        const seenSet = new Set(products.map((p) => String(p._id)));
+        for (const p of fill) {
+          if (seenSet.has(String(p._id))) continue;
+          products.push(p);
+          seenSet.add(String(p._id));
+          if (products.length >= TARGET) break;
+        }
+      }
+
+      const ids = products.map((p) => String(p._id));
+      const nextSeen = [...new Set([...seenIds, ...ids])];
+      if (total > 0 && nextSeen.length >= COVERAGE_RESET_RATIO * total) {
+        sessionStorage.setItem(SEEN_KEY, "[]");
+      } else {
+        sessionStorage.setItem(SEEN_KEY, JSON.stringify(nextSeen));
+      }
+
+      const randomized = avoidAdjacentSameVendor(shuffleInPlace([...products]));
+      set({
+        featuredProducts: Array.isArray(randomized) ? randomized : [],
+        isFetchingFeaturedProducts: false,
+      });
+    } catch (error) {
+      set({ featuredProducts: [], isFetchingFeaturedProducts: false });
+      console.error("Featured products request failed:", error?.response?.status, error?.message);
+      toast.error(
+        error.response?.data?.message || "Failed to load featured products. Check your connection.",
       );
     }
   },
@@ -153,6 +307,9 @@ export const useProductStore = create((set, get) => ({
   },
 
   getProductById: async (productId) => {
+    // #region agent log
+    fetch('http://127.0.0.1:7487/ingest/07a883ea-b310-42a0-b12a-05bb98b06b93',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'61923e'},body:JSON.stringify({sessionId:'61923e',location:'productStore.js:getProductById',message:'Fetch product by id',data:{productId:typeof productId=== 'string'? productId : String(productId),length:String(productId).length},hypothesisId:'H4',timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
     set({ isFetchingProduct: true, currentProduct: null });
     try {
       const res = await api.get(`/api/v1/post/product/${productId}`);

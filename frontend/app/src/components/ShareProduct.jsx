@@ -15,7 +15,10 @@ const ShareProduct = ({ product, variant = "default" }) => {
 
     const baseUrl = rawBackendUrl.replace(/\/api\/v1\/?$/, "");
 
+    // #region agent log
     const identifier = product.slug || product._id;
+    fetch('http://127.0.0.1:7487/ingest/07a883ea-b310-42a0-b12a-05bb98b06b93',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'61923e'},body:JSON.stringify({sessionId:'61923e',location:'ShareProduct.jsx:identifier',message:'Share link identifier',data:{identifier:typeof identifier=== 'string'? identifier : String(identifier),hasSlug:!!product.slug,productId:product._id? String(product._id):null},hypothesisId:'H1',timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
     const shareUrl = `${baseUrl}/share/${identifier}`;
 
     const title = product.title || "Product";

@@ -40,6 +40,8 @@ const get = asyncErrorHandler(async (req, res, next) => {
         const productsWithPostId = (post.products || []).map((p) => ({
           ...p,
           vendorPostId: post._id,
+          _id: p._id,
+          slug: p.slug,
         }));
         return acc.concat(productsWithPostId);
       }, []);

@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const asyncErrorHandler = require("../../errors/asyncErrorHandle");
 const customError = require("../../errors/customError");
 const VendorPost = require("../../models/vendorProduct");
@@ -129,8 +130,8 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
   }
   */
 
-  const pageLimit = Math.min(parseInt(limit), 50);
-  const currentPage = Math.max(parseInt(page), 1);
+  const pageLimit = Math.min(Math.max(parseInt(limit, 10) || 10, 1), 100);
+  const currentPage = Math.max(parseInt(page, 10) || 1, 1);
 
   const [posts, total] = await Promise.all([
     VendorPost.find(query)
@@ -158,6 +159,186 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
+const getFeedProducts = asyncErrorHandler(async (req, res, next) => {
+  const { school, page = 1, limit = 100 } = req.query;
+  const pageLimit = Math.min(Math.max(parseInt(limit, 10) || 100, 1), 100);
+  const currentPage = Math.max(parseInt(page, 10) || 1, 1);
+  const skip = (currentPage - 1) * pageLimit;
+
+  const query = {};
+  if (school) query.school = school;
+  if (req.query.area) query.area = createSafeRegex(req.query.area);
+  if (req.query.search) {
+    const searchRegex = createSafeRegex(req.query.search);
+    query.$or = [
+      { "products.title": searchRegex },
+      { "products.description": searchRegex },
+    ];
+  }
+
+  const pipeline = [
+    { $match: query },
+    { $sort: { createdAt: -1 } },
+    { $unwind: "$products" },
+    {
+      $lookup: {
+        from: "vendorprofiles",
+        localField: "vendorId",
+        foreignField: "userId",
+        as: "vendorProfile",
+      },
+    },
+    {
+      $unwind: { path: "$vendorProfile", preserveNullAndEmptyArrays: true },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "vendorId",
+        foreignField: "_id",
+        as: "vendorUser",
+      },
+    },
+    {
+      $unwind: { path: "$vendorUser", preserveNullAndEmptyArrays: true },
+    },
+    { $sort: { createdAt: -1 } },
+    { $skip: skip },
+    { $limit: pageLimit + 1 },
+    {
+      $project: {
+        _id: "$products._id",
+        title: "$products.title",
+        price: "$products.price",
+        image: "$products.image",
+        images: "$products.images",
+        description: "$products.description",
+        vendorPostId: { $toString: "$_id" },
+        vendorId: "$vendorId",
+        createdAt: "$createdAt",
+        rating: { $ifNull: ["$vendorProfile.rating", 0] },
+        vendor: {
+          _id: "$vendorId",
+          businessName: "$vendorUser.businessName",
+          username: "$vendorUser.username",
+          profilePic: "$vendorUser.profilePic",
+          subscriptionPlan: "$vendorUser.subscriptionPlan",
+          isVerified: "$vendorUser.isVerified",
+        },
+      },
+    },
+  ];
+
+  const raw = await VendorPost.aggregate(pipeline);
+  const hasMore = raw.length > pageLimit;
+  const products = hasMore ? raw.slice(0, pageLimit) : raw;
+
+  res.status(200).json({
+    success: true,
+    data: {
+      products,
+      page: currentPage,
+      hasMore,
+    },
+  });
+});
+
+const getFeedProductsRandom = asyncErrorHandler(async (req, res, next) => {
+  const { school } = req.query;
+  const body = req.body || {};
+  let excludedIds = Array.isArray(body.excludedIds) ? body.excludedIds : [];
+  const limit = Math.min(Math.max(parseInt(body.limit, 10) || 100, 1), 100);
+
+  const query = {};
+  if (school) query.school = school;
+  if (req.query.area) query.area = createSafeRegex(req.query.area);
+  if (req.query.search) {
+    const searchRegex = createSafeRegex(req.query.search);
+    query.$or = [
+      { "products.title": searchRegex },
+      { "products.description": searchRegex },
+    ];
+  }
+
+  const excludedObjectIds = excludedIds
+    .filter((id) => id && mongoose.Types.ObjectId.isValid(id))
+    .map((id) => new mongoose.Types.ObjectId(id));
+
+  const countPipeline = [
+    { $match: query },
+    { $unwind: "$products" },
+    { $count: "total" },
+  ];
+
+  const samplePipeline = [
+    { $match: query },
+    { $unwind: "$products" },
+  ];
+  if (excludedObjectIds.length > 0) {
+    samplePipeline.push({ $match: { "products._id": { $nin: excludedObjectIds } } });
+  }
+  samplePipeline.push({ $sample: { size: limit } });
+  samplePipeline.push({
+    $lookup: {
+      from: "vendorprofiles",
+      localField: "vendorId",
+      foreignField: "userId",
+      as: "vendorProfile",
+    },
+  });
+  samplePipeline.push({
+    $unwind: { path: "$vendorProfile", preserveNullAndEmptyArrays: true },
+  });
+  samplePipeline.push({
+    $lookup: {
+      from: "users",
+      localField: "vendorId",
+      foreignField: "_id",
+      as: "vendorUser",
+    },
+  });
+  samplePipeline.push({
+    $unwind: { path: "$vendorUser", preserveNullAndEmptyArrays: true },
+  });
+  samplePipeline.push({
+    $project: {
+      _id: "$products._id",
+      title: "$products.title",
+      price: "$products.price",
+      image: "$products.image",
+      images: "$products.images",
+      description: "$products.description",
+      vendorPostId: { $toString: "$_id" },
+      vendorId: "$vendorId",
+      createdAt: "$createdAt",
+      rating: { $ifNull: ["$vendorProfile.rating", 0] },
+      vendor: {
+        _id: "$vendorId",
+        businessName: "$vendorUser.businessName",
+        username: "$vendorUser.username",
+        profilePic: "$vendorUser.profilePic",
+        subscriptionPlan: "$vendorUser.subscriptionPlan",
+        isVerified: "$vendorUser.isVerified",
+      },
+    },
+  });
+
+  const [countResult, products] = await Promise.all([
+    VendorPost.aggregate(countPipeline).then((r) => (r[0] ? r[0].total : 0)),
+    VendorPost.aggregate(samplePipeline),
+  ]);
+
+  const total = typeof countResult === "number" ? countResult : 0;
+
+  res.status(200).json({
+    success: true,
+    data: {
+      products,
+      total,
+    },
+  });
+});
+
 const getById = asyncErrorHandler(async (req, res, next) => {
   const { postId } = req.params;
 
@@ -181,15 +362,29 @@ const getById = asyncErrorHandler(async (req, res, next) => {
 const getProductById = asyncErrorHandler(async (req, res, next) => {
   const { productId } = req.params;
   const mongoose = require("mongoose");
+  const isValidObjectId =
+    mongoose.Types.ObjectId.isValid(productId) &&
+    String(new mongoose.Types.ObjectId(productId)) === productId;
+  // #region agent log
+  const logPayload = { sessionId: "61923e", location: "vendorPost.controller.js:getProductById", message: "getProductById param", data: { productId, isValidObjectId }, hypothesisId: "H2", timestamp: Date.now() };
+  require("http").request({ hostname: "127.0.0.1", port: 7487, path: "/ingest/07a883ea-b310-42a0-b12a-05bb98b06b93", method: "POST", headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "61923e" } }, () => {}).on("error", () => {}).end(JSON.stringify(logPayload));
+  // #endregion
 
-  if (!mongoose.Types.ObjectId.isValid(productId)) {
-    return next(new customError("Invalid product ID format", 400));
-  }
+  const matchStage =
+    isValidObjectId
+      ? [
+          { $match: { "products._id": new mongoose.Types.ObjectId(productId) } },
+          { $unwind: "$products" },
+          { $match: { "products._id": new mongoose.Types.ObjectId(productId) } },
+        ]
+      : [
+          { $match: { "products.slug": productId } },
+          { $unwind: "$products" },
+          { $match: { "products.slug": productId } },
+        ];
 
   const pipeline = [
-    { $match: { "products._id": new mongoose.Types.ObjectId(productId) } },
-    { $unwind: "$products" },
-    { $match: { "products._id": new mongoose.Types.ObjectId(productId) } },
+    ...matchStage,
     {
       $lookup: {
         from: "users",
@@ -236,6 +431,10 @@ const getProductById = asyncErrorHandler(async (req, res, next) => {
   const result = await VendorPost.aggregate(pipeline);
 
   if (!result || result.length === 0) {
+    // #region agent log
+    const notFoundPayload = { sessionId: "61923e", location: "vendorPost.controller.js:getProductById:notFound", message: "Product not found", data: { productId }, hypothesisId: "H2", timestamp: Date.now() };
+    require("http").request({ hostname: "127.0.0.1", port: 7487, path: "/ingest/07a883ea-b310-42a0-b12a-05bb98b06b93", method: "POST", headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "61923e" } }, () => {}).on("error", () => {}).end(JSON.stringify(notFoundPayload));
+    // #endregion
     return next(new customError("Product not found", 404));
   }
 
@@ -522,6 +721,16 @@ const getFreshProducts = asyncErrorHandler(async (req, res, next) => {
 
     { $unwind: "$products" },
 
+    // Give each vendor one slot (their most recent post/product)
+    { $sort: { createdAt: -1 } },
+    {
+      $group: {
+        _id: "$vendorId",
+        doc: { $first: "$$ROOT" },
+      },
+    },
+    { $replaceRoot: { newRoot: "$doc" } },
+
     {
       $lookup: {
         from: "vendorprofiles",
@@ -561,6 +770,7 @@ const getFreshProducts = asyncErrorHandler(async (req, res, next) => {
         title: "$products.title",
         price: "$products.price",
         image: "$products.image",
+        images: "$products.images",
         description: "$products.description",
         vendorPostId: { $toString: "$_id" },
         vendorId: "$vendorId",
@@ -667,6 +877,8 @@ module.exports = {
   createPost,
   getMyPosts,
   getFeedPosts,
+  getFeedProducts,
+  getFeedProductsRandom,
   getById,
   getProductById,
   remove,

@@ -12,10 +12,13 @@ export function Home() {
   const feedPosts = useProductStore((state) => state.feedPosts);
   const getFeedPosts = useProductStore((state) => state.getFeedPosts);
   const isFetchingFeedPosts = useProductStore((state) => state.isFetchingFeedPosts);
+  const featuredProducts = useProductStore((state) => state.featuredProducts);
+  const getFeaturedProducts = useProductStore((state) => state.getFeaturedProducts);
+  const isFetchingFeaturedProducts = useProductStore((state) => state.isFetchingFeaturedProducts);
 
   useEffect(() => {
     getFeedPosts();
-    
+    getFeaturedProducts();
   }, []);
 
   return (
@@ -26,7 +29,7 @@ export function Home() {
           <NewArrival />
           <TopSellers />
           <Trending />
-          <NearByVendors posts={feedPosts} loading={isFetchingFeedPosts} />
+          <NearByVendors products={featuredProducts} loading={isFetchingFeaturedProducts} />
         </div>
       </div>
       <BottomNav />

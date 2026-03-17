@@ -18,7 +18,7 @@ const FEEDS_TUTORIAL_KEY = "feeds_school_filter_tutorial_seen";
 export default function Feeds() {
   const [searchParams] = useSearchParams();
   const { authUser } = useAuthStore();
-  const [posts, setPosts] = useState([]);
+  const [feedProducts, setFeedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showTutorial, setShowTutorial] = useState(() => {
     if (typeof window === "undefined") return false;
@@ -144,18 +144,20 @@ export default function Feeds() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const fetchPosts = useCallback(async () => {
+  const fetchProducts = useCallback(async () => {
     setLoading(true);
     try {
-      const params = { limit: 100 };
+      const params = {};
       if (selectedSchool) params.school = selectedSchool;
       if (selectedLocation) params.area = selectedLocation;
       if (searchQuery) params.search = searchQuery;
 
-      const res = await api.get("/api/v1/post/feed", { params });
-      setPosts(res.data.data.posts);
+      const res = await api.post("/api/v1/post/feed/products/random", { limit: 100 }, { params });
+      const products = res.data?.data?.products ?? [];
+      setFeedProducts(Array.isArray(products) ? products : []);
     } catch (error) {
       console.error(error);
+      setFeedProducts([]);
     } finally {
       setLoading(false);
     }
@@ -163,17 +165,15 @@ export default function Feeds() {
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
-      fetchPosts();
+      fetchProducts();
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [fetchPosts, searchQuery]);
+  }, [fetchProducts, searchQuery]);
 
   useEffect(() => {
-    if (!searchQuery) fetchPosts();
+    if (!searchQuery) fetchProducts();
   }, [selectedSchool, selectedLocation]);
-
-  const filteredPosts = posts;
 
   const dismissTutorial = () => {
     localStorage.setItem(FEEDS_TUTORIAL_KEY, "true");
@@ -470,10 +470,9 @@ export default function Feeds() {
         </div>
       </div>
 
-      {}
       <div className="pb-20">
         <NearByVendors
-          posts={filteredPosts}
+          products={feedProducts}
           showHeader={false}
           loading={loading}
         />
