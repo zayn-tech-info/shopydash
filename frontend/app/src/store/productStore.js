@@ -307,9 +307,6 @@ export const useProductStore = create((set, get) => ({
   },
 
   getProductById: async (productId) => {
-    // #region agent log
-    fetch('http://127.0.0.1:7487/ingest/07a883ea-b310-42a0-b12a-05bb98b06b93',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'61923e'},body:JSON.stringify({sessionId:'61923e',location:'productStore.js:getProductById',message:'Fetch product by id',data:{productId:typeof productId=== 'string'? productId : String(productId),length:String(productId).length},hypothesisId:'H4',timestamp:Date.now()})}).catch(()=>{});
-    // #endregion
     set({ isFetchingProduct: true, currentProduct: null });
     try {
       const res = await api.get(`/api/v1/post/product/${productId}`);

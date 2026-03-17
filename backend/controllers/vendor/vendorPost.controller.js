@@ -365,10 +365,6 @@ const getProductById = asyncErrorHandler(async (req, res, next) => {
   const isValidObjectId =
     mongoose.Types.ObjectId.isValid(productId) &&
     String(new mongoose.Types.ObjectId(productId)) === productId;
-  // #region agent log
-  const logPayload = { sessionId: "61923e", location: "vendorPost.controller.js:getProductById", message: "getProductById param", data: { productId, isValidObjectId }, hypothesisId: "H2", timestamp: Date.now() };
-  require("http").request({ hostname: "127.0.0.1", port: 7487, path: "/ingest/07a883ea-b310-42a0-b12a-05bb98b06b93", method: "POST", headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "61923e" } }, () => {}).on("error", () => {}).end(JSON.stringify(logPayload));
-  // #endregion
 
   const matchStage =
     isValidObjectId
@@ -431,10 +427,6 @@ const getProductById = asyncErrorHandler(async (req, res, next) => {
   const result = await VendorPost.aggregate(pipeline);
 
   if (!result || result.length === 0) {
-    // #region agent log
-    const notFoundPayload = { sessionId: "61923e", location: "vendorPost.controller.js:getProductById:notFound", message: "Product not found", data: { productId }, hypothesisId: "H2", timestamp: Date.now() };
-    require("http").request({ hostname: "127.0.0.1", port: 7487, path: "/ingest/07a883ea-b310-42a0-b12a-05bb98b06b93", method: "POST", headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "61923e" } }, () => {}).on("error", () => {}).end(JSON.stringify(notFoundPayload));
-    // #endregion
     return next(new customError("Product not found", 404));
   }
 
