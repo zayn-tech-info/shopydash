@@ -29,6 +29,9 @@ const { checkSubscription } = require("../middleware/subscription.middleware");
 const vendorPostRouter = express.Router();
 
 vendorPostRouter.get("/feed", getFeedPosts);
+vendorPostRouter.get("/feed/products", getFeedProducts);
+vendorPostRouter.post("/feed/products/random", getFeedProductsRandom);
+vendorPostRouter.get("/flash", getFlashDeals);
 
 vendorPostRouter.get("/search", searchPosts);
 vendorPostRouter.get("/fresh", getFreshProducts);
