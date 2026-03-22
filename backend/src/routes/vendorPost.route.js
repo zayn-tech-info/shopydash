@@ -4,6 +4,8 @@ const {
   createPost,
   getMyPosts,
   getFeedPosts,
+  getFeedProducts,
+  getFeedProductsRandom,
   getById,
   getProductById,
   remove,
@@ -27,7 +29,7 @@ const { checkSubscription } = require("../middleware/subscription.middleware");
 const vendorPostRouter = express.Router();
 
 vendorPostRouter.get("/feed", getFeedPosts);
-vendorPostRouter.get("/flash", getFlashDeals);
+
 vendorPostRouter.get("/search", searchPosts);
 vendorPostRouter.get("/fresh", getFreshProducts);
 vendorPostRouter.get("/trending", getTrendingProducts);

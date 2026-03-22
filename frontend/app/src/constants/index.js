@@ -1,5 +1,4 @@
 import {
-  Beef,
   BookOpen,
   Headset,
   Home,
@@ -7,16 +6,19 @@ import {
   Shirt,
   ShoppingCart,
   User,
-  Palette,
   Sparkles,
   PenTool,
   Crown,
   Vegan,
-  Gem,
   Zap,
   Star,
   MessageSquare,
   Settings,
+  UtensilsCrossed,
+  Dumbbell,
+  Heart,
+  Wrench,
+  Package,
 } from "lucide-react";
 
 import {
@@ -75,47 +77,18 @@ export const navigation = [
   },
 ];
 
+// Must match backend product category enum (vendorProduct.js)
 export const categories = [
-  {
-    id: 1,
-    text: "Gadgets",
-    icon: Headset,
-  },
-  {
-    id: 2,
-    text: "Clothing",
-    icon: Shirt,
-  },
-  {
-    id: 3,
-    text: "Books",
-    icon: BookOpen,
-  },
-  {
-    id: 4,
-    text: "Food",
-    icon: Beef,
-  },
-  {
-    id: 5,
-    text: "Cosmetics",
-    icon: Sparkles,
-  },
-  {
-    id: 6,
-    text: "Art & Design",
-    icon: Palette,
-  },
-  {
-    id: 7,
-    text: "Stationery",
-    icon: PenTool,
-  },
-  {
-    id: 8,
-    text: "Accessories",
-    icon: Gem,
-  },
+  { id: 1, text: "Electronics", icon: Headset },
+  { id: 2, text: "Fashion", icon: Shirt },
+  { id: 3, text: "Books", icon: BookOpen },
+  { id: 4, text: "Food & Beverages", icon: UtensilsCrossed },
+  { id: 5, text: "Sports & Fitness", icon: Dumbbell },
+  { id: 6, text: "Health & Beauty", icon: Sparkles },
+  { id: 7, text: "Home & Living", icon: Home },
+  { id: 8, text: "Stationery", icon: PenTool },
+  { id: 9, text: "Services", icon: Wrench },
+  { id: 10, text: "Other", icon: Package },
 ];
 
 export const VendorsPost = [

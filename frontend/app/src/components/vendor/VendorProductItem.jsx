@@ -29,7 +29,6 @@ function VendorProductItem({ product, vendorId }) {
   const description = product?.description || "";
   const stock = product?.stock ?? product?.quantity ?? null;
   const rating = product?.rating || (Math.random() * 2 + 3).toFixed(1);
-  const sold = product?.sold || Math.floor(Math.random() * 500) + 10;
   const isOutOfStock = stock === 0;
 
   const handleAddToCart = async (e) => {
@@ -115,7 +114,7 @@ function VendorProductItem({ product, vendorId }) {
           </div>
         </div>
 
-        {/* Rating & Sold - Mimicking the marketplace style */}
+        {/* Rating */}
         <div className="flex items-center gap-2 mb-2">
           <div className="flex items-center text-orange-400">
             <Star size={10} fill="currentColor" />
@@ -124,7 +123,6 @@ function VendorProductItem({ product, vendorId }) {
             <Star size={10} fill="currentColor" />
             <Star size={10} fill="currentColor" className="text-n-3" />
           </div>
-          <span className="text-[10px] text-n-4">{sold} sold</span>
         </div>
 
         <div className="flex items-end justify-between gap-2 mt-auto">

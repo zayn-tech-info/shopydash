@@ -2,15 +2,19 @@ const mongoose = require("mongoose");
 const customError = require("../errors/customError");
 const { logInfo, logError } = require("../utils/logger");
 
+
+dns.setServers(["8.8.8.8", "8.8.4.4", "1.1.1.1"]);
+dns.setDefaultResultOrder("ipv4first");
+
 const connectDB = async () => {
   const isProduction = process.env.NODE_ENV === "production";
-  const uri =
+  let uri =
     process.env.CONNECTION_URI ||
     (isProduction
       ? process.env.CONNECTION_URI_PROD
       : process.env.CONNECTION_URI_DEV);
 
-  logInfo("Database", "Connecting to MongoDB with URI: " + uri);
+  console.log("Connecting to MongoDB with URI:", uri);
   try {
     await mongoose.connect(uri, {
       dbName: process.env.MONGODB_DATABASE || "shopydash",

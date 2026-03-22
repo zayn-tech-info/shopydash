@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const asyncErrorHandler = require("../../errors/asyncErrorHandle");
 const customError = require("../../errors/customError");
 const VendorPost = require("../../models/vendorProduct");
@@ -118,339 +119,19 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
 
   const pageLimit = Math.min(parseInt(limit), 50);
   const currentPage = Math.max(parseInt(page), 1);
-  const skip = (currentPage - 1) * pageLimit;
 
-  // Near Me Discovery: when buyer has location, score by proximity (same area = 2, same school = 1, other = 0), then sort by createdAt
-  const buyerSchool =
-    (req.user && req.user.schoolName && req.user.schoolName.trim()) || null;
-  const buyerArea =
-    (req.user &&
-      (req.user.schoolArea || req.user.area) &&
-      (req.user.schoolArea || req.user.area).trim()) ||
-    null;
-  const buyerSchoolLower = buyerSchool ? buyerSchool.toLowerCase() : null;
-  const buyerAreaLower = buyerArea ? buyerArea.toLowerCase() : null;
-  const useProximitySort = !!(buyerSchoolLower || buyerAreaLower);
-
-  if (useProximitySort) {
-    const matchStage = { $match: query };
-    const lookupVendorProfileStage = {
-      $lookup: {
-        from: "vendorprofiles",
-        localField: "vendorId",
-        foreignField: "userId",
-        as: "vendorProfileDoc",
-      },
-    };
-    const addFieldsVendorProfileIdStage = {
-      $addFields: {
-        vendorProfileId: { $arrayElemAt: ["$vendorProfileDoc._id", 0] },
-      },
-    };
-    const lookupReviewsStage = {
-      $lookup: {
-        from: "reviews",
-        let: { vendorProfileId: "$vendorProfileId" },
-        pipeline: [
-          { $match: { $expr: { $eq: ["$vendor", "$$vendorProfileId"] } } },
-          {
-            $group: {
-              _id: null,
-              avgRating: { $avg: "$rating" },
-              reviewCount: { $sum: 1 },
-            },
-          },
-        ],
-        as: "reviewStats",
-      },
-    };
-    const lookupOrdersStage = {
-      $lookup: {
-        from: "orders",
-        let: { vendorProfileId: "$vendorProfileId" },
-        pipeline: [
-          {
-            $match: {
-              $expr: {
-                $and: [
-                  { $eq: ["$vendor", "$$vendorProfileId"] },
-                  { $gte: ["$createdAt", sevenDaysAgo] },
-                  { $eq: ["$paymentStatus", "paid"] },
-                ],
-              },
-            },
-          },
-          { $count: "count" },
-        ],
-        as: "weeklyOrdersArr",
-      },
-    };
-    const addFieldsSocialProofStage = {
-      $addFields: {
-        ratingAvg: {
-          $ifNull: [{ $arrayElemAt: ["$reviewStats.avgRating", 0] }, 0],
-        },
-        reviewCount: {
-          $ifNull: [{ $arrayElemAt: ["$reviewStats.reviewCount", 0] }, 0],
-        },
-        weeklyOrders: {
-          $ifNull: [{ $arrayElemAt: ["$weeklyOrdersArr.count", 0] }, 0],
-        },
-      },
-    };
-    const addFieldsStage = {
-      $addFields: {
-        proximityScore: {
-          $switch: {
-            branches: [
-              {
-                case: {
-                  $and: [
-                    buyerAreaLower !== null,
-                    {
-                      $eq: [
-                        { $toLower: { $ifNull: ["$area", ""] } },
-                        buyerAreaLower,
-                      ],
-                    },
-                  ],
-                },
-                then: 2,
-              },
-              {
-                case: {
-                  $and: [
-                    buyerSchoolLower !== null,
-                    {
-                      $eq: [
-                        { $toLower: { $ifNull: ["$school", ""] } },
-                        buyerSchoolLower,
-                      ],
-                    },
-                  ],
-                },
-                then: 1,
-              },
-            ],
-            default: 0,
-          },
-        },
-      },
-    };
-    const sortStage = { $sort: { proximityScore: -1, createdAt: -1 } };
-    const skipStage = { $skip: skip };
-    const limitStage = { $limit: pageLimit };
-    const lookupStage = {
-      $lookup: {
-        from: "users",
-        localField: "vendorId",
-        foreignField: "_id",
-        as: "vendorId",
-        pipeline: [
-          {
-            $project: {
-              businessName: 1,
-              fullName: 1,
-              phoneNumber: 1,
-              username: 1,
-              profilePic: 1,
-              subscriptionPlan: 1,
-              isVerified: 1,
-            },
-          },
-        ],
-      },
-    };
-    const unwindStage = {
-      $unwind: {
-        path: "$vendorId",
-        preserveNullAndEmptyArrays: true,
-      },
-    };
-    const projectStage = {
-      $project: {
-        proximityScore: 0,
-        vendorProfileDoc: 0,
-        reviewStats: 0,
-        weeklyOrdersArr: 0,
-        vendorProfileId: 0,
-      },
-    };
-
-    const facetPipeline = [
-      matchStage,
-      {
-        $facet: {
-          total: [{ $count: "count" }],
-          posts: [
-            lookupVendorProfileStage,
-            addFieldsVendorProfileIdStage,
-            lookupReviewsStage,
-            lookupOrdersStage,
-            addFieldsSocialProofStage,
-            addFieldsStage,
-            sortStage,
-            skipStage,
-            limitStage,
-            lookupStage,
-            unwindStage,
-            projectStage,
-          ],
-        },
-      },
-    ];
-
-    const result = await VendorPost.aggregate(facetPipeline);
-    const totalCount =
-      result[0] && result[0].total && result[0].total[0]
-        ? result[0].total[0].count
-        : 0;
-    const posts = result[0] && result[0].posts ? result[0].posts : [];
-
-    return res.status(200).json({
-      success: true,
-      data: {
-        posts,
-        pagination: {
-          currentPage,
-          totalPages: Math.ceil(totalCount / pageLimit),
-          totalItems: totalCount,
-        },
-      },
-    });
-  }
-
-  // Non-proximity path: aggregation with social proof (ratingAvg, reviewCount, weeklyOrders)
-  const nonProximityMatch = { $match: query };
-  const nonProximityLookupVendorProfile = {
-    $lookup: {
-      from: "vendorprofiles",
-      localField: "vendorId",
-      foreignField: "userId",
-      as: "vendorProfileDoc",
-    },
-  };
-  const nonProximityAddVendorProfileId = {
-    $addFields: {
-      vendorProfileId: { $arrayElemAt: ["$vendorProfileDoc._id", 0] },
-    },
-  };
-  const nonProximityLookupReviews = {
-    $lookup: {
-      from: "reviews",
-      let: { vendorProfileId: "$vendorProfileId" },
-      pipeline: [
-        { $match: { $expr: { $eq: ["$vendor", "$$vendorProfileId"] } } },
-        {
-          $group: {
-            _id: null,
-            avgRating: { $avg: "$rating" },
-            reviewCount: { $sum: 1 },
-          },
-        },
-      ],
-      as: "reviewStats",
-    },
-  };
-  const nonProximityLookupOrders = {
-    $lookup: {
-      from: "orders",
-      let: { vendorProfileId: "$vendorProfileId" },
-      pipeline: [
-        {
-          $match: {
-            $expr: {
-              $and: [
-                { $eq: ["$vendor", "$$vendorProfileId"] },
-                { $gte: ["$createdAt", sevenDaysAgo] },
-                { $eq: ["$paymentStatus", "paid"] },
-              ],
-            },
-          },
-        },
-        { $count: "count" },
-      ],
-      as: "weeklyOrdersArr",
-    },
-  };
-  const nonProximityAddSocialProof = {
-    $addFields: {
-      ratingAvg: {
-        $ifNull: [{ $arrayElemAt: ["$reviewStats.avgRating", 0] }, 0],
-      },
-      reviewCount: {
-        $ifNull: [{ $arrayElemAt: ["$reviewStats.reviewCount", 0] }, 0],
-      },
-      weeklyOrders: {
-        $ifNull: [{ $arrayElemAt: ["$weeklyOrdersArr.count", 0] }, 0],
-      },
-    },
-  };
-  const nonProximitySort = { $sort: { createdAt: -1 } };
-  const nonProximitySkip = { $skip: skip };
-  const nonProximityLimit = { $limit: pageLimit };
-  const nonProximityLookupUsers = {
-    $lookup: {
-      from: "users",
-      localField: "vendorId",
-      foreignField: "_id",
-      as: "vendorId",
-      pipeline: [
-        {
-          $project: {
-            businessName: 1,
-            fullName: 1,
-            phoneNumber: 1,
-            username: 1,
-            profilePic: 1,
-            subscriptionPlan: 1,
-            isVerified: 1,
-          },
-        },
-      ],
-    },
-  };
-  const nonProximityUnwind = {
-    $unwind: {
-      path: "$vendorId",
-      preserveNullAndEmptyArrays: true,
-    },
-  };
-  const nonProximityProject = {
-    $project: {
-      vendorProfileDoc: 0,
-      reviewStats: 0,
-      weeklyOrdersArr: 0,
-      vendorProfileId: 0,
-    },
-  };
-
-  const nonProximityFacet = [
-    nonProximityMatch,
-    {
-      $facet: {
-        total: [{ $count: "count" }],
-        posts: [
-          nonProximityLookupVendorProfile,
-          nonProximityAddVendorProfileId,
-          nonProximityLookupReviews,
-          nonProximityLookupOrders,
-          nonProximityAddSocialProof,
-          nonProximitySort,
-          nonProximitySkip,
-          nonProximityLimit,
-          nonProximityLookupUsers,
-          nonProximityUnwind,
-          nonProximityProject,
-        ],
-      },
-    },
-  ];
-
-  const nonProximityResult = await VendorPost.aggregate(nonProximityFacet);
-  const total =
-    nonProximityResult[0]?.total?.[0]?.count ?? 0;
-  const posts = nonProximityResult[0]?.posts ?? [];
+  const [posts, total] = await Promise.all([
+    VendorPost.find(query)
+      .populate(
+        "vendorId",
+        "businessName fullName phoneNumber username profilePic subscriptionPlan isVerified",
+      )
+      .sort({ createdAt: -1 })
+      .skip((currentPage - 1) * pageLimit)
+      .limit(pageLimit)
+      .lean(),
+    VendorPost.countDocuments(query),
+  ]);
 
   res.status(200).json({
     success: true,
@@ -461,6 +142,192 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
         totalPages: Math.ceil(total / pageLimit),
         totalItems: total,
       },
+    },
+  });
+});
+
+const getFeedProducts = asyncErrorHandler(async (req, res, next) => {
+  const { school, page = 1, limit = 100 } = req.query;
+  const pageLimit = Math.min(Math.max(parseInt(limit, 10) || 100, 1), 100);
+  const currentPage = Math.max(parseInt(page, 10) || 1, 1);
+  const skip = (currentPage - 1) * pageLimit;
+
+  const query = {};
+  if (school) query.school = school;
+  if (req.query.area) query.area = createSafeRegex(req.query.area);
+  if (req.query.search) {
+    const searchRegex = createSafeRegex(req.query.search);
+    query.$or = [
+      { "products.title": searchRegex },
+      { "products.description": searchRegex },
+    ];
+  }
+
+  const pipeline = [
+    { $match: query },
+    { $sort: { createdAt: -1 } },
+    { $unwind: "$products" },
+    {
+      $lookup: {
+        from: "vendorprofiles",
+        localField: "vendorId",
+        foreignField: "userId",
+        as: "vendorProfile",
+      },
+    },
+    {
+      $unwind: { path: "$vendorProfile", preserveNullAndEmptyArrays: true },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "vendorId",
+        foreignField: "_id",
+        as: "vendorUser",
+      },
+    },
+    {
+      $unwind: { path: "$vendorUser", preserveNullAndEmptyArrays: true },
+    },
+    { $sort: { createdAt: -1 } },
+    { $skip: skip },
+    { $limit: pageLimit + 1 },
+    {
+      $project: {
+        _id: "$products._id",
+        title: "$products.title",
+        price: "$products.price",
+        image: "$products.image",
+        images: "$products.images",
+        description: "$products.description",
+        vendorPostId: { $toString: "$_id" },
+        vendorId: "$vendorId",
+        createdAt: "$createdAt",
+        rating: { $ifNull: ["$vendorProfile.rating", 0] },
+        vendor: {
+          _id: "$vendorId",
+          businessName: "$vendorUser.businessName",
+          username: "$vendorUser.username",
+          profilePic: "$vendorUser.profilePic",
+          subscriptionPlan: "$vendorUser.subscriptionPlan",
+          isVerified: "$vendorUser.isVerified",
+        },
+      },
+    },
+  ];
+
+  const raw = await VendorPost.aggregate(pipeline);
+  const hasMore = raw.length > pageLimit;
+  const products = hasMore ? raw.slice(0, pageLimit) : raw;
+
+  res.status(200).json({
+    success: true,
+    data: {
+      products,
+      page: currentPage,
+      hasMore,
+    },
+  });
+});
+
+const getFeedProductsRandom = asyncErrorHandler(async (req, res, next) => {
+  const { school, category } = req.query;
+  const body = req.body || {};
+  let excludedIds = Array.isArray(body.excludedIds) ? body.excludedIds : [];
+  const limit = Math.min(Math.max(parseInt(body.limit, 10) || 100, 1), 100);
+
+  const query = {};
+  if (school) query.school = school;
+  if (req.query.area) query.area = createSafeRegex(req.query.area);
+  if (category && typeof category === "string" && category.trim()) {
+    query["products.category"] = category.trim();
+  }
+  if (req.query.search) {
+    const searchRegex = createSafeRegex(req.query.search);
+    query.$or = [
+      { "products.title": searchRegex },
+      { "products.description": searchRegex },
+    ];
+  }
+
+  const excludedObjectIds = excludedIds
+    .filter((id) => id && mongoose.Types.ObjectId.isValid(id))
+    .map((id) => new mongoose.Types.ObjectId(id));
+
+  const countPipeline = [
+    { $match: query },
+    { $unwind: "$products" },
+    { $count: "total" },
+  ];
+
+  const samplePipeline = [
+    { $match: query },
+    { $unwind: "$products" },
+  ];
+  if (query["products.category"]) {
+    samplePipeline.push({ $match: { "products.category": query["products.category"] } });
+  }
+  if (excludedObjectIds.length > 0) {
+    samplePipeline.push({ $match: { "products._id": { $nin: excludedObjectIds } } });
+  }
+  samplePipeline.push({ $sample: { size: limit } });
+  samplePipeline.push({
+    $lookup: {
+      from: "vendorprofiles",
+      localField: "vendorId",
+      foreignField: "userId",
+      as: "vendorProfile",
+    },
+  });
+  samplePipeline.push({
+    $unwind: { path: "$vendorProfile", preserveNullAndEmptyArrays: true },
+  });
+  samplePipeline.push({
+    $lookup: {
+      from: "users",
+      localField: "vendorId",
+      foreignField: "_id",
+      as: "vendorUser",
+    },
+  });
+  samplePipeline.push({
+    $unwind: { path: "$vendorUser", preserveNullAndEmptyArrays: true },
+  });
+  samplePipeline.push({
+    $project: {
+      _id: "$products._id",
+      title: "$products.title",
+      price: "$products.price",
+      image: "$products.image",
+      images: "$products.images",
+      description: "$products.description",
+      vendorPostId: { $toString: "$_id" },
+      vendorId: "$vendorId",
+      createdAt: "$createdAt",
+      rating: { $ifNull: ["$vendorProfile.rating", 0] },
+      vendor: {
+        _id: "$vendorId",
+        businessName: "$vendorUser.businessName",
+        username: "$vendorUser.username",
+        profilePic: "$vendorUser.profilePic",
+        subscriptionPlan: "$vendorUser.subscriptionPlan",
+        isVerified: "$vendorUser.isVerified",
+      },
+    },
+  });
+
+  const [countResult, products] = await Promise.all([
+    VendorPost.aggregate(countPipeline).then((r) => (r[0] ? r[0].total : 0)),
+    VendorPost.aggregate(samplePipeline),
+  ]);
+
+  const total = typeof countResult === "number" ? countResult : 0;
+
+  res.status(200).json({
+    success: true,
+    data: {
+      products,
+      total,
     },
   });
 });
@@ -488,15 +355,25 @@ const getById = asyncErrorHandler(async (req, res, next) => {
 const getProductById = asyncErrorHandler(async (req, res, next) => {
   const { productId } = req.params;
   const mongoose = require("mongoose");
+  const isValidObjectId =
+    mongoose.Types.ObjectId.isValid(productId) &&
+    String(new mongoose.Types.ObjectId(productId)) === productId;
 
-  if (!mongoose.Types.ObjectId.isValid(productId)) {
-    return next(new customError("Invalid product ID format", 400));
-  }
+  const matchStage =
+    isValidObjectId
+      ? [
+          { $match: { "products._id": new mongoose.Types.ObjectId(productId) } },
+          { $unwind: "$products" },
+          { $match: { "products._id": new mongoose.Types.ObjectId(productId) } },
+        ]
+      : [
+          { $match: { "products.slug": productId } },
+          { $unwind: "$products" },
+          { $match: { "products.slug": productId } },
+        ];
 
   const pipeline = [
-    { $match: { "products._id": new mongoose.Types.ObjectId(productId) } },
-    { $unwind: "$products" },
-    { $match: { "products._id": new mongoose.Types.ObjectId(productId) } },
+    ...matchStage,
     {
       $lookup: {
         from: "users",
@@ -904,6 +781,16 @@ const getFreshProducts = asyncErrorHandler(async (req, res, next) => {
 
     { $unwind: "$products" },
 
+    // Give each vendor one slot (their most recent post/product)
+    { $sort: { createdAt: -1 } },
+    {
+      $group: {
+        _id: "$vendorId",
+        doc: { $first: "$$ROOT" },
+      },
+    },
+    { $replaceRoot: { newRoot: "$doc" } },
+
     {
       $lookup: {
         from: "vendorprofiles",
@@ -943,6 +830,7 @@ const getFreshProducts = asyncErrorHandler(async (req, res, next) => {
         title: "$products.title",
         price: "$products.price",
         image: "$products.image",
+        images: "$products.images",
         description: "$products.description",
         vendorPostId: { $toString: "$_id" },
         vendorId: "$vendorId",
@@ -1049,6 +937,8 @@ module.exports = {
   createPost,
   getMyPosts,
   getFeedPosts,
+  getFeedProducts,
+  getFeedProductsRandom,
   getById,
   getProductById,
   remove,
