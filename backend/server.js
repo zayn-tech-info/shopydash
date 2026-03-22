@@ -220,6 +220,7 @@ cron.schedule("*/5 * * * *", () => {
 
 const { runBuyerMatchJob } = require("./src/jobs/buyerMatchJob");
 const { runExpireFlashDealsJob } = require("./src/jobs/expireFlashDealsJob");
+const { runExpireSubscriptionsJob } = require("./src/jobs/expireSubscriptionsJob");
 
 cron.schedule("0 9 * * *", () => {
   runBuyerMatchJob(io).catch((err) => {
@@ -230,6 +231,12 @@ cron.schedule("0 9 * * *", () => {
 cron.schedule("*/15 * * * *", () => {
   runExpireFlashDealsJob().catch((err) => {
     logError("ExpireFlashDealsJob", err);
+  });
+});
+
+cron.schedule("0 * * * *", () => {
+  runExpireSubscriptionsJob().catch((err) => {
+    logError("ExpireSubscriptionsJob", err);
   });
 });
 

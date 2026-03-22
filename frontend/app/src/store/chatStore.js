@@ -224,10 +224,6 @@ const useChatStore = create((set, get) => ({
         { withCredentials: true },
       );
 
-      if (res.data.action === "REDIRECT_WHATSAPP") {
-        return { allowed: false, ...res.data };
-      }
-
       return { allowed: true, conversation: res.data.data.conversation };
     } catch (error) {
       const msg = error.response?.data?.message || "Cannot initiate messaging";

@@ -409,6 +409,12 @@ const handleSubscriptionSuccess = async (data) => {
     isSubscriptionActive: true,
     subscriptionExpiresAt: endDate,
   });
+
+  const isMaxPlan = plans[planKey].name === "Shopydash Max";
+  await VendorProfile.findOneAndUpdate(
+    { userId },
+    { isVerified: isMaxPlan },
+  );
 };
 
 const handleOrderSuccess = async (data, io) => {
@@ -544,6 +550,12 @@ const verifyPayment = async (req, res) => {
           isSubscriptionActive: true,
           subscriptionExpiresAt: endDate,
         });
+
+        const isMaxPlan = planDetails.name === "Shopydash Max";
+        await VendorProfile.findOneAndUpdate(
+          { userId: transaction.user },
+          { isVerified: isMaxPlan },
+        );
       }
 
       return res.status(200).json({

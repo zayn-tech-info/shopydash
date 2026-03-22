@@ -13,6 +13,7 @@ const connectDB = async () => {
   logInfo("Database", "Connecting to MongoDB with URI: " + uri);
   try {
     await mongoose.connect(uri, {
+      dbName: process.env.MONGODB_DATABASE || "shopydash",
       serverSelectionTimeoutMS: 30000,
       connectTimeoutMS: 30000,
       maxPoolSize: 10,

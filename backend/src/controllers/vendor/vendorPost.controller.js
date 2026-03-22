@@ -274,9 +274,6 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
         reviewStats: 0,
         weeklyOrdersArr: 0,
         vendorProfileId: 0,
-        ratingAvg: 1,
-        reviewCount: 1,
-        weeklyOrders: 1,
       },
     };
 
@@ -425,9 +422,6 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
       reviewStats: 0,
       weeklyOrdersArr: 0,
       vendorProfileId: 0,
-      ratingAvg: 1,
-      reviewCount: 1,
-      weeklyOrders: 1,
     },
   };
 

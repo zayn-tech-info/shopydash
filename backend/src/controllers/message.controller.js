@@ -4,17 +4,8 @@ const User = require("../models/auth.model");
 const VendorProfile = require("../models/vendorProfile.model");
 const customError = require("../errors/customError");
 const asyncErrorHandler = require("../errors/asyncErrorHandle");
-const plans = require("../config/subscriptionPlans");
 const DOMPurify = require("isomorphic-dompurify");
 
-const hasPremiumMessaging = (vendorUser) => {
-  if (!vendorUser.subscriptionPlan) return false;
-
-  const plan = Object.values(plans).find(
-    (p) => p.name === vendorUser.subscriptionPlan
-  );
-  return plan?.features?.messaging || false;
-};
 
 const verifyConversationAccess = async (conversationId, userId) => {
   const conversation = await Conversation.findById(conversationId);
@@ -45,30 +36,6 @@ exports.checkMessagingAccess = asyncErrorHandler(async (req, res, next) => {
   if (!recipient) {
     return next(new customError("Recipient not found", 404));
   }
-  if (recipient.role === "vendor") {
-    const isPremium = hasPremiumMessaging(recipient);
-
-    if (!isPremium) {
-      return res.status(200).json({
-        status: "success",
-        action: "REDIRECT_WHATSAPP",
-        message: "This vendor uses WhatsApp for communication.",
-        data: {
-          phoneNumber: recipient.phoneNumber,
-        },
-      });
-    }
-  }
-
-  if (req.user.role === "vendor") {
-    const isSenderPremium = hasPremiumMessaging(req.user);
-    if (!isSenderPremium) {
-      return next(
-        new customError("Upgrade your plan to use internal messaging.", 403)
-      );
-    }
-  }
-
   req.recipient = recipient;
   next();
 });
@@ -249,9 +216,6 @@ exports.getAvailableVendorsForChat = asyncErrorHandler(
     const vendors = await User.find({
       role: "vendor",
       ...(schoolName ? { schoolName } : {}),
-      subscriptionPlan: {
-        $in: ["Shopydash Pro", "Shopydash Max"],
-      },
       _id: { $ne: currentUserId },
     }).select("fullName businessName profilePic subscriptionPlan schoolName");
 

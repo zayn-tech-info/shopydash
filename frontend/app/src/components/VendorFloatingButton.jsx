@@ -58,18 +58,11 @@ export const VendorFloatingButton = () => {
           </button>
         )}
 
-        {isVendor &&
-          location.pathname !== "/vendor/add" &&
-          (authUser.role !== "vendor" ||
-            ["Shopydash Pro", "Shopydash Max"].includes(
-              authUser?.subscriptionPlan,
-            )) && <div className="w-8 h-[1px] bg-white/20" />}
+        {isVendor && location.pathname !== "/vendor/add" && (
+          <div className="w-8 h-[1px] bg-white/20" />
+        )}
 
-        {(authUser.role !== "vendor" ||
-          ["Shopydash Pro", "Shopydash Max"].includes(
-            authUser?.subscriptionPlan,
-          )) && (
-          <button
+        <button
             onClick={handleMessageClick}
             className={`flex items-center justify-center text-white hover:bg-white/10 transition-colors relative ${
               isVendor ? "w-12 h-12 rounded-full" : "w-14 h-14"
@@ -83,7 +76,6 @@ export const VendorFloatingButton = () => {
               </span>
             )}
           </button>
-        )}
       </div>
     </div>
   );

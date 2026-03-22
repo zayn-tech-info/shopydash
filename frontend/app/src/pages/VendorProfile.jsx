@@ -11,7 +11,6 @@ import VendorProfileHeader from "../components/vendor/VendorProfileHeader";
 import AboutAndProducts from "../components/vendor/AboutAndProducts";
 import { VendorAddress } from "../components/vendor/VendorAddress";
 import { VendorProfileSkeleton } from "../components/skeletons/VendorProfileSkeleton";
-import ConfirmationModal from "../components/common/ConfirmationModal";
 import AuthRequiredModal from "../components/common/AuthRequiredModal";
 
 export default function VendorProfile() {
@@ -33,8 +32,6 @@ export default function VendorProfile() {
   const params = useParams();
   const [showEditModal, setShowEditModal] = useState(false);
   const [formData, setFormData] = useState(null);
-  const [showPremiumModal, setShowPremiumModal] = useState(false);
-  const [whatsappNumber, setWhatsappNumber] = useState("");
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const { checkAccess, fetchMessages } = useChatStore();
 
@@ -109,21 +106,8 @@ export default function VendorProfile() {
     if (result.allowed) {
       await fetchMessages(result.conversation._id);
       navigate("/messages");
-    } else if (result.action === "REDIRECT_WHATSAPP") {
-      setWhatsappNumber(result.data.phoneNumber ?? result.data.whatsAppNumber ?? "");
-      setShowPremiumModal(true);
     }
   }, [authUser, vendorProfile?.userId?._id, checkAccess, fetchMessages, navigate]);
-
-  const handleContinueToWhatsapp = useCallback(() => {
-    if (whatsappNumber) {
-      const formatted = whatsappNumber.replace(/\D/g, "");
-      window.open(`https://wa.me/${formatted}`, "_blank");
-    } else {
-      toast.error("Vendor WhatsApp not available");
-    }
-    setShowPremiumModal(false);
-  }, [whatsappNumber]);
 
   const handleCoverUpload = useCallback(
     async (file) => {
@@ -227,16 +211,6 @@ export default function VendorProfile() {
           />
         ) : null}
       </div>
-
-      <ConfirmationModal
-        isOpen={showPremiumModal}
-        onClose={() => setShowPremiumModal(false)}
-        onConfirm={handleContinueToWhatsapp}
-        title="Premium Vendor Only"
-        message="This vendor is not on our Premium plan. You can continue to WhatsApp to contact them."
-        confirmText="Continue to WhatsApp"
-        cancelText="Cancel"
-      />
 
       <AuthRequiredModal
         isOpen={isAuthModalOpen}
