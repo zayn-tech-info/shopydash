@@ -47,7 +47,7 @@ export default function OrderList({ isEmbedded = false, role = "client" }) {
 
   const handleConfirmDelivery = async () => {
     if (selectedOrderId) {
-      await markOrderDelivered(selectedOrderId);
+      await markOrderDelivered(selectedOrderId, role);
       setConfirmModalOpen(false);
 
       const order = orders.find((o) => o._id === selectedOrderId);

@@ -23,6 +23,12 @@ const processOrderNotifications = async (orderId, io) => {
     }
 
     const { vendor, buyer, items, createdAt, vendorAmount } = order;
+
+    if (!vendor?.userId) {
+      logError("Order Notification", `Vendor profile or user not linked for order ${orderId}`);
+      return;
+    }
+
     const vendorUserId = vendor.userId._id.toString();
     const vendorEmail = vendor.userId.email;
     const vendorName = vendor.userId.fullName;
@@ -64,7 +70,7 @@ const processOrderNotifications = async (orderId, io) => {
     sendOrderNotificationEmail(vendorEmail, vendorName, {
       buyerName: buyer.fullName,
       items: items.map((i) => ({
-        title: i.title || i.product.title,
+        title: i.product?.title || i.title || "Product",
         quantity: i.quantity,
         price: i.price,
       })),

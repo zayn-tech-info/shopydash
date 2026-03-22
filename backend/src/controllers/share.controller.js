@@ -1,5 +1,12 @@
 const VendorPost = require("../models/vendorProduct");
 
+const escapeHtml = (str) => {
+  if (typeof str !== "string") return "";
+  return str.replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[c])
+  );
+};
+
 exports.generateSharePreview = async (req, res) => {
   try {
     const { slug } = req.params;
@@ -53,9 +60,12 @@ exports.generateSharePreview = async (req, res) => {
       );
     }
 
-    const title = product.title || "Product";
+    const title = escapeHtml(product.title || "Product");
     const price = product.price ? `₦${product.price.toLocaleString()}` : "";
-    const description = product.description || `Buy ${title} on ShopyDash`;
+    const description = escapeHtml(product.description || `Buy ${product.title || "Product"} on ShopyDash`);
+    const safeStoreName = escapeHtml(storeName);
+    const safeOgImage = encodeURI(ogImage);
+    const safeFrontendUrl = encodeURI(frontendUrl);
 
     const htmlResponse = `
       <!DOCTYPE html>
@@ -63,30 +73,30 @@ exports.generateSharePreview = async (req, res) => {
       <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>${title} | ${storeName}</title>
-          
-          <meta property="og:title" content="${title} ${price ? `- ${price}` : ""}" />
+          <title>${title} | ${safeStoreName}</title>
+
+          <meta property="og:title" content="${title}${price ? ` - ${price}` : ""}" />
           <meta property="og:description" content="${description}" />
-          <meta property="og:image" content="${ogImage}" />
-          <meta property="og:image:secure_url" content="${ogImage}" />
+          <meta property="og:image" content="${safeOgImage}" />
+          <meta property="og:image:secure_url" content="${safeOgImage}" />
           <meta property="og:image:type" content="image/jpeg" />
           <meta property="og:image:width" content="1200" />
           <meta property="og:image:height" content="630" />
-          <meta property="og:url" content="${frontendUrl}" />
+          <meta property="og:url" content="${safeFrontendUrl}" />
           <meta property="og:type" content="product" />
           <meta property="og:site_name" content="ShopyDash" />
 
           <meta name="twitter:card" content="summary_large_image">
           <meta name="twitter:title" content="${title}">
           <meta name="twitter:description" content="${description}">
-          <meta name="twitter:image" content="${ogImage}">
+          <meta name="twitter:image" content="${safeOgImage}">
 
           <script>
-            window.location.replace("${frontendUrl}");
+            window.location.replace("${safeFrontendUrl}");
           </script>
       </head>
       <body>
-          <p>Redirecting to <a href="${frontendUrl}">${title}</a>...</p>
+          <p>Redirecting to <a href="${safeFrontendUrl}">${title}</a>...</p>
       </body>
       </html>
     `;
