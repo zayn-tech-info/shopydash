@@ -154,14 +154,12 @@ export default function VendorProfileHeader({
             >
               <Share2 size={18} className="sm:w-5 sm:h-5" />
             </button>
-            {!isOwner && (
-              <button
-                onClick={onMessage}
-                className="px-3 sm:px-4 py-2 sm:py-2.5 rounded-full bg-primary-3 hover:bg-primary-4 text-white font-semibold text-xs sm:text-sm transition-colors shadow-sm touch-manipulation flex-shrink-0"
-              >
-                Message
-              </button>
-            )}
+            <button
+              onClick={onMessage}
+              className="px-3 sm:px-4 py-2 sm:py-2.5 rounded-full bg-primary-3 hover:bg-primary-4 text-white font-semibold text-xs sm:text-sm transition-colors shadow-sm touch-manipulation flex-shrink-0"
+            >
+              Message
+            </button>
             {isOwner && (
               <button
                 onClick={openEdit}

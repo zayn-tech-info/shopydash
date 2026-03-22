@@ -4,17 +4,8 @@ const User = require("../models/auth.model");
 const VendorProfile = require("../models/vendorProfile.model");
 const customError = require("../errors/customError");
 const asyncErrorHandler = require("../errors/asyncErrorHandle");
-const plans = require("../config/subscriptionPlans");
 const DOMPurify = require("isomorphic-dompurify");
 
-const hasPremiumMessaging = (vendorUser) => {
-  if (!vendorUser.subscriptionPlan) return false;
-
-  const plan = Object.values(plans).find(
-    (p) => p.name === vendorUser.subscriptionPlan
-  );
-  return plan?.features?.messaging || false;
-};
 
 const verifyConversationAccess = async (conversationId, userId) => {
   const conversation = await Conversation.findById(conversationId);
@@ -45,30 +36,6 @@ exports.checkMessagingAccess = asyncErrorHandler(async (req, res, next) => {
   if (!recipient) {
     return next(new customError("Recipient not found", 404));
   }
-  if (recipient.role === "vendor") {
-    const isPremium = hasPremiumMessaging(recipient);
-
-    if (!isPremium) {
-      return res.status(200).json({
-        status: "success",
-        action: "REDIRECT_WHATSAPP",
-        message: "This vendor uses WhatsApp for communication.",
-        data: {
-          phoneNumber: recipient.phoneNumber,
-        },
-      });
-    }
-  }
-
-  if (req.user.role === "vendor") {
-    const isSenderPremium = hasPremiumMessaging(req.user);
-    if (!isSenderPremium) {
-      return next(
-        new customError("Upgrade your plan to use internal messaging.", 403)
-      );
-    }
-  }
-
   req.recipient = recipient;
   next();
 });
@@ -76,7 +43,7 @@ exports.checkMessagingAccess = asyncErrorHandler(async (req, res, next) => {
 exports.initiateOrGetConversation = asyncErrorHandler(
   async (req, res, next) => {
     const { recipientId } = req.body;
-    const senderId = req.user.id;
+    const senderId = req.user._id;
 
     let conversation = await Conversation.findOne({
       participants: { $all: [senderId, recipientId] },
@@ -108,7 +75,7 @@ exports.initiateOrGetConversation = asyncErrorHandler(
 
 exports.sendMessage = asyncErrorHandler(async (req, res, next) => {
   const { conversationId, content, replyTo } = req.body;
-  const senderId = req.user.id;
+  const senderId = req.user._id;
 
   if (!conversationId || !content) {
     return next(
@@ -140,8 +107,9 @@ exports.sendMessage = asyncErrorHandler(async (req, res, next) => {
 
   conversation.lastMessage = message._id;
 
+  const senderIdStr = senderId.toString();
   conversation.participants.forEach((pId) => {
-    if (pId.toString() !== senderId) {
+    if (pId.toString() !== senderIdStr) {
       const currentCount = conversation.unreadCounts.get(pId.toString()) || 0;
       conversation.unreadCounts.set(pId.toString(), currentCount + 1);
     }
@@ -160,7 +128,7 @@ exports.sendMessage = asyncErrorHandler(async (req, res, next) => {
     io.to(conversationId).emit("receive_message", message);
 
     conversation.participants.forEach((pId) => {
-      if (pId.toString() !== senderId) {
+      if (pId.toString() !== senderIdStr) {
         io.to(pId.toString()).emit("conversation_updated", {
           conversationId: conversation._id,
           lastMessage: message,
@@ -179,7 +147,7 @@ exports.sendMessage = asyncErrorHandler(async (req, res, next) => {
 });
 
 exports.getConversations = asyncErrorHandler(async (req, res, next) => {
-  const userId = req.user.id;
+  const userId = req.user._id;
 
   const conversations = await Conversation.find({
     participants: userId,
@@ -200,7 +168,7 @@ exports.getConversations = asyncErrorHandler(async (req, res, next) => {
 
 exports.getMessages = asyncErrorHandler(async (req, res, next) => {
   const { conversationId } = req.params;
-  const userId = req.user.id;
+  const userId = req.user._id;
 
   const page = req.query.page * 1 || 1;
   const limit = Math.min(req.query.limit * 1 || 50, 100);
@@ -248,9 +216,6 @@ exports.getAvailableVendorsForChat = asyncErrorHandler(
     const vendors = await User.find({
       role: "vendor",
       ...(schoolName ? { schoolName } : {}),
-      subscriptionPlan: {
-        $in: ["Shopydash Pro", "Shopydash Max"],
-      },
       _id: { $ne: currentUserId },
     }).select("fullName businessName profilePic subscriptionPlan schoolName");
 

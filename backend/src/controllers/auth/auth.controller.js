@@ -11,7 +11,8 @@ const {
   sendVerificationEmail,
   sendPasswordResetEmail,
 } = require("../../utils/email");
-const crypto = require("crypto");
+// const crypto = require("crypto");
+
 const VerificationToken = require("../../models/verificationToken.model");
 
 async function generateUniqueUsername(email) {

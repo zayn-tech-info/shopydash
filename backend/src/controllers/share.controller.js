@@ -25,6 +25,9 @@ exports.generateSharePreview = async (req, res) => {
     const product = post.products.find(
       (p) => p.slug === slug || (p._id && p._id.toString() === slug),
     );
+    if (!product) {
+      return res.status(404).send("Product not found");
+    }
     const storeName = post.vendorId?.businessName || "ShopyDash Store";
     const frontendUrl = process.env.FRONTEND_URL
       ? `${process.env.FRONTEND_URL}/product/${slug}`

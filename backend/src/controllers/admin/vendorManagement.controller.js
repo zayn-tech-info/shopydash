@@ -25,7 +25,7 @@ const getVendors = asyncErrorHandler(async (req, res) => {
 
   // Build VendorProfile filter
   const vendorFilter = {};
-  if (status) vendorFilter.status = status;
+  if (status) vendorFilter.activeStatus = status;
   if (kycStatus) vendorFilter.kycStatus = kycStatus;
 
   // Build User filter for search
@@ -154,7 +154,7 @@ const updateVendorStatus = asyncErrorHandler(async (req, res) => {
 
   const vendor = await VendorProfile.findByIdAndUpdate(
     req.params.id,
-    { status },
+    { activeStatus: status },
     { new: true, runValidators: true }
   ).populate("userId", "fullName email");
 

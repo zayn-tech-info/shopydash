@@ -157,8 +157,49 @@ const sendPasswordResetEmail = async (email, code) => {
   }
 };
 
+const sendBuyerMatchSummaryEmail = async (
+  email,
+  userName,
+  { categoryCount, categories, feedLink }
+) => {
+  try {
+    const categoriesText =
+      Array.isArray(categories) && categories.length > 0
+        ? categories.join(", ")
+        : "your preferred categories";
+    const feedUrl =
+      feedLink && feedLink.startsWith("http") ? feedLink : `https://app.shopydash.com${feedLink || "/feed"}`;
+
+    const content = `
+      <p style="color: #4a4a4a; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+        Hello ${userName},
+      </p>
+      <p style="color: #4a4a4a; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+        New listings in <strong>${categoriesText}</strong> match your interests. Check your feed to see what's new.
+      </p>
+      
+      <div style="text-align: center; margin-top: 30px;">
+        <a href="${feedUrl}" style="background-color: #F7561B; color: #ffffff; text-decoration: none; padding: 12px 30px; border-radius: 6px; font-weight: 600; font-size: 16px; display: inline-block; box-shadow: 0 4px 6px rgba(247, 86, 27, 0.2);">View feed</a>
+      </div>
+    `;
+
+    const data = await transport.sendMail({
+      from: { address: "noreply@shopydash.com", name: "Shopydash" },
+      to: email,
+      subject: "New listings match your interests – ShopyDash",
+      html: generateEmailLayout("New listings match your interests", content),
+    });
+
+    return data;
+  } catch (error) {
+    console.error("Error sending buyer match summary email:", error);
+    throw error;
+  }
+};
+
 module.exports = {
   sendVerificationEmail,
   sendOrderNotificationEmail,
   sendPasswordResetEmail,
+  sendBuyerMatchSummaryEmail,
 };

@@ -1,5 +1,4 @@
 import { Edit, Share2, Plus, LogOut, Settings } from "lucide-react";
-import ConfirmationModal from "../common/ConfirmationModal";
 import SubscriptionBadge from "../common/SubscriptionBadge";
 import UserAvatar from "../UserAvatar";
 import { useVendorProfileStore } from "../../store/vendorProfileStore";
@@ -56,8 +55,6 @@ export default function VendorSidebar({
     }
   };
 
-  const [showPremiumModal, setShowPremiumModal] = useState(false);
-  const [whatsappNumber, setWhatsappNumber] = useState("");
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const handleMessage = async () => {
@@ -74,20 +71,7 @@ export default function VendorSidebar({
     if (result.allowed) {
       await fetchMessages(result.conversation._id);
       navigate("/messages");
-    } else if (result.action === "REDIRECT_WHATSAPP") {
-      setWhatsappNumber(result.data.phoneNumber || result.data.whatsAppNumber);
-      setShowPremiumModal(true);
     }
-  };
-
-  const handleContinueToWhatsapp = () => {
-    if (whatsappNumber) {
-      const formattedNumber = whatsappNumber.replace(/\D/g, "");
-      window.open(`https://wa.me/${formattedNumber}`, "_blank");
-    } else {
-      toast.error("Vendor WhatsApp not available");
-    }
-    setShowPremiumModal(false);
   };
 
   return (
@@ -186,16 +170,6 @@ export default function VendorSidebar({
           </div>
         )}
       </div>
-
-      <ConfirmationModal
-        isOpen={showPremiumModal}
-        onClose={() => setShowPremiumModal(false)}
-        onConfirm={handleContinueToWhatsapp}
-        title="Premium Vendor Only"
-        message="This vendor is not on our Premium plan"
-        confirmText="Continue to WhatsApp"
-        cancelText="Cancel"
-      />
 
       <AuthRequiredModal
         isOpen={isAuthModalOpen}

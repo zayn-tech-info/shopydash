@@ -98,6 +98,7 @@ const getMyPosts = asyncErrorHandler(async (req, res, next) => {
 
 const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
   const { school, page = 1, limit = 10 } = req.query;
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
   const query = {};
   if (school) {
@@ -116,22 +117,8 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
     ];
   }
 
-  // Only filter by location if explicitly requested
-  // Comment out automatic user location filtering to show all products by default
-  /*
-  if (!school && !req.query.area) {
-    if (req.user) {
-      if (req.user.state) query.state = req.user.state;
-      if (req.user.area) query.area = req.user.area;
-    } else if (req.query.state && req.query.area) {
-      query.state = req.query.state;
-      query.area = req.query.area;
-    }
-  }
-  */
-
-  const pageLimit = Math.min(Math.max(parseInt(limit, 10) || 10, 1), 100);
-  const currentPage = Math.max(parseInt(page, 10) || 1, 1);
+  const pageLimit = Math.min(parseInt(limit), 50);
+  const currentPage = Math.max(parseInt(page), 1);
 
   const [posts, total] = await Promise.all([
     VendorPost.find(query)
@@ -521,8 +508,10 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
     limit = 50,
     excludedIds = [],
   } = req.query;
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
   const totalLimit = Math.min(parseInt(limit), 50);
+  const currentPage = Math.max(parseInt(page) || 1, 1);
   const premiumConfig = {
     targetRatio: 0.7,
     get count() {
@@ -530,6 +519,8 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
     },
   };
   const standardCount = totalLimit - premiumConfig.count;
+  const premiumSkip = (currentPage - 1) * premiumConfig.count;
+  const standardSkip = (currentPage - 1) * standardCount;
 
   const baseMatch = {};
   if (school) baseMatch.school = school;
@@ -604,6 +595,72 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
       $addFields: { subscription: { $arrayElemAt: ["$subscription", 0] } },
     });
 
+    // Social proof: vendor rating, review count, 7-day order count
+    pipe.push({
+      $lookup: {
+        from: "vendorprofiles",
+        localField: "vendorId",
+        foreignField: "userId",
+        as: "vendorProfileDoc",
+      },
+    });
+    pipe.push({
+      $addFields: {
+        vendorProfileId: { $arrayElemAt: ["$vendorProfileDoc._id", 0] },
+      },
+    });
+    pipe.push({
+      $lookup: {
+        from: "reviews",
+        let: { vendorProfileId: "$vendorProfileId" },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$vendor", "$$vendorProfileId"] } } },
+          {
+            $group: {
+              _id: null,
+              avgRating: { $avg: "$rating" },
+              reviewCount: { $sum: 1 },
+            },
+          },
+        ],
+        as: "reviewStats",
+      },
+    });
+    pipe.push({
+      $lookup: {
+        from: "orders",
+        let: { vendorProfileId: "$vendorProfileId" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ["$vendor", "$$vendorProfileId"] },
+                  { $gte: ["$createdAt", sevenDaysAgo] },
+                  { $eq: ["$paymentStatus", "paid"] },
+                ],
+              },
+            },
+          },
+          { $count: "count" },
+        ],
+        as: "weeklyOrdersArr",
+      },
+    });
+    pipe.push({
+      $addFields: {
+        ratingAvg: {
+          $ifNull: [{ $arrayElemAt: ["$reviewStats.avgRating", 0] }, 0],
+        },
+        reviewCount: {
+          $ifNull: [{ $arrayElemAt: ["$reviewStats.reviewCount", 0] }, 0],
+        },
+        weeklyOrders: {
+          $ifNull: [{ $arrayElemAt: ["$weeklyOrdersArr.count", 0] }, 0],
+        },
+      },
+    });
+
     const premiumPlans = ["Shopydash Max", "Shopydash Pro", "Shopydash Boost"];
     if (isPremium) {
       pipe.push({
@@ -645,7 +702,10 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
       pipe.push({ $sort: { createdAt: -1 } });
     }
 
-    pipe.push({ $limit: isPremium ? premiumConfig.count : standardCount });
+    const skip = isPremium ? premiumSkip : standardSkip;
+    const limitCount = isPremium ? premiumConfig.count : standardCount;
+    pipe.push({ $skip: skip });
+    pipe.push({ $limit: limitCount });
 
     pipe.push({
       $lookup: {
@@ -674,6 +734,9 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
         area: "$area",
         location: "$location",
         isBoosted: isPremium,
+        ratingAvg: 1,
+        reviewCount: 1,
+        weeklyOrders: 1,
         vendor: {
           _id: "$vendor._id",
           businessName: "$vendor.businessName",
@@ -702,10 +765,9 @@ const searchPosts = asyncErrorHandler(async (req, res, next) => {
     success: true,
     data: {
       products,
-      page: parseInt(page),
-      limit: parseInt(limit),
-
-      hasMore: products.length >= parseInt(limit),
+      page: currentPage,
+      limit: totalLimit,
+      hasMore: products.length >= totalLimit,
     },
   });
 });

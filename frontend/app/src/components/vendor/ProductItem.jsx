@@ -1,18 +1,6 @@
 import React from "react";
 import { Trash2, Upload, X, ImagePlus } from "lucide-react";
-
-const CATEGORIES = [
-  "Electronics",
-  "Fashion",
-  "Books",
-  "Food & Beverages",
-  "Sports & Fitness",
-  "Health & Beauty",
-  "Home & Living",
-  "Stationery",
-  "Services",
-  "Other",
-];
+import { preferredCategories } from "../../constants";
 
 const CONDITIONS = ["New", "Like New", "Good", "Fair", "Used"];
 
@@ -172,7 +160,7 @@ export const ProductItem = ({
                   Category
                 </label>
                 <select
-                  value={product.category}
+                  value={product.category || ""}
                   onChange={(e) =>
                     updateProduct(product.id, "category", e.target.value)
                   }
@@ -180,7 +168,7 @@ export const ProductItem = ({
                   required
                 >
                   <option value="">Select Category</option>
-                  {CATEGORIES.map((c) => (
+                  {preferredCategories.map((c) => (
                     <option key={c} value={c}>
                       {c}
                     </option>
