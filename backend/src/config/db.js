@@ -2,10 +2,6 @@ const mongoose = require("mongoose");
 const customError = require("../errors/customError");
 const { logInfo, logError } = require("../utils/logger");
 
-
-dns.setServers(["8.8.8.8", "8.8.4.4", "1.1.1.1"]);
-dns.setDefaultResultOrder("ipv4first");
-
 const connectDB = async () => {
   const isProduction = process.env.NODE_ENV === "production";
   let uri =

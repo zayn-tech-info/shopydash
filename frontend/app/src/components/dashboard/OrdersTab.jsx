@@ -75,7 +75,7 @@ function OrderCard({ order }) {
         {/* Action */}
         {order.status !== "delivered" && (
           <button
-            onClick={() => markOrderDelivered(order._id)}
+            onClick={() => markOrderDelivered(order._id, "vendor")}
             disabled={isMarkingDelivered}
             className="px-3 py-1.5 text-xs font-medium bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 transition-colors"
           >

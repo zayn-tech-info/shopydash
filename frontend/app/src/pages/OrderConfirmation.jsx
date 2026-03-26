@@ -7,6 +7,7 @@ import {
   Loader,
   ShoppingBag,
   ArrowRight,
+  Share2,
 } from "lucide-react";
 import { useCartStore } from "../store/cartStore";
 
@@ -128,6 +129,14 @@ export default function OrderConfirmation() {
           >
             Continue Shopping
           </Link>
+          <a
+            href={`https://wa.me/?text=${encodeURIComponent("Just ordered on Shopydash — the campus marketplace for students! 🛍️ Check it out: https://shopydash.com")}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 w-full py-3.5 bg-green-500 text-white rounded-xl font-semibold hover:bg-green-600 transition-colors"
+          >
+            <Share2 size={18} /> Share on WhatsApp
+          </a>
         </div>
       </div>
     </div>

@@ -199,7 +199,7 @@ const remove = asyncErrorHandler(async (req, res, next) => {
 
   await cart.save();
 
-  res.status(204).json({ cart });
+  res.status(200).json({ cart });
 });
 
 const clear = asyncErrorHandler(async (req, res, next) => {

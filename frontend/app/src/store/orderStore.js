@@ -14,7 +14,6 @@ export const useOrderStore = create((set, get) => ({
         params: { role },
       });
       set({ orders: res.data.data });
-      console.log(res);
     } catch (error) {
       console.error("Fetch Orders Error:", error);
       toast.error(error.response?.data?.message || "Failed to fetch orders");
@@ -23,13 +22,13 @@ export const useOrderStore = create((set, get) => ({
     }
   },
 
-  markOrderDelivered: async (orderId) => {
+  markOrderDelivered: async (orderId, role) => {
     set({ isMarkingDelivered: true });
     try {
       await api.put(`/api/v1/orders/${orderId}/deliver`);
       toast.success("Order confirmed! Funds released.");
 
-      await get().fetchOrders();
+      await get().fetchOrders(role);
     } catch (error) {
       console.error("Mark Delivered Error:", error);
       toast.error(error.response?.data?.message || "Action failed");

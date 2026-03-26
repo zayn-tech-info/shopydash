@@ -4,7 +4,7 @@ const customError = require("../../errors/customError");
 const VendorPost = require("../../models/vendorProduct");
 const VendorProfile = require("../../models/vendorProfile.model");
 const User = require("../../models/auth.model");
-const { createSafeRegex } = require("../../utils/regex");
+const { createSafeRegex, escapeRegex } = require("../../utils/regex");
 const plans = require("../../config/subscriptionPlans");
 
 const createPost = asyncErrorHandler(async (req, res, next) => {
@@ -29,11 +29,6 @@ const createPost = asyncErrorHandler(async (req, res, next) => {
   }
 
   const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000);
-
-  // NOTE: Previously, we enforced a per-12-hours post limit using
-  // limitConfig.postsPer12Hours and VendorPost.countDocuments here.
-  // This restriction has been intentionally removed so that all vendors
-  // can create an unlimited number of posts for now.
 
   const [vendorProfile, user] = await Promise.all([
     VendorProfile.findOne({ userId }).select("schoolName").lean(),
@@ -100,37 +95,159 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
   const { school, page = 1, limit = 10 } = req.query;
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
-  const query = {};
-  if (school) {
-    query.school = school;
-  }
-
-  if (req.query.area) {
-    query.area = createSafeRegex(req.query.area);
-  }
-
+  const matchStage = {};
+  if (school) matchStage.school = school;
+  if (req.query.area) matchStage.area = createSafeRegex(req.query.area);
   if (req.query.search) {
     const searchRegex = createSafeRegex(req.query.search);
-    query.$or = [
+    matchStage.$or = [
       { "products.title": searchRegex },
       { "products.description": searchRegex },
     ];
   }
 
-  const pageLimit = Math.min(parseInt(limit), 50);
-  const currentPage = Math.max(parseInt(page), 1);
+  const pageLimit = Math.min(parseInt(limit) || 10, 50);
+  const currentPage = Math.max(parseInt(page) || 1, 1);
+  const skip = (currentPage - 1) * pageLimit;
+
+  // Buyer's location — used for proximity scoring (null if not logged in)
+  const buyerSchool = req.user?.schoolName?.trim() || null;
+  const buyerArea = (req.user?.schoolArea || req.user?.area)?.trim() || null;
+
+  // Proximity expression: 2 = same area, 1 = same school, 0 = other/not logged in
+  const proximityExpr =
+    buyerArea || buyerSchool
+      ? {
+          $cond: [
+            buyerArea
+              ? {
+                  $regexMatch: {
+                    input: { $ifNull: ["$area", ""] },
+                    regex: escapeRegex(buyerArea),
+                    options: "i",
+                  },
+                }
+              : false,
+            2,
+            { $cond: [buyerSchool ? { $eq: ["$school", buyerSchool] } : false, 1, 0] },
+          ],
+        }
+      : 0;
+
+  const pipeline = [
+    ...(Object.keys(matchStage).length ? [{ $match: matchStage }] : []),
+
+    // Social proof — resolve vendor profile ID for review/order lookups
+    {
+      $lookup: {
+        from: "vendorprofiles",
+        localField: "vendorId",
+        foreignField: "userId",
+        as: "vendorProfileDoc",
+      },
+    },
+    { $addFields: { vendorProfileId: { $arrayElemAt: ["$vendorProfileDoc._id", 0] } } },
+
+    // Aggregate review stats per vendor
+    {
+      $lookup: {
+        from: "reviews",
+        let: { vpId: "$vendorProfileId" },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$vendor", "$$vpId"] } } },
+          {
+            $group: {
+              _id: null,
+              avgRating: { $avg: "$rating" },
+              reviewCount: { $sum: 1 },
+            },
+          },
+        ],
+        as: "reviewStats",
+      },
+    },
+
+    // Count paid orders in the last 7 days per vendor
+    {
+      $lookup: {
+        from: "orders",
+        let: { vpId: "$vendorProfileId" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ["$vendor", "$$vpId"] },
+                  { $gte: ["$createdAt", sevenDaysAgo] },
+                  { $eq: ["$paymentStatus", "paid"] },
+                ],
+              },
+            },
+          },
+          { $count: "count" },
+        ],
+        as: "weeklyOrdersArr",
+      },
+    },
+
+    {
+      $addFields: {
+        ratingAvg: { $ifNull: [{ $arrayElemAt: ["$reviewStats.avgRating", 0] }, 0] },
+        reviewCount: { $ifNull: [{ $arrayElemAt: ["$reviewStats.reviewCount", 0] }, 0] },
+        weeklyOrders: { $ifNull: [{ $arrayElemAt: ["$weeklyOrdersArr.count", 0] }, 0] },
+        proximityScore: proximityExpr,
+      },
+    },
+
+    { $sort: { proximityScore: -1, createdAt: -1 } },
+    { $skip: skip },
+    { $limit: pageLimit },
+
+    // Populate vendor user (mirrors .populate("vendorId", "..."))
+    {
+      $lookup: {
+        from: "users",
+        localField: "vendorId",
+        foreignField: "_id",
+        as: "_vendorUser",
+      },
+    },
+    {
+      $addFields: {
+        vendorId: {
+          $let: {
+            vars: { u: { $arrayElemAt: ["$_vendorUser", 0] } },
+            in: {
+              _id: "$$u._id",
+              businessName: "$$u.businessName",
+              fullName: "$$u.fullName",
+              phoneNumber: "$$u.phoneNumber",
+              username: "$$u.username",
+              profilePic: "$$u.profilePic",
+              subscriptionPlan: "$$u.subscriptionPlan",
+              isVerified: "$$u.isVerified",
+            },
+          },
+        },
+      },
+    },
+
+    // Remove internal pipeline fields (exclusion-only — no mixed include/exclude)
+    {
+      $project: {
+        vendorProfileDoc: 0,
+        vendorProfileId: 0,
+        reviewStats: 0,
+        weeklyOrdersArr: 0,
+        proximityScore: 0,
+        _vendorUser: 0,
+      },
+    },
+  ];
 
   const [posts, total] = await Promise.all([
-    VendorPost.find(query)
-      .populate(
-        "vendorId",
-        "businessName fullName phoneNumber username profilePic subscriptionPlan isVerified",
-      )
-      .sort({ createdAt: -1 })
-      .skip((currentPage - 1) * pageLimit)
-      .limit(pageLimit)
-      .lean(),
-    VendorPost.countDocuments(query),
+    VendorPost.aggregate(pipeline),
+    VendorPost.countDocuments(matchStage),
   ]);
 
   res.status(200).json({
