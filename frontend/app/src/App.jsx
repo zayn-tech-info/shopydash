@@ -92,7 +92,9 @@ const App = () => {
             (t) => (
               <div className="flex items-start gap-3">
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900">{n.title || "Notification"}</h3>
+                  <h3 className="font-semibold text-gray-900">
+                    {n.title || "Notification"}
+                  </h3>
                   <p className="text-sm text-gray-600">{n.message}</p>
                 </div>
               </div>
