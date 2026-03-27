@@ -229,6 +229,51 @@ export const useProductStore = create((set, get) => ({
     }
   },
 
+  searchFeaturedProducts: async (params = {}) => {
+    const { search, school, area } = params || {};
+    const trimmedSearch = typeof search === "string" ? search.trim() : "";
+    const filterParams = {};
+    if (school) filterParams.school = school;
+    if (area) filterParams.area = area;
+
+    set({ isFetchingFeaturedProducts: true });
+    try {
+      let products = [];
+      if (trimmedSearch) {
+        const res = await api.get("/api/v1/post/search", {
+          params: {
+            search: trimmedSearch,
+            ...filterParams,
+            limit: 100,
+          },
+        });
+        products = res.data?.data?.products ?? [];
+      } else {
+        const res = await api.post(
+          "/api/v1/post/feed/products/random",
+          { limit: 100 },
+          { params: filterParams },
+        );
+        products = res.data?.data?.products ?? [];
+      }
+
+      set({
+        featuredProducts: Array.isArray(products) ? products : [],
+        isFetchingFeaturedProducts: false,
+      });
+    } catch (error) {
+      set({ featuredProducts: [], isFetchingFeaturedProducts: false });
+      console.error(
+        "Featured search failed:",
+        error?.response?.status,
+        error?.message,
+      );
+      toast.error(
+        error.response?.data?.message || "Search failed. Please try again.",
+      );
+    }
+  },
+
   getMyPosts: async () => {
     set({ isFetchingPosts: true });
     try {

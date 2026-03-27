@@ -12,7 +12,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        </Routes>
+        </Routes> 
       </main>
       <Footer />
     </>

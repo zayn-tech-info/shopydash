@@ -4,8 +4,8 @@ import { Link, NavLink } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import { useCartStore } from "../store/cartStore";
 import useChatStore from "../store/chatStore";
-import { ShoppingCart } from "lucide-react";
-import { useEffect } from "react";
+import { ShoppingCart, Search } from "lucide-react";
+import { useEffect, useState } from "react";
 import Notifications from "./common/Notifications";
 
 export function Header() {
@@ -13,12 +13,25 @@ export function Header() {
   const cart = useCartStore((state) => state.cart);
   const { conversations, fetchConversations } = useChatStore();
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
+  const [showDesktopShortcut, setShowDesktopShortcut] = useState(false);
 
   useEffect(() => {
     if (authUser) {
       fetchConversations();
     }
   }, [authUser, fetchConversations]);
+
+  useEffect(() => {
+    const updateShortcutState = () => {
+      if (typeof window === "undefined") return;
+      const ua = navigator.userAgent || "";
+      const isTouchDevice = /Mobi|Android|iP(ad|hone)/i.test(ua);
+      setShowDesktopShortcut(!isTouchDevice && window.innerWidth >= 768);
+    };
+    updateShortcutState();
+    window.addEventListener("resize", updateShortcutState);
+    return () => window.removeEventListener("resize", updateShortcutState);
+  }, []);
 
   const unreadMessageCount = conversations.reduce((acc, conv) => {
     const count = conv.unreadCounts?.[authUser?._id] || 0;
@@ -41,6 +54,11 @@ export function Header() {
     }
   };
 
+  const openGlobalSearch = () => {
+    if (typeof window === "undefined") return;
+    window.dispatchEvent(new CustomEvent("open-feeds-search"));
+  };
+
   return (
     <div className="">
       <header className="sticky top-0 z-50 bg-n-1 md:bg-n-1/90 md:backdrop-blur-sm shadow-md">
@@ -56,6 +74,15 @@ export function Header() {
           </Link>
 
           <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={openGlobalSearch}
+              data-feeds-search-trigger
+              className="md:hidden inline-flex items-center gap-2 rounded-full bg-primary-3/90 px-3 py-2 text-sm font-semibold text-white shadow-lg backdrop-blur"
+            >
+              <Search size={16} />
+              <span>Search</span>
+            </button>
             {authUser && (
               <div className="md:hidden">
                 <Notifications />
@@ -130,6 +157,19 @@ export function Header() {
               })}
               {}
             </ul>
+
+            <button
+              type="button"
+              onClick={openGlobalSearch}
+              data-feeds-search-trigger
+              className="hidden md:inline-flex items-center gap-3 rounded-full bg-primary-3 px-4 py-2 text-sm font-semibold text-white shadow-lg transition hover:bg-primary-2"
+            >
+              <Search size={16} className="opacity-80" />
+              <span>Search</span>
+              {showDesktopShortcut && (
+                <span className="rounded-full bg-white/20 px-2 py-0.5 text-[11px] font-bold tracking-[0.2em] uppercase">Ctrl K</span>
+              )}
+            </button>
 
             {authUser && (
               <div className="mr-5">

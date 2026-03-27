@@ -129,7 +129,13 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
                 }
               : false,
             2,
-            { $cond: [buyerSchool ? { $eq: ["$school", buyerSchool] } : false, 1, 0] },
+            {
+              $cond: [
+                buyerSchool ? { $eq: ["$school", buyerSchool] } : false,
+                1,
+                0,
+              ],
+            },
           ],
         }
       : 0;
@@ -146,7 +152,11 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
         as: "vendorProfileDoc",
       },
     },
-    { $addFields: { vendorProfileId: { $arrayElemAt: ["$vendorProfileDoc._id", 0] } } },
+    {
+      $addFields: {
+        vendorProfileId: { $arrayElemAt: ["$vendorProfileDoc._id", 0] },
+      },
+    },
 
     // Aggregate review stats per vendor
     {
@@ -192,9 +202,15 @@ const getFeedPosts = asyncErrorHandler(async (req, res, next) => {
 
     {
       $addFields: {
-        ratingAvg: { $ifNull: [{ $arrayElemAt: ["$reviewStats.avgRating", 0] }, 0] },
-        reviewCount: { $ifNull: [{ $arrayElemAt: ["$reviewStats.reviewCount", 0] }, 0] },
-        weeklyOrders: { $ifNull: [{ $arrayElemAt: ["$weeklyOrdersArr.count", 0] }, 0] },
+        ratingAvg: {
+          $ifNull: [{ $arrayElemAt: ["$reviewStats.avgRating", 0] }, 0],
+        },
+        reviewCount: {
+          $ifNull: [{ $arrayElemAt: ["$reviewStats.reviewCount", 0] }, 0],
+        },
+        weeklyOrders: {
+          $ifNull: [{ $arrayElemAt: ["$weeklyOrdersArr.count", 0] }, 0],
+        },
         proximityScore: proximityExpr,
       },
     },
@@ -377,15 +393,16 @@ const getFeedProductsRandom = asyncErrorHandler(async (req, res, next) => {
     { $count: "total" },
   ];
 
-  const samplePipeline = [
-    { $match: query },
-    { $unwind: "$products" },
-  ];
+  const samplePipeline = [{ $match: query }, { $unwind: "$products" }];
   if (query["products.category"]) {
-    samplePipeline.push({ $match: { "products.category": query["products.category"] } });
+    samplePipeline.push({
+      $match: { "products.category": query["products.category"] },
+    });
   }
   if (excludedObjectIds.length > 0) {
-    samplePipeline.push({ $match: { "products._id": { $nin: excludedObjectIds } } });
+    samplePipeline.push({
+      $match: { "products._id": { $nin: excludedObjectIds } },
+    });
   }
   samplePipeline.push({ $sample: { size: limit } });
   samplePipeline.push({
@@ -476,18 +493,17 @@ const getProductById = asyncErrorHandler(async (req, res, next) => {
     mongoose.Types.ObjectId.isValid(productId) &&
     String(new mongoose.Types.ObjectId(productId)) === productId;
 
-  const matchStage =
-    isValidObjectId
-      ? [
-          { $match: { "products._id": new mongoose.Types.ObjectId(productId) } },
-          { $unwind: "$products" },
-          { $match: { "products._id": new mongoose.Types.ObjectId(productId) } },
-        ]
-      : [
-          { $match: { "products.slug": productId } },
-          { $unwind: "$products" },
-          { $match: { "products.slug": productId } },
-        ];
+  const matchStage = isValidObjectId
+    ? [
+        { $match: { "products._id": new mongoose.Types.ObjectId(productId) } },
+        { $unwind: "$products" },
+        { $match: { "products._id": new mongoose.Types.ObjectId(productId) } },
+      ]
+    : [
+        { $match: { "products.slug": productId } },
+        { $unwind: "$products" },
+        { $match: { "products.slug": productId } },
+      ];
 
   const pipeline = [
     ...matchStage,
@@ -616,275 +632,209 @@ const update = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
-const searchPosts = asyncErrorHandler(async (req, res, next) => {
-  const {
-    search,
-    school,
-    area,
-    page = 1,
-    limit = 50,
-    excludedIds = [],
-  } = req.query;
-  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+const searchPosts = asyncErrorHandler(async (req, res) => {
+  const rawSearch =
+    typeof req.query.search === "string" ? req.query.search.trim() : "";
+  const { school, area, page = 1, limit = 50, excludedIds = [] } = req.query;
 
-  const totalLimit = Math.min(parseInt(limit), 50);
-  const currentPage = Math.max(parseInt(page) || 1, 1);
-  const premiumConfig = {
-    targetRatio: 0.7,
-    get count() {
-      return Math.round(totalLimit * this.targetRatio);
-    },
-  };
-  const standardCount = totalLimit - premiumConfig.count;
-  const premiumSkip = (currentPage - 1) * premiumConfig.count;
-  const standardSkip = (currentPage - 1) * standardCount;
+  const pageSize = Math.min(Math.max(parseInt(limit, 10) || 20, 1), 100);
+  const currentPage = Math.max(parseInt(page, 10) || 1, 1);
+  const skip = (currentPage - 1) * pageSize;
 
   const baseMatch = {};
   if (school) baseMatch.school = school;
   if (area) baseMatch.area = createSafeRegex(area);
 
-  let excludeArray = [];
+  const searchRegex = rawSearch ? createSafeRegex(rawSearch) : null;
+
+  let excludeObjectIds = [];
   if (excludedIds) {
-    if (Array.isArray(excludedIds)) excludeArray = excludedIds;
-    else if (typeof excludedIds === "string")
-      excludeArray = excludedIds.split(",");
+    const rawIds = Array.isArray(excludedIds)
+      ? excludedIds
+      : typeof excludedIds === "string"
+        ? excludedIds.split(",")
+        : [];
+
+    excludeObjectIds = rawIds
+      .map((id) => {
+        try {
+          return new mongoose.Types.ObjectId(id.trim());
+        } catch (error) {
+          return null;
+        }
+      })
+      .filter(Boolean);
   }
 
-  const buildPipeline = (isPremium) => {
-    const pipe = [];
+  const pipeline = [];
+  if (Object.keys(baseMatch).length > 0) {
+    pipeline.push({ $match: baseMatch });
+  }
 
-    if (Object.keys(baseMatch).length > 0) {
-      pipe.push({ $match: baseMatch });
-    }
+  pipeline.push({ $unwind: "$products" });
 
-    pipe.push({ $unwind: "$products" });
+  if (excludeObjectIds.length > 0) {
+    pipeline.push({
+      $match: {
+        "products._id": { $nin: excludeObjectIds },
+      },
+    });
+  }
 
-    if (search) {
-      pipe.push({
-        $match: {
-          "products.title": createSafeRegex(search),
+  pipeline.push({
+    $lookup: {
+      from: "users",
+      localField: "vendorId",
+      foreignField: "_id",
+      as: "vendorUser",
+    },
+  });
+  pipeline.push({
+    $unwind: { path: "$vendorUser", preserveNullAndEmptyArrays: true },
+  });
+
+  if (searchRegex) {
+    pipeline.push({
+      $addFields: {
+        titleMatch: {
+          $regexMatch: {
+            input: { $ifNull: ["$products.title", ""] },
+            regex: searchRegex.$regex,
+            options: searchRegex.$options,
+          },
         },
-      });
-    }
+        vendorMatch: {
+          $regexMatch: {
+            input: {
+              $trim: {
+                input: {
+                  $concat: [
+                    { $ifNull: ["$vendorUser.businessName", ""] },
+                    " ",
+                    { $ifNull: ["$vendorUser.username", ""] },
+                    " ",
+                    { $ifNull: ["$vendorUser.fullName", ""] },
+                  ],
+                },
+              },
+            },
+            regex: searchRegex.$regex,
+            options: searchRegex.$options,
+          },
+        },
+      },
+    });
 
-    if (excludeArray.length > 0) {
-      const objectIds = excludeArray
-        .map((id) => {
-          try {
-            return new mongoose.Types.ObjectId(id);
-          } catch (e) {
-            return null;
-          }
-        })
-        .filter(Boolean);
+    pipeline.push({
+      $match: {
+        $or: [{ titleMatch: true }, { vendorMatch: true }],
+      },
+    });
 
-      if (objectIds.length > 0) {
-        pipe.push({
+    pipeline.push({
+      $addFields: {
+        matchPriority: {
+          $cond: [{ $eq: ["$titleMatch", true] }, 0, 1],
+        },
+      },
+    });
+  } else {
+    pipeline.push({
+      $addFields: {
+        matchPriority: 0,
+      },
+    });
+  }
+
+  pipeline.push({
+    $lookup: {
+      from: "subscriptions",
+      let: { vendorId: "$vendorId" },
+      pipeline: [
+        {
           $match: {
-            "products._id": { $nin: objectIds },
-          },
-        });
-      }
-    }
-
-    pipe.push({
-      $lookup: {
-        from: "subscriptions",
-        let: { vendorId: "$vendorId" },
-        pipeline: [
-          {
-            $match: {
-              $expr: {
-                $and: [
-                  { $eq: ["$user", "$$vendorId"] },
-                  { $eq: ["$status", "active"] },
-                  { $gt: ["$endDate", new Date()] },
-                ],
-              },
-            },
-          },
-        ],
-        as: "subscription",
-      },
-    });
-
-    pipe.push({
-      $addFields: { subscription: { $arrayElemAt: ["$subscription", 0] } },
-    });
-
-    // Social proof: vendor rating, review count, 7-day order count
-    pipe.push({
-      $lookup: {
-        from: "vendorprofiles",
-        localField: "vendorId",
-        foreignField: "userId",
-        as: "vendorProfileDoc",
-      },
-    });
-    pipe.push({
-      $addFields: {
-        vendorProfileId: { $arrayElemAt: ["$vendorProfileDoc._id", 0] },
-      },
-    });
-    pipe.push({
-      $lookup: {
-        from: "reviews",
-        let: { vendorProfileId: "$vendorProfileId" },
-        pipeline: [
-          { $match: { $expr: { $eq: ["$vendor", "$$vendorProfileId"] } } },
-          {
-            $group: {
-              _id: null,
-              avgRating: { $avg: "$rating" },
-              reviewCount: { $sum: 1 },
-            },
-          },
-        ],
-        as: "reviewStats",
-      },
-    });
-    pipe.push({
-      $lookup: {
-        from: "orders",
-        let: { vendorProfileId: "$vendorProfileId" },
-        pipeline: [
-          {
-            $match: {
-              $expr: {
-                $and: [
-                  { $eq: ["$vendor", "$$vendorProfileId"] },
-                  { $gte: ["$createdAt", sevenDaysAgo] },
-                  { $eq: ["$paymentStatus", "paid"] },
-                ],
-              },
-            },
-          },
-          { $count: "count" },
-        ],
-        as: "weeklyOrdersArr",
-      },
-    });
-    pipe.push({
-      $addFields: {
-        ratingAvg: {
-          $ifNull: [{ $arrayElemAt: ["$reviewStats.avgRating", 0] }, 0],
-        },
-        reviewCount: {
-          $ifNull: [{ $arrayElemAt: ["$reviewStats.reviewCount", 0] }, 0],
-        },
-        weeklyOrders: {
-          $ifNull: [{ $arrayElemAt: ["$weeklyOrdersArr.count", 0] }, 0],
-        },
-      },
-    });
-
-    const premiumPlans = ["Shopydash Max", "Shopydash Pro", "Shopydash Boost"];
-    if (isPremium) {
-      pipe.push({
-        $match: {
-          "subscription.plan": { $in: premiumPlans },
-        },
-      });
-
-      pipe.push({
-        $addFields: {
-          planWeight: {
-            $switch: {
-              branches: [
-                {
-                  case: { $eq: ["$subscription.plan", "Shopydash Max"] },
-                  then: 3,
-                },
-                {
-                  case: { $eq: ["$subscription.plan", "Shopydash Pro"] },
-                  then: 2,
-                },
-                {
-                  case: { $eq: ["$subscription.plan", "Shopydash Boost"] },
-                  then: 1,
-                },
+            $expr: {
+              $and: [
+                { $eq: ["$user", "$$vendorId"] },
+                { $eq: ["$status", "active"] },
+                { $gt: ["$endDate", new Date()] },
               ],
-              default: 0,
             },
           },
         },
-      });
-      pipe.push({ $sort: { planWeight: -1, createdAt: -1 } });
-    } else {
-      pipe.push({
-        $match: {
-          "subscription.plan": { $nin: premiumPlans },
-        },
-      });
-      pipe.push({ $sort: { createdAt: -1 } });
-    }
+      ],
+      as: "subscription",
+    },
+  });
 
-    const skip = isPremium ? premiumSkip : standardSkip;
-    const limitCount = isPremium ? premiumConfig.count : standardCount;
-    pipe.push({ $skip: skip });
-    pipe.push({ $limit: limitCount });
-
-    pipe.push({
-      $lookup: {
-        from: "users",
-        localField: "vendorId",
-        foreignField: "_id",
-        as: "vendor",
-      },
-    });
-    pipe.push({
-      $unwind: { path: "$vendor", preserveNullAndEmptyArrays: true },
-    });
-
-    pipe.push({
-      $project: {
-        _id: "$products._id",
-        title: "$products.title",
-        price: "$products.price",
-        image: "$products.image",
-        description: "$products.description",
-        condition: "$products.condition",
-        category: "$products.category",
-        postId: { $toString: "$_id" },
-        postedAt: "$createdAt",
-        school: "$school",
-        area: "$area",
-        location: "$location",
-        isBoosted: isPremium,
-        ratingAvg: 1,
-        reviewCount: 1,
-        weeklyOrders: 1,
-        vendor: {
-          _id: "$vendor._id",
-          businessName: "$vendor.businessName",
-          username: "$vendor.username",
-          profilePic: "$vendor.profilePic",
-          phoneNumber: "$vendor.phoneNumber",
-          subscriptionPlan: "$vendor.subscriptionPlan",
+  pipeline.push({
+    $addFields: {
+      subscription: { $arrayElemAt: ["$subscription", 0] },
+      planWeight: {
+        $switch: {
+          branches: [
+            { case: { $eq: ["$subscription.plan", "Shopydash Max"] }, then: 3 },
+            { case: { $eq: ["$subscription.plan", "Shopydash Pro"] }, then: 2 },
+            {
+              case: { $eq: ["$subscription.plan", "Shopydash Boost"] },
+              then: 1,
+            },
+          ],
+          default: 0,
         },
       },
-    });
+    },
+  });
 
-    return pipe;
-  };
+  pipeline.push({
+    $sort: {
+      matchPriority: 1,
+      planWeight: -1,
+      createdAt: -1,
+    },
+  });
 
-  const [premiumPosts, standardPosts] = await Promise.all([
-    VendorPost.aggregate(buildPipeline(true)),
-    VendorPost.aggregate(buildPipeline(false)),
-  ]);
+  pipeline.push({ $skip: skip });
+  pipeline.push({ $limit: pageSize + 1 });
 
-  const merged = [];
-  const maxLen = Math.max(premiumPosts.length, standardPosts.length);
+  pipeline.push({
+    $project: {
+      _id: "$products._id",
+      title: "$products.title",
+      price: "$products.price",
+      image: "$products.image",
+      images: "$products.images",
+      description: "$products.description",
+      condition: "$products.condition",
+      category: "$products.category",
+      postId: { $toString: "$_id" },
+      postedAt: "$createdAt",
+      school: "$school",
+      area: "$area",
+      location: "$location",
+      isBoosted: { $gt: ["$planWeight", 0] },
+      vendor: {
+        _id: "$vendorUser._id",
+        businessName: "$vendorUser.businessName",
+        username: "$vendorUser.username",
+        profilePic: "$vendorUser.profilePic",
+        phoneNumber: "$vendorUser.phoneNumber",
+        subscriptionPlan: "$vendorUser.subscriptionPlan",
+      },
+    },
+  });
 
-  const products = [...premiumPosts, ...standardPosts];
+  const results = await VendorPost.aggregate(pipeline);
+  const hasMore = results.length > pageSize;
+  const products = hasMore ? results.slice(0, pageSize) : results;
 
   res.status(200).json({
     success: true,
     data: {
       products,
       page: currentPage,
-      limit: totalLimit,
-      hasMore: products.length >= totalLimit,
+      limit: pageSize,
+      hasMore,
     },
   });
 });

@@ -26,13 +26,11 @@ export function HomeContent({
   const [isSearchActive, setIsSearchActive] = useState(false);
   const dropdownRef = useRef(null);
 
-  
   const [selectedSchool, setSelectedSchool] = useState("");
   const [schools, setSchools] = useState([]);
   const [loadingSchools, setLoadingSchools] = useState(false);
   const [showSchoolDropdown, setShowSchoolDropdown] = useState(false);
 
-  
   const [selectedLocation, setSelectedLocation] = useState("");
   const [areaSuggestions, setAreaSuggestions] = useState([]);
   const [loadingAreas, setLoadingAreas] = useState(false);
@@ -40,7 +38,6 @@ export function HomeContent({
   const locationDropdownRef = useRef(null);
   const schoolDropdownRef = useRef(null);
 
-  
   useEffect(() => {
     const fetchSchools = async () => {
       try {
@@ -59,7 +56,6 @@ export function HomeContent({
     fetchSchools();
   }, []);
 
-  
   useEffect(() => {
     const fetchAreas = async () => {
       if (!selectedSchool) {
@@ -89,7 +85,6 @@ export function HomeContent({
     return () => clearTimeout(delayDebounceFn);
   }, [selectedLocation, selectedSchool]);
 
-  
   useEffect(() => {
     function handleClickOutside(event) {
       if (
@@ -114,7 +109,6 @@ export function HomeContent({
     if (onSubmit) {
       onSubmit(value);
     } else {
-      
       const params = new URLSearchParams();
       if (value) params.append("search", value);
       if (selectedSchool) params.append("school", selectedSchool);
@@ -168,249 +162,50 @@ export function HomeContent({
               )}
             </div>
 
-            <div
-              className={`w-full md:max-w-lg transition-all duration-300 ${
-                isSearchActive ? "z-50 relative" : "relative"
-              }`}
-            >
-              <div
-                className={`bg-white transition-all duration-300 ease-out ${
-                  isSearchActive
-                    ? "rounded-2xl shadow-2xl ring-1 ring-n-3/10"
-                    : "rounded-xl"
-                }`}
-              >
-                <form
-                  onSubmit={handleSubmit}
-                  className="relative"
-                  role="search"
-                >
-                  <div
-                    className={`relative transition-all duration-300 ${
-                      isSearchActive ? "p-3" : ""
-                    }`}
-                  >
-                    {}
-                    <div className="relative group">
-                      <Search
-                        className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-300 ${
-                          isSearchActive
-                            ? "text-n-4"
-                            : "text-n-4 group-hover:text-primary-3"
-                        }`}
-                        size={20}
-                      />
 
-                      <input
-                        type="text"
-                        value={value}
-                        onChange={onChange}
-                        onFocus={() => setIsSearchActive(true)}
-                        placeholder={placeholder}
-                        aria-label="text"
-                        className={`w-full h-11 md:h-12 bg-n-2/30 border border-transparent outline-none text-sm md:text-base text-n-8 placeholder:text-n-4/60 transition-all duration-300 ${
-                          isSearchActive
-                            ? "rounded-xl pl-10 pr-9 focus:bg-n-2/50"
-                            : "rounded-xl pl-10 pr-12 focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10"
-                        }`}
-                      />
-
-                      {/* Search Button */}
-                      <div className="absolute right-1.5 top-1/2 -translate-y-1/2">
-                        {isSearchActive ? (
-                          <button
-                            type="button"
-                            onClick={() => setIsSearchActive(false)}
-                            className="p-2 hover:bg-n-3/20 rounded-full text-n-4 transition-colors"
-                          >
-                            <X size={18} />
-                          </button>
-                        ) : (
-                          <button
-                            type="submit"
-                            className="p-2 bg-primary-3 text-white rounded-lg hover:bg-primary-4 transition-all shadow-sm shadow-primary-3/20 hover:shadow-md hover:shadow-primary-3/30"
-                          >
-                            <SearchIcon size={18} />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Filter Options */}
-                    <div
-                      className={`grid grid-cols-1 md:grid-cols-2 gap-4 transition-all duration-500 ease-in-out overflow-hidden ${
-                        isSearchActive
-                          ? "max-h-60 opacity-100 mt-4 px-1 pb-1 overflow-visible"
-                          : "max-h-0 opacity-0 mt-0"
-                      }`}
-                    >
-                      {}
-                      <div
-                        className="space-y-2 relative"
-                        ref={schoolDropdownRef}
-                      >
-                        <label className="text-xs font-bold text-n-4 uppercase tracking-wider flex items-center gap-2 ml-1">
-                          <School size={14} /> School
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            value={selectedSchool}
-                            onChange={(e) => {
-                              setSelectedSchool(e.target.value);
-                              setShowSchoolDropdown(true);
-                            }}
-                            onFocus={() => setShowSchoolDropdown(true)}
-                            placeholder="All Schools"
-                            className="w-full h-11 px-4 pr-10 rounded-xl bg-n-2/30 border border-transparent outline-none text-sm text-n-8 focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all cursor-pointer"
-                          />
-                          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-n-4">
-                            {loadingSchools ? (
-                              <Loader className="animate-spin w-4 h-4" />
-                            ) : (
-                              <ChevronDown
-                                className={`w-4 h-4 transition-transform ${
-                                  showSchoolDropdown ? "rotate-180" : ""
-                                }`}
-                              />
-                            )}
-                          </div>
-
-                          {showSchoolDropdown && (
-                            <div className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-n-3/10 max-h-60 overflow-y-auto py-2">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setSelectedSchool("");
-                                  setShowSchoolDropdown(false);
-                                }}
-                                className="w-full px-4 py-2 text-left text-sm text-n-6 hover:bg-primary-3/5 hover:text-primary-3 transition-colors flex items-center justify-between"
-                              >
-                                <span className="font-medium">All Schools</span>
-                                {selectedSchool === "" && (
-                                  <Check className="w-4 h-4 text-primary-3" />
-                                )}
-                              </button>
-                              {schools
-                                .filter((s) =>
-                                  s
-                                    .toLowerCase()
-                                    .includes(selectedSchool.toLowerCase())
-                                )
-                                .map((school, index) => (
-                                  <button
-                                    key={index}
-                                    type="button"
-                                    onClick={() => {
-                                      setSelectedSchool(school);
-                                      setShowSchoolDropdown(false);
-                                      setSelectedLocation("");
-                                    }}
-                                    className="w-full px-4 py-2 text-left text-sm text-n-6 hover:bg-primary-3/5 hover:text-primary-3 transition-colors flex items-center justify-between"
-                                  >
-                                    <span>{school}</span>
-                                    {selectedSchool === school && (
-                                      <Check className="w-4 h-4 text-primary-3" />
-                                    )}
-                                  </button>
-                                ))}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {}
-                      <div
-                        className="space-y-2 relative"
-                        ref={locationDropdownRef}
-                      >
-                        <label className="text-xs font-bold text-n-4 uppercase tracking-wider flex items-center gap-2 ml-1">
-                          <MapPin size={14} /> Location
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            placeholder={
-                              selectedSchool
-                                ? `Filter by location around...`
-                                : "Select a school first"
-                            }
-                            value={selectedLocation}
-                            onChange={(e) => {
-                              setSelectedLocation(e.target.value);
-                              setShowLocationDropdown(true);
-                            }}
-                            onFocus={() => setShowLocationDropdown(true)}
-                            disabled={!selectedSchool}
-                            className={`w-full h-11 px-4 pr-10 rounded-xl bg-n-2/30 border border-transparent outline-none text-sm text-n-8 focus:bg-white focus:border-primary-3 focus:ring-4 focus:ring-primary-3/10 transition-all ${
-                              !selectedSchool
-                                ? "opacity-50 cursor-not-allowed"
-                                : ""
-                            }`}
-                          />
-                          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-n-4">
-                            {loadingAreas ? (
-                              <Loader className="animate-spin w-4 h-4" />
-                            ) : (
-                              <ChevronDown
-                                className={`w-4 h-4 transition-transform ${
-                                  showLocationDropdown ? "rotate-180" : ""
-                                }`}
-                              />
-                            )}
-                          </div>
-                          {showLocationDropdown && selectedSchool && (
-                            <div className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-n-3/10 max-h-60 overflow-y-auto py-2">
-                              {areaSuggestions.length > 0 ? (
-                                areaSuggestions.map((area, index) => (
-                                  <button
-                                    key={index}
-                                    type="button"
-                                    onClick={() => {
-                                      setSelectedLocation(area);
-                                      setShowLocationDropdown(false);
-                                    }}
-                                    className="w-full px-4 py-2 text-left text-sm text-n-6 hover:bg-primary-3/5 hover:text-primary-3 transition-colors flex items-center justify-between"
-                                  >
-                                    <span>{area}</span>
-                                    {selectedLocation === area && (
-                                      <Check className="w-4 h-4 text-primary-3" />
-                                    )}
-                                  </button>
-                                ))
-                              ) : (
-                                <div className="px-4 py-2 text-sm text-n-4">
-                                  No areas found
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </form>
-              </div>
-            </div>
           </div>
 
           {/* Categories Section */}
           <div className="relative mt-6 md:mt-8 mb-4">
             {/* Fade indicators for scroll hint */}
-              <div className="pointer-events-none select-none absolute left-0 top-0 h-full w-10 z-5 block md:hidden" style={{background: 'linear-gradient(to right, #fff 70%, transparent)'}} />
-              <div className="pointer-events-none select-none absolute right-0 top-0 h-full w-10 z-5 block md:hidden" style={{background: 'linear-gradient(to left, #fff 70%, transparent)'}} />
+            <div
+              className="pointer-events-none select-none absolute left-0 top-0 h-full w-10 z-5 block md:hidden"
+              style={{
+                background: "linear-gradient(to right, #fff 70%, transparent)",
+              }}
+            />
+            <div
+              className="pointer-events-none select-none absolute right-0 top-0 h-full w-10 z-5 block md:hidden"
+              style={{
+                background: "linear-gradient(to left, #fff 70%, transparent)",
+              }}
+            />
             <button
               type="button"
               aria-label="Scroll categories left"
               className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-gradient-to-r from-white/90 via-white/70 to-transparent hover:from-primary-3/90 hover:via-primary-3/80 hover:to-primary-3/60 text-primary-3 hover:text-white shadow-lg rounded-full p-2 transition-all duration-200 flex"
-              style={{ boxShadow: '0 4px 16px 0 rgba(0,0,0,0.10)' }}
+              style={{ boxShadow: "0 4px 16px 0 rgba(0,0,0,0.10)" }}
               onClick={() => {
-                document.getElementById('category-scroll').scrollBy({ left: -200, behavior: 'smooth' });
+                document
+                  .getElementById("category-scroll")
+                  .scrollBy({ left: -200, behavior: "smooth" });
               }}
             >
-              <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+              <svg
+                width="22"
+                height="22"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                viewBox="0 0 24 24"
+              >
+                <path d="M15 19l-7-7 7-7" />
+              </svg>
             </button>
-            <div id="category-scroll" className="w-full flex gap-4 md:gap-6 lg:gap-8 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0 md:justify-between md:flex-nowrap scroll-smooth">
+            <div
+              id="category-scroll"
+              className="w-full flex gap-4 md:gap-6 lg:gap-8 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0 md:justify-between md:flex-nowrap scroll-smooth"
+            >
               {categories.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -421,7 +216,13 @@ export function HomeContent({
                   >
                     <div className="flex flex-col items-center gap-2 md:gap-2.5">
                       <div className="w-14 h-14 md:w-16 md:h-16 lg:w-18 lg:h-18 rounded-full bg-n-2/40 group-hover:bg-primary-3/10 flex items-center justify-center text-n-6 group-hover:text-primary-3 transition-all duration-200 border border-n-3/20 group-hover:border-primary-3/30 shadow-sm">
-                        {Icon && <Icon size={22} className="md:w-6 md:h-6" strokeWidth={1.5} />}
+                        {Icon && (
+                          <Icon
+                            size={22}
+                            className="md:w-6 md:h-6"
+                            strokeWidth={1.5}
+                          />
+                        )}
                       </div>
                       <p className="text-xs md:text-sm font-semibold text-n-6 group-hover:text-primary-3 transition-colors whitespace-nowrap">
                         {item.text}
@@ -435,12 +236,23 @@ export function HomeContent({
               type="button"
               aria-label="Scroll categories right"
               className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-gradient-to-l from-white/90 via-white/70 to-transparent hover:from-primary-3/90 hover:via-primary-3/80 hover:to-primary-3/60 text-primary-3 hover:text-white shadow-lg rounded-full p-2 transition-all duration-200 flex"
-              style={{ boxShadow: '0 4px 16px 0 rgba(0,0,0,0.10)' }}
+              style={{ boxShadow: "0 4px 16px 0 rgba(0,0,0,0.10)" }}
               onClick={() => {
-                document.getElementById('category-scroll').scrollBy({ left: 200, behavior: 'smooth' });
+                document
+                  .getElementById("category-scroll")
+                  .scrollBy({ left: 200, behavior: "smooth" });
               }}
             >
-              <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+              <svg
+                width="22"
+                height="22"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                viewBox="0 0 24 24"
+              >
+                <path d="M9 5l7 7-7 7" />
+              </svg>
             </button>
           </div>
         </div>
